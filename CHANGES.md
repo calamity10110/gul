@@ -1,5 +1,46 @@
 # CHANGELOG
 
+## [0.6.0] - 2025-11-27
+
+### Added
+- **Reactive UI System**:
+  - Implemented `ReactiveState` for state management
+  - Created component system with props and children
+  - Added event handling and rendering infrastructure
+- **GPU Acceleration**:
+  - Added support for CUDA, OpenCL, Metal, and WebGPU backends
+  - Implemented device detection and selection
+  - Added kernel compilation and execution
+  - Implemented parallel map/reduce operations
+- **Distributed Runtime**:
+  - Implemented node management and status tracking
+  - Added Remote Procedure Call (RPC) system
+  - Implemented distributed state management
+  - Added load balancing and fault tolerance
+- **Advanced Linting**:
+  - Added performance linting (loop invariants, clones)
+  - Added security linting (SQL injection, XSS)
+  - Added code smell detection and architecture validation
+  - Implemented comprehensive lint reporting
+
+## [0.5.0] - 2025-11-27
+
+### Added
+- **Native Package Support**:
+  - Implemented `PackageRegistry` for dependency management
+  - Added support for 18 popular frameworks (Axum, Tokio, React, Django, etc.)
+  - Implemented dependency resolution and feature selection
+- **WASM Backend**:
+  - Added WASM bytecode generation
+  - Implemented optimization levels (Size, Speed, Balanced)
+  - Added JavaScript interop and browser API bindings
+- **Embedded Support**:
+  - Added support for ESP32, RP2040, STM32, Arduino, nRF52
+  - Implemented HAL bindings and memory constraint checking
+- **Mobile Support**:
+  - Added Android and iOS build configurations
+  - Implemented mobile UI components and native API bridges
+
 ## v0.3.0 — Phase 3 Complete: IDE & Tooling (2025-11-27)
 
 **Code Formatter:**
