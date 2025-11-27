@@ -1,3 +1,4 @@
+mod advanced;
 mod ast;
 mod compiler;
 mod lexer;
