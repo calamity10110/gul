@@ -1,6 +1,7 @@
 mod advanced;
 mod ast;
 mod compiler;
+mod interop;
 mod lexer;
 mod parser;
 mod platform;

@@ -41,6 +41,16 @@
   - Added Android and iOS build configurations
   - Implemented mobile UI components and native API bridges
 
+## [0.4.0] - 2025-11-27
+
+### Added
+- **Multi-Language Integration**:
+  - **Rust FFI**: Implemented compilation and binding generation
+  - **C FFI**: Added header generation and type mapping
+  - **Python Integration**: Added script execution and PyO3 bridging
+  - **JavaScript/TypeScript**: Implemented execution and transpilation support
+  - **SQL Integration**: Added query execution and type mapping infrastructure
+
 ## v0.3.0 — Phase 3 Complete: IDE & Tooling (2025-11-27)
 
 **Code Formatter:**
