@@ -53,7 +53,7 @@ impl PackageRegistry {
             ecosystem: PackageEcosystem::Rust,
             version: "0.7".to_string(),
             features: vec!["web".to_string(), "http".to_string(), "routing".to_string()],
-            dependencies: vec!["tokio".to_string(), "tower".to_string()],
+            dependencies: vec!["tokio".to_string()],
         });
 
         // Tokio - Async runtime
