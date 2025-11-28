@@ -761,4 +761,179 @@ mod tests {
             _ => panic!("Expected function"),
         }
     }
+
+    #[test]
+    fn test_parse_async_function() {
+        let mut lexer = Lexer::new("asy fetch(url):\n    res = await http.get(url)\n    return res.text()");
+        let tokens = lexer.tokenize();
+        let mut parser = Parser::new(tokens);
+        let program = parser.parse().unwrap();
+
+        assert_eq!(program.statements.len(), 1);
+        match &program.statements[0] {
+            Statement::Function { name, is_async, .. } => {
+                assert_eq!(name, "fetch");
+                assert!(*is_async);
+            }
+            _ => panic!("Expected async function"),
+        }
+    }
+
+    #[test]
+    fn test_parse_ownership_in_parameters() {
+        let mut lexer = Lexer::new("fn process(own data, ref config):\n    result = data + config.value\n    return result");
+        let tokens = lexer.tokenize();
+        let mut parser = Parser::new(tokens);
+        let program = parser.parse().unwrap();
+
+        assert_eq!(program.statements.len(), 1);
+        match &program.statements[0] {
+            Statement::Function { name, params, .. } => {
+                assert_eq!(name, "process");
+                assert_eq!(params.len(), 2);
+                // Note: ownership parsing would need to be implemented in the AST
+            }
+            _ => panic!("Expected function with ownership parameters"),
+        }
+    }
+
+    #[test]
+    fn test_parse_ui_sprite_expression() {
+        let mut lexer = Lexer::new("def slider = ^÷^[slider{min=0, max=100, value=50}]");
+        let tokens = lexer.tokenize();
+        let mut parser = Parser::new(tokens);
+        let program = parser.parse().unwrap();
+
+        assert_eq!(program.statements.len(), 1);
+        match &program.statements[0] {
+            Statement::Definition { name, value } => {
+                assert_eq!(name, "slider");
+                // Check if the value is a UiSprite expression
+                match value {
+                    Expression::UiSprite { .. } => {}, // Success
+                    _ => panic!("Expected UiSprite expression"),
+                }
+            }
+            _ => panic!("Expected definition with UI sprite"),
+        }
+    }
+
+    #[test]
+    fn test_parse_custom_block() {
+        let mut lexer = Lexer::new("cs rust:\n    fn sum(a: i32, b: i32) -> i32 {\n        a + b\n    }");
+        let tokens = lexer.tokenize();
+        let mut parser = Parser::new(tokens);
+        let program = parser.parse().unwrap();
+
+        assert_eq!(program.statements.len(), 1);
+        match &program.statements[0] {
+            Statement::CustomBlock { language, .. } => {
+                assert_eq!(language, "rust");
+            }
+            _ => panic!("Expected custom block"),
+        }
+    }
+
+    #[test]
+    fn test_parse_if_elif_else() {
+        let mut lexer = Lexer::new("if x > 0:\n    return x\nelif x < 0:\n    return -x\nelse:\n    return 0");
+        let tokens = lexer.tokenize();
+        let mut parser = Parser::new(tokens);
+        let program = parser.parse().unwrap();
+
+        assert_eq!(program.statements.len(), 1);
+        match &program.statements[0] {
+            Statement::If { then_body, else_body, .. } => {
+                assert_eq!(then_body.len(), 1);
+                assert!(else_body.is_some());
+            }
+            _ => panic!("Expected if statement"),
+        }
+    }
+
+    #[test]
+    fn test_parse_for_loop() {
+        let mut lexer = Lexer::new("for item in collection:\n    process(item)");
+        let tokens = lexer.tokenize();
+        let mut parser = Parser::new(tokens);
+        let program = parser.parse().unwrap();
+
+        assert_eq!(program.statements.len(), 1);
+        match &program.statements[0] {
+            Statement::For { variable, .. } => {
+                assert_eq!(variable, "item");
+            }
+            _ => panic!("Expected for loop"),
+        }
+    }
+
+    #[test]
+    fn test_parse_while_loop() {
+        let mut lexer = Lexer::new("while condition:\n    update()");
+        let tokens = lexer.tokenize();
+        let mut parser = Parser::new(tokens);
+        let program = parser.parse().unwrap();
+
+        assert_eq!(program.statements.len(), 1);
+        match &program.statements[0] {
+            Statement::While { .. } => {
+                // Success
+            }
+            _ => panic!("Expected while loop"),
+        }
+    }
+
+    #[test]
+    fn test_parse_main_function() {
+        let mut lexer = Lexer::new("mn main():\n    print(\"Hello, World!\")\n    ui.print(^÷^[tree])\n    data = await fetch(\"https://api.example.com\")\n    print(data)");
+        let tokens = lexer.tokenize();
+        let mut parser = Parser::new(tokens);
+        let program = parser.parse().unwrap();
+
+        assert_eq!(program.statements.len(), 1);
+        match &program.statements[0] {
+            Statement::Main { .. } => {
+                // Success
+            }
+            _ => panic!("Expected main function"),
+        }
+    }
+
+    #[test]
+    fn test_parse_import_statement() {
+        let mut lexer = Lexer::new("imp std.io");
+        let tokens = lexer.tokenize();
+        let mut parser = Parser::new(tokens);
+        let program = parser.parse().unwrap();
+
+        assert_eq!(program.statements.len(), 1);
+        match &program.statements[0] {
+            Statement::Import(module) => {
+                assert_eq!(module, "std.io");
+            }
+            _ => panic!("Expected import statement"),
+        }
+    }
+
+    #[test]
+    fn test_parse_complex_expression() {
+        let mut lexer = Lexer::new("def result = (a + b) * c / d - e");
+        let tokens = lexer.tokenize();
+        let mut parser = Parser::new(tokens);
+        let program = parser.parse().unwrap();
+
+        assert_eq!(program.statements.len(), 1);
+        // The expression parsing should handle operator precedence correctly
+    }
+
+    #[test]
+    fn test_parse_nested_function_calls() {
+        let mut lexer = Lexer::new("def result = max(min(a, b), c)");
+        let tokens = lexer.tokenize();
+        let mut parser = Parser::new(tokens);
+        let program = parser.parse().unwrap();
+
+        assert_eq!(program.statements.len(), 1);
+        // Should parse nested function calls correctly
+    }
 }

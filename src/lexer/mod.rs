@@ -641,4 +641,150 @@ mod tests {
         let return_count = tokens.iter().filter(|t| matches!(t, Token::Return)).count();
         assert_eq!(return_count, 3);
     }
+
+    #[test]
+    fn test_ui_sprite_variations() {
+        // Test various UI sprite formats from SYNTAX.md
+        // These test the ^÷^[component{properties}] syntax for inline UI components
+        let test_cases = vec![
+            ("^÷^[tree]", "tree"),
+            ("^÷^[slider{min=0, max=100, value=50}]", "slider{min=0, max=100, value=50}"),
+            ("^÷^[button{text=\"Click Me\"}]", "button{text=\"Click Me\"}"),
+            ("^÷^[image:icon]", "image:icon"),
+            ("^÷^[sprite:player{x=10, y=20, width=32, height=32}]", "sprite:player{x=10, y=20, width=32, height=32}"),
+        ];
+
+        for (input, expected) in test_cases {
+            let mut lexer = Lexer::new(input);
+            let tokens = lexer.tokenize();
+            assert_eq!(tokens[0], Token::UiSprite(expected.to_string()));
+        }
+    }
+
+    #[test]
+    fn test_foreign_language_blocks() {
+        // Test foreign language block syntax from SYNTAX.md
+        // This tests the cs language: ... syntax for multi-language integration
+        let test_cases = vec![
+            ("cs rust:\n    fn sum(a: i32, b: i32) -> i32 { a + b }", "rust"),
+            ("cs python:\n    import math\n    def compute(x):\n        return math.sin(x)", "python"),
+            ("cs js:\n    export function greet(name) {\n        return `Hello, ${name}!`;\n    }", "js"),
+            ("cs ts:\n    export function add(a: number, b: number): number {\n        return a + b;\n    }", "ts"),
+            ("cs c:\n    int fibonacci(int n) {\n        return n <= 1 ? n : fibonacci(n-1) + fibonacci(n-2);\n    }", "c"),
+            ("cs sql:\n    select * from users where age > 18 order by name;", "sql"),
+        ];
+
+        for (input, expected_lang) in test_cases {
+            let mut lexer = Lexer::new(input);
+            let tokens = lexer.tokenize();
+
+            // Find the Cs token followed by identifier
+            let cs_pos = tokens.iter().position(|t| matches!(t, Token::Cs));
+            assert!(cs_pos.is_some(), "Expected Cs token in: {}", input);
+
+            // Check that the next token is the expected language identifier
+            if let Some(pos) = cs_pos {
+                if pos + 1 < tokens.len() {
+                    if let Token::Identifier(lang) = &tokens[pos + 1] {
+                        assert_eq!(lang, expected_lang, "Expected language {} but got {}", expected_lang, lang);
+                    } else {
+                        panic!("Expected identifier after Cs token");
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn test_type_annotations() {
+        let mut lexer = Lexer::new("def name: str = \"Alice\"\ndef age: int = 30\ndef speed: float = 10.5 m/s");
+        let tokens = lexer.tokenize();
+
+        // Check for colon tokens (type annotations)
+        let colon_count = tokens.iter().filter(|t| matches!(t, Token::Colon)).count();
+        assert_eq!(colon_count, 3);
+
+        // Check for type identifiers
+        let type_identifiers: Vec<_> = tokens.iter().filter_map(|t| {
+            if let Token::Identifier(id) = t {
+                if id == "str" || id == "int" || id == "float" {
+                    Some(id.as_str())
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        }).collect();
+
+        assert_eq!(type_identifiers, vec!["str", "int", "float"]);
+    }
+
+    #[test]
+    fn test_loop_constructs() {
+        let mut lexer = Lexer::new("loop:\n    print(\"infinite\")\n    break_if(condition)\n\nfor item in collection:\n    process(item)\n\nwhile condition:\n    update()");
+        let tokens = lexer.tokenize();
+
+        // Check for loop keywords
+        assert!(tokens.iter().any(|t| matches!(t, Token::Loop)));
+        assert!(tokens.iter().any(|t| matches!(t, Token::For)));
+        assert!(tokens.iter().any(|t| matches!(t, Token::While)));
+        assert!(tokens.iter().any(|t| matches!(t, Token::In)));
+    }
+
+    #[test]
+    fn test_import_statements() {
+        let mut lexer = Lexer::new("imp std.io\nimp std.http\nimp ai.cv\nimp ui\nimp embedded.gpio");
+        let tokens = lexer.tokenize();
+
+        // Check for import keywords
+        let import_count = tokens.iter().filter(|t| matches!(t, Token::Imp)).count();
+        assert_eq!(import_count, 5);
+
+        // Check for dot notation in imports
+        let dot_count = tokens.iter().filter(|t| matches!(t, Token::Dot)).count();
+        assert_eq!(dot_count, 4); // std.io, std.http, ai.cv, embedded.gpio
+    }
+
+    #[test]
+    fn test_main_entry_point() {
+        let mut lexer = Lexer::new("mn main():\n    print(\"Hello, World!\")\n    ui.print(^÷^[tree])\n    data = await fetch(\"https://api.example.com\")\n    print(data)");
+        let tokens = lexer.tokenize();
+
+        // Check for main keyword
+        assert!(tokens.iter().any(|t| matches!(t, Token::Mn)));
+
+        // Check for await keyword
+        assert!(tokens.iter().any(|t| matches!(t, Token::Await)));
+
+        // Check for UI sprite
+        assert!(tokens.iter().any(|t| matches!(t, Token::UiSprite(_))));
+    }
+
+    #[test]
+    fn test_scientific_expressions() {
+        // Test scientific notation and expressions from SYNTAX.md
+        // Covers physics formulas, chemistry expressions, and mathematical operations
+        let test_cases = vec![
+            ("def F = m * a", vec![Token::Def, Token::Identifier("F".to_string()), Token::Equal, Token::Identifier("m".to_string()), Token::Star, Token::Identifier("a".to_string())]),
+            ("def E = m * c^2", vec![Token::Def, Token::Identifier("E".to_string()), Token::Equal, Token::Identifier("m".to_string()), Token::Star, Token::Identifier("c".to_string()), Token::Caret, Token::Integer(2)]),
+            ("def v = d / t", vec![Token::Def, Token::Identifier("v".to_string()), Token::Equal, Token::Identifier("d".to_string()), Token::Slash, Token::Identifier("t".to_string())]),
+            ("def pH = -log10([H+])", vec![Token::Def, Token::Identifier("pH".to_string()), Token::Equal, Token::Minus, Token::Identifier("log10".to_string()), Token::LeftParen, Token::LeftBracket, Token::Identifier("H".to_string()), Token::Plus, Token::RightBracket, Token::RightParen]),
+        ];
+
+        for (input, expected_pattern) in test_cases {
+            let mut lexer = Lexer::new(input);
+            let tokens = lexer.tokenize();
+
+            // Check that we have the expected token pattern
+            for (i, expected_token) in expected_pattern.iter().enumerate() {
+                if i < tokens.len() {
+                    match (expected_token, &tokens[i]) {
+                        (Token::Identifier(expected), Token::Identifier(actual)) => assert_eq!(expected, actual),
+                        (expected, actual) => assert_eq!(expected, actual),
+                    }
+                }
+            }
+        }
+    }
 }

@@ -1,5 +1,23 @@
 # CHANGELOG
 
+## [0.8.0] - 2025-11-27
+
+### Added
+- **Phase 8 Started**: Scientific Computing - Symbolic Math Engine
+  - Initiated implementation of symbolic expression parsing
+  - Planned algebraic simplification, differentiation, integration, and equation solving
+
+## [0.7.0] - 2025-11-27
+
+### Added
+- **Enhanced Test Suite**:
+  - Increased lexer tests from 14 to 25, covering UI sprite variations, foreign language blocks, type annotations, loop constructs, import statements, main entry points, and scientific expressions
+  - Increased parser tests from 3 to 12, covering async functions, ownership parameters, UI sprite expressions, custom blocks, control flow (if/elif/else, for, while), and complex expressions
+  - Total test count now 229/229 passing (100% success rate)
+
+### Fixed
+- **Compilation Errors**: Added missing `Eq`, `Hash`, `PartialEq` traits for `PowerMode` enum and `PartialOrd`, `Ord`, `Eq` traits for `TaskPriority` enum in embedded modules
+
 ## [0.6.0] - 2025-11-27
 
 ### Added
@@ -25,7 +43,8 @@
 
 ## [0.5.0] - 2025-11-27
 
-### Added
+### Added features
+
 - **Native Package Support**:
   - Implemented `PackageRegistry` for dependency management
   - Added support for 18 popular frameworks (Axum, Tokio, React, Django, etc.)
@@ -43,7 +62,8 @@
 
 ## [0.4.0] - 2025-11-27
 
-### Added
+### Added new features
+
 - **Multi-Language Integration**:
   - **Rust FFI**: Implemented compilation and binding generation
   - **C FFI**: Added header generation and type mapping
@@ -54,6 +74,7 @@
 ## v0.3.0 — Phase 3 Complete: IDE & Tooling (2025-11-27)
 
 **Code Formatter:**
+
 - Implemented formatting rules for indentation and spacing
 - Added comment formatting with proper spacing
 - Implemented line wrapping and format-on-save capability

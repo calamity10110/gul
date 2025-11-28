@@ -3,6 +3,10 @@ name = "universal-lang"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+name = "universal_lang"
+path = "src/lib.rs"
+
 [dependencies]
 # Lexer and parser
 logos = "0.13"
