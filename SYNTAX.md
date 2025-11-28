@@ -1,21 +1,22 @@
-# GLOB Language - Complete Syntax Guide
+# GLOB Language - Complete Syntax Guide (v0.11.0)
 
-**GLOB** (Global Language for Optimized Building) is a modern, multi-paradigm programming language designed for beginners and experts alike.
+**GLOB** (Global Language for Optimized Building) - A modern, multi-paradigm programming language
 
 ---
 
 ## Table of Contents
 
 1. [Basic Concepts](#basic-concepts)
-2. [Variables and Definitions](#variables-and-definitions)
-3. [Functions](#functions)
-4. [Imports and Packages](#imports-and-packages)
-5. [Control Flow](#control-flow)
-6. [Ownership Model](#ownership-model)
-7. [UI Components](#ui-components)
-8. [Multi-Language Integration](#multi-language-integration)
-9. [Scientific Computing](#scientific-computing)
-10. [Best Practices](#best-practices)
+2. [Variables and Mutability](#variables-and-mutability)
+3. [Flexible Import System](#flexible-import-system)
+4. [Functions](#functions)
+5. [Annotations](#annotations)
+6. [Control Flow](#control-flow)
+7. [Ownership Model](#ownership-model)
+8. [UI Components](#ui-components)
+9. [Multi-Language Integration](#multi-language-integration)
+10. [Scientific Computing](#scientific-computing)
+11. [Best Practices](#best-practices)
 
 ---
 
@@ -23,82 +24,199 @@
 
 ### What is GLOB?
 
-GLOB combines the best features of multiple languages:
-- **Python's** readability and simplicity
-- **Rust's** safety and ownership model
-- **JavaScript's** async capabilities
-- **SQL's** data-oriented expressions
-- **Scientific notation** for math, physics, and chemistry
+GLOB combines simplicity with power:
 
-### Your First GLOB Program
+- **Python-like** syntax (easy to read)
+- **Rust-like** safety (memory safe)
+- **JavaScript-like** async (non-blocking I/O)
+- **Scientific notation** (physics, chemistry, math)
+- **Multi-language** (embed Python, Rust, JS, SQL)
+
+### Your First Program
 
 ```glob
-# This is a comment - lines starting with # are ignored by the computer
+# hello.mn - Your first GLOB program
 
-# The main function is where your program starts
 mn main():
-    print("Hello, World!")  # Display text on screen
+    print("Hello, GLOB!")
 ```
 
-**Explanation:**
-- `mn main():` - Defines the main entry point (where execution begins)
-- `print()` - Built-in function to display text
-- Indentation (spaces) defines code blocks, just like Python
+Run it: `glob run hello.mn`
 
 ---
 
-## Variables and Definitions
+## Variables and Mutability
 
-### Simple Definitions
-
-Use `def` to create variables (named storage for values):
+### Immutable Variables (Default)
 
 ```glob
-# Basic types
-def name = "Alice"           # String (text)
-def age = 25                 # Integer (whole number)
-def height = 5.8             # Float (decimal number)
-def is_student = true        # Boolean (true/false)
+# Immutable - cannot be changed after creation
+def name = "Alice"
+def age = 25
+def PI = 3.14159
 
-# Lists (ordered collections)
-def numbers = [1, 2, 3, 4, 5]
-def names = ["Alice", "Bob", "Charlie"]
+# This would cause an error:
+# age = 26  # ERROR: Cannot modify immutable variable
+```
 
-# Dictionaries (key-value pairs)
-def person = {
-    name: "Alice",
-    age: 25,
-    city: "New York"
+### Mutable Variables (? prefix)
+
+```glob
+# Mutable - can be changed
+?count = 0
+?total = 100
+?name = "Bob"
+
+# Now we can change them
+?count = ?count + 1  # OK: count is now 1
+?total = ?total - 50  # OK: total is now 50
+?name = "Alice"       # OK: name is now "Alice"
+```
+
+### When to Use Mutable vs Immutable
+
+```glob
+# Use immutable for constants
+def MAX_USERS = 1000
+def API_URL = "https://api.example.com"
+
+# Use mutable for counters, accumulators
+?counter = 0
+?sum = 0
+
+fn count_items(items):
+    ?count = 0
+    for item in items:
+        ?count = ?count + 1
+    return ?count
+```
+
+### Global vs Static Variables
+
+```glob
+# Global variables (managed by async functions)
+@global ?app_state = {
+    users: [],
+    sessions: {}
 }
+
+# Static variables (managed by all functions)
+@static cache = {}
+@static config = load_config()
+
+asy update_state(user):
+    # Async functions can modify global state
+    @global ?app_state.users.append(user)
+
+fn get_cached(key):
+    # All functions can access static variables
+    return @static cache.get(key)
 ```
 
-### Type Annotations (Optional)
+---
 
-You can specify types explicitly for clarity:
+## Flexible Import System
+
+GLOB supports multiple equivalent import syntaxes. Choose the style you prefer!
+
+### Format 1: Individual Imports
 
 ```glob
-def name: str = "Alice"      # String type
-def age: int = 25            # Integer type
-def price: float = 19.99     # Float type
-def items: list = [1, 2, 3]  # List type
+# Import one at a time
+imp std.io
+imp std.http
+imp python: numpy
+imp python: matplotlib
+imp rust: tokio
+imp my_package
 ```
 
-### Scientific Units
-
-GLOB supports units for scientific computing:
+### Format 2: Grouped Imports with Brackets
 
 ```glob
-# Physics
-def speed = 10 m/s           # Meters per second
-def acceleration = 9.81 m/s^2  # Meters per second squared
-def mass = 75 kg             # Kilograms
+# Group related imports
+imp [
+    python: (numpy, matplotlib, pandas),
+    rust: (tokio, serde),
+    my_package,
+    other_package
+]
+```
 
-# Chemistry
-def pH = -log10([H+])        # pH calculation
-def molarity = 2.5 mol/L     # Moles per liter
+### Format 3: Grouped Imports with Braces
 
-# Energy
-def energy = m * c^2         # Einstein's equation
+```glob
+# Using braces (equivalent to brackets)
+imp python: {numpy, matplotlib}
+imp rust: {tokio, serde}
+imp {my_package, other_package}
+```
+
+### Format 4: Grouped Imports with Parentheses
+
+```glob
+# Using parentheses (also equivalent)
+imp python: (numpy, matplotlib)
+imp rust: (tokio, serde)
+imp (my_package, other_package)
+```
+
+### Format 5: Mixed Styles
+
+```glob
+# Mix and match - all valid!
+imp {
+    python: [numpy, matplotlib],
+    rust: (tokio, serde),
+    my_package
+}
+
+# Or even:
+imp [python: {numpy, matplotlib}, rust: (tokio)]
+```
+
+### Bracket Equivalence Rule
+
+**Important:** `[]`, `{}`, and `()` work the same for grouping, as long as they match:
+
+```glob
+# All of these are valid:
+imp [a, b, c]
+imp {a, b, c}
+imp (a, b, c)
+
+# These are also valid:
+imp python: [numpy, pandas]
+imp python: {numpy, pandas}
+imp python: (numpy, pandas)
+
+# But these are ERRORS (mismatched):
+# imp [a, b, c}    # ERROR: [ doesn't match }
+# imp {a, b, c]    # ERROR: { doesn't match ]
+```
+
+### Import Examples
+
+```glob
+# Data science project
+imp [
+    python: (numpy, pandas, matplotlib, scipy),
+    std: (io, math, stats)
+]
+
+# Web server project
+imp {
+    std: {http, io, json},
+    rust: {tokio, serde},
+    js: (express, axios)
+}
+
+# IoT project
+imp (
+    embedded: (gpio, i2c, spi),
+    std: (time, io),
+    rust: tokio
+)
 ```
 
 ---
@@ -107,139 +225,214 @@ def energy = m * c^2         # Einstein's equation
 
 ### Synchronous Functions
 
-Regular functions that execute immediately:
-
 ```glob
-# Simple function
+# Basic function
 fn greet(name):
     return "Hello, " + name
 
-# Function with multiple parameters
-fn add(a, b):
-    result = a + b
-    return result
-
 # Function with type annotations
-fn multiply(x: int, y: int) -> int:
-    return x * y
+@fn calculate(@int x, @int y) -> @int:
+    return x + y
 
-# Using the functions
-message = greet("Alice")     # Returns "Hello, Alice"
-sum = add(5, 3)              # Returns 8
-product = multiply(4, 7)     # Returns 28
+# Function with mutable parameter
+fn increment(@mut ?value):
+    ?value = ?value + 1
+    return ?value
 ```
-
-**Key Points:**
-- `fn` keyword starts a function definition
-- Parameters go in parentheses `()`
-- Colon `:` starts the function body
-- Indent the function body with spaces
-- `return` sends a value back to the caller
 
 ### Async Functions
 
-Functions that can wait for operations without blocking:
-
 ```glob
-# Async function for network requests
-asy fetch_data(url):
-    # 'await' pauses until the request completes
+# Basic async function
+@asy fetch_data(url):
     response = await http.get(url)
     return response.json()
 
-# Async function with error handling
-asy download_file(url, filename):
+# Async with error handling
+@asy safe_fetch(url):
     try:
-        data = await http.get(url)
-        file.write(filename, data)
-        return true
+        data = await fetch_data(url)
+        return data
     catch error:
-        print("Download failed:", error)
-        return false
-
-# Using async functions
-mn main():
-    # Must use 'await' when calling async functions
-    data = await fetch_data("https://api.example.com/users")
-    print(data)
+        print("Error:", error)
+        return null
 ```
-
-**When to use async:**
-- Network requests (HTTP, WebSocket)
-- File I/O operations
-- Database queries
-- Any operation that might wait for external resources
 
 ---
 
-## Imports and Packages
+## Annotations
 
-### Standard Library Imports
+GLOB uses `@` prefix for annotations. Annotations provide type hints, optimization hints, and semantic information.
+
+### Type Annotations
 
 ```glob
-# Single import
-imp std.io              # File and console I/O
-imp std.http            # HTTP client
-imp std.math            # Mathematical functions
+# Basic types
+@int age = 25
+@str name = "Alice"
+@float price = 19.99
+@bool is_active = true
+@char letter = 'A'
 
-# Multiple imports
-imp std.io
-imp std.http
-imp std.json
-imp ui                  # UI components
+# Collection types
+@lst numbers = [1, 2, 3, 4, 5]
+@map person = {name: "Bob", age: 30}
+@set unique_ids = {1, 2, 3}
+
+# Special types
+@null empty = null
+@any value = anything
+@void no_return = undefined
 ```
 
-### Importing Python Packages
-
-GLOB can use Python libraries directly:
+### Mutable Type Annotations
 
 ```glob
-# Import Python packages
-imp python: numpy       # NumPy for numerical computing
-imp python: pandas      # Pandas for data analysis
-imp python: matplotlib  # Matplotlib for plotting
+# Combine @ and ? for mutable typed variables
+@?int counter = 0
+@?str message = "Hello"
+@?lst items = []
 
-# Using Python packages
-mn main():
-    # Use numpy functions
-    arr = numpy.array([1, 2, 3, 4, 5])
-    mean = numpy.mean(arr)
-    print("Mean:", mean)
+# Use in functions
+fn add_item(@?lst items, item):
+    items.append(item)
 ```
 
-### Importing JavaScript/Node Packages
+### Function Annotations
 
 ```glob
-# Import JavaScript/Node.js packages
-imp js: express         # Express web framework
-imp js: axios           # HTTP client
-imp js: lodash          # Utility library
+# Annotate function type
+@asy download(url):
+    return await http.get(url)
 
-# Using JavaScript packages
-asy start_server():
-    app = express()
-    app.get("/", fn(req, res):
-        res.send("Hello from GLOB!")
-    )
-    await app.listen(3000)
+@fn calculate(x, y):
+    return x + y
+
+# Custom language blocks
+@cs python:
+    def analyze(data):
+        return sum(data) / len(data)
 ```
 
-### Importing Rust Crates
+### Ownership Annotations
 
 ```glob
-# Import Rust crates
-imp rust: serde         # Serialization
-imp rust: tokio         # Async runtime
-imp rust: regex         # Regular expressions
+# Reference (borrow)
+fn print_data(@ref data):
+    print(data)
+    # data is borrowed, not owned
+
+# Own (take ownership)
+fn consume(@own data):
+    process(data)
+    # data is moved, caller loses access
+
+# Copy (explicit duplicate)
+fn backup(@copy data):
+    return data
+    # data is copied
+
+# Move (transfer ownership)
+fn transfer(@move resource):
+    return resource
+    # resource is moved
 ```
 
-### Custom Package Imports
+### Comparison Operator Annotations
 
 ```glob
-# Import your own packages
-imp myproject.utils     # From myproject/utils.mn
-imp myproject.models    # From myproject/models.mn
-imp myproject.api       # From myproject/api.mn
+# Use @ prefix for operator functions
+result = @less(5, 10)        # 5 < 10 → true
+result = @more(10, 5)        # 10 > 5 → true
+result = @equal(5, 5)        # 5 == 5 → true
+result = @not_equal(5, 10)   # 5 != 10 → true
+result = @less_equal(5, 5)   # 5 <= 5 → true
+result = @more_equal(10, 5)  # 10 >= 5 → true
+```
+
+### Logical Operator Annotations
+
+```glob
+# Logical operations
+result = @and(true, false)   # true && false → false
+result = @or(true, false)    # true || false → true
+result = @not(true)          # !true → false
+result = @xor(true, false)   # true XOR false → true
+```
+
+### Statistical Function Annotations
+
+```glob
+# Statistical operations
+numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+total = @sum(numbers)           # Sum of all numbers
+average = @mean(numbers)        # Mean/average
+middle = @median(numbers)       # Median value
+most_common = @mode(numbers)    # Mode (most frequent)
+
+# Advanced statistics
+std = @stddev(numbers)          # Standard deviation
+var = @variance(numbers)        # Variance
+corr = @correlation(x, y)       # Correlation coefficient
+cov = @covariance(x, y)         # Covariance
+
+# Data operations
+sorted_data = @sort(numbers)    # Sort ascending
+reversed_data = @reverse(numbers)  # Reverse order
+length = @len(numbers)          # Length/count
+maximum = @max(numbers)         # Maximum value
+minimum = @min(numbers)         # Minimum value
+```
+
+### Mathematical Function Annotations
+
+```glob
+# Logarithms and exponentials
+result = @log(100, 10)    # Log base 10
+result = @ln(2.718)       # Natural log
+result = @exp(1)          # e^1
+
+# Roots and powers
+result = @sqrt(16)        # Square root
+result = @cbrt(27)        # Cube root
+
+# Rounding and truncation
+result = @abs(-5)         # Absolute value
+result = @floor(3.7)      # Floor (3)
+result = @ceil(3.2)       # Ceiling (4)
+result = @round(3.5)      # Round (4)
+result = @trunc(3.9)      # Truncate (3)
+result = @frac(3.7)       # Fractional part (0.7)
+
+# Sign functions
+result = @sign(-5)        # Sign (-1, 0, or 1)
+result = @signum(10)      # Signum function
+```
+
+### Control Flow Annotations
+
+```glob
+# Annotated control flow (for clarity)
+@if condition:
+    do_something()
+@elif other_condition:
+    do_other()
+@else:
+    do_default()
+
+# Annotated loops
+@for item in collection:
+    process(item)
+
+@while condition:
+    update()
+
+@loop:
+    if done:
+        @break
+    if skip:
+        @continue
 ```
 
 ---
@@ -249,167 +442,65 @@ imp myproject.api       # From myproject/api.mn
 ### If-Elif-Else
 
 ```glob
-# Simple if statement
 if age >= 18:
     print("Adult")
-
-# If-else
-if temperature > 30:
-    print("Hot day!")
+elif age >= 13:
+    print("Teenager")
 else:
-    print("Nice weather")
-
-# If-elif-else chain
-if score >= 90:
-    grade = "A"
-elif score >= 80:
-    grade = "B"
-elif score >= 70:
-    grade = "C"
-elif score >= 60:
-    grade = "D"
-else:
-    grade = "F"
+    print("Child")
 ```
 
 ### Loops
 
 ```glob
-# For loop - iterate over a collection
+# For loop
 for number in [1, 2, 3, 4, 5]:
     print(number)
 
-# For loop with range
-for i in range(10):
-    print("Count:", i)
+# While loop
+?count = 0
+while ?count < 10:
+    print(?count)
+    ?count = ?count + 1
 
-# While loop - repeat while condition is true
-count = 0
-while count < 5:
-    print(count)
-    count = count + 1
-
-# Infinite loop with break
+# Infinite loop
 loop:
     user_input = input("Enter 'quit' to exit: ")
     if user_input == "quit":
         break
-    print("You entered:", user_input)
-
-# Continue - skip to next iteration
-for number in range(10):
-    if number % 2 == 0:
-        continue  # Skip even numbers
-    print(number)  # Only prints odd numbers
 ```
 
 ---
 
 ## Ownership Model
 
-GLOB uses Rust-inspired ownership for memory safety:
-
-### Own - Transfer Ownership
-
 ```glob
-# 'own' transfers ownership (moves the data)
-fn process_data(own data):
-    # This function now owns 'data'
-    # Original caller can't use 'data' anymore
-    result = transform(data)
-    return result
+# Own - Transfer ownership
+fn process_data(@own data):
+    transform(data)
+    # Caller can't use data anymore
 
-# Usage
-my_data = [1, 2, 3, 4, 5]
-result = process_data(own my_data)
-# my_data is no longer accessible here
+# Ref - Borrow reference
+fn read_data(@ref data):
+    print(data)
+    # Caller still owns data
+
+# Copy - Explicit duplicate
+fn backup_data(@copy data):
+    return data
+    # Both copies exist
 ```
-
-### Ref - Borrow Reference
-
-```glob
-# 'ref' creates a reference (no copying, no moving)
-fn calculate_sum(ref numbers):
-    # Function can read 'numbers' but doesn't own it
-    total = 0
-    for num in numbers:
-        total = total + num
-    return total
-
-# Usage
-my_numbers = [1, 2, 3, 4, 5]
-sum = calculate_sum(ref my_numbers)
-# my_numbers is still accessible here
-print(my_numbers)  # Works fine
-```
-
-### Copy - Explicit Duplication
-
-```glob
-# 'copy' creates a duplicate
-fn modify_list(copy items):
-    # Function gets a copy, original is unchanged
-    items.append(99)
-    return items
-
-# Usage
-original = [1, 2, 3]
-modified = modify_list(copy original)
-print(original)  # [1, 2, 3] - unchanged
-print(modified)  # [1, 2, 3, 99] - has the new item
-```
-
-**Best Practice:**
-- Use `ref` by default (most efficient)
-- Use `own` when transferring large data
-- Use `copy` only when you need a duplicate
 
 ---
 
 ## UI Components
 
-### Inline UI Syntax
-
-GLOB's unique feature: UI components as first-class syntax!
-
 ```glob
-# The ^÷^ syntax creates UI components
-def tree_widget = ^÷^[tree]
-def slider_widget = ^÷^[slider{min=0, max=100, value=50}]
-def button_widget = ^÷^[button{text="Click Me"}]
-
-# Display UI components
-ui.print(^÷^[tree])
+# Inline UI components with ^÷^ syntax
+ui.print(^÷^[button{text="Click Me", color="blue"}])
 ui.print(^÷^[slider{min=0, max=100, value=50}])
-ui.print(^÷^[button{text="Submit", color="blue"}])
-ui.print(^÷^[progress{value=75, max=100}])
-```
-
-### Available UI Components
-
-```glob
-# Text and Display
-ui.print(^÷^[text{content="Hello", size=16, color="black"}])
-ui.print(^÷^[heading{text="Title", level=1}])
-
-# Input Components
-ui.print(^÷^[input{placeholder="Enter name", type="text"}])
-ui.print(^÷^[textarea{rows=5, cols=40}])
-ui.print(^÷^[checkbox{label="Agree to terms", checked=false}])
-
-# Interactive Components
-ui.print(^÷^[button{text="Submit", onclick="handleSubmit"}])
-ui.print(^÷^[slider{min=0, max=100, value=50, step=1}])
-ui.print(^÷^[dropdown{options=["Option 1", "Option 2", "Option 3"]}])
-
-# Data Display
 ui.print(^÷^[table{headers=["Name", "Age"], rows=data}])
 ui.print(^÷^[chart{type="bar", data=values}])
-ui.print(^÷^[progress{value=75, max=100, label="Loading..."}])
-
-# Layout Components
-ui.print(^÷^[container{children=[widget1, widget2]}])
-ui.print(^÷^[grid{columns=3, gap=10}])
 ```
 
 ---
@@ -419,313 +510,198 @@ ui.print(^÷^[grid{columns=3, gap=10}])
 ### Python Integration
 
 ```glob
-# Embed Python code directly
-cs python:
+imp python: (numpy, pandas)
+
+@cs python:
     import numpy as np
-    import pandas as pd
-    
-    def analyze_data(data):
-        df = pd.DataFrame(data)
-        return df.describe()
+    def analyze(data):
+        return np.mean(data)
 
-# Use Python functions in GLOB
 mn main():
-    data = [[1, 2], [3, 4], [5, 6]]
-    stats = analyze_data(data)
-    print(stats)
-```
-
-### JavaScript Integration
-
-```glob
-# Embed JavaScript code
-cs js:
-    export function formatDate(date) {
-        return new Date(date).toLocaleDateString();
-    }
-    
-    export function fetchAPI(url) {
-        return fetch(url).then(r => r.json());
-    }
-
-# Use JavaScript functions
-mn main():
-    formatted = formatDate("2024-01-15")
-    print(formatted)
+    data = [1, 2, 3, 4, 5]
+    result = analyze(data)
+    print(result)
 ```
 
 ### Rust Integration
 
 ```glob
-# Embed Rust code for performance
-cs rust:
-    fn fibonacci(n: u64) -> u64 {
-        match n {
-            0 => 0,
-            1 => 1,
-            _ => fibonacci(n - 1) + fibonacci(n - 2)
-        }
+imp rust: tokio
+
+@cs rust:
+    fn fast_compute(n: u64) -> u64 {
+        n * n
     }
 
-# Use Rust functions
 mn main():
-    result = fibonacci(10)
-    print("Fibonacci(10) =", result)
+    result = fast_compute(100)
+    print(result)
 ```
 
-### SQL Integration
+### JavaScript Integration
 
 ```glob
-# Embed SQL queries
-cs sql:
-    SELECT users.name, orders.total
-    FROM users
-    JOIN orders ON users.id = orders.user_id
-    WHERE orders.total > 100
-    ORDER BY orders.total DESC
+imp js: axios
 
-# Execute SQL
+@cs js:
+    export function formatDate(date) {
+        return new Date(date).toLocaleDateString();
+    }
+
 mn main():
-    results = db.execute(sql_query)
-    for row in results:
-        print(row.name, row.total)
+    formatted = formatDate("2024-01-15")
+    print(formatted)
 ```
 
 ---
 
 ## Scientific Computing
 
-### Physics Calculations
-
 ```glob
-# Define physical constants
-def c = 299792458 m/s        # Speed of light
-def G = 6.674e-11 N*m^2/kg^2  # Gravitational constant
+# Physics
+def speed = 10 m/s
+def acceleration = 9.81 m/s^2
+def energy = m * c^2
 
-# Physics formulas
-fn kinetic_energy(mass, velocity):
+# Chemistry
+def pH = -log10([H+])
+def molarity = 2.5 mol/L
+
+# Use in calculations
+@fn kinetic_energy(@float mass, @float velocity) -> @float:
     return 0.5 * mass * velocity^2
-
-fn gravitational_force(m1, m2, distance):
-    return G * m1 * m2 / distance^2
-
-# Usage
-energy = kinetic_energy(10 kg, 5 m/s)
-force = gravitational_force(100 kg, 200 kg, 10 m)
-```
-
-### Chemistry Calculations
-
-```glob
-# Chemical calculations
-fn calculate_pH(h_concentration):
-    return -log10(h_concentration)
-
-fn ideal_gas_law(pressure, volume, temperature):
-    R = 8.314 J/(mol*K)  # Gas constant
-    return (pressure * volume) / (R * temperature)
-
-# Usage
-ph_value = calculate_pH(1e-7)  # Neutral pH
-moles = ideal_gas_law(101325 Pa, 0.001 m^3, 298 K)
-```
-
-### Mathematical Operations
-
-```glob
-# Import math functions
-imp std.math
-
-# Use mathematical functions
-result = math.sin(math.PI / 2)  # Sine
-root = math.sqrt(16)            # Square root
-power = math.pow(2, 10)         # 2^10
-log_val = math.log(100, 10)     # Log base 10
 ```
 
 ---
 
 ## Best Practices
 
-### 1. Code Organization
+### 1. Use Immutable by Default
 
 ```glob
-# Good: Organize imports at the top
+# Good: Immutable unless you need to change it
+def MAX_RETRIES = 3
+def API_URL = "https://api.example.com"
+
+# Only use mutable when necessary
+?retry_count = 0
+```
+
+### 2. Choose Clear Import Style
+
+```glob
+# Good: Grouped by category
+imp [
+    python: (numpy, pandas),
+    std: (io, http),
+    my_utils
+]
+
+# Also good: One per line for clarity
+imp python: numpy
+imp python: pandas
 imp std.io
 imp std.http
-imp python: numpy
-
-# Good: Group related definitions
-def API_URL = "https://api.example.com"
-def API_KEY = "your-key-here"
-def TIMEOUT = 30
-
-# Good: Clear function names
-fn calculate_total_price(items, tax_rate):
-    subtotal = sum(items)
-    tax = subtotal * tax_rate
-    return subtotal + tax
 ```
 
-### 2. Error Handling
+### 3. Use Annotations for Clarity
 
 ```glob
-# Good: Handle errors explicitly
-asy fetch_user_data(user_id):
-    try:
-        response = await http.get(f"/users/{user_id}")
-        return response.json()
-    catch error:
-        print("Error fetching user:", error)
-        return null
+# Good: Annotated types
+@fn calculate(@int x, @int y) -> @int:
+    return x + y
 
-# Good: Validate inputs
-fn divide(a, b):
-    if b == 0:
-        print("Error: Division by zero")
-        return null
-    return a / b
-```
-
-### 3. Use Ownership Wisely
-
-```glob
-# Good: Use 'ref' for read-only access
-fn print_list(ref items):
-    for item in items:
+# Good: Annotated ownership
+@fn process(@ref data):
+    for item in data:
         print(item)
-
-# Good: Use 'own' when transferring data
-fn process_and_store(own data):
-    processed = transform(data)
-    database.save(processed)
-
-# Good: Use 'copy' sparingly
-fn backup_data(copy original):
-    return original  # Returns a copy
 ```
 
-### 4. Async Best Practices
+### 4. Prefer @ Functions for Statistics
 
 ```glob
-# Good: Use async for I/O operations
-asy load_user_profile(user_id):
-    user = await db.get_user(user_id)
-    posts = await db.get_posts(user_id)
-    return {user: user, posts: posts}
+# Good: Use @ annotations
+average = @mean(numbers)
+total = @sum(values)
 
-# Good: Parallel async operations
-asy load_dashboard():
-    # Run multiple async operations in parallel
-    users = await fetch_users()
-    stats = await fetch_stats()
-    notifications = await fetch_notifications()
-    return {users, stats, notifications}
-```
-
-### 5. Comments and Documentation
-
-```glob
-# Good: Explain WHY, not WHAT
-fn calculate_discount(price, customer_type):
-    # Premium customers get 20% discount to encourage loyalty
-    if customer_type == "premium":
-        return price * 0.8
-    return price
-
-# Good: Document complex functions
-#[
-Function: process_payment
-Purpose: Handles payment processing with retry logic
-Parameters:
-  - amount: Payment amount in cents
-  - payment_method: Credit card or PayPal
-Returns: Transaction ID or null on failure
-]#
-asy process_payment(amount, payment_method):
-    # Implementation here
-    pass
-```
-
-### 6. Naming Conventions
-
-```glob
-# Good: Use descriptive names
-def user_count = 100          # Clear what it represents
-def max_retry_attempts = 3    # Self-documenting
-
-# Good: Use snake_case for variables and functions
-fn calculate_total_price(items):
-    pass
-
-# Good: Use UPPER_CASE for constants
-def MAX_CONNECTIONS = 100
-def API_VERSION = "v2"
+# Instead of manual calculation
+# average = sum(numbers) / len(numbers)
 ```
 
 ---
 
-## Complete Example Program
+## Complete Example
 
 ```glob
-# Complete GLOB program demonstrating key features
+# Complete GLOB program with new features
 
-# Imports
-imp std.io
-imp std.http
-imp python: pandas
+# Flexible imports
+imp [
+    python: (numpy, pandas),
+    std: (io, http),
+    rust: tokio
+]
 
-# Constants
+# Constants (immutable)
 def API_URL = "https://api.example.com"
 def MAX_RETRIES = 3
 
-# Async function with error handling
-asy fetch_data(endpoint):
-    try:
-        response = await http.get(API_URL + endpoint)
-        return response.json()
-    catch error:
-        print("Fetch error:", error)
-        return null
+# Global mutable state
+@global ?app_state = {
+    users: [],
+    request_count: 0
+}
 
-# Synchronous function with ownership
-fn process_data(ref raw_data):
-    # Process data without taking ownership
-    processed = []
-    for item in raw_data:
-        if item.value > 0:
-            processed.append(item)
-    return processed
+# Async function with annotations
+@asy fetch_users(endpoint):
+    ?retries = 0
 
-# Python integration for data analysis
-cs python:
+    @while ?retries < MAX_RETRIES:
+        try:
+            response = await http.get(API_URL + endpoint)
+            return response.json()
+        catch error:
+            ?retries = ?retries + 1
+
+    return null
+
+# Sync function with type annotations
+@fn analyze_data(@ref data) -> @map:
+    @int count = @len(data)
+    @float average = @mean(data)
+    @float total = @sum(data)
+
+    return {
+        count: count,
+        average: average,
+        total: total
+    }
+
+# Python integration
+@cs python:
     import pandas as pd
-    
-    def analyze(data):
-        df = pd.DataFrame(data)
-        return df.describe().to_dict()
+    def create_dataframe(data):
+        return pd.DataFrame(data)
 
 # Main entry point
 mn main():
-    print("Starting GLOB application...")
-    
-    # Fetch data asynchronously
-    raw_data = await fetch_data("/data")
-    
-    if raw_data != null:
-        # Process data
-        processed = process_data(ref raw_data)
-        
-        # Analyze with Python
-        stats = analyze(processed)
-        
-        # Display results with UI
-        ui.print(^÷^[heading{text="Data Analysis Results"}])
+    # Fetch data
+    users = await fetch_users("/users")
+
+    if users != null:
+        # Analyze
+        stats = analyze_data(@ref users)
+
+        # Display
         ui.print(^÷^[table{data=stats}])
-        
+
+        # Update global state
+        @global ?app_state.users = users
+        @global ?app_state.request_count = @global ?app_state.request_count + 1
+
         print("Analysis complete!")
     else:
-        print("Failed to fetch data")
+        print("Failed to fetch users")
 ```
 
 ---
@@ -733,35 +709,43 @@ mn main():
 ## Quick Reference
 
 ### Keywords
-- `def` - Define variable
-- `fn` - Define synchronous function
-- `asy` - Define async function
-- `mn` - Define main entry point
-- `imp` - Import package
+
+- `def` - Immutable variable
+- `?variable` - Mutable variable
+- `fn` - Synchronous function
+- `asy` - Async function
+- `mn` - Main entry point
+- `imp` - Import
 - `cs` - Custom language block
-- `own`, `ref`, `copy` - Ownership keywords
-- `await` - Wait for async operation
+- `await` - Wait for async
 - `if`, `elif`, `else` - Conditionals
 - `for`, `while`, `loop` - Loops
 - `break`, `continue` - Loop control
-- `return` - Return from function
+- `return` - Return value
 - `try`, `catch` - Error handling
 
-### Operators
-- `+`, `-`, `*`, `/`, `%` - Arithmetic
-- `^` - Power
-- `==`, `!=`, `<`, `>`, `<=`, `>=` - Comparison
-- `&&`, `||`, `!` - Logical
-- `&`, `|`, `<<`, `>>` - Bitwise
+### Annotations (@ prefix)
 
-### Built-in Functions
-- `print()` - Display output
-- `input()` - Get user input
-- `len()` - Get length
-- `range()` - Generate number sequence
-- `sum()` - Sum of numbers
-- `max()`, `min()` - Maximum/minimum
+- Types: `@int`, `@str`, `@float`, `@bool`, `@lst`, `@map`, `@set`
+- Ownership: `@ref`, `@own`, `@copy`, `@move`
+- Functions: `@asy`, `@fn`, `@cs`
+- Operators: `@less`, `@more`, `@equal`, `@and`, `@or`, `@not`
+- Statistics: `@sum`, `@mean`, `@median`, `@stddev`, `@correlation`
+- Math: `@log`, `@ln`, `@exp`, `@sqrt`, `@abs`, `@floor`, `@ceil`
+- Scope: `@global`, `@static`, `@local`
+
+### Mutability
+
+- `def x = 5` - Immutable
+- `?x = 5` - Mutable
+- `@?int x = 5` - Mutable with type annotation
+
+### Import Formats
+
+- Individual: `imp package`
+- Grouped: `imp [pkg1, pkg2]` or `imp {pkg1, pkg2}` or `imp (pkg1, pkg2)`
+- Language-specific: `imp python: numpy` or `imp python: {numpy, pandas}`
 
 ---
 
-**Ready to start coding in GLOB? Check out the examples in the `examples/` directory!**
+**Ready to code in GLOB? Check out the examples in `examples/` directory!**

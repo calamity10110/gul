@@ -5,7 +5,7 @@
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)]()
 [![Tests](https://img.shields.io/badge/tests-297%2F303%20passing-green)]()
 [![License](https://img.shields.io/badge/license-MIT-blue)]()
-[![Version](https://img.shields.io/badge/version-0.10.0-orange)]()
+[![Version](https://img.shields.io/badge/version-0.11.0-orange)]()
 
 ---
 
@@ -27,7 +27,7 @@ GLOB (Global Language for Optimized Building) is a revolutionary programming lan
 ✅ **Multi-Paradigm** - Functional, OOP, async, reactive  
 ✅ **Auto-Organizing** - Compiler organizes your code automatically  
 ✅ **Safe by Default** - Rust-inspired ownership model  
-✅ **Universal** - Runs everywhere (native, WASM, embedded, mobile)  
+✅ **Universal** - Runs everywhere (native, WASM, embedded, mobile)
 
 ---
 
@@ -61,6 +61,7 @@ glob run hello.mn
 ```
 
 Output:
+
 ```
 Hello, GLOB!
 ```
@@ -72,13 +73,15 @@ Hello, GLOB!
 ### 5-Minute Tutorial
 
 ```glob
-# Import packages
-imp std.io
-imp std.http
+# Flexible import system - choose your style!
+imp [python: (numpy, pandas), std: (io, http)]
 
-# Define constants
+# Immutable constants
 def API_URL = "https://api.example.com"
 def MAX_RETRIES = 3
+
+# Mutable variables with ? prefix
+?retry_count = 0
 
 # Async function
 asy fetch_data(endpoint):
@@ -98,13 +101,13 @@ fn process_data(ref data):
 mn main():
     # Fetch data asynchronously
     data = await fetch_data("/users")
-    
+
     # Process data
     processed = process_data(ref data)
-    
+
     # Display with UI component
     ui.print(^÷^[table{data=processed}])
-    
+
     print("Done!")
 ```
 
@@ -135,6 +138,7 @@ mn main(): print(greet("World"))
 ```
 
 GLOB automatically creates:
+
 - `imports.imp` - All imports
 - `definitions.def` - All constants
 - `functions.fnc` - All functions
@@ -253,7 +257,13 @@ asy load_dashboard():
 
 ## 🏗️ Project Status
 
-### Current Version: 0.10.0 (Production Ready)
+### Current Version: 0.11.0 (Production Ready)
+
+**New in 0.11.0:**
+
+- ✨ Flexible import system (multiple equivalent syntaxes)
+- ✨ Mutability with `?` prefix
+- ✨ Comprehensive `@` annotation system
 
 **Test Coverage:** 297/303 tests passing (98%)
 
@@ -272,14 +282,14 @@ asy load_dashboard():
 
 ### Platform Support
 
-| Platform | Status | Notes |
-|----------|--------|-------|
-| Linux | ✅ Supported | Primary development platform |
-| macOS | ✅ Supported | Full feature support |
-| Windows | ✅ Supported | Native and WSL |
-| WASM | ✅ Supported | Browser and Node.js |
+| Platform | Status       | Notes                         |
+| -------- | ------------ | ----------------------------- |
+| Linux    | ✅ Supported | Primary development platform  |
+| macOS    | ✅ Supported | Full feature support          |
+| Windows  | ✅ Supported | Native and WSL                |
+| WASM     | ✅ Supported | Browser and Node.js           |
 | Embedded | ✅ Supported | ESP32, RP2040, STM32, Arduino |
-| Mobile | ✅ Supported | Android, iOS (via WASM) |
+| Mobile   | ✅ Supported | Android, iOS (via WASM)       |
 
 ---
 
@@ -392,7 +402,7 @@ imp python: matplotlib
 cs python:
     import pandas as pd
     import matplotlib.pyplot as plt
-    
+
     def analyze(filename):
         df = pd.read_csv(filename)
         return df.describe()
@@ -443,21 +453,15 @@ GLOB is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 ## 🙏 Acknowledgments
 
 GLOB is inspired by many great languages:
+
 - **Python** - Simplicity and readability
 - **Rust** - Safety and performance
 - **JavaScript** - Async and web integration
 - **Julia** - Scientific computing
 - **Elixir** - Concurrency model
+- **C++** - Performance and low-level control
 
 ---
-
-## 📞 Contact
-
-- **Website:** https://glob-lang.org
-- **GitHub:** https://github.com/glob-lang/glob
-- **Discord:** https://discord.gg/glob-lang
-- **Twitter:** @glob_lang
-- **Email:** hello@glob-lang.org
 
 ---
 
