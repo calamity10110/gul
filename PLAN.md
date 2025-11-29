@@ -6,6 +6,12 @@
 
 PHASE 5 Update
 
+- [2025-11-28 22:59:00 UTC-8] : Detailed Phase 5 roadmap with testing tasks and Rustea support
+- Files modified : PLAN.md
+- Purpose : Detailed planning for native package support, testing, and Rustea integration
+
+PHASE 5 Update
+
 - [2025-11-28 22:45:00 UTC-8] : Detailed Phase 5 roadmap and platform support update
 - Files modified : PLAN.md, SUPPORT_PLATFORMS.md
 - Purpose : Detailed planning for native package support and multi-platform targets
@@ -412,97 +418,146 @@ This document consolidates all development tasks from TODO.md, FUTURE_DEVELOPMEN
   - TODO: Add middleware integration
   - TODO: Support for async handlers
   - TODO: Implement request/response type mapping
+  - TODO: write integration tests
+  - TODO: run integration tests
 - [.] Add Tokio support (async runtime) - **PARTIAL**
   - [x] Integrate Tokio runtime spawning
   - [x] Add task management utilities
   - TODO: Implement async channel support
   - TODO: Support for async file I/O
+  - TODO: write integration tests
+  - TODO: run integration tests
 - [.] Add Serde support (serialization) - **PARTIAL**
   - [x] Implement JSON/YAML/TOML serialization (JSON only)
   - TODO: Add custom derive macros
   - TODO: Support for binary formats (Bincode, MessagePack)
   - TODO: Implement schema validation
+  - TODO: write integration tests
+  - TODO: run integration tests
 - [.] Add Dioxus support (UI framework) - **IN PROGRESS**
   - [x] Add dependency (v0.7.1)
   - TODO: Implement component parsing
   - TODO: Add reactive state management
   - TODO: Support for event handling
-  - TODO: Implement virtual DOM diffing
+  - TODO: implement GUL webui ide with dioxus
+  - TODO: write GUL website with introduction and learning resources
+  - TODO: write website tests
+  - TODO: run dioxus tests
+- [ ] Add Rustea support (Rust TUI framework)
+  - TODO: Define the Model
+  - TODO: Implement the update function
+  - TODO: Define the View
+  - TODO: Implement the App trait
+  - TODO: Implement the main function
+  - TODO: write integration tests
+  - TODO: implement GUL TUI ide with rustea
+  - TODO: write TUI tests
+  - TODO: run rustea tests
 - [ ] Add Tauri support (desktop apps)
   - TODO: Implement IPC communication
   - TODO: Add window management
   - TODO: Support for system tray
   - TODO: Implement file dialog integration
+  - TODO: write Tauri tests
+  - TODO: run integration tests
 - [ ] Add Leptos support (web framework)
   - TODO: Implement server-side rendering
   - TODO: Add client-side hydration
   - TODO: Support for signals and effects
   - TODO: Implement routing
+  - TODO: write Leptos tests
+  - TODO: run integration tests
 - [ ] Add Django support (Python web framework)
   - TODO: Implement Django model parsing
   - TODO: Add URL routing support
   - TODO: Support for Django ORM
   - TODO: Implement template rendering
+  - TODO: write Django tests
+  - TODO: run integration tests
+  - TODO: test Django template rendering
 - [ ] Add Flask support (Python micro-framework)
   - TODO: Implement route decorators
   - TODO: Add request/response handling
   - TODO: Support for Flask extensions
   - TODO: Implement session management
+  - TODO: write Flask tests
+  - TODO: run integration tests
 - [ ] Add FastAPI support (Python async API)
   - TODO: Implement async endpoint parsing
   - TODO: Add automatic API documentation
   - TODO: Support for Pydantic models
   - TODO: Implement dependency injection
+  - TODO: write FastAPI tests
+  - TODO: run integration tests
 - [ ] Add Pydantic support (data validation)
   - TODO: Implement model validation
   - TODO: Add field types and constraints
   - TODO: Support for custom validators
   - TODO: Implement serialization/deserialization
+  - TODO: write Pydantic tests
+  - TODO: run integration tests
 - [ ] Add NumPy support (numerical computing)
   - TODO: Implement array operations
   - TODO: Add mathematical functions
   - TODO: Support for broadcasting
   - TODO: Implement linear algebra operations
+  - TODO: write NumPy tests
+  - TODO: run integration tests
 - [ ] Add Pandas support (data analysis)
   - TODO: Implement DataFrame operations
   - TODO: Add data manipulation functions
   - TODO: Support for CSV/Excel I/O
   - TODO: Implement data visualization integration
+  - TODO: write Pandas tests
+  - TODO: run integration tests
 - [ ] Add React support (UI library)
   - TODO: Implement JSX parsing
   - TODO: Add component lifecycle
   - TODO: Support for hooks
   - TODO: Implement virtual DOM
+  - TODO: write React tests
+  - TODO: run integration tests
 - [ ] Add Angular support (web framework)
   - TODO: Implement component decorators
   - TODO: Add dependency injection
   - TODO: Support for modules and services
   - TODO: Implement routing
+  - TODO: write Angular tests
+  - TODO: run integration tests
 - [ ] Add Vue.js support (progressive framework)
   - TODO: Implement Vue component parsing
   - TODO: Add reactive data binding
   - TODO: Support for directives
   - TODO: Implement single-file components
+  - TODO: write Vue.js tests
+  - TODO: run integration tests
 - [ ] Add Node.js support (JavaScript runtime)
   - TODO: Implement npm package integration
   - TODO: Add module system support
   - TODO: Support for CommonJS and ES modules
   - TODO: Implement event loop integration
+  - TODO: write Node.js tests
+  - TODO: run integration tests
 - [ ] Add Express.js support (web framework)
   - TODO: Implement middleware parsing
   - TODO: Add route handling
   - TODO: Support for Express plugins
   - TODO: Implement error handling
+  - TODO: write Express.js tests
+  - TODO: run integration tests
 - [ ] Add D3.js support (data visualization)
   - TODO: Implement SVG generation
   - TODO: Add data binding
   - TODO: Support for transitions
   - TODO: Implement interactive visualizations
+  - TODO: write D3.js tests
+  - TODO: run integration tests
 - [ ] Write package integration tests
   - TODO: Add unit tests for each package integration
   - TODO: Implement compatibility tests
   - TODO: Write performance benchmarks
   - TODO: Add integration test suites
+  - TODO: run integration tests
 
 ### 5.1 WASM Backend
 
@@ -512,36 +567,45 @@ This document consolidates all development tasks from TODO.md, FUTURE_DEVELOPMEN
   - TODO: Add memory management for WASM
   - TODO: Support for WASM function imports/exports
   - TODO: Implement table and global variable handling
+  - TODO: write WASM tests
+  - TODO: run WASM tests
 - [ ] Add wasm-bindgen integration
   - TODO: Implement JavaScript binding generation
   - TODO: Add TypeScript definition file generation
   - TODO: Support for complex type marshalling
   - TODO: Implement closure and callback support
   - TODO: Add error handling across JS/WASM boundary
+  - TODO: write wasm-bindgen tests
+  - TODO: run wasm-bindgen tests
 - [ ] Implement JS interop for WASM
   - TODO: Add DOM manipulation APIs
   - TODO: Implement Web API access (fetch, WebSocket, etc.)
   - TODO: Support for JavaScript object interaction
   - TODO: Add event handling integration
   - TODO: Implement promise/async interop
+  - TODO: write JS interop tests
+  - TODO: run JS interop tests
 - [ ] Add browser API support
   - TODO: Implement Canvas 2D/3D rendering
   - TODO: Add WebGL/WebGPU integration
   - TODO: Support for audio/video APIs
   - TODO: Implement geolocation and sensors
   - TODO: Add IndexedDB and local storage
+  - TODO: write browser API tests
+  - TODO: run integration tests
 - [ ] Implement WASM optimization
   - TODO: Add dead code elimination
   - TODO: Implement function inlining
   - TODO: Support for WASM-specific optimizations
   - TODO: Add bundle size optimization
   - TODO: Implement lazy loading
+  - TODO: write optimization tests
 - [ ] Write WASM backend tests
   - TODO: Add WASM module generation tests
-  - TODO: Implement JS interop functionality tests
-  - TODO: Write browser API integration tests
   - TODO: Add optimization correctness tests
   - TODO: Create end-to-end WASM application tests
+  - TODO: run all WASM tests
+  - TODO: debug and fix any issues
 
 ### 5.2 Embedded Targets
 
@@ -551,42 +615,55 @@ This document consolidates all development tasks from TODO.md, FUTURE_DEVELOPMEN
   - TODO: Add GPIO and ADC/DAC access
   - TODO: Support for deep sleep modes
   - TODO: Implement OTA update capability
+  - TODO: write integration tests
+  - TODO: run integration tests
 - [ ] Add RP2040 support
   - TODO: Integrate Raspberry Pi Pico toolchain
   - TODO: Add PIO (Programmable I/O) support
   - TODO: Implement multicore programming
   - TODO: Support for USB and UART
   - TODO: Add real-time capabilities
+  - TODO: write integration tests
+  - TODO: run integration tests
 - [ ] Implement STM32 support
   - TODO: Add STM32Cube integration
   - TODO: Implement peripheral access (SPI, I2C, UART)
   - TODO: Add interrupt handling
   - TODO: Support for FreeRTOS
   - TODO: Implement power management
+  - TODO: write integration tests
+  - TODO: run integration tests
 - [ ] Add Arduino support
   - TODO: Implement Arduino IDE integration
   - TODO: Add digital/analog I/O support
   - TODO: Support for common Arduino libraries
   - TODO: Implement serial communication
   - TODO: Add timer and interrupt support
+  - TODO: write integration tests
+  - TODO: run integration tests
 - [ ] Implement Nordic nRF52 support
   - TODO: Add nRF52 SDK integration
   - TODO: Implement Bluetooth Low Energy
   - TODO: Add mesh networking support
   - TODO: Support for NFC
   - TODO: Implement secure boot
+  - TODO: write integration tests
+  - TODO: run integration tests
 - [ ] Add embedded HAL (Hardware Abstraction Layer)
   - TODO: Implement unified GPIO interface
   - TODO: Add SPI/I2C/UART abstractions
   - TODO: Support for PWM and ADC
   - TODO: Implement timer abstractions
   - TODO: Add interrupt management
+  - TODO: write integration tests
+  - TODO: run integration tests
 - [ ] Write embedded target tests
   - TODO: Add hardware abstraction tests
   - TODO: Implement peripheral driver tests
-  - TODO: Write integration tests for each target
+  - TODO: Write resource management tests for each target
   - TODO: Add power consumption tests
   - TODO: Create real-time performance tests
+  - TODO: debug and fix any issues
 
 ### 5.3 Mobile Support
 
@@ -725,6 +802,7 @@ This document consolidates all development tasks from TODO.md, FUTURE_DEVELOPMEN
   - TODO: Support for multiple AI providers
   - TODO: Add model selection and configuration
   - TODO: Implement rate limiting and caching
+  - TODO: Add llm prompt with 0 shot examples of gul syntax, common patterns, and built-in functions.
 - [ ] Implement code explanation
   - TODO: Add function and class explanation
   - TODO: Implement algorithm explanation
@@ -749,12 +827,13 @@ This document consolidates all development tasks from TODO.md, FUTURE_DEVELOPMEN
   - TODO: Support for modernization refactoring
   - TODO: Implement safety improvements
   - TODO: Add maintainability enhancements
-- [ ] Write AI assistant tests
+- [ ] Write AI assistant intergration tests
   - TODO: Add LLM integration tests
   - TODO: Implement suggestion accuracy tests
   - TODO: Write code generation validation tests
   - TODO: Add performance and reliability tests
   - TODO: Create user interaction tests
+  - TODO: Add AI assistant documentation
 
 ---
 
