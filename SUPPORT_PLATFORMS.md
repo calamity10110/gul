@@ -35,7 +35,7 @@
 
 ## 📦 Native Package Support
 
-- **Rust**: Tokio, Axum, Serde, Dioxus, Tauri
+- **Rust**: Tokio, Axum, Serde, Dioxus, Tauri, Rustea
 - **Python**: NumPy, Pandas, Django, Flask, FastAPI
 - **JavaScript**: Node.js, Express.js, D3.js
 - **UI**: React, Vue, Angular (via integration)
