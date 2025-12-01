@@ -726,7 +726,7 @@ mod tests {
     #[test]
     fn test_constant_folding() {
         let mut codegen = WasmCodeGen::new();
-        let mut func = WasmFunction {
+        let func = WasmFunction {
             name: "test".to_string(),
             params: vec![],
             results: vec![WasmType::I32],

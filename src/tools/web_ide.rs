@@ -18,6 +18,7 @@ pub struct GulWebIde {
     /// Build output
     build_output: String,
     /// Settings
+    #[allow(dead_code)]
     settings: IdeSettings,
 }
 
@@ -169,7 +170,7 @@ impl GulWebIde {
 
     /// Format the active file
     pub fn format_active_file(&mut self) -> std::io::Result<()> {
-        if let Some(tab) = self.open_files.get_mut(self.active_tab) {
+        if let Some(_tab) = self.open_files.get_mut(self.active_tab) {
             // Integration with formatter would go here
             self.build_output = "File formatted successfully\n".to_string();
         }

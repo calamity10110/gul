@@ -1,17 +1,4 @@
-mod advanced;
-mod ast;
-mod autonomous;
-mod benchmarks;
-mod compiler;
-mod embedded;
-mod interop;
-mod lexer;
-mod memory;
-mod parser;
-mod platform;
-mod runtime;
-mod semantic;
-mod tools;
+use glob_lang::{autonomous, benchmarks, compiler, tools};
 
 use clap::{Parser, Subcommand};
 use colored::*;
@@ -87,6 +74,28 @@ enum Commands {
         #[arg(short, long)]
         version: Option<String>,
     },
+
+    /// Launch IDE
+    Ide {
+        /// IDE type (tui or web)
+        #[arg(short, long, default_value = "tui")]
+        mode: String,
+    },
+
+    /// Run optimizations
+    Optimize {
+        /// Source file to optimize
+        file: PathBuf,
+    },
+
+    /// Run refactoring tools
+    Refactor {
+        /// Source file to refactor
+        file: PathBuf,
+    },
+
+    /// Run benchmarks
+    Bench,
 }
 
 fn main() {
@@ -182,6 +191,82 @@ fn main() {
             println!("Preparing package for publication...");
             // Package publishing would connect to the package registry
             println!("{}", "Package published!".green());
+        }
+
+        Commands::Ide { mode } => match mode.as_str() {
+            "tui" => {
+                println!("Launching TUI IDE...");
+                let mut ide = tools::tui_ide::GulTuiIde::new();
+                if let Err(e) = ide.run() {
+                    eprintln!("TUI IDE error: {}", e);
+                }
+            }
+            "web" => {
+                println!("Launching Web IDE...");
+                let mut ide = tools::web_ide::GulWebIde::new();
+                if let Err(e) = ide.run_project() {
+                    eprintln!("Web IDE error: {}", e);
+                }
+            }
+            _ => eprintln!("Unknown IDE mode: {}", mode),
+        },
+
+        Commands::Optimize { file } => {
+            println!("Optimizing {}", file.display());
+            match std::fs::read_to_string(&file) {
+                Ok(code) => {
+                    let mut optimizer = autonomous::optimizer::AutoOptimizer::new(
+                        autonomous::optimizer::OptLevel::Aggressive,
+                    );
+                    match optimizer.optimize(&code) {
+                        Ok(optimized) => {
+                            println!("{}", optimizer.generate_report());
+                            // In a real scenario, we might write back to file or a new file
+                            println!("Optimized code length: {}", optimized.len());
+                        }
+                        Err(e) => eprintln!("Optimization failed: {}", e),
+                    }
+                }
+                Err(e) => eprintln!("Failed to read file: {}", e),
+            }
+        }
+
+        Commands::Refactor { file } => {
+            println!("Refactoring {}", file.display());
+            match std::fs::read_to_string(&file) {
+                Ok(code) => {
+                    let refactorer = autonomous::refactoring::SelfRefactoringCompiler::new();
+                    let matches = refactorer.analyze(&code);
+                    if matches.is_empty() {
+                        println!("No refactoring opportunities found.");
+                    } else {
+                        println!("Found {} refactoring opportunities:", matches.len());
+                        for m in matches {
+                            println!("- {:?}: {}", m.pattern, m.description);
+                        }
+                    }
+                }
+                Err(e) => eprintln!("Failed to read file: {}", e),
+            }
+        }
+
+        Commands::Bench => {
+            println!("Running benchmarks...");
+            use benchmarks::Benchmark;
+
+            let bench = benchmarks::compiler_bench::CompilationBenchmark::new("fn main() {}");
+            let result = bench.run();
+            println!(
+                "Benchmark: {}, Duration: {:?}, Memory: {} bytes",
+                result.name, result.duration, result.memory_usage
+            );
+
+            let runtime_bench = benchmarks::runtime_bench::RuntimeBenchmark::new(1_000_000);
+            let result = runtime_bench.run();
+            println!(
+                "Benchmark: {}, Duration: {:?}, Memory: {} bytes",
+                result.name, result.duration, result.memory_usage
+            );
         }
     }
 }

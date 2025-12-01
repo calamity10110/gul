@@ -20,9 +20,9 @@ pub enum AndroidArch {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum IOSArch {
-    ARM64,     // iPhone/iPad
-    X86_64,    // Simulator
-    ARM64_SIM, // M1 Mac Simulator
+    ARM64,    // iPhone/iPad
+    X86_64,   // Simulator
+    Arm64Sim, // M1 Mac Simulator
 }
 
 /// Mobile build configuration

@@ -34,6 +34,12 @@ impl SqlBridge {
             || q.starts_with("INSERT")
             || q.starts_with("UPDATE")
             || q.starts_with("DELETE")
+            || q.starts_with("CREATE")
+            || q.starts_with("DROP")
+            || q.starts_with("ALTER")
+            || q.starts_with("BEGIN")
+            || q.starts_with("COMMIT")
+            || q.starts_with("ROLLBACK")
     }
 
     pub fn map_result_type(&self, sql_type: &str) -> String {

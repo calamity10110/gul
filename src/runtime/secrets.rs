@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 // Secrets manager - handles encrypted credentials
 
+use base64::{engine::general_purpose::STANDARD, Engine as _};
 use std::collections::HashMap;
 use std::fs;
 
@@ -64,14 +65,15 @@ impl SecretsManager {
             .enumerate()
             .map(|(i, b)| b ^ key[i % key.len()])
             .collect();
-        base64::encode(&encrypted)
+        STANDARD.encode(&encrypted)
     }
 
     pub fn decrypt(&self, encrypted: &str) -> Result<String, String> {
         // Decrypt using same XOR key
         let key = b"gul_secret_key_32bytes_long!!!!";
-        let decoded =
-            base64::decode(encrypted).map_err(|e| format!("Failed to decode base64: {}", e))?;
+        let decoded = STANDARD
+            .decode(encrypted)
+            .map_err(|e| format!("Failed to decode base64: {}", e))?;
 
         let decrypted: Vec<u8> = decoded
             .iter()
