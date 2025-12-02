@@ -372,7 +372,7 @@ impl SymbolicMathEngine {
 
     /// Simplify unary operations
     fn simplify_unary(&self, op: UnaryOperator, expr: &Expression) -> Expression {
-        match (op.clone(), expr) {
+        match (op, expr) {
             // -(-x) = x
             (
                 UnaryOperator::Negate,
@@ -524,10 +524,10 @@ impl SymbolicMathEngine {
                 }
             }
             Expression::BinaryOp { left, op, right } => {
-                self.differentiate_binary(left, op.clone(), right, var)
+                self.differentiate_binary(left, *op, right, var)
             }
             Expression::UnaryOp { op, expr: inner } => {
-                self.differentiate_unary(op.clone(), inner, var)
+                self.differentiate_unary(*op, inner, var)
             }
             Expression::Power { base, exponent } => self.differentiate_power(base, exponent, var),
             Expression::Function { name, args } => self.differentiate_function(name, args, var),
@@ -1121,29 +1121,26 @@ impl SymbolicMathEngine {
     /// Solve linear equation ax + b = 0
     fn solve_linear(&self, left: &Expression, right: &Expression, var: &str) -> Vec<Expression> {
         // Check if this is ax + b format
-        match (left, right) {
-            (
+        if let (
                 Expression::BinaryOp {
                     left: a_expr,
                     op: BinaryOperator::Multiply,
                     right: x_expr,
                 },
                 b_expr,
-            ) => {
-                if let (Expression::Variable(x), Expression::Constant(b)) =
-                    (x_expr.as_ref(), b_expr)
-                {
-                    if x == var {
-                        if let Expression::Constant(a) = a_expr.as_ref() {
-                            if *a != 0.0 {
-                                // x = -b/a
-                                return vec![Expression::Constant(-b / a)];
-                            }
+            ) = (left, right) {
+            if let (Expression::Variable(x), Expression::Constant(b)) =
+                (x_expr.as_ref(), b_expr)
+            {
+                if x == var {
+                    if let Expression::Constant(a) = a_expr.as_ref() {
+                        if *a != 0.0 {
+                            // x = -b/a
+                            return vec![Expression::Constant(-b / a)];
                         }
                     }
                 }
             }
-            _ => {}
         }
 
         // Check if it's just ax = 0
@@ -1202,30 +1199,27 @@ impl SymbolicMathEngine {
         // This is a very simplified coefficient extractor
         // In a real implementation, this would be much more sophisticated
 
-        match expr {
-            Expression::BinaryOp {
+        if let Expression::BinaryOp {
                 left,
                 op: BinaryOperator::Add,
                 right,
-            } => {
-                // Check for ax^2 + bx
-                if let Expression::BinaryOp {
-                    left: ax2,
-                    op: BinaryOperator::Add,
-                    right: bx,
-                } = left.as_ref()
-                {
-                    if let (Some((a, 0.0, 0.0)), Some((b, 0.0, 0.0))) = (
-                        self.extract_term_coefficients(ax2, var),
-                        self.extract_term_coefficients(bx, var),
-                    ) {
-                        if let Expression::Constant(c) = right.as_ref() {
-                            return Some((a, b, *c));
-                        }
+            } = expr {
+            // Check for ax^2 + bx
+            if let Expression::BinaryOp {
+                left: ax2,
+                op: BinaryOperator::Add,
+                right: bx,
+            } = left.as_ref()
+            {
+                if let (Some((a, 0.0, 0.0)), Some((b, 0.0, 0.0))) = (
+                    self.extract_term_coefficients(ax2, var),
+                    self.extract_term_coefficients(bx, var),
+                ) {
+                    if let Expression::Constant(c) = right.as_ref() {
+                        return Some((a, b, *c));
                     }
                 }
             }
-            _ => {}
         }
 
         None

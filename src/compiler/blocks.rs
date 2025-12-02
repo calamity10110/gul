@@ -14,6 +14,12 @@ pub struct BlockOrganizer {
     main: Option<Statement>,
 }
 
+impl Default for BlockOrganizer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl BlockOrganizer {
     pub fn new() -> Self {
         BlockOrganizer {
@@ -104,8 +110,7 @@ impl BlockOrganizer {
     }
 
     fn generate_package_toml(&self) -> String {
-        format!(
-            r#"[package]
+        r#"[package]
 name = "my-package"
 version = "0.1.0"
 authors = []
@@ -118,8 +123,7 @@ async = "async.asy"
 functions = "functions.fnc"
 custom = "custom.cs"
 main = "main.mn"
-"#
-        )
+"#.to_string()
     }
 }
 

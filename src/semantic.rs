@@ -29,6 +29,12 @@ pub struct Symbol {
     pub ownership: Ownership,
 }
 
+impl Default for SymbolTable {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SymbolTable {
     pub fn new() -> Self {
         SymbolTable {

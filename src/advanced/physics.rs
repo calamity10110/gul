@@ -121,6 +121,12 @@ pub struct ParticleSystem {
     time: f64,
 }
 
+impl Default for ParticleSystem {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ParticleSystem {
     pub fn new() -> Self {
         ParticleSystem {
@@ -256,6 +262,12 @@ impl RigidBody {
 /// Collision Detection System
 pub struct CollisionDetector {
     broad_phase_pairs: Vec<(usize, usize)>,
+}
+
+impl Default for CollisionDetector {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl CollisionDetector {
@@ -471,6 +483,12 @@ pub struct ElectromagneticField {
     currents: Vec<(Vec3, Vec3)>, // Position, current vector
 }
 
+impl Default for ElectromagneticField {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ElectromagneticField {
     pub fn new() -> Self {
         ElectromagneticField {
@@ -540,6 +558,12 @@ pub struct PhysicsEngine {
     em_field: ElectromagneticField,
     rigid_bodies: Vec<RigidBody>,
     time: f64,
+}
+
+impl Default for PhysicsEngine {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl PhysicsEngine {

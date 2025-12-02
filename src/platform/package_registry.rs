@@ -181,7 +181,7 @@ impl PackageRegistry {
     /// Scan for vulnerabilities
     pub fn scan_vulnerabilities(&self, package: &Package) -> Result<(), String> {
         // Check against known vulnerable packages
-        let vulnerable_packages = vec!["malicious-pkg", "backdoor-lib"];
+        let vulnerable_packages = ["malicious-pkg", "backdoor-lib"];
 
         if vulnerable_packages.contains(&package.name.as_str()) {
             return Err(format!(
@@ -191,7 +191,7 @@ impl PackageRegistry {
         }
 
         // Check dependencies for vulnerabilities
-        for (dep_name, _) in &package.dependencies {
+        for dep_name in package.dependencies.keys() {
             if vulnerable_packages.contains(&dep_name.as_str()) {
                 return Err(format!("Dependency {} is vulnerable", dep_name));
             }
@@ -279,7 +279,7 @@ impl AutoImport {
         for symbol in symbols {
             self.symbol_index
                 .entry(symbol)
-                .or_insert_with(Vec::new)
+                .or_default()
                 .push(package_name.to_string());
         }
     }
@@ -290,11 +290,10 @@ impl AutoImport {
         let mut missing = Vec::new();
 
         for word in code.split_whitespace() {
-            if word.chars().next().map_or(false, |c| c.is_uppercase()) {
-                if !self.symbol_index.contains_key(word) {
+            if word.chars().next().is_some_and(|c| c.is_uppercase())
+                && !self.symbol_index.contains_key(word) {
                     missing.push(word.to_string());
                 }
-            }
         }
 
         missing

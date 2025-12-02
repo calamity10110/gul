@@ -78,8 +78,8 @@ impl AdvancedLinter {
 
     fn check_performance_issues(&mut self, line: &str, line_num: usize) {
         // Check for loop invariant code motion
-        if self.is_rule_enabled("performance_loop_invariant") {
-            if line.contains("loop") && line.contains("=") {
+        if self.is_rule_enabled("performance_loop_invariant")
+            && line.contains("loop") && line.contains("=") {
                 self.issues.push(AdvancedLintIssue {
                     severity: LintSeverity::Performance,
                     category: "performance".to_string(),
@@ -91,11 +91,10 @@ impl AdvancedLinter {
                     auto_fixable: false,
                 });
             }
-        }
 
         // Check for unnecessary clones
-        if self.is_rule_enabled("performance_unnecessary_clone") {
-            if line.contains(".clone()") && line.contains("&") {
+        if self.is_rule_enabled("performance_unnecessary_clone")
+            && line.contains(".clone()") && line.contains("&") {
                 self.issues.push(AdvancedLintIssue {
                     severity: LintSeverity::Performance,
                     category: "performance".to_string(),
@@ -106,13 +105,12 @@ impl AdvancedLinter {
                     auto_fixable: true,
                 });
             }
-        }
     }
 
     fn check_security_issues(&mut self, line: &str, line_num: usize) {
         // Check for SQL injection vulnerabilities
-        if self.is_rule_enabled("security_sql_injection") {
-            if line.contains("execute") && line.contains("+") && line.contains("\"") {
+        if self.is_rule_enabled("security_sql_injection")
+            && line.contains("execute") && line.contains("+") && line.contains("\"") {
                 self.issues.push(AdvancedLintIssue {
                     severity: LintSeverity::Security,
                     category: "security".to_string(),
@@ -125,11 +123,10 @@ impl AdvancedLinter {
                     auto_fixable: false,
                 });
             }
-        }
 
         // Check for XSS vulnerabilities
-        if self.is_rule_enabled("security_xss") {
-            if line.contains("innerHTML") || line.contains("dangerouslySetInnerHTML") {
+        if self.is_rule_enabled("security_xss")
+            && (line.contains("innerHTML") || line.contains("dangerouslySetInnerHTML")) {
                 self.issues.push(AdvancedLintIssue {
                     severity: LintSeverity::Security,
                     category: "security".to_string(),
@@ -140,13 +137,12 @@ impl AdvancedLinter {
                     auto_fixable: false,
                 });
             }
-        }
     }
 
     fn check_code_smells(&mut self, line: &str, line_num: usize) {
         // Check for long functions
-        if self.is_rule_enabled("code_smell_long_function") {
-            if line.contains("fn ") && line.len() > 100 {
+        if self.is_rule_enabled("code_smell_long_function")
+            && line.contains("fn ") && line.len() > 100 {
                 self.issues.push(AdvancedLintIssue {
                     severity: LintSeverity::Warning,
                     category: "code_smell".to_string(),
@@ -157,7 +153,6 @@ impl AdvancedLinter {
                     auto_fixable: false,
                 });
             }
-        }
 
         // Check for too many parameters
         if self.is_rule_enabled("code_smell_too_many_parameters") {

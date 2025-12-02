@@ -541,7 +541,7 @@ impl JsInterop {
             for import in &self.imports {
                 output.push_str(&format!("import {{ {} }} from './host.js';\n", import));
             }
-            output.push_str("\n");
+            output.push('\n');
         }
 
         // Generate export wrappers

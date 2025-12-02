@@ -101,11 +101,9 @@ impl FileSystem {
             .map_err(|e| format!("Failed to read directory '{}': {}", path, e))?;
 
         let mut result = Vec::new();
-        for entry in entries {
-            if let Ok(entry) = entry {
-                if let Some(name) = entry.file_name().to_str() {
-                    result.push(name.to_string());
-                }
+        for entry in entries.flatten() {
+            if let Some(name) = entry.file_name().to_str() {
+                result.push(name.to_string());
             }
         }
 

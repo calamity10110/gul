@@ -130,14 +130,13 @@ impl Parser {
             }
 
             // Skip closing delimiter if we had an opening one
-            if has_bracket {
-                if self.current_token() == &Token::RightBracket
+            if has_bracket
+                && (self.current_token() == &Token::RightBracket
                     || self.current_token() == &Token::RightBrace
-                    || self.current_token() == &Token::RightParen
+                    || self.current_token() == &Token::RightParen)
                 {
                     self.advance();
                 }
-            }
 
             self.skip_newlines();
             Ok(Statement::Import(module_name))

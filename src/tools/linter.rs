@@ -149,7 +149,7 @@ pub fn lint_file(file: &Path, fix: bool) -> Result<Vec<String>, String> {
             if let Some(fix_text) = &issue.auto_fix {
                 // Simple fix application (would need more sophisticated logic for real use)
                 fixed_source = fixed_source
-                    .replace(&source.lines().nth(issue.line - 1).unwrap_or(""), fix_text);
+                    .replace(source.lines().nth(issue.line - 1).unwrap_or(""), fix_text);
             }
         }
         std::fs::write(file, fixed_source).map_err(|e| format!("Failed to write file: {}", e))?;

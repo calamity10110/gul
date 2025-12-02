@@ -112,7 +112,7 @@ impl HttpClient {
             .send()
             .map_err(|e| format!("Request failed: {}", e))?;
 
-        Ok(HttpResponse::from_response(response)?)
+        HttpResponse::from_response(response)
     }
 
     /// Make a request with retry logic
