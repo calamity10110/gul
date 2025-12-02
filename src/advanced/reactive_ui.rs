@@ -2,10 +2,12 @@
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
+type SubscriberFn<T> = Box<dyn Fn(&T) + Send + Sync>;
+
 #[derive(Clone)]
 pub struct ReactiveState<T: Clone> {
     value: Arc<Mutex<T>>,
-    subscribers: Arc<Mutex<Vec<Box<dyn Fn(&T) + Send + Sync>>>>,
+    subscribers: Arc<Mutex<Vec<SubscriberFn<T>>>>,
 }
 
 impl<T: Clone> ReactiveState<T> {

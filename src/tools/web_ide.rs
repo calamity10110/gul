@@ -267,6 +267,7 @@ impl Terminal {
 }
 
 impl ProjectConfig {
+    #[allow(clippy::should_implement_trait)]
     /// Create default project configuration
     pub fn default() -> Self {
         ProjectConfig {
@@ -278,6 +279,7 @@ impl ProjectConfig {
 }
 
 impl IdeSettings {
+    #[allow(clippy::should_implement_trait)]
     /// Create default IDE settings
     pub fn default() -> Self {
         IdeSettings {

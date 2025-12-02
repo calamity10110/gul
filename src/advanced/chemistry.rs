@@ -340,7 +340,7 @@ impl EquationBalancer {
         Ok(coefficients)
     }
 
-    fn gaussian_elimination(matrix: &mut Vec<Vec<f64>>) -> Result<(), String> {
+    fn gaussian_elimination(matrix: &mut [Vec<f64>]) -> Result<(), String> {
         let rows = matrix.len();
         let cols = matrix[0].len();
 
@@ -362,6 +362,7 @@ impl EquationBalancer {
             }
 
             // Eliminate
+            #[allow(clippy::needless_range_loop)]
             for k in (i + 1)..rows {
                 let factor = matrix[k][i] / matrix[i][i];
                 for j in i..cols {

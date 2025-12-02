@@ -4,6 +4,7 @@
 use std::collections::HashMap;
 use std::process::Command;
 
+#[allow(clippy::type_complexity)]
 pub struct FfiBridge {
     rust_functions: HashMap<String, Box<dyn Fn(Vec<String>) -> String>>,
 }

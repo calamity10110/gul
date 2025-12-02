@@ -273,6 +273,7 @@ impl EmbeddedDisplay {
                     }
                 };
 
+    #[allow(clippy::needless_range_loop)]
                 if char_index < font.len() {
                     for row in 0..5 {
                         for col in 0..5 {

@@ -90,7 +90,7 @@ impl BlockOrganizer {
         // Write main.mn
         if let Some(main_stmt) = &self.main {
             // Format main statement properly
-            let content = self.format_statements(&[main_stmt.clone()]);
+            let content = self.format_statements(std::slice::from_ref(main_stmt));
             fs::write(output_path.join("main.mn"), content).map_err(|e| e.to_string())?;
         }
 
@@ -123,7 +123,8 @@ async = "async.asy"
 functions = "functions.fnc"
 custom = "custom.cs"
 main = "main.mn"
-"#.to_string()
+"#
+        .to_string()
     }
 }
 

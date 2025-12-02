@@ -129,7 +129,7 @@ impl UiRuntime {
             UiComponent::HBox { children } => self.render_hbox(children),
         }
     }
-
+    #[allow(clippy::only_used_in_recursion)]
     fn render_tree(&self, nodes: &[TreeNode], depth: usize, prefix: &str) {
         for (i, node) in nodes.iter().enumerate() {
             let is_last = i == nodes.len() - 1;

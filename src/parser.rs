@@ -103,18 +103,14 @@ impl Parser {
 
         // Handle flexible import syntax: imp [python: numpy] or imp python: numpy
         // Skip optional grouping delimiters
-        let has_bracket = if self.current_token() == &Token::LeftBracket {
+        let has_bracket = matches!(
+            self.current_token(),
+            Token::LeftBracket | Token::LeftBrace | Token::LeftParen
+        );
+
+        if has_bracket {
             self.advance();
-            true
-        } else if self.current_token() == &Token::LeftBrace {
-            self.advance();
-            true
-        } else if self.current_token() == &Token::LeftParen {
-            self.advance();
-            true
-        } else {
-            false
-        };
+        }
 
         if let Token::Identifier(module) = self.current_token() {
             let module_name = module.clone();
@@ -134,9 +130,9 @@ impl Parser {
                 && (self.current_token() == &Token::RightBracket
                     || self.current_token() == &Token::RightBrace
                     || self.current_token() == &Token::RightParen)
-                {
-                    self.advance();
-                }
+            {
+                self.advance();
+            }
 
             self.skip_newlines();
             Ok(Statement::Import(module_name))

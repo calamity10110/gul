@@ -82,7 +82,7 @@ impl IdeState {
     pub fn get_file_content(&self, path: &PathBuf) -> Option<&String> {
         self.open_files.get(path)
     }
-
+    #[allow(clippy::ptr_arg)]
     pub fn update_file_content(&mut self, path: &PathBuf, content: String) {
         self.open_files.insert(path.clone(), content);
     }

@@ -360,7 +360,7 @@ impl NativeAPIBridge {
 
                 for api in self.apis.values() {
                     for method in &api.methods {
-                        code.push_str(&"    @JavascriptInterface\n".to_string());
+                        code.push_str("    @JavascriptInterface\n");
                         code.push_str(&format!("    public void {}() {{\n", method));
                         code.push_str("        // Implementation\n");
                         code.push_str("    }\n\n");
