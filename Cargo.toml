@@ -1,6 +1,6 @@
 [package]
 name = "gul"
-version = "0.12.0"
+version = "0.13.0"
 edition = "2021"
 authors = ["GUL Team <team@gul-lang.org>"]
 description = "GUL (Glob Universal Language) - A universal programming language with multi-language integration, flexible imports, and comprehensive annotations"
