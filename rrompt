@@ -1,0 +1,36 @@
+
+let mut count = 0 - Clear, add let ? count = 0
+import { a, b, c } - One clear way
+Annotation Overload
+❌ @ for types, functions, operators, everything
+✅ Separate concerns with proper keywords
+mn main() Unclear
+❌ mn main() - What does mn mean?
+✅ fn main() - Standard like every language
+Block System Too Magic
+❌ Auto-splits code into 6 files
+✅ Manual organization (make it optional)
+Inconsistent Keywords
+❌ 
+def
+, fn, asy, mn, 
+imp
+, 
+cs
+✅ 
+const
+, fn, async, 
+main
+, import, extern
+UI Syntax Bizarre
+❌ ^÷^[button{}] - Impossible to type
+✅ ui.button() - Standard function call
+Scientific Notation Unclear
+❌ 10 m/s - Ambiguous parsing
+✅ 10.unit("m/s") - Explicit units
+Ownership Half-Baked
+❌ @own, @ref, @copy - No enforcement
+✅ Full Rust-like system or drop it
+Multi-Language Unclear
+❌ @cs python: - Unclear boundaries
+✅ extern python {} - Explicit blocks

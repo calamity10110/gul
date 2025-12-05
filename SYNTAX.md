@@ -49,46 +49,50 @@ Run it: `glob run hello.mn`
 
 ### Immutable Variables (Default)
 
-````glob
-# Immutable - cannot be changed after creation (def is optional)
-def name = "Alice"
-age = 25
-def PI = 3.14159
+```glob
+# Immutable - cannot be changed after creation
+name = "Alice"        # Immutable by default
+age = 25              # Immutable by default
+const PI = 3.14159    # Explicit immutable (recommended)
+def MAX = 100         # Legacy syntax (still supported)
+```
 
+### Mutable Variables
 
-### Mutable Variables (? prefix, def is optional)
+GUL supports **two syntaxes** for mutable variables:
 
 ```glob
-# Mutable - can be changed
-def ?count = 0
-?total = 100
+# Option 1: mut keyword (recommended for new code)
+mut count = 0
+mut total = 100
 
-# Now we can change them
-?count = ?count + 1  # OK: count is now 1
-?total = ?total - 50  # OK: total is now 50
-?name = "Alice"       # OK: name is now "Alice"
+# Option 2: ? prefix (legacy, still supported)
+?counter = 0
+?sum = 100
 
-````
+# Both work the same way:
+mut count = count + 1   # OK: count is now 1
+?counter = ?counter + 1 # OK: counter is now 1
+```
+
+**Recommendation:** Use `mut` for new code as it's clearer and more familiar to developers from other languages.
 
 ### When to Use Mutable vs Immutable
 
 ```glob
 # Use immutable for constants
-def MAX_USERS = 1000
-API_URL = "https://api.example.com"
+const MAX_USERS = 1000
+const API_URL = "https://api.example.com"
 
 # Use mutable for counters, accumulators
-def ?counter = 0
-?sum = 0
+mut counter = 0
+mut sum = 0
 
 fn count_items(items):
-    ?count = 0
+    mut count = 0
     for item in items:
-        ?count = ?count + 1
-    return ?count
-# or
-fn @count(items):
-    return ?count
+        count = count + 1
+    return count
 ```
 
 ### Global vs Static Variables
@@ -120,109 +124,79 @@ fn get_cached(key):
 
 ---
 
-## Flexible Import System
+## Import System
 
-GUL supports multiple equivalent import syntaxes. Choose the style you prefer!
+GUL supports flexible import syntax. Use `import` keyword (recommended) or `imp` (legacy).
 
-### Format 1: Individual Imports
+### Individual Imports
 
 ```glob
-# Import one at a time
+# Recommended: import keyword
+import std.io
+import std.http
+import python.numpy
+import python.matplotlib
+import rust.tokio
+
+# Legacy: imp keyword (still supported)
 imp std.io
-imp std.http
-imp python: numpy
-imp python: matplotlib
-imp rust: tokio
-imp my_package
+imp python.numpy
 ```
 
-### Format 2: Grouped Imports with Brackets
+### Grouped Imports
 
 ```glob
-# Group related imports
-imp [
-    python: (numpy, matplotlib, pandas),
-    rust: (tokio, serde),
-    my_package,
-    other_package
-]
-```
-
-### Format 3: Grouped Imports with Braces
-
-```glob
-# Using braces (equivalent to brackets)
-imp python: {numpy, matplotlib}
-imp rust: {tokio, serde}
-imp {my_package, other_package}
-```
-
-### Format 4: Grouped Imports with Parentheses
-
-```glob
-# Using parentheses (also equivalent)
-imp python: (numpy, matplotlib)
-imp rust: (tokio, serde)
-imp (my_package, other_package)
-```
-
-### Format 5: Mixed Styles
-
-```glob
-# Mix and match - all valid!
-imp {
-    python: [numpy, matplotlib],
-    rust: (tokio, serde),
-    my_package
+# Group related imports with braces
+import {
+    std.io,
+    std.http,
+    python.numpy,
+    python.pandas
 }
 
-# Or even:
-imp [python: {numpy, matplotlib}, rust: (tokio)]
+# Shorthand for language packages
+import python{numpy, pandas, matplotlib}
+import rust{tokio, serde}
 ```
 
-### Bracket Equivalence Rule
-
-**Important:** `[]`, `{}`, and `()` work the same for grouping, as long as they match:
+### Mixed Syntax
 
 ```glob
-# All of these are valid:
-imp [a, b, c]
-imp {a, b, c}
-imp (a, b, c)
-
-# These are also valid:
-imp python: [numpy, pandas]
-imp python: {numpy, pandas}
-imp python: (numpy, pandas)
-
-# But these are ERRORS (mismatched):
-# imp [a, b, c}    # ERROR: [ doesn't match }
-# imp {a, b, c]    # ERROR: { doesn't match ]
+# Combine individual and grouped
+import std.io
+import std.http
+import {
+    python{numpy, pandas},
+    rust{tokio, serde}
+}
 ```
 
 ### Import Examples
 
 ```glob
 # Data science project
-imp [
-    python: (numpy, pandas, matplotlib, scipy),
-    std: (io, math, stats)
-]
+import {
+    std.io,
+    std.math,
+    python{numpy, pandas, matplotlib, scipy}
+}
 
 # Web server project
-imp {
-    std: {http, io, json},
-    rust: {tokio, serde},
-    js: (express, axios)
+import {
+    std{http, io, json},
+    rust{tokio, serde},
+    js{express, axios}
 }
 
 # IoT project
-imp (
-    embedded: (gpio, i2c, spi),
-    std: (time, io),
-    rust: tokio
-)
+import {
+    embedded{gpio, i2c, spi},
+    std{time, io},
+    rust.tokio
+}
 ```
+
+**Recommendation:** Use `import` keyword for new code. The `imp` keyword is maintained for backward compatibility.
 
 ---
 
@@ -248,13 +222,18 @@ fn increment(@mut ?value):
 ### Async Functions
 
 ```glob
-# Basic async function
-@asy fetch_data(url):
+# Async function (recommended syntax)
+async fetch_data(url):
+    response = await http.get(url)
+    return response.json()
+
+# Legacy syntax (still supported)
+@asy fetch_data_legacy(url):
     response = await http.get(url)
     return response.json()
 
 # Async with error handling
-@asy safe_fetch(url):
+async safe_fetch(url):
     try:
         data = await fetch_data(url)
         return data
@@ -263,32 +242,41 @@ fn increment(@mut ?value):
         return null
 ```
 
+**Recommendation:** Use `async` keyword for new code. The `@asy` syntax is maintained for backward compatibility.
+
 ---
 
 ## Annotations
 
-GUL uses `@` prefix for annotations. Annotations provide type hints, optimization hints, and semantic information.
+GUL supports **two syntaxes** for type annotations:
 
 ### Type Annotations
 
 ```glob
-# Basic types
+# Option 1: Colon syntax (recommended)
+age: int = 25
+name: str = "Alice"
+price: float = 19.99
+is_active: bool = true
+
+# Option 2: @ prefix (legacy, still supported)
 @int age = 25
 @str name = "Alice"
 @float price = 19.99
 @bool is_active = true
-@char letter = 'A'
 
 # Collection types
-@lst numbers = [1, 2, 3, 4, 5]
+numbers: list = [1, 2, 3, 4, 5]
+person: map = {name: "Bob", age: 30}
+unique_ids: set = {1, 2, 3}
+
+# Or with @ prefix:
+@list numbers = [1, 2, 3, 4, 5]
 @map person = {name: "Bob", age: 30}
 @set unique_ids = {1, 2, 3}
-
-# Special types
-@null empty = null
-@any value = anything
-@void no_return = undefined
 ```
+
+**Recommendation:** Use `:` syntax for new code as it's more familiar. The `@` prefix is faster to type and still supported.
 
 ### Mutable Type Annotations
 
@@ -506,12 +494,17 @@ fn backup_data(@copy data):
 ## UI Components
 
 ```glob
-# Inline UI components with ^÷^ syntax
+# Template literal syntax (recommended)
+ui.render(`<button text="Click Me" color="blue">`)
+ui.render(`<slider min=0 max=100 value=50>`)
+ui.render(`<table headers=["Name", "Age"] rows=data>`)
+ui.render(`<chart type="bar" data=values>`)
+
+# Legacy syntax (still supported)
 ui.print(^÷^[button{text="Click Me", color="blue"}])
-ui.print(^÷^[slider{min=0, max=100, value=50}])
-ui.print(^÷^[table{headers=["Name", "Age"], rows=data}])
-ui.print(^÷^[chart{type="bar", data=values}])
 ```
+
+**Recommendation:** Use template literals with backticks for new code.
 
 ---
 
@@ -520,14 +513,23 @@ ui.print(^÷^[chart{type="bar", data=values}])
 ### Python Integration
 
 ```glob
-imp python: (numpy, pandas)
+import python{numpy, pandas}
 
+# Recommended: extern syntax
+extern python {
+    fn analyze(data: list) -> float {
+        import numpy as np
+        return np.mean(data)
+    }
+}
+
+# Legacy syntax (still supported)
 @cs python:
     import numpy as np
-    def analyze(data):
+    def analyze_legacy(data):
         return np.mean(data)
 
-mn main():
+main():
     data = [1, 2, 3, 4, 5]
     result = analyze(data)
     print(result)
@@ -536,14 +538,15 @@ mn main():
 ### Rust Integration
 
 ```glob
-imp rust: tokio
+import rust.tokio
 
-@cs rust:
+extern rust {
     fn fast_compute(n: u64) -> u64 {
         n * n
     }
+}
 
-mn main():
+main():
     result = fast_compute(100)
     print(result)
 ```
