@@ -51,7 +51,7 @@ impl Course {
                 title: "Welcome to GUL".to_string(),
                 description: "Introduction to GUL and your first program".to_string(),
                 content: r#"
-Welcome to GUL (Glob Universal Language)!
+Welcome to GUL (GUL Universal Language)!
 
 GUL is a universal programming language that allows you to:
 - Write code in multiple languages in one file

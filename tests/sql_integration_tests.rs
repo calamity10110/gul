@@ -3,7 +3,7 @@
 
 #[cfg(test)]
 mod sql_integration_tests {
-    use glob_lang::interop::sql::SqlBridge;
+    use gul_lang::interop::sql::SqlBridge;
 
     #[test]
     fn test_sql_bridge_creation() {

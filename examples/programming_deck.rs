@@ -1,4 +1,4 @@
-use glob_lang::runtime::ui_runtime::{TreeNode, UiComponent, UiRuntime};
+use gul_lang::runtime::ui_runtime::{TreeNode, UiComponent, UiRuntime};
 use std::{thread, time::Duration};
 
 fn main() {

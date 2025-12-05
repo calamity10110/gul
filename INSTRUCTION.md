@@ -1,6 +1,6 @@
-# GUL (Glob Universal Language) - Getting Started Guide
+# GUL (GUL Universal Language) - Getting Started Guide
 
-Welcome to **GUL** - the Glob Universal Language! This guide will teach you everything you need to start coding in GUL.
+Welcome to **GUL** - the GUL Universal Language! This guide will teach you everything you need to start coding in GUL.
 
 ## 📋 Table of Contents
 
@@ -393,7 +393,7 @@ ui.print(^÷^[button{text="Click Me!"}])
 Use this prompt to teach an LLM how to code in GUL:
 
 ````
-You are an expert GUL (Glob Universal Language) programmer. GUL is a universal programming language with these key features:
+You are an expert GUL (GUL Universal Language) programmer. GUL is a universal programming language with these key features:
 
 1. SYNTAX:
    - Variables: `def name = value` (immutable), `?name = value` (mutable)

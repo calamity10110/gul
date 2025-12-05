@@ -3,9 +3,9 @@ name = "gul"
 version = "0.13.0"
 edition = "2021"
 authors = ["GUL Team <team@gul-lang.org>"]
-description = "GUL (Glob Universal Language) - A universal programming language with multi-language integration, flexible imports, and comprehensive annotations"
+description = "GUL (GUL Universal Language) - A universal programming language with multi-language integration, flexible imports, and comprehensive annotations"
 license = "MIT"
-repository = "https://github.com/glob-lang/glob"
+repository = "https://github.com/gul-lang/gul"
 keywords = [
     "compiler",
     "programming-language",
@@ -16,7 +16,7 @@ keywords = [
 categories = ["compilers", "development-tools"]
 
 [lib]
-name = "glob_lang"
+name = "gul_lang"
 path = "src/lib.rs"
 
 [dependencies]

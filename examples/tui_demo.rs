@@ -1,4 +1,4 @@
-use glob_lang::runtime::ui_runtime::{UiComponent, UiRuntime};
+use gul_lang::runtime::ui_runtime::{UiComponent, UiRuntime};
 use std::{thread, time::Duration};
 
 fn main() {

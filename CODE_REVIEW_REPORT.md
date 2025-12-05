@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-This review addresses three key areas for improvement in the GUL (Glob Universal Language) project:
+This review addresses three key areas for improvement in the GUL (GUL Universal Language) project:
 
 1. **Minor Code Cleanup**: Unused `peek` method in parser
 2. **Documentation**: Inline documentation coverage across modules

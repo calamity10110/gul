@@ -1,4 +1,4 @@
-# GUL (Glob Universal Language) - Development Plan
+# GUL (GUL Universal Language) - Development Plan
 
 **Current Version:** v0.12.2  
 **Status:** ✅ Phases 0-15 Complete | 🚀 Ready for Phase 16  

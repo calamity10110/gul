@@ -1,6 +1,6 @@
 # GUL Language - Complete Syntax Guide (v0.11.0)
 
-**GUL** (Glob Universal Language) - A modern, multi-paradigm programming language
+**GUL** (GUL Universal Language) - A modern, multi-paradigm programming language
 
 ---
 

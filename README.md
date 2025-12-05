@@ -1,4 +1,4 @@
-# GUL - Glob Universal Language
+# GUL - GUL Universal Language
 
 **A modern, multi-paradigm programming language designed for everyone**
 
@@ -11,7 +11,7 @@
 
 ## 🌟 What is GUL?
 
-GUL (Glob Universal Language) is a revolutionary programming language that combines:
+GUL (GUL Universal Language) is a revolutionary programming language that combines:
 
 - **🐍 Python's** simplicity and readability
 - **🦀 Rust's** safety and performance

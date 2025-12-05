@@ -1,4 +1,4 @@
-use glob_lang::{autonomous, benchmarks, compiler, tools};
+use gul_lang::{autonomous, benchmarks, compiler, tools};
 
 use clap::{Parser, Subcommand};
 use colored::*;
