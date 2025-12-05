@@ -54,6 +54,52 @@ jobs:
       - name: Run doc tests
         run: cargo test --doc --verbose
 
+  test-packages:
+    name: Test Packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          override: true
+
+      - name: Test gul-http
+        run: cd packages/web/gul-http && cargo test --verbose
+
+      - name: Test gul-tui
+        run: cd packages/tui/gul-tui && cargo test --verbose
+
+      - name: Build examples
+        run: |
+          cd packages/web/gul-http && cargo build --examples
+          cd ../../../packages/tui/gul-tui && cargo build --examples
+
+  test-no-std:
+    name: Test no_std targets
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target:
+          - thumbv7em-none-eabihf
+          - riscv32imac-unknown-none-elf
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          target: ${{ matrix.target }}
+          override: true
+
+      - name: Build for ${{ matrix.target }}
+        run: cargo build --target ${{ matrix.target }} --no-default-features
+
   lint:
     name: Linting
     runs-on: ubuntu-latest

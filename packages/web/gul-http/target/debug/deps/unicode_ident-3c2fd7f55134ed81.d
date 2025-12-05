@@ -1,0 +1,8 @@
+/media/vu/512gb/blob/gul/packages/web/gul-http/target/debug/deps/unicode_ident-3c2fd7f55134ed81.d: /home/vu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/unicode-ident-1.0.22/src/lib.rs /home/vu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/unicode-ident-1.0.22/src/tables.rs
+
+/media/vu/512gb/blob/gul/packages/web/gul-http/target/debug/deps/libunicode_ident-3c2fd7f55134ed81.rlib: /home/vu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/unicode-ident-1.0.22/src/lib.rs /home/vu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/unicode-ident-1.0.22/src/tables.rs
+
+/media/vu/512gb/blob/gul/packages/web/gul-http/target/debug/deps/libunicode_ident-3c2fd7f55134ed81.rmeta: /home/vu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/unicode-ident-1.0.22/src/lib.rs /home/vu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/unicode-ident-1.0.22/src/tables.rs
+
+/home/vu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/unicode-ident-1.0.22/src/lib.rs:
+/home/vu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/unicode-ident-1.0.22/src/tables.rs:
