@@ -4,7 +4,7 @@ use std::fmt;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {
-    // Keywords
+    // Keywords (legacy)
     Imp,
     Def,
     Fn,
@@ -27,6 +27,14 @@ pub enum Token {
     Continue,
     Try,
     Catch,
+
+    // New keywords (v2.0)
+    Import, // import (replaces imp)
+    Const,  // const (explicit immutable)
+    Mut,    // mut (mutable)
+    Async,  // async (replaces asy)
+    Extern, // extern (replaces cs)
+    Main,   // main (optional, can use without mn)
 
     // Literals
     Integer(i64),
@@ -473,6 +481,7 @@ impl Lexer {
 
         // Check for keywords first
         let token = match value.as_str() {
+            // Legacy keywords (backward compatibility)
             "imp" => Token::Imp,
             "def" => Token::Def,
             "fn" => Token::Fn,
@@ -495,8 +504,19 @@ impl Lexer {
             "continue" => Token::Continue,
             "try" => Token::Try,
             "catch" => Token::Catch,
+
+            // New keywords (v2.0)
+            "import" => Token::Import,
+            "const" => Token::Const,
+            "mut" => Token::Mut,
+            "async" => Token::Async,
+            "extern" => Token::Extern,
+            "main" => Token::Main,
+
+            // Boolean literals
             "true" => Token::Bool(true),
             "false" => Token::Bool(false),
+
             _ => Token::Identifier(value.clone()),
         };
 
