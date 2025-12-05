@@ -1,0 +1,1 @@
+/media/vu/512gb/blob/gul/packages/tui/gul-tui/target/debug/examples/basic: /media/vu/512gb/blob/gul/packages/tui/gul-tui/examples/basic.rs /media/vu/512gb/blob/gul/packages/tui/gul-tui/src/layout.rs /media/vu/512gb/blob/gul/packages/tui/gul-tui/src/lib.rs /media/vu/512gb/blob/gul/packages/tui/gul-tui/src/style.rs /media/vu/512gb/blob/gul/packages/tui/gul-tui/src/widgets.rs
