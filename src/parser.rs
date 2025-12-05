@@ -78,7 +78,7 @@ impl Parser {
             Token::Fn => self.parse_function(false),
             Token::Asy => self.parse_function(true),
             Token::Cs => self.parse_custom_block(),
-            Token::Mn => self.parse_main(),
+            Token::Mn | Token::Main => self.parse_main(),
             Token::If => self.parse_if(),
             Token::Loop => self.parse_loop(),
             Token::For => self.parse_for(),
@@ -254,7 +254,7 @@ impl Parser {
 
             match self.current_token() {
                 Token::Eof => break,
-                Token::Def | Token::Fn | Token::Asy | Token::Cs | Token::Mn => break,
+                Token::Def | Token::Fn | Token::Asy | Token::Cs | Token::Mn | Token::Main => break,
                 _ => {
                     // Check if this looks like end of block (next line is dedented)
                     // For now, just parse the statement
@@ -299,6 +299,7 @@ impl Parser {
                         | Token::Asy
                         | Token::Cs
                         | Token::Mn
+                        | Token::Main
                         | Token::Imp
                         | Token::At
                 ) {
@@ -319,6 +320,7 @@ impl Parser {
                             | Token::Asy
                             | Token::Cs
                             | Token::Mn
+                            | Token::Main
                             | Token::Imp
                             | Token::At
                     ) {
@@ -337,24 +339,34 @@ impl Parser {
     }
 
     fn parse_main(&mut self) -> Result<Statement, String> {
-        self.advance(); // Skip 'mn'
+        let is_new_syntax = matches!(self.current_token(), Token::Main);
+        self.advance(); // Skip 'mn' or 'main'
 
-        if let Token::Identifier(name) = self.current_token() {
-            if name != "main" {
-                return Err("Expected 'main' after 'mn'".to_string());
-            }
-            self.advance();
-
+        if is_new_syntax {
+            // New syntax: main(): (no 'main' identifier needed)
             self.expect(Token::LeftParen)?;
             self.expect(Token::RightParen)?;
             self.expect(Token::Colon)?;
             self.skip_newlines();
 
             let body = self.parse_block()?;
-
             Ok(Statement::Main { body })
         } else {
-            Err("Expected 'main' after 'mn'".to_string())
+            // Legacy syntax: mn main():
+            match self.current_token().clone() {
+                Token::Identifier(name) if name == "main" => {
+                    self.advance(); // Skip 'main' identifier
+
+                    self.expect(Token::LeftParen)?;
+                    self.expect(Token::RightParen)?;
+                    self.expect(Token::Colon)?;
+                    self.skip_newlines();
+
+                    let body = self.parse_block()?;
+                    Ok(Statement::Main { body })
+                }
+                _ => Err("Expected 'main' after 'mn'".to_string()),
+            }
         }
     }
 
