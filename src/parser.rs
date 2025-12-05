@@ -353,8 +353,22 @@ impl Parser {
             Ok(Statement::Main { body })
         } else {
             // Legacy syntax: mn main():
-            match self.current_token().clone() {
+            // Note: 'main' might be tokenized as Token::Main (keyword) or Token::Identifier("main")
+            match self.current_token() {
+                Token::Main => {
+                    // 'main' was tokenized as keyword
+                    self.advance(); // Skip 'main' keyword
+
+                    self.expect(Token::LeftParen)?;
+                    self.expect(Token::RightParen)?;
+                    self.expect(Token::Colon)?;
+                    self.skip_newlines();
+
+                    let body = self.parse_block()?;
+                    Ok(Statement::Main { body })
+                }
                 Token::Identifier(name) if name == "main" => {
+                    // 'main' was tokenized as identifier (shouldn't happen but handle it)
                     self.advance(); // Skip 'main' identifier
 
                     self.expect(Token::LeftParen)?;
