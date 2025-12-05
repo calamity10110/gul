@@ -1,0 +1,13 @@
+[package]
+name = "gul-chart"
+version = "0.1.0"
+edition = "2021"
+authors = ["GUL Team <team@gul-lang.org>"]
+description = "Terminal charts"
+license = "MIT"
+repository = "https://github.com/gul-lang/packages"
+keywords = ["chart", "visualization"]
+
+[dependencies]
+
+[dev-dependencies]

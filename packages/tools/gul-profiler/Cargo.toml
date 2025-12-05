@@ -1,0 +1,13 @@
+[package]
+name = "gul-profiler"
+version = "0.1.0"
+edition = "2021"
+authors = ["GUL Team <team@gul-lang.org>"]
+description = "Performance profiler TUI"
+license = "MIT"
+repository = "https://github.com/gul-lang/packages"
+keywords = ["profiler", "performance", "tui"]
+
+[dependencies]
+
+[dev-dependencies]

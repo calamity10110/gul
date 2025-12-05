@@ -1,0 +1,13 @@
+[package]
+name = "gul-terminal"
+version = "0.1.0"
+edition = "2021"
+authors = ["GUL Team <team@gul-lang.org>"]
+description = "Terminal emulator"
+license = "MIT"
+repository = "https://github.com/gul-lang/packages"
+keywords = ["terminal", "emulator"]
+
+[dependencies]
+
+[dev-dependencies]

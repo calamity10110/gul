@@ -1,0 +1,13 @@
+[package]
+name = "gul-git"
+version = "0.1.0"
+edition = "2021"
+authors = ["GUL Team <team@gul-lang.org>"]
+description = "Git TUI interface"
+license = "MIT"
+repository = "https://github.com/gul-lang/packages"
+keywords = ["git", "vcs", "tui"]
+
+[dependencies]
+
+[dev-dependencies]

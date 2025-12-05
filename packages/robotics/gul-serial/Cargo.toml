@@ -1,0 +1,13 @@
+[package]
+name = "gul-serial"
+version = "0.1.0"
+edition = "2021"
+authors = ["GUL Team <team@gul-lang.org>"]
+description = "Serial port"
+license = "MIT"
+repository = "https://github.com/gul-lang/packages"
+keywords = ["serial", "uart", "embedded"]
+
+[dependencies]
+
+[dev-dependencies]

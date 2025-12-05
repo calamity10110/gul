@@ -1,0 +1,13 @@
+[package]
+name = "gul-redis"
+version = "0.1.0"
+edition = "2021"
+authors = ["GUL Team <team@gul-lang.org>"]
+description = "Redis client"
+license = "MIT"
+repository = "https://github.com/gul-lang/packages"
+keywords = ["redis", "cache", "database"]
+
+[dependencies]
+
+[dev-dependencies]

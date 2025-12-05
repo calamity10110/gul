@@ -1,0 +1,13 @@
+[package]
+name = "gul-debug"
+version = "0.1.0"
+edition = "2021"
+authors = ["GUL Team <team@gul-lang.org>"]
+description = "Debugging tools"
+license = "MIT"
+repository = "https://github.com/gul-lang/packages"
+keywords = ["debug", "tools"]
+
+[dependencies]
+
+[dev-dependencies]

@@ -1,0 +1,13 @@
+[package]
+name = "gul-css"
+version = "0.1.0"
+edition = "2021"
+authors = ["GUL Team <team@gul-lang.org>"]
+description = "CSS utilities"
+license = "MIT"
+repository = "https://github.com/gul-lang/packages"
+keywords = ["css", "style"]
+
+[dependencies]
+
+[dev-dependencies]

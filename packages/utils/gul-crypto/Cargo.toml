@@ -1,0 +1,14 @@
+[package]
+name = "gul-crypto"
+version = "0.1.0"
+edition = "2021"
+authors = ["GUL Team <team@gul-lang.org>"]
+description = "Cryptography library for GUL"
+license = "MIT"
+repository = "https://github.com/gul-lang/packages"
+keywords = ["crypto", "encryption", "gul"]
+categories = ["development-tools"]
+
+[dependencies]
+
+[dev-dependencies]

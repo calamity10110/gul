@@ -1,0 +1,13 @@
+[package]
+name = "gul-spi"
+version = "0.1.0"
+edition = "2021"
+authors = ["GUL Team <team@gul-lang.org>"]
+description = "SPI communication"
+license = "MIT"
+repository = "https://github.com/gul-lang/packages"
+keywords = ["spi", "hardware", "embedded"]
+
+[dependencies]
+
+[dev-dependencies]

@@ -1,0 +1,13 @@
+[package]
+name = "gul-numpy"
+version = "0.1.0"
+edition = "2021"
+authors = ["GUL Team <team@gul-lang.org>"]
+description = "Array operations"
+license = "MIT"
+repository = "https://github.com/gul-lang/packages"
+keywords = ["numpy", "array", "math"]
+
+[dependencies]
+
+[dev-dependencies]

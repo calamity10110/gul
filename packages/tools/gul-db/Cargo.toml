@@ -1,0 +1,13 @@
+[package]
+name = "gul-db"
+version = "0.1.0"
+edition = "2021"
+authors = ["GUL Team <team@gul-lang.org>"]
+description = "Database TUI client"
+license = "MIT"
+repository = "https://github.com/gul-lang/packages"
+keywords = ["database", "client", "tui"]
+
+[dependencies]
+
+[dev-dependencies]
