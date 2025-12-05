@@ -73,10 +73,29 @@ jobs:
       - name: Test gul-tui
         run: cd packages/tui/gul-tui && cargo test --verbose
 
+      - name: Test gul-json
+        run: cd packages/utils/gul-json && cargo test --verbose
+
+      - name: Test gul-ssh
+        run: cd packages/tui/gul-ssh && cargo test --verbose
+
+      - name: Test gul-ml
+        run: cd packages/data-science/gul-ml && cargo test --verbose
+
+      - name: Test gul-postgres
+        run: cd packages/database/gul-postgres && cargo test --verbose
+
+      - name: Test gul-test
+        run: cd packages/testing/gul-test && cargo test --verbose
+
+      - name: Test gul-datetime
+        run: cd packages/utils/gul-datetime && cargo test --verbose
+
       - name: Build examples
         run: |
           cd packages/web/gul-http && cargo build --examples
           cd ../../../packages/tui/gul-tui && cargo build --examples
+          cd ../../../packages/data-science/gul-ml && cargo build --examples
 
   test-no-std:
     name: Test no_std targets

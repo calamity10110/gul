@@ -1,0 +1,14 @@
+[package]
+name = "gul-datetime"
+version = "0.1.0"
+edition = "2021"
+authors = ["GUL Team <team@gul-lang.org>"]
+description = "Date and time handling for GUL"
+license = "MIT"
+repository = "https://github.com/gul-lang/packages"
+keywords = ["datetime", "time", "date", "gul"]
+categories = ["date-and-time"]
+
+[dependencies]
+
+[dev-dependencies]
