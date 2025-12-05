@@ -46,6 +46,10 @@ dioxus = { version = "0.7.1", features = [] }
 anyhow = "1.0"
 thiserror = "1.0"
 
+# Cryptography for package signing
+sha2 = "0.10"
+hex = "0.4"
+
 # TUI components
 crossterm = "0.27"
 unicode-width = "0.1"
