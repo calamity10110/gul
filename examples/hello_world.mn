@@ -1,1 +1,11 @@
-print("Hello, World!")
+main():
+    const message: str = "Hello, World!"
+    mut count: int = 42
+    print(message)
+    print("Count:", count)
+
+    # Test error handling
+    try:
+        print("Testing try/catch...")
+    catch error:
+        print("Caught error:", error)

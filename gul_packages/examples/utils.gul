@@ -1,0 +1,18 @@
+# Example: Utilities
+use std::utils
+
+fn main():
+    print("--- Utilities Example ---")
+    
+    # DateTime
+    now = utils::DateTime::now()
+    print("Current time: " + now.format("%Y-%m-%d"))
+    
+    # Regex
+    re = utils::Regex::new("^[a-z]+$")
+    print("Matches 'hello': " + re.match("hello").to_string())
+    print("Matches '123': " + re.match("123").to_string())
+    
+    # Crypto
+    hash = utils::crypto::sha256("secret")
+    print("Hash: " + hash)

@@ -1,0 +1,32 @@
+# Science Module for GUL
+# Ported from Scipy / Domain libraries
+
+module physics:
+    struct Vector3:
+        x: float
+        y: float
+        z: float
+        
+    fn gravity() -> float:
+        return 9.81
+
+module chemistry:
+    struct Element:
+        symbol: string
+        atomic_number: int
+        mass: float
+        
+    fn lookup(symbol: string) -> Element:
+        return Element { symbol, atomic_number: 1, mass: 1.008 }
+
+module bio:
+    fn transcribe(dna: string) -> string:
+        # T -> U
+        return dna.replace("T", "U")
+
+module math:
+    fn pi() -> float:
+        return 3.14159265359
+        
+    fn sin(x: float) -> float:
+        return 0.0 # Mock

@@ -291,9 +291,10 @@ impl AutoImport {
 
         for word in code.split_whitespace() {
             if word.chars().next().is_some_and(|c| c.is_uppercase())
-                && !self.symbol_index.contains_key(word) {
-                    missing.push(word.to_string());
-                }
+                && !self.symbol_index.contains_key(word)
+            {
+                missing.push(word.to_string());
+            }
         }
 
         missing
@@ -508,7 +509,7 @@ mod tests {
         );
 
         let recommendations =
-            auto_import.recommend_packages(&vec!["Vec".to_string(), "HashMap".to_string()]);
+            auto_import.recommend_packages(&["Vec".to_string(), "HashMap".to_string()]);
         assert!(recommendations.contains(&"std".to_string()));
     }
 

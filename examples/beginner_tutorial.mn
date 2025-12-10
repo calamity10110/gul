@@ -1,75 +1,74 @@
-# GLOB Beginner Tutorial - v0.11.0
-# This example demonstrates the core features of GLOB in a simple program.
+# GUL Beginner Tutorial - v2.0
+# This example demonstrates the core features of GUL in a simple program.
 
 # 1. Flexible Imports
-# You can group imports using [], {}, or ()
-imp [
-    std: (io, math),
-    python: (random)
-]
+import std{io, math}
+import python{random}
 
-# 2. Constants (Immutable by default)
-def MAX_GUESSES = 5
-def MIN_NUMBER = 1
-def MAX_NUMBER = 100
+# 2. Constants
+const MAX_GUESSES = 5
+const MIN_NUMBER = 1
+const MAX_NUMBER = 100
 
-# 3. Global State (Mutable with ?)
-@global ?game_state = {
+# 3. Global State (Mutable)
+mut game_state = {
     high_score: 0,
     games_played: 0
 }
 
-# 4. Functions with Annotations
-# @fn: Synchronous function
-# @int: Type annotation for return value
-@fn generate_secret_number() -> @int:
-    # Use Python's random module via FFI
-    @cs python:
-        import random
-        def get_random(min_val, max_val):
+# 4. Functions
+# Pure logic function
+fn generate_secret_number() -> int:
+    # Foreign Block (Python)
+    extern python {
+        fn get_random(min_val, max_val):
+            import random
             return random.randint(min_val, max_val)
-    
-    return python.get_random(MIN_NUMBER, MAX_NUMBER)
+    }
 
-# @asy: Async function
-@asy play_game():
+    return get_random(MIN_NUMBER, MAX_NUMBER)
+
+# Async function
+async play_game():
     print(f"Welcome to Guess the Number! ({MIN_NUMBER}-{MAX_NUMBER})")
     
     secret = generate_secret_number()
-    ?guesses_left = MAX_GUESSES
-    ?won = false
-    
-    # Loop with annotation
-    @while ?guesses_left > 0:
-        print(f"Guesses left: {?guesses_left}")
-        
-        # UI Input
+    mut guesses_left = MAX_GUESSES
+    mut won = false
+
+    loop:
+        if guesses_left <= 0:
+            break
+
+        print(f"Guesses left: {guesses_left}")
+
+        # UI Input (Async)
         input_str = await io.input("Enter your guess: ")
-        
-        # Type conversion with annotation hint
-        @int guess = int(input_str)
-        
+
+        # Type conversion
+        guess = int(input_str)
+
         if guess == secret:
             print("Congratulations! You won!")
-            ?won = true
-            @break
+            won = true
+            break
         elif guess < secret:
             print("Too low!")
         else:
             print("Too high!")
-            
-        ?guesses_left = ?guesses_left - 1
-        
-    if not ?won:
+
+        guesses_left = guesses_left - 1
+
+    if not won:
         print(f"Game Over! The number was {secret}")
-        
+
     # Update global state
-    @global ?game_state.games_played = @global ?game_state.games_played + 1
-    if ?won:
-        @global ?game_state.high_score = @global ?game_state.high_score + 1
+    game_state.games_played = game_state.games_played + 1
+    if won:
+        game_state.high_score = game_state.high_score + 1
 
 # Main Entry Point
-mn main():
+main():
     await play_game()
     print("Thanks for playing!")
-    print(f"Total games played: {@global ?game_state.games_played}")
+    print(f"Total games played: {game_state.games_played}")

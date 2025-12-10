@@ -1,9 +1,9 @@
-imp http
+import http
 
-asy fetch_data(url):
+async fetch_data(url):
     res = await http.get(url)
     return res.json()
 
-mn main():
+main():
     data = await fetch_data("https://api.example.com/users")
     print("Fetched data:", data)

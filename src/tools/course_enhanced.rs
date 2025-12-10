@@ -1,10 +1,10 @@
 // Enhanced GUL Interactive Course - Beginner Friendly
 // With code execution, validation, persistence, and better pedagogy
 
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
-use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Lesson {
@@ -36,7 +36,7 @@ pub enum ContentBlock {
     Concept {
         title: String,
         explanation: String,
-        why: String, // Why is this important?
+        why: String,     // Why is this important?
         analogy: String, // Real-world analogy
     },
     CodeExample {
@@ -317,7 +317,7 @@ main:
                 completed: false,
                 score: 0.0,
             },
-            
+
             // Enhanced Lesson 1: Hello World (with much more detail)
             Lesson {
                 id: "hello_world".to_string(),
@@ -402,7 +402,7 @@ main:                  ← Entry point (start here!)
                 completed: false,
                 score: 0.0,
             },
-            
+
             // Continue with more enhanced lessons...
             // (I'll create a few more to show the pattern)
         ]
@@ -410,28 +410,50 @@ main:                  ← Entry point (start here!)
 
     fn create_glossary() -> HashMap<String, String> {
         let mut glossary = HashMap::new();
-        
-        glossary.insert("Variable".to_string(), 
-            "A named storage location for data. Like a labeled box where you can put things.".to_string());
+
+        glossary.insert(
+            "Variable".to_string(),
+            "A named storage location for data. Like a labeled box where you can put things."
+                .to_string(),
+        );
         glossary.insert("Function".to_string(), 
             "A reusable block of code that performs a specific task. Like a recipe you can use multiple times.".to_string());
-        glossary.insert("String".to_string(), 
-            "Text data enclosed in quotes. Example: \"Hello\"".to_string());
-        glossary.insert("Integer".to_string(), 
-            "A whole number without decimals. Example: 42, -5, 0".to_string());
-        glossary.insert("Indentation".to_string(), 
-            "Spaces or tabs at the start of a line. GUL uses this to group code together.".to_string());
-        glossary.insert("Compiler".to_string(), 
-            "A program that translates your code into instructions the computer can execute.".to_string());
-        glossary.insert("Syntax".to_string(), 
-            "The rules for writing code correctly. Like grammar for programming languages.".to_string());
-        glossary.insert("Bug".to_string(), 
-            "An error or mistake in your code that causes it to not work as expected.".to_string());
-        glossary.insert("Debug".to_string(), 
-            "The process of finding and fixing bugs in your code.".to_string());
-        glossary.insert("Loop".to_string(), 
-            "Code that repeats multiple times. Like doing something over and over.".to_string());
-        
+        glossary.insert(
+            "String".to_string(),
+            "Text data enclosed in quotes. Example: \"Hello\"".to_string(),
+        );
+        glossary.insert(
+            "Integer".to_string(),
+            "A whole number without decimals. Example: 42, -5, 0".to_string(),
+        );
+        glossary.insert(
+            "Indentation".to_string(),
+            "Spaces or tabs at the start of a line. GUL uses this to group code together."
+                .to_string(),
+        );
+        glossary.insert(
+            "Compiler".to_string(),
+            "A program that translates your code into instructions the computer can execute."
+                .to_string(),
+        );
+        glossary.insert(
+            "Syntax".to_string(),
+            "The rules for writing code correctly. Like grammar for programming languages."
+                .to_string(),
+        );
+        glossary.insert(
+            "Bug".to_string(),
+            "An error or mistake in your code that causes it to not work as expected.".to_string(),
+        );
+        glossary.insert(
+            "Debug".to_string(),
+            "The process of finding and fixing bugs in your code.".to_string(),
+        );
+        glossary.insert(
+            "Loop".to_string(),
+            "Code that repeats multiple times. Like doing something over and over.".to_string(),
+        );
+
         glossary
     }
 

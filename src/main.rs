@@ -28,6 +28,12 @@ enum Commands {
         optimize: bool,
     },
 
+    /// Run a GUL program
+    Run {
+        /// Source file to run
+        file: PathBuf,
+    },
+
     /// Watch and rebuild on changes
     Watch {
         /// Source file to watch
@@ -115,6 +121,27 @@ fn main() {
             match compiler::build_target(&file, &target, optimize) {
                 Ok(_) => println!("{}", "Build complete!".green()),
                 Err(e) => eprintln!("{} {}", "Build failed:".red().bold(), e),
+            }
+        }
+
+        Commands::Run { file } => {
+            println!("{} {}", "Running".green().bold(), file.display());
+            match std::fs::read_to_string(&file) {
+                Ok(source) => {
+                    let mut lexer = gul_lang::lexer::Lexer::new(&source);
+                    let tokens = lexer.tokenize();
+                    let mut parser = gul_lang::parser::Parser::new(tokens);
+                    match parser.parse() {
+                        Ok(program) => {
+                            let mut interpreter = gul_lang::interpreter::Interpreter::new();
+                            if let Err(e) = interpreter.run(&program) {
+                                eprintln!("{} {}", "Runtime error:".red().bold(), e);
+                            }
+                        }
+                        Err(e) => eprintln!("{} {}", "Parse error:".red().bold(), e),
+                    }
+                }
+                Err(e) => eprintln!("{} {}", "Failed to read file:".red().bold(), e),
             }
         }
 

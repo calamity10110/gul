@@ -142,14 +142,46 @@ impl EmbeddedDisplay {
         let mut err = 0i32;
 
         while x >= y {
-            self.set_pixel((center_x as i32 + x) as usize, (center_y as i32 + y) as usize, color)?;
-            self.set_pixel((center_x as i32 + y) as usize, (center_y as i32 + x) as usize, color)?;
-            self.set_pixel((center_x as i32 - y) as usize, (center_y as i32 + x) as usize, color)?;
-            self.set_pixel((center_x as i32 - x) as usize, (center_y as i32 + y) as usize, color)?;
-            self.set_pixel((center_x as i32 - x) as usize, (center_y as i32 - y) as usize, color)?;
-            self.set_pixel((center_x as i32 - y) as usize, (center_y as i32 - x) as usize, color)?;
-            self.set_pixel((center_x as i32 + y) as usize, (center_y as i32 - x) as usize, color)?;
-            self.set_pixel((center_x as i32 + x) as usize, (center_y as i32 - y) as usize, color)?;
+            self.set_pixel(
+                (center_x as i32 + x) as usize,
+                (center_y as i32 + y) as usize,
+                color,
+            )?;
+            self.set_pixel(
+                (center_x as i32 + y) as usize,
+                (center_y as i32 + x) as usize,
+                color,
+            )?;
+            self.set_pixel(
+                (center_x as i32 - y) as usize,
+                (center_y as i32 + x) as usize,
+                color,
+            )?;
+            self.set_pixel(
+                (center_x as i32 - x) as usize,
+                (center_y as i32 + y) as usize,
+                color,
+            )?;
+            self.set_pixel(
+                (center_x as i32 - x) as usize,
+                (center_y as i32 - y) as usize,
+                color,
+            )?;
+            self.set_pixel(
+                (center_x as i32 - y) as usize,
+                (center_y as i32 - x) as usize,
+                color,
+            )?;
+            self.set_pixel(
+                (center_x as i32 + y) as usize,
+                (center_y as i32 - x) as usize,
+                color,
+            )?;
+            self.set_pixel(
+                (center_x as i32 + x) as usize,
+                (center_y as i32 - y) as usize,
+                color,
+            )?;
 
             y += 1;
             err += 1 + 2 * y;
@@ -273,7 +305,7 @@ impl EmbeddedDisplay {
                     }
                 };
 
-    #[allow(clippy::needless_range_loop)]
+                #[allow(clippy::needless_range_loop)]
                 if char_index < font.len() {
                     for row in 0..5 {
                         for col in 0..5 {

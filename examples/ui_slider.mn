@@ -1,7 +1,7 @@
-imp ui
+import ui
 
-def slider = ^÷^[slider{min=0, max=100, value=50}]
+const slider = ^&^[slider{min=0, max=100, value=50}]
 
-mn main():
+main():
     ui.print(slider)
     print("Slider value:", slider.value)

@@ -1,0 +1,24 @@
+# Example: ML Model Training
+use std::ml
+
+fn main():
+    print("--- Machine Learning Example ---")
+    
+    # Create model
+    mut model = ml::Model::new()
+    
+    # Add layers
+    model.add(ml::dense(784, 128, ml::Activation::ReLU))
+    model.add(ml::dense(128, 10, ml::Activation::Softmax))
+    
+    print("Model created with 2 layers")
+    
+    # Create mock data
+    x_train = ml::Tensor::new([], [100, 784])
+    y_train = ml::Tensor::new([], [100, 10])
+    
+    # Train model
+    print("Starting training...")
+    model.train(x_train, y_train, 10)
+    
+    print("Training complete!")

@@ -1,0 +1,37 @@
+# Data Science Module for GUL
+# Ported from NumPy / Pandas
+
+module numpy:
+    struct Array:
+        data: vec<float>
+        shape: vec<int>
+        
+        fn new(data: vec<float>) -> Array:
+            return Array { data, shape: [data.len()] }
+            
+        fn mean(self) -> float:
+            sum = 0.0
+            for x in self.data:
+                sum = sum + x
+            return sum / self.data.len().to_float()
+            
+        fn sum(self) -> float:
+            # mock sum
+            return 0.0
+
+module pandas:
+    struct Series:
+        name: string
+        data: vec<any>
+        
+    struct DataFrame:
+        columns: map<string, Series>
+        
+        fn new(data: map<string, vec<any>>) -> DataFrame:
+            return DataFrame { columns: {} }
+            
+        fn head(self, n: int = 5):
+            print("Showing top " + n.to_string() + " rows")
+            
+        fn describe(self):
+            print("DataFrame stats...")

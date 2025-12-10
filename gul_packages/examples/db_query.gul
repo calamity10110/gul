@@ -1,0 +1,16 @@
+# Example: Database Query
+use std::db
+
+fn main():
+    print("--- Database Example ---")
+    
+    # Connect to Postgres
+    conn = db::postgres::connect("postgres://user:pass@localhost/db")
+    
+    # Create table
+    conn.execute("CREATE TABLE users (id SERIAL, name TEXT)")
+    
+    # Query data
+    rows = conn.query("SELECT * FROM users")
+    
+    print("Found " + rows.len().to_string() + " users")

@@ -1,0 +1,59 @@
+# TUI Module for GUL
+# Ported from Ratatui / Textual concepts
+
+struct Color:
+    r: int
+    g: int
+    b: int
+    
+    fn hex(hex: string) -> Color:
+        return Color { r: 0, g: 0, b: 0 } # Mock
+
+enum Alignment:
+    Left
+    Center
+    Right
+
+struct Style:
+    fg: Color
+    bg: Color
+    bold: bool
+
+struct Rect:
+    x: int
+    y: int
+    width: int
+    height: int
+
+# Widgets
+struct Block:
+    title: string
+    borders: bool
+    style: Style
+
+struct Text:
+    content: string
+    style: Style
+
+struct Paragraph:
+    text: Text
+    alignment: Alignment
+
+# Core
+struct Frame:
+    size: Rect
+    
+    fn render_widget(self, widget: any, area: Rect):
+        print("Rendering widget at " + area.x.to_string() + "," + area.y.to_string())
+
+struct Terminal:
+    width: int
+    height: int
+    
+    fn init() -> Terminal:
+        return Terminal { width: 80, height: 24 }
+        
+    fn draw(self, render_fn: fn(Frame)):
+        print("Drawing frame...")
+        frame = Frame { size: Rect { x: 0, y: 0, width: self.width, height: self.height } }
+        render_fn(frame)

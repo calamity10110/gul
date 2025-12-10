@@ -10,7 +10,7 @@ pub struct BlockOrganizer {
     definitions: Vec<Statement>,
     functions: Vec<Statement>,
     async_functions: Vec<Statement>,
-    custom_blocks: Vec<Statement>,
+    foreign_blocks: Vec<Statement>,
     main: Option<Statement>,
 }
 
@@ -27,7 +27,7 @@ impl BlockOrganizer {
             definitions: Vec::new(),
             functions: Vec::new(),
             async_functions: Vec::new(),
-            custom_blocks: Vec::new(),
+            foreign_blocks: Vec::new(),
             main: None,
         }
     }
@@ -37,6 +37,8 @@ impl BlockOrganizer {
             match statement {
                 Statement::Import(_) => self.imports.push(statement.clone()),
                 Statement::Definition { .. } => self.definitions.push(statement.clone()),
+                Statement::GlobalDef { .. } => self.definitions.push(statement.clone()), // Group globals with definitions
+                Statement::StructDef { .. } => self.definitions.push(statement.clone()), // Group structs
                 Statement::Function { is_async, .. } => {
                     if *is_async {
                         self.async_functions.push(statement.clone());
@@ -44,7 +46,7 @@ impl BlockOrganizer {
                         self.functions.push(statement.clone());
                     }
                 }
-                Statement::CustomBlock { .. } => self.custom_blocks.push(statement.clone()),
+                Statement::ForeignBlock { .. } => self.foreign_blocks.push(statement.clone()),
                 Statement::Main { .. } => self.main = Some(statement.clone()),
                 _ => {}
             }
@@ -82,8 +84,8 @@ impl BlockOrganizer {
         }
 
         // Write custom.cs
-        if !self.custom_blocks.is_empty() {
-            let content = self.format_statements(&self.custom_blocks);
+        if !self.foreign_blocks.is_empty() {
+            let content = self.format_statements(&self.foreign_blocks);
             fs::write(output_path.join("custom.cs"), content).map_err(|e| e.to_string())?;
         }
 

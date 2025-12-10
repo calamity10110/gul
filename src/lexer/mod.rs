@@ -27,6 +27,8 @@ pub enum Token {
     Continue,
     Try,
     Catch,
+    Finally,
+    Throw,
 
     // New keywords (v2.0)
     Import, // import (replaces imp)
@@ -35,6 +37,10 @@ pub enum Token {
     Async,  // async (replaces asy)
     Extern, // extern (replaces cs)
     Main,   // main (optional, can use without mn)
+    Struct, // struct definition
+    Global, // @global
+    Static, // @static
+    Local,  // @local
 
     // Literals
     Integer(i64),
@@ -108,6 +114,9 @@ impl fmt::Display for Token {
             Token::UiSprite(s) => write!(f, "UiSprite({})", s),
             Token::QuestionMark => write!(f, "?"),
             Token::At => write!(f, "@"),
+            Token::Global => write!(f, "global"),
+            Token::Static => write!(f, "static"),
+            Token::Local => write!(f, "local"),
             _ => write!(f, "{:?}", self),
         }
     }
@@ -205,8 +214,8 @@ impl Lexer {
                         '0'..='9' => tokens.push(self.read_number()),
                         'a'..='z' | 'A'..='Z' | '_' => tokens.push(self.read_identifier_or_unit()),
                         '^' => {
-                            // Check for UI sprite syntax: ^÷^[...]
-                            if self.peek(1) == Some('÷')
+                            // Check for UI sprite syntax: ^&^[...]
+                            if self.peek(1) == Some('&')
                                 && self.peek(2) == Some('^')
                                 && self.peek(3) == Some('[')
                             {
@@ -396,7 +405,7 @@ impl Lexer {
     }
 
     fn read_ui_sprite(&mut self) -> Token {
-        // Skip ^÷^[
+        // Skip ^&^[
         self.advance();
         self.advance();
         self.advance();
@@ -479,16 +488,43 @@ impl Lexer {
             }
         }
 
-        // Check for keywords first
+        // Check for keywords first - v2.0 keywords take priority
         let token = match value.as_str() {
-            // Legacy keywords (backward compatibility)
-            "imp" => Token::Imp,
-            "def" => Token::Def,
-            "fn" => Token::Fn,
-            "asy" => Token::Asy,
-            "cs" => Token::Cs,
-            "mn" => Token::Mn,
-            "own" => Token::Own,
+            // v2.0 keywords (primary)
+            "import" | "use" => Token::Import,
+            "const" => Token::Const,
+            "mut" => Token::Mut,
+            "async" => Token::Async,
+            "extern" => Token::Extern,
+            "main" => Token::Main,
+            "struct" => Token::Struct,
+            "global" => Token::Global,
+            "static" => Token::Static,
+            "local" => Token::Local,
+
+            // Legacy keywords (backward compatibility with warnings)
+            "imp" => {
+                eprintln!("Warning: 'imp' is deprecated, use 'import' instead");
+                Token::Imp
+            }
+            "def" => {
+                eprintln!("Warning: 'def' is deprecated, use 'const' or 'mut' for variables, 'fn' for functions");
+                Token::Def
+            }
+            "fn" => Token::Fn, // 'fn' is still valid in v2.0
+            "asy" => {
+                eprintln!("Warning: 'asy' is deprecated, use 'async' instead");
+                Token::Asy
+            }
+            "cs" => {
+                eprintln!("Warning: 'cs' is deprecated, use 'extern' instead");
+                Token::Cs
+            }
+            "mn" => {
+                eprintln!("Warning: 'mn' is deprecated, use 'main' instead");
+                Token::Mn
+            }
+            "own" => Token::Own, // ownership keywords still valid
             "ref" => Token::Ref,
             "copy" => Token::Copy,
             "await" => Token::Await,
@@ -504,14 +540,8 @@ impl Lexer {
             "continue" => Token::Continue,
             "try" => Token::Try,
             "catch" => Token::Catch,
-
-            // New keywords (v2.0)
-            "import" => Token::Import,
-            "const" => Token::Const,
-            "mut" => Token::Mut,
-            "async" => Token::Async,
-            "extern" => Token::Extern,
-            "main" => Token::Main,
+            "finally" => Token::Finally,
+            "throw" => Token::Throw,
 
             // Boolean literals
             "true" => Token::Bool(true),
@@ -522,6 +552,40 @@ impl Lexer {
 
         // If it's an identifier, check if it's followed by a unit pattern (e.g., m/s, kg)
         if matches!(token, Token::Identifier(_)) {
+            if let Token::Identifier(ref id) = token {
+                // Check for ui![...] syntax
+                if id == "ui" && self.current_char == Some('!') && self.peek(1) == Some('[') {
+                    self.advance(); // Skip !
+                                    // Now at [, read_ui_sprite typically expects 4 chars upfront (^&^[) so we need to handle manually
+                                    // or refactor read_ui_sprite.
+                                    // Let's implement reading here for now to avoid breaking read_ui_sprite signature assumptions
+                    self.advance(); // Skip [
+
+                    let mut content = String::new();
+                    let mut depth = 1;
+
+                    while let Some(ch) = self.current_char {
+                        if ch == '[' {
+                            depth += 1;
+                            content.push(ch);
+                            self.advance();
+                        } else if ch == ']' {
+                            depth -= 1;
+                            if depth == 0 {
+                                self.advance();
+                                break;
+                            }
+                            content.push(ch);
+                            self.advance();
+                        } else {
+                            content.push(ch);
+                            self.advance();
+                        }
+                    }
+                    return Token::UiSprite(content);
+                }
+            }
+
             // Check for unit patterns like m/s, m/s^2, kg, etc.
             if self.current_char == Some('/') {
                 let mut unit = value.clone();
@@ -561,7 +625,7 @@ mod tests {
 
     #[test]
     fn test_ui_sprite() {
-        let mut lexer = Lexer::new("def tree = ^÷^[tree]");
+        let mut lexer = Lexer::new("def tree = ^&^[tree]");
         let tokens = lexer.tokenize();
 
         assert_eq!(tokens[0], Token::Def);
@@ -572,7 +636,7 @@ mod tests {
 
     #[test]
     fn test_ui_sprite_with_properties() {
-        let mut lexer = Lexer::new("^÷^[slider{min=0, max=100}]");
+        let mut lexer = Lexer::new("^&^[slider{min=0, max=100}]");
         let tokens = lexer.tokenize();
 
         assert_eq!(
@@ -729,20 +793,20 @@ mod tests {
     #[test]
     fn test_ui_sprite_variations() {
         // Test various UI sprite formats from SYNTAX.md
-        // These test the ^÷^[component{properties}] syntax for inline UI components
+        // These test the ^&^[component{properties}] syntax for inline UI components
         let test_cases = vec![
-            ("^÷^[tree]", "tree"),
+            ("^&^[tree]", "tree"),
             (
-                "^÷^[slider{min=0, max=100, value=50}]",
+                "^&^[slider{min=0, max=100, value=50}]",
                 "slider{min=0, max=100, value=50}",
             ),
             (
-                "^÷^[button{text=\"Click Me\"}]",
+                "^&^[button{text=\"Click Me\"}]",
                 "button{text=\"Click Me\"}",
             ),
-            ("^÷^[image:icon]", "image:icon"),
+            ("^&^[image:icon]", "image:icon"),
             (
-                "^÷^[sprite:player{x=10, y=20, width=32, height=32}]",
+                "^&^[sprite:player{x=10, y=20, width=32, height=32}]",
                 "sprite:player{x=10, y=20, width=32, height=32}",
             ),
         ];
@@ -752,6 +816,16 @@ mod tests {
             let tokens = lexer.tokenize();
             assert_eq!(tokens[0], Token::UiSprite(expected.to_string()));
         }
+    }
+
+    #[test]
+    fn test_ui_macro_syntax() {
+        let mut lexer = Lexer::new("ui![button{text=\"Click\"}]");
+        let tokens = lexer.tokenize();
+        assert_eq!(
+            tokens[0],
+            Token::UiSprite("button{text=\"Click\"}".to_string())
+        );
     }
 
     #[test]
@@ -850,7 +924,7 @@ mod tests {
 
     #[test]
     fn test_main_entry_point() {
-        let mut lexer = Lexer::new("mn main():\n    print(\"Hello, World!\")\n    ui.print(^÷^[tree])\n    data = await fetch(\"https://api.example.com\")\n    print(data)");
+        let mut lexer = Lexer::new("mn main():\n    print(\"Hello, World!\")\n    ui.print(^&^[tree])\n    data = await fetch(\"https://api.example.com\")\n    print(data)");
         let tokens = lexer.tokenize();
 
         // Check for main keyword
@@ -951,7 +1025,7 @@ mod tests {
         assert_eq!(tokens[4], Token::At);
         assert_eq!(tokens[5], Token::Identifier("int".to_string()));
         assert_eq!(tokens[6], Token::At);
-        assert_eq!(tokens[7], Token::Identifier("global".to_string()));
+        assert_eq!(tokens[7], Token::Global);
     }
 
     #[test]

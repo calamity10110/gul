@@ -667,6 +667,6 @@ mod tests {
         let hal = EmbeddedHAL::new(target);
 
         let peripherals = hal.list_peripherals();
-        assert!(peripherals.len() > 0);
+        assert!(!peripherals.is_empty());
     }
 }

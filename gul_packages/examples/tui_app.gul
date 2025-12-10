@@ -1,0 +1,21 @@
+# Example: TUI App
+use std::tui
+
+fn draw_ui(f: tui::Frame):
+    # Create a layout
+    layout = tui::Rect { x: 0, y: 0, width: 80, height: 24 }
+    
+    # Create a block
+    block = tui::Block {
+        title: "Hello GUL",
+        borders: true,
+        style: tui::Style { fg: tui::Color::hex("#ffffff"), bg: tui::Color::hex("#000000"), bold: true }
+    }
+    
+    f.render_widget(block, layout)
+
+fn main():
+    print("--- TUI App Example ---")
+    
+    term = tui::Terminal::init()
+    term.draw(draw_ui)

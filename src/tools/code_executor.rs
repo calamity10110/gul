@@ -5,8 +5,8 @@ use std::time::Duration;
 
 #[derive(Debug, Clone)]
 pub struct CodeExecutor {
-    timeout: Duration,
-    max_output_size: usize,
+    _timeout: Duration,
+    _max_output_size: usize,
 }
 
 #[derive(Debug, Clone)]
@@ -36,8 +36,8 @@ pub struct TestResult {
 impl CodeExecutor {
     pub fn new() -> Self {
         CodeExecutor {
-            timeout: Duration::from_secs(5),
-            max_output_size: 10_000, // 10KB max output
+            _timeout: Duration::from_secs(5),
+            _max_output_size: 10_000, // 10KB max output
         }
     }
 

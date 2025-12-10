@@ -1,0 +1,56 @@
+# Machine Learning Module for GUL
+# Ported from PyTorch/sklearn concepts
+
+struct Tensor:
+    data: vec<float>
+    shape: vec<int>
+    
+    fn new(data: vec<float>, shape: vec<int>) -> Tensor:
+        return Tensor { data, shape }
+        
+    fn matmul(self, other: Tensor) -> Tensor:
+        # Mock matrix multiplication
+        return Tensor { data: [], shape: [] }
+
+enum Activation:
+    ReLU
+    Sigmoid
+    Tanh
+    Softmax
+
+struct Layer:
+    weights: Tensor
+    bias: Tensor
+    activation: Activation
+
+    fn forward(self, input: Tensor) -> Tensor:
+        # Mock forward pass
+        # output = input.matmul(self.weights) + self.bias
+        return Tensor { data: [], shape: [] }
+
+struct Model:
+    layers: vec<Layer>
+    
+    fn new() -> Model:
+        return Model { layers: [] }
+    
+    fn add(mut self, layer: Layer):
+        self.layers.push(layer)
+        
+    fn predict(self, input: Tensor) -> Tensor:
+        mut output = input
+        for layer in self.layers:
+            output = layer.forward(output)
+        return output
+        
+    fn train(mut self, x: Tensor, y: Tensor, epochs: int):
+        print("Training for " + epochs.to_string() + " epochs...")
+        # Mock training loop
+        
+# Helper for creating layers
+fn dense(input_size: int, output_size: int, act: Activation) -> Layer:
+    return Layer {
+        weights: Tensor::new([], [input_size, output_size]),
+        bias: Tensor::new([], [output_size]),
+        activation: act,
+    }

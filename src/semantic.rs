@@ -13,7 +13,8 @@ pub enum Type {
     List(Box<Type>),
     Dict(Box<Type>, Box<Type>),
     Function(Vec<Type>, Box<Type>),
-    Unit,
+    Unit(String), // Unit types with name
+    Any,          // Gradual typing
     Unknown,
 }
 
@@ -108,6 +109,54 @@ impl SemanticAnalyzer {
                 // Module validation would check against available modules
                 // For now, we accept all imports
                 let _ = module;
+            }
+            Statement::GlobalDef { name, value, .. } => {
+                let value_type = self.infer_type(value);
+                let symbol = Symbol {
+                    name: name.clone(),
+                    symbol_type: value_type,
+                    is_mutable: true,
+                    ownership: Ownership::Own,
+                };
+                if let Err(e) = self.symbol_table.define(name.clone(), symbol) {
+                    self.errors.push(e);
+                }
+            }
+            Statement::StructDef {
+                name,
+                fields,
+                methods,
+            } => {
+                let symbol = Symbol {
+                    name: name.clone(),
+                    symbol_type: Type::Unknown,
+                    is_mutable: false,
+                    ownership: Ownership::Own,
+                };
+                if let Err(e) = self.symbol_table.define(name.clone(), symbol) {
+                    self.errors.push(e);
+                }
+
+                // Analyze methods within struct scope
+                self.symbol_table.enter_scope();
+
+                // Define fields in scope (simplified)
+                for (field_name, _) in fields {
+                    let field_sym = Symbol {
+                        name: field_name.clone(),
+                        symbol_type: Type::Unknown,
+                        is_mutable: true,
+                        ownership: Ownership::Ref,
+                    };
+                    if let Err(e) = self.symbol_table.define(field_name.clone(), field_sym) {
+                        self.errors.push(e);
+                    }
+                }
+
+                for stmt in methods {
+                    self.analyze_statement(stmt);
+                }
+                self.symbol_table.exit_scope();
             }
             Statement::Definition { name, value } => {
                 let value_type = self.infer_type(value);
@@ -255,11 +304,38 @@ impl SemanticAnalyzer {
             Statement::Expression(expr) => {
                 let _expr_type = self.infer_type(expr);
             }
-            Statement::CustomBlock { .. } => {
+            Statement::ForeignBlock { .. } => {
                 // Custom blocks are validated separately
             }
             Statement::Break | Statement::Continue => {
                 // Valid in loop context
+            }
+            Statement::Try {
+                try_body,
+                catch_body,
+                finally_body,
+                ..
+            } => {
+                // Analyze try body
+                for stmt in try_body {
+                    self.analyze_statement(stmt);
+                }
+                // Analyze catch body if present
+                if let Some(catch) = catch_body {
+                    for stmt in catch {
+                        self.analyze_statement(stmt);
+                    }
+                }
+                // Analyze finally body if present
+                if let Some(finally) = finally_body {
+                    for stmt in finally {
+                        self.analyze_statement(stmt);
+                    }
+                }
+            }
+            Statement::Throw(expr) => {
+                let _throw_type = self.infer_type(expr);
+                // Throw can throw any type
             }
         }
     }
@@ -358,6 +434,36 @@ impl SemanticAnalyzer {
                         .push("'await' can only be used in async functions".to_string());
                 }
                 self.infer_type(expr)
+            }
+            Expression::Ownership { value, .. } => self.infer_type(value),
+            Expression::ListOp { .. } => Type::Unknown,
+            Expression::Typed { expr, ty } => {
+                // Convert AST Type to semantic Type
+                let expected_type = match ty {
+                    crate::ast::Type::Int => Type::Integer,
+                    crate::ast::Type::Float => Type::Float,
+                    crate::ast::Type::String => Type::String,
+                    crate::ast::Type::Bool => Type::Bool,
+                    crate::ast::Type::List(_) => Type::List(Box::new(Type::Unknown)), // TODO: Handle nested types
+                    crate::ast::Type::Dict(_, _) => {
+                        Type::Dict(Box::new(Type::Unknown), Box::new(Type::Unknown))
+                    }
+                    crate::ast::Type::Any => Type::Any,
+                    crate::ast::Type::Unit(name) => Type::Unit(name.clone()),
+                    crate::ast::Type::Function(_, _) => {
+                        Type::Function(vec![], Box::new(Type::Unknown))
+                    } // TODO: Handle function types
+                };
+
+                // Check if the inferred type matches the annotation
+                let inferred = self.infer_type(expr);
+                if inferred != Type::Unknown && inferred != expected_type {
+                    self.errors.push(format!(
+                        "Type mismatch: expected {:?}, got {:?}",
+                        expected_type, inferred
+                    ));
+                }
+                expected_type // Return the annotated type
             }
         }
     }

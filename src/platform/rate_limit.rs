@@ -95,7 +95,10 @@ impl RateLimiter {
         let mut buckets = self.buckets.write().await;
 
         let bucket = buckets.entry(key.to_string()).or_insert_with(|| {
-            TokenBucket::new(self.default_limit.burst, self.default_limit.requests_per_minute)
+            TokenBucket::new(
+                self.default_limit.burst,
+                self.default_limit.requests_per_minute,
+            )
         });
 
         if bucket.try_consume(1.0) {
@@ -113,7 +116,10 @@ impl RateLimiter {
         let mut buckets = self.buckets.write().await;
 
         let bucket = buckets.entry(key.to_string()).or_insert_with(|| {
-            TokenBucket::new(self.default_limit.burst, self.default_limit.requests_per_minute)
+            TokenBucket::new(
+                self.default_limit.burst,
+                self.default_limit.requests_per_minute,
+            )
         });
 
         bucket.available()

@@ -8,7 +8,7 @@ mod sql_integration_tests {
     #[test]
     fn test_sql_bridge_creation() {
         let _bridge = SqlBridge::new();
-        assert!(true, "SqlBridge should be created successfully");
+        // assert!(true, "SqlBridge should be created successfully"); // Removed useless assertion
     }
 
     #[test]

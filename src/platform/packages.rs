@@ -278,7 +278,7 @@ mod tests {
     #[test]
     fn test_registry_creation() {
         let registry = PackageRegistry::new();
-        assert!(registry.packages.len() > 0);
+        assert!(!registry.packages.is_empty());
     }
 
     #[test]
@@ -296,10 +296,10 @@ mod tests {
         let registry = PackageRegistry::new();
 
         let web_packages = registry.search_packages("web");
-        assert!(web_packages.len() > 0);
+        assert!(!web_packages.is_empty());
 
         let async_packages = registry.search_packages("async");
-        assert!(async_packages.len() > 0);
+        assert!(!async_packages.is_empty());
     }
 
     #[test]

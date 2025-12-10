@@ -1,0 +1,31 @@
+# Robotics Module for GUL
+# Ported from RPi.GPIO / ROS
+
+module gpio:
+    enum Mode:
+        Input
+        Output
+        
+    fn setup(pin: int, mode: Mode):
+        print("Setting up pin " + pin.to_string())
+        
+    fn write(pin: int, value: bool):
+        print("Writing to pin " + pin.to_string())
+
+module sensors:
+    struct DHT11:
+        pin: int
+        
+        fn read(self) -> map<string, float>:
+            return {"temp": 25.0, "humidity": 60.0}
+
+module ros:
+    struct Node:
+        name: string
+        
+        fn init(name: string) -> Node:
+            print("Initializing ROS node: " + name)
+            return Node { name }
+            
+        fn publish(self, topic: string, msg: string):
+            print("Publishing to " + topic + ": " + msg)

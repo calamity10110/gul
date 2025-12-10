@@ -11,7 +11,7 @@ fn main() {
     // 1. Text Components
     println!("--- Text Components ---");
     runtime.print(UiComponent::Text {
-        content: "Welcome to GLOB TUI Demo".to_string(),
+        content: "Welcome to GUL TUI Demo".to_string(),
         fg: Some("green".to_string()),
         bg: None,
         bold: true,

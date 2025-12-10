@@ -675,7 +675,7 @@ mod tests {
         system.update(1.0);
 
         let particles = system.get_particles();
-        assert!(particles.len() >= 1); // Particles may die
+        assert!(!particles.is_empty()); // Particles may die
 
         // Check that gravity is applied
         for particle in particles {
@@ -694,7 +694,7 @@ mod tests {
         detector.broad_phase(&particles);
         let collisions = detector.narrow_phase(&particles);
 
-        assert!(collisions.len() > 0); // Should detect collision
+        assert!(!collisions.is_empty()); // Should detect collision
     }
 
     #[test]
@@ -715,7 +715,7 @@ mod tests {
         engine.update(0.1);
 
         let particles = engine.get_particles();
-        assert!(particles.len() >= 1);
+        assert!(!particles.is_empty());
 
         let e_field = engine.electric_field_at(&Vec3::new(1.0, 0.0, 0.0));
         assert!(e_field.x > 0.0);

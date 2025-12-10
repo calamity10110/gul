@@ -526,9 +526,7 @@ impl SymbolicMathEngine {
             Expression::BinaryOp { left, op, right } => {
                 self.differentiate_binary(left, *op, right, var)
             }
-            Expression::UnaryOp { op, expr: inner } => {
-                self.differentiate_unary(*op, inner, var)
-            }
+            Expression::UnaryOp { op, expr: inner } => self.differentiate_unary(*op, inner, var),
             Expression::Power { base, exponent } => self.differentiate_power(base, exponent, var),
             Expression::Function { name, args } => self.differentiate_function(name, args, var),
         }
@@ -1122,16 +1120,15 @@ impl SymbolicMathEngine {
     fn solve_linear(&self, left: &Expression, right: &Expression, var: &str) -> Vec<Expression> {
         // Check if this is ax + b format
         if let (
-                Expression::BinaryOp {
-                    left: a_expr,
-                    op: BinaryOperator::Multiply,
-                    right: x_expr,
-                },
-                b_expr,
-            ) = (left, right) {
-            if let (Expression::Variable(x), Expression::Constant(b)) =
-                (x_expr.as_ref(), b_expr)
-            {
+            Expression::BinaryOp {
+                left: a_expr,
+                op: BinaryOperator::Multiply,
+                right: x_expr,
+            },
+            b_expr,
+        ) = (left, right)
+        {
+            if let (Expression::Variable(x), Expression::Constant(b)) = (x_expr.as_ref(), b_expr) {
                 if x == var {
                     if let Expression::Constant(a) = a_expr.as_ref() {
                         if *a != 0.0 {
@@ -1200,10 +1197,11 @@ impl SymbolicMathEngine {
         // In a real implementation, this would be much more sophisticated
 
         if let Expression::BinaryOp {
-                left,
-                op: BinaryOperator::Add,
-                right,
-            } = expr {
+            left,
+            op: BinaryOperator::Add,
+            right,
+        } = expr
+        {
             // Check for ax^2 + bx
             if let Expression::BinaryOp {
                 left: ax2,
@@ -1330,7 +1328,7 @@ mod tests {
     fn test_engine_creation() {
         let _engine = SymbolicMathEngine::new();
         // Just test that it can be created
-        assert!(true);
+        // assert!(true); // Removed useless assertion
     }
 
     // TODO: Add more comprehensive tests once features are implemented
@@ -1711,11 +1709,11 @@ mod integration_tests {
                 ..
             } => {
                 // Valid integration result
-                assert!(true);
+                // assert!(true); // Removed useless assertion
             }
             _ => {
                 // Also accept other valid forms
-                assert!(true);
+                // assert!(true); // Removed useless assertion
             }
         }
     }
@@ -1767,7 +1765,7 @@ mod equation_solving_tests {
         };
         let solutions = engine.solve(&equation, "x");
         // The current implementation may return 2 solutions or simplified form
-        assert!(solutions.len() >= 1);
+        assert!(!solutions.is_empty());
         // If we get 2 solutions, verify they are correct
         if solutions.len() == 2 {
             let mut values = solutions

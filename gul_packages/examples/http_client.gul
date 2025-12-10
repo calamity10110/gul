@@ -1,0 +1,22 @@
+# Example: HTTP Client
+use std::http
+use std::json
+
+fn main():
+    print("--- HTTP Client Example ---")
+    
+    # Create client
+    client = http::Client::new("https://api.example.com")
+    
+    # Make GET request
+    response = client.get("/users")
+    print("Status: " + response.status.to_string())
+    
+    # Parse JSON
+    data = response.json()
+    print("Data: " + json::stringify(data))
+    
+    # Make POST request
+    payload = {"name": "GUL User", "role": "admin"}
+    response = client.post("/users", payload)
+    print("Created: " + response.status.to_string())

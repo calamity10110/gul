@@ -189,7 +189,7 @@ fn main() {
                 bold: false,
             },
             UiComponent::Text {
-                content: "Running `target/debug/glob`".to_string(),
+                content: "Running `target/debug/gul`".to_string(),
                 fg: Some("white".to_string()),
                 bg: None,
                 bold: false,

@@ -125,8 +125,7 @@ impl MobileBackend {
         match platform {
             MobilePlatform::Android => {
                 // Validate Android permission
-                let valid_permissions =
-                    ["CAMERA", "LOCATION", "STORAGE", "MICROPHONE", "CONTACTS"];
+                let valid_permissions = ["CAMERA", "LOCATION", "STORAGE", "MICROPHONE", "CONTACTS"];
 
                 if valid_permissions.contains(&permission) {
                     Ok(())
@@ -136,8 +135,7 @@ impl MobileBackend {
             }
             MobilePlatform::Ios => {
                 // Validate iOS permission
-                let valid_permissions =
-                    ["Camera", "Location", "Photos", "Microphone", "Contacts"];
+                let valid_permissions = ["Camera", "Location", "Photos", "Microphone", "Contacts"];
 
                 if valid_permissions.contains(&permission) {
                     Ok(())

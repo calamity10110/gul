@@ -1,0 +1,18 @@
+# Example: TCP Server
+use std::net
+
+fn main():
+    print("--- TCP Server Example ---")
+    
+    addr = net::SocketAddr::new("127.0.0.1", 8080)
+    listener = net::TcpListener::bind(addr)
+    
+    print("Server running...")
+    
+    # Simulate accepting one connection
+    stream = listener.accept()
+    
+    msg = stream.read()
+    print("Received: " + msg)
+    
+    stream.write("Hello from GUL Server!")

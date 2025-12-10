@@ -50,6 +50,29 @@ impl CodeGenerator {
             Statement::Import(module) => {
                 self.emit_line(&format!("// import {}", module));
             }
+            Statement::StructDef {
+                name,
+                fields,
+                methods,
+            } => {
+                self.emit_line(&format!("struct {} {{", name));
+                self.indent();
+                for (field_name, field_type) in fields {
+                    self.emit_line(&format!("{}: {},", field_name, field_type));
+                }
+                self.dedent();
+                self.emit_line("}");
+
+                if !methods.is_empty() {
+                    self.emit_line(&format!("impl {} {{", name));
+                    self.indent();
+                    for method in methods {
+                        self.generate_statement(method)?;
+                    }
+                    self.dedent();
+                    self.emit_line("}");
+                }
+            }
             Statement::Definition { name, value } => {
                 let value_code = self.generate_expression(value)?;
                 self.emit_line(&format!("let {} = {};", name, value_code));
@@ -172,9 +195,22 @@ impl CodeGenerator {
                 let expr_code = self.generate_expression(expr)?;
                 self.emit_line(&format!("{};", expr_code));
             }
-            Statement::CustomBlock { language, code } => {
-                self.emit_line(&format!("// Custom {} block:", language));
+            Statement::ForeignBlock { language, code } => {
+                self.emit_line(&format!("// Foreign {} block:", language));
                 self.emit_line(&format!("// {}", code));
+            }
+            Statement::GlobalDef { name, value, .. } => {
+                // Treat global as normal definition for now in codegen
+                let val_code = self.generate_expression(value)?;
+                self.emit_line(&format!("// Global {}", name));
+                self.emit_line(&format!("let {} = {};", name, val_code));
+            }
+            Statement::Try { .. } => {
+                self.emit_line("// Try/catch not implemented in codegen yet");
+            }
+            Statement::Throw(expr) => {
+                let expr_code = self.generate_expression(expr)?;
+                self.emit_line(&format!("throw {};", expr_code));
             }
         }
 
@@ -241,6 +277,9 @@ impl CodeGenerator {
                 let expr_code = self.generate_expression(expr)?;
                 Ok(format!("await {}", expr_code))
             }
+            Expression::Ownership { value, .. } => self.generate_expression(value),
+            Expression::ListOp { .. } => Ok("/* list op */".to_string()),
+            Expression::Typed { expr, .. } => self.generate_expression(expr), // For now, ignore type annotation in codegen
         }
     }
 

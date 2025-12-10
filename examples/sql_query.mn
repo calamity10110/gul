@@ -1,24 +1,26 @@
-imp db
+import db
 
-cs sql:
+extern sql {
     create table if not exists users (
         id integer primary key,
         name text not null,
         email text unique not null,
         age integer
     );
+}
 
-cs sql:
+extern sql {
     insert into users (name, email, age) values
         ('Alice', 'alice@example.com', 30),
         ('Bob', 'bob@example.com', 25),
         ('Charlie', 'charlie@example.com', 35);
+}
 
-mn main():
-    db.execute(sql.create_table)
-    db.execute(sql.insert_users)
-    
+main():
+    db.execute(create_table)
+    db.execute(insert_users)
+
     results = db.query("select * from users where age > 25")
-    
+
     for row in results:
         print(row.name, row.email, row.age)

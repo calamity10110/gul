@@ -1,0 +1,26 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "mcp_everything": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-everything"],
+    },
+    "code-mode": {
+      "type": "local",
+      "command": ["npx", "-y", "@utcp/code-mode-mcp"],
+      "enabled": true,
+      "environment": {
+        "UTCP_CONFIG_FILE": "/home/vu/.config/opencode/.utcp_config.json"},
+     },  
+   },
+  "permission": {
+    "edit": "allow",
+    "bash": "ask",
+    "webfetch": "ask",
+    "doom_loop": "ask",
+    "external_directory": "ask"
+  },
+  "plugin": ["opencode-skills"],
+}
+
+

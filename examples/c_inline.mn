@@ -1,0 +1,33 @@
+# Foreign C Block
+# Note: In GUL v2, pure .mn files can contain foreign blocks.
+# The previous .cs extension is for dedicated foreign source files.
+
+cs c:
+    #include <math.h>
+    #include <string.h>
+
+    double calculate_distance(double x1, double y1, double x2, double y2) {
+        double dx = x2 - x1;
+        double dy = y2 - y1;
+        return sqrt(dx*dx + dy*dy);
+    }
+    
+    // Simple string reversal in C
+    void reverse_string(char* str) {
+        int len = strlen(str);
+        for (int i = 0; i < len/2; i++) {
+            char temp = str[i];
+            str[i] = str[len-1-i];
+            str[len-1-i] = temp;
+        }
+    }
+
+mn main():
+    # Call foreign function
+    distance = c.calculate_distance(0.0, 0.0, 3.0, 4.0)
+    print("Distance:", distance)
+    
+    # Ownership transfer to foreign code (ref)
+    def own text = "Hello, World!"
+    c.reverse_string(ref text)
+    print("Reversed:", text)

@@ -1,0 +1,44 @@
+# Utilities Module for GUL
+
+# DateTime handling
+struct DateTime:
+    timestamp: int # Unix timestamp
+    
+    fn now() -> DateTime:
+        # return DateTime { timestamp: sys::time() }
+        return DateTime { timestamp: 1701792000 }
+        
+    fn format(self, fmt: string) -> string:
+        # Mock formatting
+        return "2025-12-05 12:00:00"
+
+# Regular Expressions
+struct Regex:
+    pattern: string
+    
+    fn new(pattern: string) -> Regex:
+        return Regex { pattern }
+        
+    fn match(self, text: string) -> bool:
+        # Mock matching
+        return true
+        
+    fn replace(self, text: string, replacement: string) -> string:
+        return text
+
+# Cryptography
+module crypto:
+    fn sha256(data: string) -> string:
+        # Mock hash
+        return "hash123"
+        
+    fn md5(data: string) -> string:
+        return "hash456"
+
+# File System Helpers
+module fs:
+    fn read_file(path: string) -> string:
+        return "content"
+        
+    fn write_file(path: string, content: string):
+        print("Writing to " + path)

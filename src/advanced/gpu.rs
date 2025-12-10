@@ -181,7 +181,7 @@ mod tests {
         let mut accelerator = GpuAccelerator::new();
         accelerator.detect_devices();
 
-        assert!(accelerator.devices.len() > 0);
+        assert!(!accelerator.devices.is_empty());
     }
 
     #[test]
@@ -216,7 +216,7 @@ mod tests {
 
         let result = accelerator.compile_kernel(
             "add".to_string(),
-            "kernel void add(global float* a) { }".to_string(),
+            "kernel void add(float* a) { }".to_string(),
             GpuBackend::OpenCL,
         );
 

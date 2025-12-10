@@ -1,0 +1,17 @@
+use std.math
+use std.http
+
+print("--- Standard Library Test ---")
+
+# Test Math
+val = 16.0
+root = math.sqrt(val)
+print("Square root of " + val + " is " + root)
+
+# Test HTTP
+url = "https://example.com"
+client = http.Client.new(url)
+print("Created HTTP Client for " + url)
+
+resp = client.get("/api")
+print("Response Status: " + resp.status)

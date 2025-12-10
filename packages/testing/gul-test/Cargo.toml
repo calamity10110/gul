@@ -10,5 +10,6 @@ keywords = ["test", "testing", "framework", "gul"]
 categories = ["development-tools::testing"]
 
 [dependencies]
+gul = { path = "../../../" }
 
 [dev-dependencies]

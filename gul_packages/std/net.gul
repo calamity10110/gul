@@ -1,0 +1,53 @@
+# Networking Module for GUL
+# Ported from Python socket / Rust std::net
+
+struct SocketAddr:
+    ip: string
+    port: int
+    
+    fn new(ip: string, port: int) -> SocketAddr:
+        return SocketAddr { ip, port }
+        
+    fn to_string(self) -> string:
+        return self.ip + ":" + self.port.to_string()
+
+struct TcpStream:
+    addr: SocketAddr
+    connected: bool
+    
+    fn connect(addr: SocketAddr) -> TcpStream:
+        print("Connecting to " + addr.to_string())
+        return TcpStream { addr, connected: true }
+        
+    fn write(self, data: string):
+        print("Sending: " + data)
+        
+    fn read(self) -> string:
+        return "response data"
+
+struct TcpListener:
+    addr: SocketAddr
+    
+    fn bind(addr: SocketAddr) -> TcpListener:
+        print("Listening on " + addr.to_string())
+        return TcpListener { addr }
+        
+    fn accept(self) -> TcpStream:
+        # Mock accept
+        client_addr = SocketAddr::new("127.0.0.1", 54321)
+        print("Accepted connection from " + client_addr.to_string())
+        return TcpStream { addr: client_addr, connected: true }
+
+struct UdpSocket:
+    addr: SocketAddr
+    
+    fn bind(addr: SocketAddr) -> UdpSocket:
+        return UdpSocket { addr }
+    
+    fn send_to(self, data: string, target: SocketAddr):
+        print("UDP sending to " + target.to_string())
+
+# Helper functions
+fn connect(ip: string, port: int) -> TcpStream:
+    addr = SocketAddr::new(ip, port)
+    return TcpStream::connect(addr)

@@ -1,4 +1,6 @@
 // GUL Test - Testing Framework
+use gul_lang::{interpreter::Interpreter, lexer::Lexer, parser::Parser};
+use std::path::Path;
 
 /// Test Result
 pub type TestResult = Result<(), String>;
@@ -30,6 +32,31 @@ impl TestSuite {
         self.tests.push(TestCase {
             name: name.into(),
             func: Box::new(func),
+        });
+    }
+
+    pub fn add_file_test(&mut self, name: impl Into<String>, path: impl AsRef<Path>) {
+        let path = path.as_ref().to_path_buf();
+        let name = name.into();
+
+        self.tests.push(TestCase {
+            name: name.clone(),
+            func: Box::new(move || {
+                let source = std::fs::read_to_string(&path)
+                    .map_err(|e| format!("Failed to read file: {}", e))?;
+
+                let mut lexer = Lexer::new(&source);
+                let tokens = lexer.tokenize();
+                let mut parser = Parser::new(tokens);
+                let program = parser.parse().map_err(|e| format!("Parse error: {}", e))?;
+
+                let mut interpreter = Interpreter::new();
+                interpreter
+                    .run(&program)
+                    .map_err(|e| format!("Runtime error: {}", e))?;
+
+                Ok(())
+            }),
         });
     }
 
@@ -109,35 +136,39 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_suite_creation() {
+    fn test_suite_creation() -> Result<(), String> {
         let suite = TestSuite::new("test_suite");
         assert_eq!(suite.tests.len(), 0);
+        Ok(())
     }
 
     #[test]
-    fn test_add_test() {
+    fn test_add_test() -> Result<(), String> {
         let mut suite = TestSuite::new("test_suite");
         suite.add_test("test1", || Ok(()));
         assert_eq!(suite.tests.len(), 1);
+        Ok(())
     }
 
     #[test]
-    fn test_run_passing() {
+    fn test_run_passing() -> Result<(), String> {
         let mut suite = TestSuite::new("test_suite");
         suite.add_test("test1", || Ok(()));
 
         let results = suite.run();
         assert_eq!(results.passed, 1);
         assert_eq!(results.failed, 0);
+        Ok(())
     }
 
     #[test]
-    fn test_run_failing() {
+    fn test_run_failing() -> Result<(), String> {
         let mut suite = TestSuite::new("test_suite");
         suite.add_test("test1", || Err("failed".to_string()));
 
         let results = suite.run();
         assert_eq!(results.passed, 0);
         assert_eq!(results.failed, 1);
+        Ok(())
     }
 }

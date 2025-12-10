@@ -1,188 +1,103 @@
 # GUL v2.0 Syntax Examples
-# Demonstrating revised syntax with backward compatibility
+# Demonstrating modern v2.0 syntax
 
 # ============================================
-# 1. MUTABILITY - New 'mut' keyword
+# 1. MUTABILITY - 'mut' and 'const' keywords
 # ============================================
 
-# Immutable (default)
-name = "Alice"
-const age = 25
+# Immutable constants
 const PI = 3.14159
+const MAX_USERS = 100
 
-# Mutable - NEW syntax (recommended)
+# Mutable variables
 mut count = 0
 mut total = 100
 
-# Mutable - LEGACY syntax (still works)
-?counter = 0
-?sum = 50
+# Regular variables (inferred types)
+name = "Alice"
+age = 25
 
-# Both work the same:
-count = count + 1    # mut variable
-?counter = ?counter + 1  # legacy mutable
+# Type annotations
+username: str = "Bob"
+user_age: int = 30
 
 
 # ============================================
-# 2. IMPORTS - New 'import' keyword
+# 2. IMPORTS - 'import' keyword
 # ============================================
 
-# NEW syntax (recommended)
+# Standard imports
 import std.io
 import std.http
+
+# Multi-language imports
 import python{numpy, pandas}
 import rust{tokio, serde}
 
 # Grouped imports
 import {
-    std.io,
     std.math,
-    python{numpy, matplotlib}
+    std.collections,
+    python{matplotlib}
 }
 
-# LEGACY syntax (still works)
-imp std.json
-imp python: scipy
-
 
 # ============================================
-# 3. TYPE ANNOTATIONS - Colon syntax
-# ============================================
-
-# NEW syntax (recommended)
-username: str = "Bob"
-user_age: int = 30
-price: float = 19.99
-active: bool = true
-
-# LEGACY syntax (still works)
-@str email = "bob@example.com"
-@int score = 100
-
-
-# ============================================
-# 4. FUNCTIONS - async keyword
+# 3. FUNCTIONS - 'fn' and 'async' keywords
 # ============================================
 
 # Sync function
-fn greet(name):
+fn greet(name: str) -> str:
     return "Hello, " + name
 
-# NEW async syntax (recommended)
-async fetch_data(url):
+# Async function
+async fetch_data(url: str) -> dict:
     response = await http.get(url)
     return response.json()
 
-# LEGACY async syntax (still works)
-@asy legacy_fetch(url):
-    return await http.get(url)
-
 
 # ============================================
-# 5. MAIN FUNCTION - Simplified
+# 4. MULTI-LANGUAGE - 'extern' keyword
 # ============================================
 
-# NEW syntax (recommended)
-main():
-    print("Hello from GUL v2.0!")
-    
-    # Use new syntax
-    mut counter = 0
-    const max = 10
-    
-    while counter < max:
-        print(counter)
-        counter = counter + 1
-    
-    # Fetch data with async
-    data = await fetch_data("https://api.example.com")
-    print(data)
-
-# LEGACY syntax (still works)
-# mn main():
-#     print("Legacy syntax works too!")
-
-
-# ============================================
-# 6. MULTI-LANGUAGE - extern keyword
-# ============================================
-
-# NEW syntax (recommended)
 extern python {
-    fn analyze(data: list) -> float {
+    fn analyze_data(data: list) -> dict {
         import numpy as np
-        return np.mean(data)
-    }
-}
-
-extern rust {
-    fn fast_compute(n: u64) -> u64 {
-        n * n
-    }
-}
-
-# LEGACY syntax (still works)
-@cs js:
-    export function formatDate(date) {
-        return new Date(date).toLocaleDateString()
-    }
-
-
-# ============================================
-# 7. UI COMPONENTS - Template literals
-# ============================================
-
-# NEW syntax (recommended)
-ui.render(`<button text="Click Me">`)
-ui.render(`<slider min=0 max=100 value=50>`)
-
-# LEGACY syntax (still works)
-ui.print(^÷^[button{text="Legacy"}])
-
-
-# ============================================
-# 8. COMPLETE EXAMPLE - All new syntax
-# ============================================
-
-import {
-    std.http,
-    python{numpy, pandas}
-}
-
-const API_URL = "https://api.example.com"
-mut request_count = 0
-
-async fetch_users() -> list:
-    mut retries = 0
-    const max_retries = 3
-    
-    while retries < max_retries:
-        try:
-            response = await http.get(API_URL + "/users")
-            request_count = request_count + 1
-            return response.json()
-        catch error:
-            retries = retries + 1
-    
-    return []
-
-extern python {
-    fn calculate_stats(users: list) -> map {
-        import pandas as pd
-        df = pd.DataFrame(users)
+        arr = np.array(data)
         return {
-            "count": len(users),
-            "avg_age": df['age'].mean()
+            "mean": float(np.mean(arr)),
+            "std": float(np.std(arr)),
+            "count": len(data)
         }
     }
 }
 
+extern rust {
+    fn fast_compute(n: int) -> int {
+        return n * n
+    }
+}
+
+
+# ============================================
+# 5. MAIN FUNCTION
+# ============================================
+
 main():
-    print("GUL v2.0 - Modern Syntax Demo")
-    
-    users = await fetch_users()
-    stats = calculate_stats(users)
-    
-    print("Total users:", stats["count"])
-    print("Average age:", stats["avg_age"])
-    print("Requests made:", request_count)
+    print("Hello from GUL v2.0!")
+
+    # Use modern syntax
+    mut counter = 0
+    const max_count = 10
+
+    while counter < max_count:
+        print("Count:", counter)
+        counter = counter + 1
+
+    # Test multi-language integration
+    data = [1, 2, 3, 4, 5]
+    stats = analyze_data(data)
+    print("Data stats:", stats)
+
+    result = fast_compute(5)
+    print("5 squared =", result)

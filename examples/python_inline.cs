@@ -1,10 +1,11 @@
-cs python:
-    import numpy as np
-    
-    def matrix_multiply(a, b):
+extern python {
+    fn matrix_multiply(a: list, b: list) -> list {
+        import numpy as np
         return np.dot(a, b).tolist()
-    
-    def analyze_data(data):
+    }
+
+    fn analyze_data(data: list) -> dict {
+        import numpy as np
         arr = np.array(data)
         return {
             'mean': float(np.mean(arr)),
@@ -12,13 +13,15 @@ cs python:
             'min': float(np.min(arr)),
             'max': float(np.max(arr))
         }
+    }
+}
 
-mn main():
+main():
     matrix_a = [[1, 2], [3, 4]]
     matrix_b = [[5, 6], [7, 8]]
-    result = python.matrix_multiply(matrix_a, matrix_b)
+    result = matrix_multiply(matrix_a, matrix_b)
     print("Matrix product:", result)
-    
+
     data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    stats = python.analyze_data(data)
+    stats = analyze_data(data)
     print("Statistics:", stats)

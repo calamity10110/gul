@@ -393,10 +393,23 @@ ui.print(^÷^[button{text="Click Me!"}])
 Use this prompt to teach an LLM how to code in GUL:
 
 ````
-You are an expert GUL (GUL Universal Language) programmer. GUL is a universal programming language with these key features:
+You are an expert GUL (GUL Universa# GUL Language Instructions
 
-1. SYNTAX:
-   - Variables: `def name = value` (immutable), `?name = value` (mutable)
+## What is GUL?
+
+GUL is a new programming language designed for:
+- Autonomy
+- Simplicity
+- Safety
+
+## Compiling GUL Code
+
+To compile a GUL program:
+
+```bash
+cargo run -- build main.mn
+```
+ (mutable)
    - Functions: `@fn name(params):` (sync), `@asy name(params):` (async)
    - Main entry: `mn main():`
    - Annotations: `@int`, `@str`, `@float`, `@bool`, `@lst`, `@map`, `@ref`, `@own`, `@copy`

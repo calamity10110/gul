@@ -1,0 +1,7 @@
+struct Point:
+    x: int
+    y: int
+
+def msg = "Hello from GUL Interpreter!"
+print(msg)
+print(10 + 20)

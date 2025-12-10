@@ -1,6 +1,19 @@
 // AST (Abstract Syntax Tree) definitions
 
 #[derive(Debug, Clone, PartialEq)]
+pub enum Type {
+    Int,
+    Float,
+    String,
+    Bool,
+    List(Box<Type>),
+    Dict(Box<Type>, Box<Type>),
+    Any,                            // Gradual typing - can hold any value
+    Unit(String),                   // Unit types like "m", "kg", "m/s"
+    Function(Vec<Type>, Box<Type>), // Parameter types and return type
+}
+
+#[derive(Debug, Clone, PartialEq)]
 pub struct Program {
     pub statements: Vec<Statement>,
 }
@@ -8,6 +21,11 @@ pub struct Program {
 #[derive(Debug, Clone, PartialEq)]
 pub enum Statement {
     Import(String),
+    StructDef {
+        name: String,
+        fields: Vec<(String, String)>,
+        methods: Vec<Statement>,
+    },
     Definition {
         name: String,
         value: Expression,
@@ -18,9 +36,14 @@ pub enum Statement {
         body: Vec<Statement>,
         is_async: bool,
     },
-    CustomBlock {
+    ForeignBlock {
         language: String,
         code: String,
+    },
+    GlobalDef {
+        name: String,
+        value: Expression,
+        mutable: bool,
     },
     Main {
         body: Vec<Statement>,
@@ -50,8 +73,14 @@ pub enum Statement {
     },
     Break,
     Continue,
+    Try {
+        try_body: Vec<Statement>,
+        catch_var: Option<String>,
+        catch_body: Option<Vec<Statement>>,
+        finally_body: Option<Vec<Statement>>,
+    },
+    Throw(Expression),
 }
-
 #[derive(Debug, Clone, PartialEq)]
 pub enum Expression {
     Integer(i64),
@@ -87,6 +116,19 @@ pub enum Expression {
         object: Box<Expression>,
         member: String,
     },
+    Ownership {
+        mode: Ownership,
+        value: Box<Expression>,
+    },
+    ListOp {
+        op: ListOp,
+        args: Vec<Expression>,
+    },
+    // Type-annotated expressions for gradual typing
+    Typed {
+        expr: Box<Expression>,
+        ty: Type,
+    },
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -118,4 +160,14 @@ pub enum Ownership {
     Own,
     Ref,
     Copy,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum ListOp {
+    Car,
+    Cdr,
+    Cons,
+    Map,
+    Fold,
+    Slice,
 }

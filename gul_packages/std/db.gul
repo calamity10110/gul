@@ -1,0 +1,49 @@
+# Database Module for GUL
+# Ported from generic DB interfaces / Rust sqlx concepts
+
+struct ConnectionConfig:
+    host: string
+    port: int
+    user: string
+    password: string
+    db_name: string
+
+struct Row:
+    data: map<string, any>
+    
+    fn get(self, column: string) -> any:
+        # return self.data[column]
+        return "mock_value"
+
+struct Connection:
+    config: ConnectionConfig
+    connected: bool
+    
+    fn execute(self, query: string) -> int:
+        print("Executing: " + query)
+        return 1 # rows affected
+        
+    fn query(self, query: string) -> vec<Row>:
+        print("Querying: " + query)
+        return [Row { data: {} }]
+
+# Drivers
+module postgres:
+    fn connect(url: string) -> Connection:
+        print("Connecting to Postgres: " + url)
+        return Connection { 
+            config: ConnectionConfig { 
+                host: "localhost", port: 5432, user: "postgres", password: "", db_name: "test" 
+            }, 
+            connected: true 
+        }
+
+module sqlite:
+    fn open(path: string) -> Connection:
+        print("Opening SQLite: " + path)
+        return Connection {
+            config: ConnectionConfig {
+                host: "", port: 0, user: "", password: "", db_name: ""
+            },
+            connected: true
+        }

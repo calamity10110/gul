@@ -1,7 +1,6 @@
 [package]
 name = "gul-http"
 version = "0.1.0"
-edition = "2021"
 authors = ["GUL Team <team@gul-lang.org>"]
 description = "HTTP client and server for GUL"
 license = "MIT"
@@ -10,9 +9,15 @@ keywords = ["http", "client", "server", "web", "gul"]
 categories = ["web-programming", "network-programming"]
 
 [dependencies]
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-tokio = { version = "1.35", features = ["full"] }
+std = "1.0"
 
-[dev-dependencies]
-tokio-test = "0.4"
+[dependencies.python]
+requests = "2.28.0"
+
+[blocks]
+imports = "imports.imp"
+definitions = "definitions.def"
+async = "async.asy"
+functions = "functions.fnc"
+custom = "custom.cs"
+main = "main.mn"

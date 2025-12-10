@@ -1,0 +1,43 @@
+# Web Framework for GUL
+# Ported from Flask / Axum
+
+use std::net
+use std::http
+
+struct Request:
+    method: string
+    path: string
+    headers: map<string, string>
+    body: string
+
+struct Route:
+    path: string
+    handler: fn(Request) -> http::Response
+
+struct App:
+    routes: vec<Route>
+    
+    fn new() -> App:
+        return App { routes: [] }
+    
+    fn route(mut self, path: string, handler: fn(Request) -> http::Response):
+        self.routes.push(Route { path, handler })
+        
+    fn run(self, host: string = "127.0.0.1", port: int = 8080):
+        addr = net::SocketAddr::new(host, port)
+        listener = net::TcpListener::bind(addr)
+        print("Web server running on " + addr.to_string())
+        
+        # Simple loop (mock)
+        loop:
+            stream = listener.accept()
+            # Handle request...
+            break
+
+# Helper for response creation
+fn json(data: any) -> http::Response:
+    return http::Response {
+        status: 200,
+        headers: {"Content-Type": "application/json"},
+        body: std::json::stringify(data)
+    }

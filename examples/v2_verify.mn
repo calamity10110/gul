@@ -1,0 +1,41 @@
+import std.math
+
+mut counter: int = 10
+
+const data: list = [100, 200, 300]
+
+main():
+    print("--- GUL v2.0 Verification ---")
+    print("Initial Counter:", counter)
+
+    counter = 20
+    print("Updated Counter:", counter)
+
+    print("Data:", data)
+
+    # Type annotations and gradual typing
+    const message: str = "Hello, GUL v2.0!"
+    mut result: any = 42
+
+    print(message)
+    print("Result:", result)
+
+    # Try/Catch error handling
+    try:
+        print("Testing try/catch...")
+        # This would normally throw an error
+        # throw "Test error"
+    catch error:
+        print("Caught error:", error)
+
+    # List Operations
+    h = car(data)
+    print("Car (Head):", h)
+
+    t = cdr(data)
+    print("Cdr (Tail):", t)
+
+    new_list = cons(50, data)
+    print("Cons (Prepend):", new_list)
+
+    print("--- Verification Complete ---")
