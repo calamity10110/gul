@@ -470,14 +470,25 @@ For detailed history, see [PROGRESS.md](PROGRESS.md) and [CHANGES.md](CHANGES.md
 
 ## 🚀 Next Phase: Phase 16
 
-### Phase 16: Release v0.13.0
+### Phase 16: Release v0.14.0 (Language v2.1)
 
-**Status:** Planned  
+**Status:** In Progress  
 **Target:** Q1 2026
+
+#### 16.0 Language v2.1 Updates (NEW)
+
+- [x] Bracket Equivalence: `()`, `{}`, `[]` interchangeable when matching
+- [x] UI Syntax Clarification: Correct `^&^` and `ui.print()` usage
+- [x] File Type System: `.mn`, `.def`, `.fnc`, `.cs` architecture
+- [x] Compiler Implementation: Lexer/parser updates for bracket equivalence (12 new tests)
+- [ ] Documentation: Update all docs with v2.1 syntax
+- [ ] Examples: Update all examples with correct syntax
+- [x] Tests: Comprehensive test suite for v2.1 features (397 total tests passing)
+- [ ] Course: Update interactive course content
 
 #### 16.1 Release Preparation
 
-- [x] Version bumping (v0.12.2 → v0.13.0) ✅ Complete
+- [x] Version bumping (v0.13.0 → v0.14.0)
 - [ ] Update dependencies
 - [ ] Create comprehensive changelog
 - [ ] Tag release
@@ -579,9 +590,9 @@ For detailed history, see [PROGRESS.md](PROGRESS.md) and [CHANGES.md](CHANGES.md
 
 - **Website:** https://gul-lang.org (framework ready)
 - **Repository:** https://github.com/gul-lang/gul
-- **Documentation:** https://docs.gul-lang.org (framework ready)
-- **Package Registry:** https://packages.gul-lang.org (framework ready)
-- **Community:** https://community.gul-lang.org (framework ready)
+- **Documentation:** https://docs.mn-lang.org (framework ready)
+- **Package Registry:** https://packages.mn-lang.org (framework ready)
+- **Community:** https://community.mn-lang.org (framework ready)
 
 ---
 

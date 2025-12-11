@@ -245,7 +245,7 @@ url = "https://custom-registry.example.com"
 
 GUL respects the following environment variables:
 
-- `GUL_HOME`: GUL installation directory (default: `~/.gul`)
+- `GUL_HOME`: GUL installation directory (default: `~/.mn`)
 - `GUL_REGISTRY`: Package registry URL
 - `GUL_CACHE_DIR`: Package cache directory
 - `GUL_LOG_LEVEL`: Logging level (trace, debug, info, warn, error)
@@ -253,8 +253,8 @@ GUL respects the following environment variables:
 Example `.bashrc`/`.zshrc` configuration:
 
 ```bash
-export GUL_HOME=$HOME/.gul
-export GUL_REGISTRY=https://packages.gul-lang.org
+export GUL_HOME=$HOME/.mn
+export GUL_REGISTRY=https://packages.mn-lang.org
 export GUL_CACHE_DIR=$HOME/.cache/gul
 export GUL_LOG_LEVEL=info
 export PATH=$PATH:$HOME/.cargo/bin
@@ -279,7 +279,7 @@ gul completion fish > ~/.config/fish/completions/gul.fish
 
 ### Test Your Installation
 
-Create a simple test file `hello.gul`:
+Create a simple test file `hello.mn`:
 
 ```gul
 main:
@@ -289,7 +289,7 @@ main:
 Run it:
 
 ```bash
-gul run hello.gul
+gul run hello.mn
 ```
 
 Expected output:
@@ -353,7 +353,7 @@ sudo cargo install --path .
 **Solution**: Check your internet connection and firewall settings. Try:
 
 ```bash
-curl -I https://packages.gul-lang.org
+curl -I https://packages.mn-lang.org
 ```
 
 ### Performance Issues
@@ -371,7 +371,7 @@ If you encounter issues not covered here:
 
 - **Documentation**: [gul-lang.org/docs](https://gul-lang.org/docs)
 - **GitHub Issues**: [github.com/gul-lang/gul/issues](https://github.com/gul-lang/gul/issues)
-- **Community Forum**: [forum.gul-lang.org](https://forum.gul-lang.org)
+- **Community Forum**: [forum.mn-lang.org](https://forum.mn-lang.org)
 - **Discord**: [discord.gg/gul-lang](https://discord.gg/gul-lang)
 
 ## 📚 Next Steps
@@ -417,7 +417,7 @@ cargo uninstall gul
 ### Remove All Files
 
 ```bash
-rm -rf ~/.gul
+rm -rf ~/.mn
 rm -rf ~/.cache/gul
 ```
 

@@ -1,0 +1,165 @@
+# C FFI Integration Tests
+# Tests GUL's ability to interoperate with C code
+
+import std.testing
+import std.c
+
+@test
+fn test_c_inline_execution():
+    """Test inline C code execution"""
+    result = c.exec("""
+#include <stdio.h>
+#include <string.h>
+
+char* greet(const char* name) {
+    static char buffer[256];
+    sprintf(buffer, "Hello, %s!", name);
+    return buffer;
+}
+
+greet("GUL");
+""")
+    
+    assert result == "Hello, GUL!"
+
+@test
+fn test_c_stdlib_functions():
+    """Test calling C standard library functions"""
+    result = c.exec("""
+#include <math.h>
+
+sqrt(16.0);
+""")
+    
+    assert result == 4.0
+
+@test
+fn test_c_struct_manipulation():
+    """Test C struct creation and manipulation"""
+    result = c.exec("""
+#include <stdlib.h>
+
+typedef struct {
+    int x;
+    int y;
+} Point;
+
+Point create_point(int x, int y) {
+    Point p;
+    p.x = x;
+    p.y = y;
+    return p;
+}
+
+Point p = create_point(10, 20);
+p.x + p.y;
+""")
+    
+    assert result == 30
+
+@test
+fn test_c_pointer_arithmetic():
+    """Test C pointer operations"""
+    result = c.exec("""
+#include <string.h>
+
+int sum_array(int* arr, int size) {
+    int sum = 0;
+    for (int i = 0; i < size; i++) {
+        sum += arr[i];
+    }
+    return sum;
+}
+
+int numbers[] = {1, 2, 3, 4, 5};
+sum_array(numbers, 5);
+""")
+    
+    assert result == 15
+
+@test
+fn test_c_memory_allocation():
+    """Test dynamic memory allocation"""
+    result = c.exec("""
+#include <stdlib.h>
+#include <string.h>
+
+char* create_string(const char* input) {
+    char* str = (char*)malloc(strlen(input) + 1);
+    strcpy(str, input);
+    return str;
+}
+
+char* result = create_string("allocated");
+int len = strlen(result);
+free(result);
+len;
+""")
+    
+    assert result == 9
+
+@test
+fn test_c_file_operations():
+    """Test C file I/O"""
+    result = c.exec("""
+#include <stdio.h>
+
+FILE* fp = fopen("/tmp/test_gul.txt", "w");
+if (fp != NULL) {
+    fprintf(fp, "GUL Test");
+    fclose(fp);
+}
+
+fp = fopen("/tmp/test_gul.txt", "r");
+char buffer[100];
+if (fp != NULL) {
+    fgets(buffer, 100, fp);
+    fclose(fp);
+}
+
+strcmp(buffer, "GUL Test");
+""")
+    
+    assert result == 0
+
+@test
+fn test_c_callback_functions():
+    """Test C function pointers and callbacks"""
+    result = c.exec("""
+typedef int (*operation)(int, int);
+
+int add(int a, int b) {
+    return a + b;
+}
+
+int apply(operation op, int x, int y) {
+    return op(x, y);
+}
+
+apply(add, 5, 3);
+""")
+    
+    assert result == 8
+
+@test
+fn test_c_bitwise_operations():
+    """Test C bitwise operations"""
+    result = c.exec("""
+unsigned int set_bit(unsigned int num, int pos) {
+    return num | (1 << pos);
+}
+
+unsigned int clear_bit(unsigned int num, int pos) {
+    return num & ~(1 << pos);
+}
+
+unsigned int val = 0;
+val = set_bit(val, 0);  // Set bit 0
+val = set_bit(val, 2);  // Set bit 2
+val;  // Should be 5 (binary 101)
+""")
+    
+    assert result == 5
+
+main:
+    testing.run_all_tests()

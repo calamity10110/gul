@@ -34,9 +34,9 @@ cargo run --example programming_deck
 gul ide --tui
 ````
 
-### IDE Layout
+## IDE Layout
 
-```
+```bash
 ┌─────────────────────────────────────────────────────────────┐
 │ GUL IDE v0.11.0 - [Programming Deck]                       │
 ├──────────────┬────────────────────────────┬─────────────────┤
@@ -104,7 +104,7 @@ ui.print(^&^[button{text: "Click Me!"}])
 
 **Output:**
 
-```
+```bash
 ┌───────────┐
 │ Click Me! │
 └───────────┘
@@ -122,7 +122,7 @@ ui.print(^&^[progress{
 
 **Output:**
 
-```
+```bash
 Loading: [███████████████████████████░░░░░░░░░░░░░] 75%
 ```
 
@@ -139,7 +139,7 @@ ui.print(^&^[slider{
 
 **Output:**
 
-```
+```bash
 Volume: [====================|                    ] 50/100
 ```
 
@@ -158,7 +158,7 @@ ui.print(^&^[table{
 
 **Output:**
 
-```
+```bash
 ┌────┬─────────┬──────────┐
 │ ID │ Name    │ Status   │
 ├────┼─────────┼──────────┤
@@ -195,7 +195,7 @@ ui.print(^&^[tree{
 
 **Output:**
 
-```
+```bash
 ├── src
 │   ├── main.mn
 │   └── utils.mn

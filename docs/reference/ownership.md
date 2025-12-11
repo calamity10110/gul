@@ -550,7 +550,7 @@ fn main():
 
 # Error message:
 # Error: value used after move
-#   --> main.gul:3:11
+#   --> main.mn:3:11
 #   |
 # 2 |     y = x
 #   |         - value moved here

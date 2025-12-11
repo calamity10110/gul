@@ -1,0 +1,209 @@
+name: Documentation Automation
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "docs/**"
+      - "src/**"
+      - "packages/**"
+  pull_request:
+    paths:
+      - "docs/**"
+  schedule:
+    # Update docs daily at 4 AM UTC
+    - cron: "0 4 * * *"
+
+jobs:
+  # Validate documentation
+  validate-docs:
+    name: Validate Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install markdown-link-check
+          npm install -g markdownlint-cli
+
+      - name: Check markdown formatting
+        run: markdownlint 'docs/**/*.md'
+
+      - name: Validate links
+        uses: lycheeverse/lychee-action@v1
+        with:
+          args: --verbose --no-progress 'docs/**/*.md'
+
+      - name: Validate code examples
+        run: python scripts/ci/validate_code_examples.py
+
+      - name: Check for broken cross-references
+        run: python scripts/ci/check_doc_references.py
+
+  # Generate API documentation
+  generate-api-docs:
+    name: Generate API Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Generate Rust API docs
+        run: cargo doc --no-deps --all-features --document-private-items
+
+      - name: Generate GUL stdlib docs
+        run: |
+          cargo build --release
+          ./target/release/gul doc --all-packages --output docs/api/generated
+
+      - name: Generate package API docs
+        run: python scripts/ci/generate_package_api_docs.py
+
+      - name: Upload API docs
+        uses: actions/upload-artifact@v3
+        with:
+          name: api-documentation
+          path: docs/api/generated
+
+  # Build documentation site
+  build-docs-site:
+    name: Build Documentation Site
+    runs-on: ubuntu-latest
+    needs: [validate-docs, generate-api-docs]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download API docs
+        uses: actions/download-artifact@v3
+        with:
+          name: api-documentation
+          path: docs/api/generated
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install MkDocs
+        run: |
+          pip install mkdocs mkdocs-material mkdocs-mermaid2-plugin
+          pip install pymdown-extensions pygments
+
+      - name: Build documentation site
+        run: mkdocs build --strict
+
+      - name: Test documentation site
+        run: |
+          pip install pytest pytest-html
+          pytest tests/docs/
+
+      - name: Upload documentation site
+        uses: actions/upload-artifact@v3
+        with:
+          name: documentation-site
+          path: site
+
+  # Deploy documentation
+  deploy-docs:
+    name: Deploy Documentation
+    runs-on: ubuntu-latest
+    needs: build-docs-site
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download documentation site
+        uses: actions/download-artifact@v3
+        with:
+          name: documentation-site
+          path: site
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          cname: docs.gul-lang.org
+
+      - name: Deploy to documentation server
+        run: |
+          # rsync -avz --delete site/ user@docs-server:/var/www/docs/
+          echo "Deploy to custom server (configure as needed)"
+
+  # Generate changelog
+  generate-changelog:
+    name: Generate Changelog
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Generate changelog
+        run: python scripts/ci/generate_changelog.py
+
+      - name: Update CHANGES.md
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add CHANGES.md
+          git diff --quiet && git diff --staged --quiet || git commit -m "docs: update changelog [skip ci]"
+          git push
+
+  # Generate tutorial screenshots
+  generate-screenshots:
+    name: Generate Tutorial Screenshots
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build GUL
+        run: cargo build --release
+
+      - name: Install screenshot tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb imagemagick
+
+      - name: Generate CLI screenshots
+        run: |
+          xvfb-run python scripts/ci/generate_cli_screenshots.py
+
+      - name: Generate TUI screenshots
+        run: |
+          xvfb-run python scripts/ci/generate_tui_screenshots.py
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v3
+        with:
+          name: tutorial-screenshots
+          path: docs/assets/screenshots

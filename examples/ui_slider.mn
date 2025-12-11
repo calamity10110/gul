@@ -1,7 +1,19 @@
-import ui
+# GUL UI Slider - v2.1
 
-const slider = ^&^[slider{min=0, max=100, value=50}]
+import std{ui}
 
-main():
+# v2.1: UI component literal syntax
+const slider = ^&^[slider{min: 0, max: 100, value: 50}]
+
+# v2.1: main block without parentheses
+main:
+    # v2.1: Both ui.print() and ^&^ work
     ui.print(slider)
+    
+    # Alternative: function call style (equivalent)
+    ui.print(button[text: "Click me", color: "blue"])
+    
+    # Alternative: component literal style
+    ^&^[label{text: "Hello World"}]
+    
     print("Slider value:", slider.value)

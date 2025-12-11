@@ -222,7 +222,14 @@ fn main() {
 
         Commands::Ide { mode } => match mode.as_str() {
             "tui" => {
-                println!("Launching TUI IDE...");
+                println!("Launching TUI IDE (Ratatui)...");
+                let mut app = gul_lang::tui::GulTuiApp::new();
+                if let Err(e) = app.run() {
+                    eprintln!("TUI IDE error: {}", e);
+                }
+            }
+            "legacy" => {
+                println!("Launching Legacy TUI IDE...");
                 let mut ide = tools::tui_ide::GulTuiIde::new();
                 if let Err(e) = ide.run() {
                     eprintln!("TUI IDE error: {}", e);
@@ -235,7 +242,7 @@ fn main() {
                     eprintln!("Web IDE error: {}", e);
                 }
             }
-            _ => eprintln!("Unknown IDE mode: {}", mode),
+            _ => eprintln!("Unknown IDE mode: {}. Available: tui, legacy, web", mode),
         },
 
         Commands::Optimize { file } => {

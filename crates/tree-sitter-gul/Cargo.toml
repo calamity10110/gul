@@ -1,0 +1,16 @@
+[package]
+name = "tree-sitter-gul"
+version = "0.1.0"
+edition = "2021"
+description = "Tree-sitter grammar for the GUL programming language"
+license = "MIT"
+repository = "https://github.com/gul-lang/gul"
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+tree-sitter = "0.24"
+
+[build-dependencies]
+cc = "1.0"

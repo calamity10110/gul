@@ -467,15 +467,15 @@ Want to improve the course? Contributions are welcome!
 
 ### Documentation
 
-- **GUL Docs:** https://docs.gul-lang.org
-- **API Reference:** https://api.gul-lang.org
+- **GUL Docs:** https://docs.mn-lang.org
+- **API Reference:** https://api.mn-lang.org
 - **Examples:** https://github.com/gul-lang/gul/tree/main/examples
 
 ### Community
 
 - **Discord:** https://discord.gg/gul
 - **GitHub:** https://github.com/gul-lang/gul
-- **Forum:** https://community.gul-lang.org
+- **Forum:** https://community.mn-lang.org
 
 ### Support
 

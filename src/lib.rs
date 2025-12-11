@@ -16,3 +16,4 @@ pub mod runtime;
 pub mod semantic;
 pub mod stdlib;
 pub mod tools;
+pub mod tui;

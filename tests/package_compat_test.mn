@@ -1,0 +1,203 @@
+# Package Compatibility Tests
+# Tests that GUL packages work together correctly
+
+import std.testing
+import std.http
+import std.database
+import std.json
+import std.datetime
+
+@test
+fn test_http_json_integration():
+    """Test HTTP module with JSON parsing"""
+    
+    # Create test server
+    server = http.Server(port=8081)
+    
+    @server.get("/api/data")
+    fn get_data(request):
+        data = {
+            "status": "success",
+            "timestamp": datetime.now().to_string(),
+            "data": [1, 2, 3, 4, 5]
+        }
+        return http.json_response(data)
+    
+    # Start server in background
+    server.start_async()
+    
+    # Make request
+    client = http.Client()
+    response = client.get("http://localhost:8081/api/data")
+    
+    # Parse JSON
+    parsed = json.parse(response.body)
+    
+    assert parsed["status"] == "success"
+    assert len(parsed["data"]) == 5
+    
+    server.stop()
+
+@test
+fn test_database_json_integration():
+    """Test database module with JSON data"""
+    
+    # Create in-memory database
+    db = database.connect("sqlite::memory:")
+    
+    # Create table
+    db.execute("""
+        CREATE TABLE users (
+            id INTEGER PRIMARY KEY,
+            name TEXT,
+            metadata TEXT
+        )
+    """)
+    
+    # Insert JSON data
+    metadata = json.stringify({
+        "age": 30,
+        "city": "NYC",
+        "active": True
+    })
+    
+    db.insert("users", {
+        "name": "Alice",
+        "metadata": metadata
+    })
+    
+    # Query and parse
+    user = db.query_one("SELECT * FROM users WHERE name = ?", ["Alice"])
+    parsed_metadata = json.parse(user["metadata"])
+    
+    assert parsed_metadata["age"] == 30
+    assert parsed_metadata["city"] == "NYC"
+
+@test
+fn test_http_database_stack():
+    """Test full web stack: HTTP + Database + JSON"""
+    
+    # Setup database
+    db = database.connect("sqlite::memory:")
+    db.execute("""
+        CREATE TABLE posts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT,
+            content TEXT,
+            created_at TEXT
+        )
+    """)
+    
+    # Create HTTP server
+    server = http.Server(port=8082)
+    
+    @server.post("/api/posts")
+    fn create_post(request):
+        data = request.json()
+        
+        post_id = db.insert("posts", {
+            "title": data["title"],
+            "content": data["content"],
+            "created_at": datetime.now().to_string()
+        })
+        
+        return http.json_response({
+            "id": post_id,
+            "status": "created"
+        }, status=201)
+    
+    @server.get("/api/posts/{id}")
+    fn get_post(request, id: int):
+        post = db.query_one("SELECT * FROM posts WHERE id = ?", [id])
+        
+        if post is None:
+            return http.not_found("Post not found")
+        
+        return http.json_response(post)
+    
+    server.start_async()
+    
+    # Test create
+    client = http.Client()
+    create_response = client.post(
+        "http://localhost:8082/api/posts",
+        json={
+            "title": "Test Post",
+            "content": "Test content"
+        }
+    )
+    
+    assert create_response.status_code == 201
+    
+    # Test retrieve
+    created_data = json.parse(create_response.body)
+    post_id = created_data["id"]
+    
+    get_response = client.get(f"http://localhost:8082/api/posts/{post_id}")
+    post_data = json.parse(get_response.body)
+    
+    assert post_data["title"] == "Test Post"
+    
+    server.stop()
+
+@test
+fn test_datetime_json_serialization():
+    """Test datetime with JSON serialization"""
+    
+    now = datetime.now()
+    
+    data = {
+        "timestamp": now.to_string(),
+        "unix": now.to_unix(),
+        "formatted": now.format("%Y-%m-%d %H:%M:%S")
+    }
+    
+    # Serialize
+    json_str = json.stringify(data)
+    
+    # Deserialize
+    parsed = json.parse(json_str)
+    
+    assert parsed["timestamp"] == data["timestamp"]
+    assert parsed["unix"] == data["unix"]
+
+@test
+fn test_cross_package_error_handling():
+    """Test error handling across packages"""
+    
+    # HTTP + Database error handling
+    db = database.connect("sqlite::memory:")
+    
+    result = try:
+        db.query("SELECT * FROM nonexistent_table")
+    catch e:
+        "database_error"
+    
+    assert result == "database_error"
+    
+    # HTTP error handling
+    client = http.Client()
+    
+    result = try:
+        client.get("http://localhost:99999/invalid")
+    catch e:
+        "http_error"
+    
+    assert result == "http_error"
+
+@test
+fn test_package_version_compatibility():
+    """Test that package versions are compatible"""
+    
+    # All packages should export version info
+    http_version = http.VERSION
+    db_version = database.VERSION
+    json_version = json.VERSION
+    
+    # Versions should be semantic
+    assert http_version.matches("\\d+\\.\\d+\\.\\d+")
+    assert db_version.matches("\\d+\\.\\d+\\.\\d+")
+    assert json_version.matches("\\d+\\.\\d+\\.\\d+")
+
+main:
+    testing.run_all_tests()

@@ -71,7 +71,7 @@ gul run hello.mn
 
 Output:
 
-```
+```bash
 Hello, GUL!
 ```
 
@@ -82,7 +82,7 @@ Hello, GUL!
 ### 5-Minute Tutorial
 
 ```gul
-# Flexible import system - choose your style!
+# Import system
 import python{numpy, pandas}
 import std{io, http}
 
@@ -99,24 +99,25 @@ async fetch_data(endpoint):
     return response.json()
 
 # Synchronous function
-fn process_data(ref data):
+fn process_data(ref response):
     # 'ref' means borrow, not copy
     result = []
-    for item in data:
+    for item in response:
         if item.value > 0:
             result.append(item)
     return result
 
 # Main entry point
-main():
+main:
     # Fetch data asynchronously
     data = await fetch_data("/users")
 
     # Process data
     processed = process_data(ref data)
 
-    # Display with UI component
-    ui.print(^&^[table{data=processed}])
+    # Display with UI component (equivalent syntaxes)
+    ui.print(table[data=processed])   # Function style
+    ^&^[table{data=processed}]        # Component literal style
 
     print("Done!")
 ```
@@ -134,25 +135,27 @@ main():
 
 ## 🎯 Core Features
 
-### 1. Auto-Organizing Block System
+### 1. File Type System
 
-Write everything in one file, GUL organizes it automatically:
+GUL uses four file types. Write everything in `.mn`, compiler organizes on publish:
+
+| Extension | Purpose                                   |
+| --------- | ----------------------------------------- |
+| `.mn`     | Main file - Entry point and user code     |
+| `.def`    | Definition - Imports and type definitions |
+| `.fnc`    | Function - All function logic             |
+| `.cs`     | Cross-Script - External language code     |
 
 ```gul
-# You write: main.mn
+# You write: myapp.mn (everything in one file)
 
-import std.io
+import std{io, http}
 const MAX_USERS = 100
 fn greet(name): return "Hello, " + name
-main(): print(greet("World"))
+main: print(greet("World"))
 ```
 
-GUL automatically creates:
-
-- `imports.imp` - All imports
-- `definitions.def` - All constants
-- `functions.fnc` - All functions
-- `main.mn` (cleaned) - Just the main function
+On publish, GUL separates into `.def`, `.fnc`, `.cs`, cleaned `.mn`
 
 ### 2. Multi-Language Integration
 
@@ -188,14 +191,20 @@ main():
 
 ### 3. First-Class UI Components
 
-UI elements are part of the language syntax:
+UI elements are part of the language syntax. `^&^` and `ui.print()` are equivalent:
 
-```glob
-# Create UI components inline
-ui.print(^&^[button{text="Click Me", color="blue"}])
-ui.print(^&^[slider{min=0, max=100, value=50}])
-ui.print(^&^[chart{type="bar", data=values}])
-ui.print(^&^[table{headers=["Name", "Age"], rows=data}])
+```gul
+# Component literal style (standalone)
+^&^[button{text="Click Me", color="blue"}]
+^&^[slider{min=0, max=100, value=50}]
+
+# Function call style (equivalent)
+ui.print(button[text="Click Me", color="blue"])
+ui.print(table[headers=["Name", "Age"], rows=data])
+
+# Brackets (), [], {} are interchangeable when matching
+ui.print(chart{type="bar", data=values})
+ui.print(chart[type="bar", data=values])
 ```
 
 ### 4. Ownership Model
@@ -459,8 +468,8 @@ mn main():
 - **[Official Tutorial](https://gul.org/tutorial)** - Step-by-step guide
 - **[Language Reference](https://gul.org/reference)** - Complete reference
 - **[Cookbook](https://gul.org/cookbook)** - Common patterns
-- **[API Documentation](https://docs.gul.org)** - Standard library docs
-- **[Community Forum](https://forum.gul.org)** - Ask questions
+- **[API Documentation](https://docs.mn.org)** - Standard library docs
+- **[Community Forum](https://forum.mn.org)** - Ask questions
 
 ---
 

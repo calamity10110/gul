@@ -73,7 +73,7 @@ This documentation is organized into the following sections:
 - **License:** MIT
 - **Repository:** [github.com/gul-lang/gul](https://github.com/gul-lang/gul)
 - **Website:** [gul-lang.org](https://gul-lang.org)
-- **Package Registry:** [packages.gul-lang.org](https://packages.gul-lang.org)
+- **Package Registry:** [packages.mn-lang.org](https://packages.mn-lang.org)
 
 ---
 

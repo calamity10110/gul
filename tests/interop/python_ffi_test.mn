@@ -1,0 +1,125 @@
+# Python FFI Integration Tests
+# Tests GUL's ability to interoperate with Python code
+
+import std{testing, python}
+
+@test
+fn test_python_inline_execution():
+    """Test inline Python code execution"""
+    result = python.exec("""
+def greet(name):
+    return f"Hello, {name}!"
+
+result = greet("GUL")
+""")
+    
+    assert result == "Hello, GUL!"
+
+@test
+fn test_python_import_stdlib():
+    """Test importing Python standard library"""
+    math = python.import("math")
+    
+    pi = math.pi
+    sqrt_result = math.sqrt(16)
+    
+    assert sqrt_result == 4.0
+    assert pi > 3.14
+
+@test
+fn test_python_numpy_integration():
+    """Test NumPy array operations"""
+    np = python.import("numpy")
+    
+    # Create array
+    arr = np.array([1, 2, 3, 4, 5])
+    
+    # Perform operations
+    mean = np.mean(arr)
+    sum = np.sum(arr)
+    
+    assert mean == 3.0
+    assert sum == 15
+
+@test
+fn test_python_pandas_dataframe():
+    """Test Pandas DataFrame integration"""
+    pd = python.import("pandas")
+    
+    # Create DataFrame
+    data = {
+        "name": ["Alice", "Bob", "Charlie"],
+        "age": [25, 30, 35]
+    }
+    df = pd.DataFrame(data)
+    
+    # Query DataFrame
+    mean_age = df["age"].mean()
+    
+    assert mean_age == 30.0
+    assert len(df) == 3
+
+@test
+fn test_bidirectional_python_gul_calls():
+    """Test calling GUL functions from Python and vice versa"""
+    
+    # Define GUL function
+    fn multiply(a: int, b: int): int:
+        return a * b
+    
+    # Call from Python
+    result = python.exec("""
+def use_gul_function():
+    return gul.multiply(6, 7)
+
+result = use_gul_function()
+""")
+    
+    assert result == 42
+
+@test
+fn test_python_exception_handling():
+    """Test Python exception handling in GUL"""
+    
+    result = try:
+        python.exec("raise ValueError('Test error')")
+    catch e:
+        "exception_caught"
+    
+    assert result == "exception_caught"
+
+@test
+fn test_python_async_await():
+    """Test Python async/await integration"""
+    asyncio = python.import("asyncio")
+    
+    result = python.exec("""
+async def async_task():
+    await asyncio.sleep(0.1)
+    return "async_complete"
+
+result = asyncio.run(async_task())
+""")
+    
+    assert result == "async_complete"
+
+@test
+fn test_python_class_instantiation():
+    """Test creating Python class instances"""
+    result = python.exec("""
+class Counter:
+    def __init__(self):
+        self.count = 0
+    
+    def increment(self):
+        self.count += 1
+        return self.count
+
+counter = Counter()
+result = [counter.increment() for _ in range(5)]
+""")
+    
+    assert result == [1, 2, 3, 4, 5]
+
+main:
+    testing.run_all_tests()

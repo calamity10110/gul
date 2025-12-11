@@ -998,27 +998,65 @@ impl Parser {
 
         loop {
             match self.current_token() {
-                Token::LeftParen => {
-                    // Function call
-                    self.advance();
-                    let mut args = Vec::new();
+                // v2.1: All bracket types can be used for function calls
+                Token::LeftParen | Token::LeftBracket | Token::LeftBrace => {
+                    let open_bracket = self.current_token().clone();
 
-                    while self.current_token() != &Token::RightParen {
-                        args.push(self.parse_expression()?);
+                    // Determine if this is a function call or index access
+                    // For identifiers followed by brackets, treat as function call
+                    let is_function_call =
+                        matches!(expr, Expression::Identifier(_) | Expression::Member { .. });
 
-                        if self.current_token() == &Token::Comma {
-                            self.advance();
-                        } else {
-                            break;
+                    if is_function_call || open_bracket == Token::LeftParen {
+                        // Function call with any bracket type
+                        self.advance();
+                        let mut args = Vec::new();
+
+                        while !self.current_token().is_close_bracket() {
+                            // Check for named parameters (key=value or key:value)
+                            args.push(self.parse_expression()?);
+
+                            if self.current_token() == &Token::Comma {
+                                self.advance();
+                            } else {
+                                break;
+                            }
                         }
+
+                        // v2.1: Validate bracket matching
+                        if !open_bracket.brackets_match(self.current_token()) {
+                            return Err(format!(
+                                "Mismatched brackets: opened with {:?}, closed with {:?}",
+                                open_bracket,
+                                self.current_token()
+                            ));
+                        }
+                        self.advance(); // consume closing bracket
+
+                        expr = Expression::Call {
+                            function: Box::new(expr),
+                            args,
+                        };
+                    } else {
+                        // Index access (only for LeftBracket in non-function context)
+                        self.advance();
+                        let index = self.parse_expression()?;
+
+                        // v2.1: Accept any matching closing bracket
+                        if !open_bracket.brackets_match(self.current_token()) {
+                            return Err(format!(
+                                "Mismatched brackets: opened with {:?}, closed with {:?}",
+                                open_bracket,
+                                self.current_token()
+                            ));
+                        }
+                        self.advance();
+
+                        expr = Expression::Index {
+                            object: Box::new(expr),
+                            index: Box::new(index),
+                        };
                     }
-
-                    self.expect(Token::RightParen)?;
-
-                    expr = Expression::Call {
-                        function: Box::new(expr),
-                        args,
-                    };
                 }
                 Token::Dot => {
                     // Member access
@@ -1035,17 +1073,6 @@ impl Parser {
                     } else {
                         return Err("Expected member name after '.'".to_string());
                     }
-                }
-                Token::LeftBracket => {
-                    // Index access
-                    self.advance();
-                    let index = self.parse_expression()?;
-                    self.expect(Token::RightBracket)?;
-
-                    expr = Expression::Index {
-                        object: Box::new(expr),
-                        index: Box::new(index),
-                    };
                 }
                 _ => break,
             }
@@ -1085,7 +1112,7 @@ impl Parser {
                 let sprite_content = content.clone();
                 self.advance();
 
-                // Parser for Universal Languagent (simplified)
+                // Parser for UI components (simplified)
                 // Format: sprite_type{prop1=val1, prop2=val2} or just sprite_type
                 let parts: Vec<&str> = sprite_content.splitn(2, '{').collect();
                 let sprite_type = parts[0].to_string();
@@ -1101,57 +1128,110 @@ impl Parser {
                 let expr = self.parse_expression()?;
                 Ok(Expression::Await(Box::new(expr)))
             }
-            Token::LeftParen => {
+            // v2.1: All bracket types can be used for grouping or collections
+            Token::LeftParen | Token::LeftBracket | Token::LeftBrace => {
+                let open_bracket = self.current_token().clone();
                 self.advance();
-                let expr = self.parse_expression()?;
-                self.expect(Token::RightParen)?;
-                Ok(expr)
-            }
-            Token::LeftBracket => {
-                // List literal
-                self.advance();
-                let mut elements = Vec::new();
 
-                while self.current_token() != &Token::RightBracket {
-                    elements.push(self.parse_expression()?);
-
-                    if self.current_token() == &Token::Comma {
-                        self.advance();
-                    } else {
-                        break;
-                    }
+                // Check if empty
+                if open_bracket.brackets_match(self.current_token()) {
+                    self.advance();
+                    return Ok(Expression::List(Vec::new()));
                 }
 
-                self.expect(Token::RightBracket)?;
-                Ok(Expression::List(elements))
-            }
-            Token::LeftBrace => {
-                // Dict literal
-                self.advance();
-                let mut pairs = Vec::new();
+                // Parse first element
+                let first_expr = self.parse_expression()?;
 
-                while self.current_token() != &Token::RightBrace {
-                    if let Token::Identifier(key) = self.current_token() {
-                        let key_name = key.clone();
+                // Check what follows to determine type
+                match self.current_token() {
+                    // Colon after first element = dictionary
+                    Token::Colon => {
                         self.advance();
+                        let first_value = self.parse_expression()?;
+                        let mut pairs = vec![];
 
-                        self.expect(Token::Colon)?;
+                        // Extract key from first_expr
+                        let key = match first_expr {
+                            Expression::Identifier(k) => k,
+                            _ => return Err("Dictionary key must be identifier".to_string()),
+                        };
+                        pairs.push((key, first_value));
 
-                        let value = self.parse_expression()?;
-                        pairs.push((key_name, value));
-
-                        if self.current_token() == &Token::Comma {
+                        // Parse remaining pairs
+                        while self.current_token() == &Token::Comma {
                             self.advance();
-                        } else {
-                            break;
+                            if open_bracket.brackets_match(self.current_token()) {
+                                break; // trailing comma
+                            }
+                            if let Token::Identifier(key) = self.current_token() {
+                                let key_name = key.clone();
+                                self.advance();
+                                self.expect(Token::Colon)?;
+                                let value = self.parse_expression()?;
+                                pairs.push((key_name, value));
+                            } else {
+                                return Err("Expected key identifier in dict".to_string());
+                            }
                         }
-                    } else {
-                        return Err("Expected key identifier".to_string());
+
+                        // v2.1: Validate bracket matching
+                        if !open_bracket.brackets_match(self.current_token()) {
+                            return Err(format!(
+                                "Mismatched brackets: opened with {:?}, closed with {:?}",
+                                open_bracket,
+                                self.current_token()
+                            ));
+                        }
+                        self.advance();
+                        Ok(Expression::Dict(pairs))
+                    }
+                    // Comma = list
+                    Token::Comma => {
+                        let mut elements = vec![first_expr];
+                        while self.current_token() == &Token::Comma {
+                            self.advance();
+                            if open_bracket.brackets_match(self.current_token()) {
+                                break; // trailing comma
+                            }
+                            elements.push(self.parse_expression()?);
+                        }
+
+                        // v2.1: Validate bracket matching
+                        if !open_bracket.brackets_match(self.current_token()) {
+                            return Err(format!(
+                                "Mismatched brackets: opened with {:?}, closed with {:?}",
+                                open_bracket,
+                                self.current_token()
+                            ));
+                        }
+                        self.advance();
+                        Ok(Expression::List(elements))
+                    }
+                    // Closing bracket = single element (grouping or single-element list)
+                    _ if open_bracket.brackets_match(self.current_token()) => {
+                        self.advance();
+                        // For () this is grouping, for [] and {} this is single-element list
+                        if open_bracket == Token::LeftParen {
+                            Ok(first_expr) // Grouping
+                        } else {
+                            Ok(Expression::List(vec![first_expr])) // Single element list
+                        }
+                    }
+                    _ => {
+                        // v2.1: Check for mismatched brackets
+                        if self.current_token().is_close_bracket() {
+                            return Err(format!(
+                                "Mismatched brackets: opened with {:?}, closed with {:?}",
+                                open_bracket,
+                                self.current_token()
+                            ));
+                        }
+                        Err(format!(
+                            "Unexpected token in collection: {:?}",
+                            self.current_token()
+                        ))
                     }
                 }
-
-                self.expect(Token::RightBrace)?;
-                Ok(Expression::Dict(pairs))
             }
             _ => Err(format!(
                 "Unexpected token in expression: {:?}",
@@ -1522,5 +1602,163 @@ mod tests {
 
         assert_eq!(program.statements.len(), 1);
         // Should parse nested function calls correctly
+    }
+
+    // v2.1 Bracket Equivalence Parser Tests
+    #[test]
+    fn test_v21_function_call_with_brackets() {
+        // Function call using [] instead of ()
+        let mut lexer = Lexer::new("def result = print[\"hello\"]");
+        let tokens = lexer.tokenize();
+        let mut parser = Parser::new(tokens);
+        let program = parser.parse().unwrap();
+
+        assert_eq!(program.statements.len(), 1);
+        match &program.statements[0] {
+            Statement::Definition { name, value } => {
+                assert_eq!(name, "result");
+                match value {
+                    Expression::Call { function: _, args } => {
+                        assert_eq!(args.len(), 1);
+                    }
+                    _ => panic!("Expected function call"),
+                }
+            }
+            _ => panic!("Expected definition"),
+        }
+    }
+
+    #[test]
+    fn test_v21_function_call_with_braces() {
+        // Function call using {} instead of ()
+        let mut lexer = Lexer::new("def result = print{\"hello\"}");
+        let tokens = lexer.tokenize();
+        let mut parser = Parser::new(tokens);
+        let program = parser.parse().unwrap();
+
+        assert_eq!(program.statements.len(), 1);
+        match &program.statements[0] {
+            Statement::Definition { name, value } => {
+                assert_eq!(name, "result");
+                match value {
+                    Expression::Call { function: _, args } => {
+                        assert_eq!(args.len(), 1);
+                    }
+                    _ => panic!("Expected function call"),
+                }
+            }
+            _ => panic!("Expected definition"),
+        }
+    }
+
+    #[test]
+    fn test_v21_list_with_parens() {
+        // List using () instead of []
+        let mut lexer = Lexer::new("def data = (1, 2, 3)");
+        let tokens = lexer.tokenize();
+        let mut parser = Parser::new(tokens);
+        let program = parser.parse().unwrap();
+
+        assert_eq!(program.statements.len(), 1);
+        match &program.statements[0] {
+            Statement::Definition { name, value } => {
+                assert_eq!(name, "data");
+                match value {
+                    Expression::List(elements) => {
+                        assert_eq!(elements.len(), 3);
+                    }
+                    _ => panic!("Expected list"),
+                }
+            }
+            _ => panic!("Expected definition"),
+        }
+    }
+
+    #[test]
+    fn test_v21_list_with_braces() {
+        // List using {} instead of []
+        let mut lexer = Lexer::new("def data = {1, 2, 3}");
+        let tokens = lexer.tokenize();
+        let mut parser = Parser::new(tokens);
+        let program = parser.parse().unwrap();
+
+        assert_eq!(program.statements.len(), 1);
+        match &program.statements[0] {
+            Statement::Definition { name, value } => {
+                assert_eq!(name, "data");
+                match value {
+                    Expression::List(elements) => {
+                        assert_eq!(elements.len(), 3);
+                    }
+                    _ => panic!("Expected list"),
+                }
+            }
+            _ => panic!("Expected definition"),
+        }
+    }
+
+    #[test]
+    fn test_v21_dict_with_brackets() {
+        // Dict using [] instead of {}
+        let mut lexer = Lexer::new("def config = [host: \"localhost\", port: 8080]");
+        let tokens = lexer.tokenize();
+        let mut parser = Parser::new(tokens);
+        let program = parser.parse().unwrap();
+
+        assert_eq!(program.statements.len(), 1);
+        match &program.statements[0] {
+            Statement::Definition { name, value } => {
+                assert_eq!(name, "config");
+                match value {
+                    Expression::Dict(pairs) => {
+                        assert_eq!(pairs.len(), 2);
+                        assert_eq!(pairs[0].0, "host");
+                        assert_eq!(pairs[1].0, "port");
+                    }
+                    _ => panic!("Expected dict"),
+                }
+            }
+            _ => panic!("Expected definition"),
+        }
+    }
+
+    #[test]
+    fn test_v21_empty_collections() {
+        // Empty list with different brackets
+        let mut lexer = Lexer::new("def empty = []");
+        let tokens = lexer.tokenize();
+        let mut parser = Parser::new(tokens);
+        let program = parser.parse().unwrap();
+
+        match &program.statements[0] {
+            Statement::Definition { value, .. } => match value {
+                Expression::List(elements) => assert_eq!(elements.len(), 0),
+                _ => panic!("Expected empty list"),
+            },
+            _ => panic!("Expected definition"),
+        }
+    }
+
+    #[test]
+    fn test_v21_mixed_bracket_nesting() {
+        // Nested with different bracket types
+        let mut lexer = Lexer::new("def x = func{a, [1, 2], (3, 4)}");
+        let tokens = lexer.tokenize();
+        let mut parser = Parser::new(tokens);
+        let program = parser.parse().unwrap();
+
+        assert_eq!(program.statements.len(), 1);
+        match &program.statements[0] {
+            Statement::Definition { name, value } => {
+                assert_eq!(name, "x");
+                match value {
+                    Expression::Call { args, .. } => {
+                        assert_eq!(args.len(), 3);
+                    }
+                    _ => panic!("Expected function call"),
+                }
+            }
+            _ => panic!("Expected definition"),
+        }
     }
 }

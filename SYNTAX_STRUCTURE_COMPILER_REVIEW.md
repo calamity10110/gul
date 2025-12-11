@@ -190,14 +190,14 @@ pub fn main():
 # Option 1: Manual organization (like every other language)
 project/
 ├── src/
-│   ├── main.gul
-│   ├── utils.gul
-│   ├── api.gul
-│   └── models.gul
+│   ├── main.mn
+│   ├── utils.mn
+│   ├── api.mn
+│   └── models.mn
 └── package.toml
 
 # Option 2: Single file with sections
-// main.gul
+// main.mn
 // Imports
 import std.io
 
@@ -534,7 +534,7 @@ match divide(10, 2) {
 **Fix:**
 
 ```
-Source Code (.gul)
+Source Code (.mn)
     ↓
 Lexer (tokens)
     ↓

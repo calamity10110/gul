@@ -1,7 +1,7 @@
-# GUL Beginner Tutorial - v2.0
-# This example demonstrates the core features of GUL in a simple program.
+# GUL Beginner Tutorial - v2.1
+# This example demonstrates the core features of GUL with v2.1 syntax.
 
-# 1. Flexible Imports
+# 1. Flexible Imports (v2.1 brace syntax)
 import std{io, math}
 import python{random}
 
@@ -67,8 +67,8 @@ async play_game():
     if won:
         game_state.high_score = game_state.high_score + 1
 
-# Main Entry Point
-main():
+# Main Entry Point (v2.1: no parentheses needed)
+main:
     await play_game()
     print("Thanks for playing!")
     print(f"Total games played: {game_state.games_played}")

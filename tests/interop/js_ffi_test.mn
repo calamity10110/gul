@@ -1,0 +1,177 @@
+# JavaScript/TypeScript FFI Integration Tests
+# Tests GUL's ability to interoperate with JavaScript and TypeScript
+
+import std.testing
+import std.javascript as js
+
+@test
+fn test_js_inline_execution():
+    """Test inline JavaScript code execution"""
+    result = js.exec("""
+function greet(name) {
+    return `Hello, ${name}!`;
+}
+
+greet("GUL");
+""")
+    
+    assert result == "Hello, GUL!"
+
+@test
+fn test_js_array_operations():
+    """Test JavaScript array methods"""
+    result = js.exec("""
+const numbers = [1, 2, 3, 4, 5];
+const doubled = numbers.map(x => x * 2);
+const sum = doubled.reduce((a, b) => a + b, 0);
+sum;
+""")
+    
+    assert result == 30
+
+@test
+fn test_js_object_manipulation():
+    """Test JavaScript object operations"""
+    result = js.exec("""
+const person = {
+    name: "Alice",
+    age: 30,
+    greet() {
+        return `${this.name} is ${this.age} years old`;
+    }
+};
+
+person.greet();
+""")
+    
+    assert result == "Alice is 30 years old"
+
+@test
+fn test_js_async_await():
+    """Test JavaScript async/await"""
+    result = js.exec("""
+async function fetchData() {
+    return new Promise(resolve => {
+        setTimeout(() => resolve("data"), 100);
+    });
+}
+
+await fetchData();
+""")
+    
+    assert result == "data"
+
+@test
+fn test_js_class_syntax():
+    """Test JavaScript ES6 classes"""
+    result = js.exec("""
+class Calculator {
+    constructor() {
+        this.result = 0;
+    }
+    
+    add(n) {
+        this.result += n;
+        return this;
+    }
+    
+    multiply(n) {
+        this.result *= n;
+        return this;
+    }
+    
+    getResult() {
+        return this.result;
+    }
+}
+
+const calc = new Calculator();
+calc.add(5).multiply(3).getResult();
+""")
+    
+    assert result == 15
+
+@test
+fn test_js_destructuring():
+    """Test JavaScript destructuring"""
+    result = js.exec("""
+const data = {
+    user: {
+        name: "Bob",
+        details: {
+            age: 25,
+            city: "NYC"
+        }
+    }
+};
+
+const { user: { details: { age } } } = data;
+age;
+""")
+    
+    assert result == 25
+
+@test
+fn test_js_spread_operator():
+    """Test JavaScript spread operator"""
+    result = js.exec("""
+const arr1 = [1, 2, 3];
+const arr2 = [4, 5, 6];
+const combined = [...arr1, ...arr2];
+combined.length;
+""")
+    
+    assert result == 6
+
+@test
+fn test_typescript_types():
+    """Test TypeScript type checking"""
+    result = js.exec_typescript("""
+interface User {
+    name: string;
+    age: number;
+}
+
+function createUser(name: string, age: number): User {
+    return { name, age };
+}
+
+const user = createUser("Charlie", 35);
+user.age;
+""")
+    
+    assert result == 35
+
+@test
+fn test_typescript_generics():
+    """Test TypeScript generics"""
+    result = js.exec_typescript("""
+function identity<T>(arg: T): T {
+    return arg;
+}
+
+function wrapInArray<T>(item: T): T[] {
+    return [item];
+}
+
+const result = wrapInArray(42);
+result[0];
+""")
+    
+    assert result == 42
+
+@test
+fn test_nodejs_module_import():
+    """Test Node.js module imports"""
+    result = js.exec("""
+const fs = require('fs');
+const path = require('path');
+
+// Test path operations
+path.join('a', 'b', 'c');
+""")
+    
+    assert result.contains("/") or result.contains("\\")
+
+main:
+    testing.run_all_tests()

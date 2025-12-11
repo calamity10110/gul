@@ -1,9 +1,8 @@
-# HTTP Client Module for GUL
-# Ported from Python/Rust concepts
+# HTTP Client Module for GUL v2.1
+# Standard library HTTP client
 
-# Import requiregex_replace(gul|Blob, "gul")es (mocked for now)
-# use native::net
-# use native::io
+# Import using v2.1 brace syntax
+# import native{net, io}
 
 struct Response:
     status: int
@@ -12,8 +11,7 @@ struct Response:
 
     fn json(self) -> any:
         # Parse JSON body
-        # return json.parse(self.body)
-        return std::json::parse(self.body)
+        return std.json.parse(self.body)
 
     fn text(self) -> string:
         return self.body
@@ -23,37 +21,38 @@ struct Client:
     headers: map<string, string>
 
     fn new(base_url: string = "") -> Client:
-        return Client {
+        return Client{
             base_url: base_url,
-            headers: {},
+            headers: {}
         }
 
     fn get(self, url: string) -> Response:
         # TODO: Implement actual network call
         full_url = self.base_url + url
-        print("GET " + full_url)
+        print(f"GET {full_url}")
         
-        return Response {
+        # v2.1: Dict/struct with any brackets
+        return Response{
             status: 200,
             headers: {"Content-Type": "application/json"},
-            body: "{\"status\": \"ok\"}",
+            body: "{\"status\": \"ok\"}"
         }
 
     fn post(self, url: string, data: any) -> Response:
         full_url = self.base_url + url
-        print("POST " + full_url)
+        print(f"POST {full_url}")
         
-        return Response {
+        return Response{
             status: 201,
             headers: {},
-            body: "{\"created\": true}",
+            body: "{\"created\": true}"
         }
 
 # Global helper functions
 fn get(url: string) -> Response:
-    client = Client::new()
+    client = Client.new()
     return client.get(url)
 
 fn post(url: string, data: any) -> Response:
-    client = Client::new()
+    client = Client.new()
     return client.post(url, data)

@@ -1,0 +1,41 @@
+# JSON Module for GUL v2.1
+# Standard library JSON parser
+
+enum Value:
+    Null
+    Bool(bool)
+    Number(float)
+    String(string)
+    Array(vec<Value>)
+    Object(map<string, Value>)
+
+fn parse(input: string) -> Value:
+    # TODO: Implement actual parser
+    # For now, return a mock object
+    if input == "null":
+        return Value.Null
+        
+    # v2.1: Any bracket type for structs
+    return Value.Object{
+        "status": Value.String("ok")
+    }
+
+fn stringify(value: Value) -> string:
+    match value:
+        Value.Null => "null"
+        Value.Bool(b) => b.to_string()
+        Value.Number(n) => n.to_string()
+        Value.String(s) => "\"" + s + "\""
+        Value.Array(arr) => "[" + "..." + "]"
+        Value.Object(obj) => "{" + "..." + "}"
+
+# Helper to load from file
+fn load(path: string) -> Value:
+    # content = fs.read_to_string(path)
+    # return parse(content)
+    return Value.Null
+
+# Helper to save to file
+fn save(path: string, value: Value):
+    content = stringify(value)
+    # fs.write_to_string(path, content)

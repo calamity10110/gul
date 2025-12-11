@@ -69,7 +69,7 @@ curl -sSf https://gul-lang.org/install.sh | sh
 3. **Add to PATH**:
 
    ```bash
-   export PATH="$PATH:$HOME/.gul/bin"
+   export PATH="$PATH:$HOME/.mn/bin"
    ```
 
 ### Build from Source
@@ -95,10 +95,10 @@ gul --version
 
 ## Your First GUL Program
 
-Create a file called `hello.gul`:
+Create a file called `hello.mn`:
 
 ```gul
-# hello.gul - Your first GUL program
+# hello.mn - Your first GUL program
 
 main():
     print("Hello, GUL!")
@@ -108,7 +108,7 @@ main():
 Run it:
 
 ```bash
-gul run hello.gul
+gul run hello.mn
 ```
 
 Output:
@@ -240,7 +240,7 @@ Now that you have GUL installed and running, explore these resources:
 ## Getting Help
 
 - 📚 **Documentation**: You're reading it!
-- 💬 **Community Forum**: [community.gul-lang.org](https://community.gul-lang.org)
+- 💬 **Community Forum**: [community.mn-lang.org](https://community.mn-lang.org)
 - 🐛 **Issue Tracker**: [GitHub Issues](https://github.com/gul-lang/gul/issues)
 - 💼 **Discord**: Join our [Discord server](https://discord.gg/gul-lang)
 

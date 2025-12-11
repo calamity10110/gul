@@ -1,0 +1,87 @@
+# Package Installation Tests
+# Tests that packages install and work correctly
+
+import std.testing
+import std.package_manager as pm
+
+@test
+fn test_package_installation():
+    """Test installing a package"""
+    
+    # Install http package
+    result = pm.install("http")
+    
+    assert result.success == True
+    assert pm.is_installed("http") == True
+
+@test
+fn test_package_listing():
+    """Test listing installed packages"""
+    
+    packages = pm.list_installed()
+    
+    assert len(packages) > 0
+    assert "http" in packages
+
+@test
+fn test_package_info():
+    """Test getting package information"""
+    
+    info = pm.get_info("http")
+    
+    assert info.name == "http"
+    assert info.version != None
+    assert len(info.dependencies) >= 0
+
+@test
+fn test_package_removal():
+    """Test removing a package"""
+    
+    # Install then remove
+    pm.install("test-package")
+    assert pm.is_installed("test-package") == True
+    
+    pm.remove("test-package")
+    assert pm.is_installed("test-package") == False
+
+@test
+fn test_package_update():
+    """Test updating packages"""
+    
+    # Get current version
+    old_version = pm.get_version("http")
+    
+    # Update (may or may not actually update)
+    pm.update("http")
+    
+    new_version = pm.get_version("http")
+    
+    # Version should be >= old version
+    assert new_version >= old_version
+
+@test
+fn test_dependency_resolution():
+    """Test automatic dependency installation"""
+    
+    # Install package with dependencies
+    result = pm.install("database")
+    
+    assert result.success == True
+    
+    # Check dependencies were installed
+    deps = pm.get_dependencies("database")
+    for dep in deps:
+        assert pm.is_installed(dep) == True
+
+@test
+fn test_package_verification():
+    """Test package integrity verification"""
+    
+    # Verify installed packages
+    verification = pm.verify_all()
+    
+    assert verification.all_valid == True
+    assert len(verification.errors) == 0
+
+main:
+    testing.run_all_tests()

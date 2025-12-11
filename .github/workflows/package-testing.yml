@@ -1,0 +1,215 @@
+name: Package Ecosystem Testing
+
+on:
+  push:
+    paths:
+      - "packages/**"
+      - "gul_packages/**"
+      - "Cargo.toml"
+  pull_request:
+    paths:
+      - "packages/**"
+      - "gul_packages/**"
+  schedule:
+    # Run daily at 3 AM UTC
+    - cron: "0 3 * * *"
+
+jobs:
+  # Validate all packages
+  validate-packages:
+    name: Validate Package Metadata
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install toml pyyaml jsonschema
+
+      - name: Validate package manifests
+        run: python scripts/ci/validate_packages.py
+
+      - name: Check package versions
+        run: python scripts/ci/check_package_versions.py
+
+      - name: Validate dependencies
+        run: python scripts/ci/validate_dependencies.py
+
+  # Test package compatibility
+  test-compatibility:
+    name: Package Compatibility Matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package-set:
+          - web
+          - database
+          - data-science
+          - tui
+          - utils
+          - testing
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build GUL
+        run: cargo build --release
+
+      - name: Test ${{ matrix.package-set }} packages
+        run: |
+          for package in packages/${{ matrix.package-set }}/*; do
+            if [ -d "$package" ]; then
+              echo "::group::Testing $(basename $package)"
+              cd "$package"
+              cargo test --all-features
+              cd -
+              echo "::endgroup::"
+            fi
+          done
+
+      - name: Test cross-package compatibility
+        run: python scripts/ci/test_package_compatibility.py --category ${{ matrix.package-set }}
+
+  # Test all gul_packages
+  test-gul-packages:
+    name: Test GUL Standard Packages
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build GUL compiler
+        run: cargo build --release
+
+      - name: Install GUL
+        run: cargo install --path .
+
+      - name: Test all gul_packages
+        run: |
+          for package in gul_packages/*; do
+            if [ -d "$package" ]; then
+              echo "::group::Testing GUL package: $(basename $package)"
+              gul test "$package"
+              echo "::endgroup::"
+            fi
+          done
+
+      - name: Generate compatibility report
+        run: python scripts/ci/generate_compatibility_report.py
+
+  # Package installation tests
+  test-installation:
+    name: Package Installation Tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install GUL
+        run: cargo install --path .
+
+      - name: Test package installation
+        run: |
+          gul install http
+          gul install database
+          gul install ui
+          gul install json
+          gul install datetime
+
+      - name: Test installed packages
+        run: gul test tests/package_install_test.gul
+
+      - name: Test package removal
+        run: |
+          gul remove http
+          gul remove database
+
+  # Performance regression tests
+  package-benchmarks:
+    name: Package Performance Benchmarks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run package benchmarks
+        run: |
+          for package in packages/*/*; do
+            if [ -d "$package" ] && [ -f "$package/benches" ]; then
+              cd "$package"
+              cargo bench --no-fail-fast
+              cd -
+            fi
+          done
+
+      - name: Compare with baseline
+        run: python scripts/ci/benchmark_comparison.py
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v3
+        with:
+          name: package-benchmarks
+          path: target/criterion
+
+  # Package documentation generation
+  generate-package-docs:
+    name: Generate Package Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Generate package docs
+        run: |
+          for package in packages/*/*; do
+            if [ -d "$package" ]; then
+              cd "$package"
+              cargo doc --no-deps --all-features
+              cd -
+            fi
+          done
+
+      - name: Generate API reference
+        run: python scripts/ci/generate_api_docs.py
+
+      - name: Build documentation site
+        run: |
+          pip install mkdocs mkdocs-material
+          mkdocs build
+
+      - name: Deploy docs (main branch only)
+        if: github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site

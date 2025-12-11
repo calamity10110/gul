@@ -1,0 +1,158 @@
+# Rust FFI Integration Tests
+# Tests GUL's ability to interoperate with Rust code
+
+import std.testing
+import std.rust
+
+@test
+fn test_rust_inline_execution():
+    """Test inline Rust code execution"""
+    result = rust.exec("""
+fn greet(name: &str) -> String {
+    format!("Hello, {}!", name)
+}
+
+greet("GUL")
+""")
+    
+    assert result == "Hello, GUL!"
+
+@test
+fn test_rust_struct_creation():
+    """Test creating and using Rust structs"""
+    result = rust.exec("""
+struct Point {
+    x: f64,
+    y: f64,
+}
+
+impl Point {
+    fn distance(&self) -> f64 {
+        (self.x.powi(2) + self.y.powi(2)).sqrt()
+    }
+}
+
+let p = Point { x: 3.0, y: 4.0 };
+p.distance()
+""")
+    
+    assert result == 5.0
+
+@test
+fn test_rust_option_type():
+    """Test Rust Option type integration"""
+    result = rust.exec("""
+fn find_value(vec: Vec<i32>, target: i32) -> Option<usize> {
+    vec.iter().position(|&x| x == target)
+}
+
+let numbers = vec![1, 2, 3, 4, 5];
+match find_value(numbers, 3) {
+    Some(idx) => idx,
+    None => 999
+}
+""")
+    
+    assert result == 2
+
+@test
+fn test_rust_result_type():
+    """Test Rust Result type error handling"""
+    result = rust.exec("""
+fn divide(a: f64, b: f64) -> Result<f64, String> {
+    if b == 0.0 {
+        Err("Division by zero".to_string())
+    } else {
+        Ok(a / b)
+    }
+}
+
+match divide(10.0, 2.0) {
+    Ok(val) => val,
+    Err(_) => -1.0
+}
+""")
+    
+    assert result == 5.0
+
+@test
+fn test_rust_traits():
+    """Test Rust trait implementations"""
+    result = rust.exec("""
+trait Describable {
+    fn describe(&self) -> String;
+}
+
+struct Person {
+    name: String,
+    age: u32,
+}
+
+impl Describable for Person {
+    fn describe(&self) -> String {
+        format!("{} is {} years old", self.name, self.age)
+    }
+}
+
+let person = Person {
+    name: "Alice".to_string(),
+    age: 30
+};
+
+person.describe()
+""")
+    
+    assert result == "Alice is 30 years old"
+
+@test
+fn test_rust_lifetimes():
+    """Test Rust lifetime annotations"""
+    result = rust.exec("""
+fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+
+longest("short", "much longer string")
+""")
+    
+    assert result == "much longer string"
+
+@test
+fn test_rust_async_await():
+    """Test Rust async/await"""
+    result = rust.exec("""
+async fn async_task() -> i32 {
+    42
+}
+
+tokio::runtime::Runtime::new()
+    .unwrap()
+    .block_on(async_task())
+""")
+    
+    assert result == 42
+
+@test
+fn test_rust_macro_usage():
+    """Test Rust macro expansion"""
+    result = rust.exec("""
+macro_rules! create_function {
+    ($func_name:ident) => {
+        fn $func_name() -> &'static str {
+            stringify!($func_name)
+        }
+    };
+}
+
+create_function!(foo);
+foo()
+""")
+    
+    assert result == "foo"
+
+main:
+    testing.run_all_tests()

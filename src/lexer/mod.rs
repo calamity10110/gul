@@ -104,6 +104,45 @@ pub enum Token {
     At,             // @
 }
 
+// v2.1 Bracket Equivalence - Helper functions
+impl Token {
+    /// Check if this token is any opening bracket (), [], {}
+    pub fn is_open_bracket(&self) -> bool {
+        matches!(
+            self,
+            Token::LeftParen | Token::LeftBracket | Token::LeftBrace
+        )
+    }
+
+    /// Check if this token is any closing bracket ), ], }
+    pub fn is_close_bracket(&self) -> bool {
+        matches!(
+            self,
+            Token::RightParen | Token::RightBracket | Token::RightBrace
+        )
+    }
+
+    /// Get the matching closing bracket for an opening bracket
+    pub fn matching_close(&self) -> Option<Token> {
+        match self {
+            Token::LeftParen => Some(Token::RightParen),
+            Token::LeftBracket => Some(Token::RightBracket),
+            Token::LeftBrace => Some(Token::RightBrace),
+            _ => None,
+        }
+    }
+
+    /// Check if two brackets match (same type)
+    pub fn brackets_match(&self, other: &Token) -> bool {
+        matches!(
+            (self, other),
+            (Token::LeftParen, Token::RightParen)
+                | (Token::LeftBracket, Token::RightBracket)
+                | (Token::LeftBrace, Token::RightBrace)
+        )
+    }
+}
+
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
@@ -1060,5 +1099,62 @@ mod tests {
         // Should have 3 indents and 3 dedents for nested blocks
         assert_eq!(indent_count, 3);
         assert_eq!(dedent_count, 3);
+    }
+
+    // v2.1 Bracket Equivalence Tests
+    #[test]
+    fn test_bracket_helper_is_open() {
+        assert!(Token::LeftParen.is_open_bracket());
+        assert!(Token::LeftBracket.is_open_bracket());
+        assert!(Token::LeftBrace.is_open_bracket());
+        assert!(!Token::RightParen.is_open_bracket());
+        assert!(!Token::Plus.is_open_bracket());
+    }
+
+    #[test]
+    fn test_bracket_helper_is_close() {
+        assert!(Token::RightParen.is_close_bracket());
+        assert!(Token::RightBracket.is_close_bracket());
+        assert!(Token::RightBrace.is_close_bracket());
+        assert!(!Token::LeftParen.is_close_bracket());
+        assert!(!Token::Minus.is_close_bracket());
+    }
+
+    #[test]
+    fn test_bracket_helper_matching_close() {
+        assert_eq!(Token::LeftParen.matching_close(), Some(Token::RightParen));
+        assert_eq!(
+            Token::LeftBracket.matching_close(),
+            Some(Token::RightBracket)
+        );
+        assert_eq!(Token::LeftBrace.matching_close(), Some(Token::RightBrace));
+        assert_eq!(Token::RightParen.matching_close(), None);
+        assert_eq!(Token::Plus.matching_close(), None);
+    }
+
+    #[test]
+    fn test_bracket_helper_brackets_match() {
+        assert!(Token::LeftParen.brackets_match(&Token::RightParen));
+        assert!(Token::LeftBracket.brackets_match(&Token::RightBracket));
+        assert!(Token::LeftBrace.brackets_match(&Token::RightBrace));
+
+        // Mismatched should be false
+        assert!(!Token::LeftParen.brackets_match(&Token::RightBracket));
+        assert!(!Token::LeftParen.brackets_match(&Token::RightBrace));
+        assert!(!Token::LeftBracket.brackets_match(&Token::RightParen));
+    }
+
+    #[test]
+    fn test_v21_all_bracket_types_tokenized() {
+        let mut lexer = Lexer::new("func() func[] func{}");
+        let tokens = lexer.tokenize();
+
+        // Should have all bracket types
+        assert!(tokens.iter().any(|t| matches!(t, Token::LeftParen)));
+        assert!(tokens.iter().any(|t| matches!(t, Token::RightParen)));
+        assert!(tokens.iter().any(|t| matches!(t, Token::LeftBracket)));
+        assert!(tokens.iter().any(|t| matches!(t, Token::RightBracket)));
+        assert!(tokens.iter().any(|t| matches!(t, Token::LeftBrace)));
+        assert!(tokens.iter().any(|t| matches!(t, Token::RightBrace)));
     }
 }

@@ -21,29 +21,29 @@ The GUL ecosystem is organized into a modular package structure in `gul_packages
 
 ### 2.1 Core Standard Library (`gul_packages/std/`)
 
-- **http.gul**: HTTP client/server (Requests/Reqwest inspired).
-- **json.gul**: JSON parsing and serialization (Serde inspired).
-- **ml.gul**: Machine Learning primitives (Tensors, Models, Layers).
-- **utils.gul**: Common utilities (Regex, DateTime, Crypto).
+- **http.mn**: HTTP client/server (Requests/Reqwest inspired).
+- **json.mn**: JSON parsing and serialization (Serde inspired).
+- **ml.mn**: Machine Learning primitives (Tensors, Models, Layers).
+- **utils.mn**: Common utilities (Regex, DateTime, Crypto).
 
 ### 2.2 Extended Standard Library
 
-- **net.gul**: Low-level networking (TCP/UDP sockets).
-- **db.gul**: Database abstractions (PostgreSQL, SQLite).
-- **tui.gul**: Terminal User Interface framework (Widgets, Layouts).
-- **web.gul**: Web application framework (Routing, Middleware).
+- **net.mn**: Low-level networking (TCP/UDP sockets).
+- **db.mn**: Database abstractions (PostgreSQL, SQLite).
+- **tui.mn**: Terminal User Interface framework (Widgets, Layouts).
+- **web.mn**: Web application framework (Routing, Middleware).
 
 ### 2.3 Domain Specific Libraries
 
-- **data.gul**: Data science tools (DataFrames, Arrays).
-- **science.gul**: Scientific modules (Physics, Chemistry, Biology, Math).
-- **robotics.gul**: IoT and Robotics (GPIO, Sensors, ROS integration).
+- **data.mn**: Data science tools (DataFrames, Arrays).
+- **science.mn**: Scientific modules (Physics, Chemistry, Biology, Math).
+- **robotics.mn**: IoT and Robotics (GPIO, Sensors, ROS integration).
 
 ## 3. Language Features
 
 ### Syntax (v2.0)
 
-- **File Extensions:** `.gul` (General), `.def` (Definitions), `.fnc` (Functions), `.mn` (Main).
+- **File Extensions:** `.mn` (General), `.def` (Definitions), `.fnc` (Functions), `.mn` (Main).
 - **Blocks:** Indentation-based (Python-style).
 - **Comments:** `# Single line`, `#[ Multi-line ]#`.
 - **Keywords:** `import`, `const`, `mut`, `fn`, `async`, `extern`, `main`, `struct`.
@@ -175,10 +175,10 @@ GUL aims to be a "universal" language, suitable for systems programming, web dev
 - `.fnc`: Function files. Contains `fn`, `async` functions. Pure logic.
 - `.mn`: Main files. Contains `main():` entry point and orchestrates execution.
 - `.scrt`: Secret files. Encrypted storage for API keys/credentials.
-- `.gul`: General purpose files (can contain any valid GUL code).
+- `.mn`: General purpose files (can contain any valid GUL code).
 
   2.2 Module System
-  Modules map to file paths. `imp std.math` imports `std/math.gul` or `std/math` package.
+  Modules map to file paths. `imp std.math` imports `std/math.mn` or `std/math` package.
 
   2.3 Naming Rules
 
@@ -745,7 +745,7 @@ Unused variables, dead code (linter).
 17. Modules & Imports
 
 17.1 Module Structure
-Files map to modules. `src/math.gul` is `math`. Folders are packages.
+Files map to modules. `src/math.mn` is `math`. Folders are packages.
 
 17.2 Import Syntax
 `imp std.io` or `import std.io`.
@@ -1119,7 +1119,7 @@ expr ::= literal | ident | binary_op | call
 (See `gul_packages/std/README.md` and generated docs).
 
 200. Package database and Manager
-     Central registry at `registry.gul-lang.org` (mock).
+     Central registry at `registry.mn-lang.org` (mock).
 
 201. Builtin features
      `print`, `len`, `range`, `car`, `cdr`, `cons`.

@@ -579,9 +579,9 @@ For detailed history, see [PROGRESS.md](PROGRESS.md) and [CHANGES.md](CHANGES.md
 
 - **Website:** https://gul-lang.org (framework ready)
 - **Repository:** https://github.com/gul-lang/gul
-- **Documentation:** https://docs.gul-lang.org (framework ready)
-- **Package Registry:** https://packages.gul-lang.org (framework ready)
-- **Community:** https://community.gul-lang.org (framework ready)
+- **Documentation:** https://docs.mn-lang.org (framework ready)
+- **Package Registry:** https://packages.mn-lang.org (framework ready)
+- **Community:** https://community.mn-lang.org (framework ready)
 
 ---
 

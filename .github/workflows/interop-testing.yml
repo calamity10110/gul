@@ -1,0 +1,256 @@
+name: Multi-Language Interop Testing
+
+on:
+  push:
+    paths:
+      - "src/interop/**"
+      - "tests/interop/**"
+  pull_request:
+  schedule:
+    # Run twice daily
+    - cron: "0 */12 * * *"
+
+jobs:
+  # Python FFI testing
+  test-python-ffi:
+    name: Python ${{ matrix.python-version }} FFI
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build GUL
+        run: cargo build --release
+
+      - name: Install Python dependencies
+        run: pip install pytest numpy pandas
+
+      - name: Test Python inline execution
+        run: ./target/release/gul test tests/interop/python_inline.gul
+
+      - name: Test Python FFI calls
+        run: ./target/release/gul test tests/interop/python_ffi.gul
+
+      - name: Test Python library imports
+        run: ./target/release/gul test tests/interop/python_libs.gul
+
+      - name: Test bidirectional Python/GUL calls
+        run: ./target/release/gul test tests/interop/python_bidirectional.gul
+
+  # Rust FFI testing
+  test-rust-ffi:
+    name: Rust ${{ matrix.rust }} FFI
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        rust: [stable, beta, nightly]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust ${{ matrix.rust }}
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+
+      - name: Build GUL
+        run: cargo build --release
+
+      - name: Test Rust inline execution
+        run: ./target/release/gul test tests/interop/rust_inline.gul
+
+      - name: Test Rust FFI calls
+        run: ./target/release/gul test tests/interop/rust_ffi.gul
+
+      - name: Test Rust library linking
+        run: ./target/release/gul test tests/interop/rust_libs.gul
+
+  # C/C++ FFI testing
+  test-c-ffi:
+    name: C/C++ FFI
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        compiler: [gcc, clang]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install C/C++ compiler
+        run: |
+          if [ "${{ matrix.compiler }}" = "gcc" ]; then
+            sudo apt-get update && sudo apt-get install -y gcc g++
+          else
+            sudo apt-get update && sudo apt-get install -y clang
+          fi
+        if: runner.os == 'Linux'
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build GUL
+        run: cargo build --release
+
+      - name: Test C inline execution
+        run: ./target/release/gul test tests/interop/c_inline.gul
+        env:
+          CC: ${{ matrix.compiler }}
+
+      - name: Test C FFI calls
+        run: ./target/release/gul test tests/interop/c_ffi.gul
+
+      - name: Test C library linking
+        run: ./target/release/gul test tests/interop/c_libs.gul
+
+  # JavaScript/TypeScript FFI testing
+  test-js-ts-ffi:
+    name: JS/TS ${{ matrix.node-version }} FFI
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ["18", "20", "21"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build GUL
+        run: cargo build --release
+
+      - name: Install Node dependencies
+        run: npm install
+
+      - name: Test JavaScript inline
+        run: ./target/release/gul test tests/interop/js_inline.gul
+
+      - name: Test TypeScript inline
+        run: |
+          npm install -g typescript
+          ./target/release/gul test tests/interop/ts_inline.gul
+
+      - name: Test Node.js module imports
+        run: ./target/release/gul test tests/interop/nodejs_modules.gul
+
+      - name: Test async/await interop
+        run: ./target/release/gul test tests/interop/js_async.gul
+
+  # Go FFI testing
+  test-go-ffi:
+    name: Go ${{ matrix.go-version }} FFI
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        go-version: ["1.20", "1.21"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go ${{ matrix.go-version }}
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build GUL
+        run: cargo build --release
+
+      - name: Test Go inline
+        run: ./target/release/gul test tests/interop/go_inline.gul
+
+      - name: Test Go FFI
+        run: ./target/release/gul test tests/interop/go_ffi.gul
+
+  # Comprehensive interop integration tests
+  test-multi-lang-integration:
+    name: Multi-Language Integration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup all languages
+        run: |
+          # Python
+          sudo apt-get update
+          sudo apt-get install -y python3 python3-pip
+
+          # Node.js
+          curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+          sudo apt-get install -y nodejs
+
+          # C/C++
+          sudo apt-get install -y gcc g++ clang
+
+          # Go
+          wget https://go.dev/dl/go1.21.5.linux-amd64.tar.gz
+          sudo tar -C /usr/local -xzf go1.21.5.linux-amd64.tar.gz
+          echo "/usr/local/go/bin" >> $GITHUB_PATH
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build GUL
+        run: cargo build --release
+
+      - name: Test multi-language pipeline
+        run: ./target/release/gul test tests/interop/multi_lang_pipeline.gul
+
+      - name: Test language mixing in single file
+        run: ./target/release/gul test tests/interop/mixed_lang_single_file.gul
+
+      - name: Test performance across languages
+        run: ./target/release/gul test tests/interop/performance_comparison.gul
+
+      - name: Generate interop report
+        run: python scripts/ci/generate_interop_report.py
+
+  # Test language version compatibility
+  test-language-updates:
+    name: Language Version Compatibility
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build GUL
+        run: cargo build --release
+
+      - name: Test against latest language versions
+        run: python scripts/ci/test_language_versions.py
+
+      - name: Check for deprecated API usage
+        run: python scripts/ci/check_deprecated_apis.py
+
+      - name: Generate compatibility matrix
+        run: python scripts/ci/generate_lang_compat_matrix.py

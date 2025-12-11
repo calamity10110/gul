@@ -291,7 +291,7 @@ aws cloudfront create-distribution \
 ### Customization
 
 ```javascript
-// .gul/config.json
+// .mn/config.json
 {
   "theme": "dark",
   "fontSize": 14,
@@ -469,7 +469,7 @@ imp dioxus.ssr
 
 ```gul
 # Lazy load components
-@lazy import HeavyComponent from "./heavy.gul"
+@lazy import HeavyComponent from "./heavy.mn"
 
 @fn App():
     return html!(

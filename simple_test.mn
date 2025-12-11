@@ -1,0 +1,23 @@
+# GUL Simple Test - v2.1
+# Basic syntax demonstration
+
+struct Point:
+    x: int
+    y: int
+
+const msg = "Hello from GUL Interpreter!"
+
+# v2.1: main block without parentheses
+main:
+    print(msg)
+    print(10 + 20)
+    
+    # v2.1: Bracket equivalence for collections
+    data = [1, 2, 3]
+    data2 = (1, 2, 3)  # Also creates a list
+    data3 = {1, 2, 3}  # Also creates a list
+    
+    # v2.1: Dict with any brackets
+    config = [host: "localhost", port: 8080]
+    
+    print("Done!")

@@ -21,7 +21,7 @@
 - **Ownership**: `own`, `ref`, `copy` (unchanged)
 
 ### File Types
-- **.gul**: General purpose files
+- **.mn**: General purpose files
 - **.def**: Definition files (types, constants, imports)
 - **.fnc**: Function files (pure logic)
 - **.mn**: Main files (entry point and orchestration)

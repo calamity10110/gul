@@ -38,7 +38,7 @@ print("Server running on http://localhost:8080")
 Run it:
 
 ```bash
-gul run server.gul
+gul run server.mn
 ```
 
 ## 🛣️ Routing

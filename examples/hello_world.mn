@@ -1,8 +1,15 @@
-main():
+# GUL Hello World - v2.1
+# Demonstrates basic syntax with v2.1 features
+
+main:
     const message: str = "Hello, World!"
     mut count: int = 42
     print(message)
     print("Count:", count)
+
+    # v2.1: Bracket equivalence - all valid
+    print["Using square brackets"]
+    print{"Using curly braces"}
 
     # Test error handling
     try:

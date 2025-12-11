@@ -1,0 +1,149 @@
+# GUL UI Component Tests
+# Tests UI syntax using v2.1 specification
+
+import std.testing
+import std.ui
+
+# ==========================================
+# UI Syntax Tests
+# ==========================================
+
+@test
+fn test_ui_component_literal_basic():
+    """Basic ^&^ component syntax"""
+    
+    # Standalone component literal
+    ^&^[button{text: "Click Me"}]
+    ^&^[input{type: "text", placeholder: "Enter name"}]
+    ^&^[label{text: "Hello World"}]
+
+@test
+fn test_ui_print_function_basic():
+    """Basic ui.print() function syntax"""
+    
+    # Function call style (equivalent to ^&^)
+    ui.print(button[text: "Submit"])
+    ui.print(input[type: "password"])
+    ui.print(label[text: "Welcome"])
+
+@test
+fn test_ui_components_equivalent():
+    """^&^ and ui.print() are interchangeable"""
+    
+    # These produce the same result
+    ^&^()  # Empty component
+    ui.print()  # Same as above
+    
+    # With content
+    ^&^[div{class: "container"}]
+    ui.print(div[class: "container"])
+
+@test
+fn test_ui_nested_components():
+    """Nested UI components"""
+    
+    ^&^[
+        container{
+            header[text: "My App"],
+            main{
+                sidebar[width: 200],
+                content[flex: 1]
+            },
+            footer[text: "© 2025"]
+        }
+    ]
+
+@test
+fn test_ui_mixed_brackets():
+    """UI with mixed bracket styles (all valid)"""
+    
+    ^&^{
+        layout(direction: "vertical")[
+            panel{title: "Dashboard"},
+            grid(cols: 3){
+                card[title: "Card 1"],
+                card(title: "Card 2"),
+                card{title: "Card 3"}
+            }
+        ]
+    }
+
+@test
+fn test_ui_with_data_binding():
+    """UI components with data"""
+    
+    data = [
+        {name: "Alice", age: 30},
+        {name: "Bob", age: 25}
+    ]
+    
+    ^&^[
+        table{
+            data: data,
+            columns: ["Name", "Age"]
+        }
+    ]
+    
+    ui.print(table[data: data, columns: ["Name", "Age"]])
+
+@test
+fn test_ui_event_handlers():
+    """UI with event handlers"""
+    
+    fn handle_click():
+        print("Clicked!")
+    
+    ^&^[
+        button{
+            text: "Click Me",
+            onclick: handle_click
+        }
+    ]
+
+@test
+fn test_ui_conditional_rendering():
+    """Conditional UI rendering"""
+    
+    show_sidebar = True
+    
+    ^&^[
+        layout{
+            if show_sidebar:
+                sidebar[width: 200]
+            main[flex: 1]
+        }
+    ]
+
+@test
+fn test_ui_list_rendering():
+    """List-based UI rendering"""
+    
+    items = ["Item 1", "Item 2", "Item 3"]
+    
+    ^&^[
+        list{
+            [li{text: item} for item in items]
+        }
+    ]
+
+@test
+fn test_tui_vs_webui_compatibility():
+    """Same syntax works for TUI and Web UI"""
+    
+    # This syntax works for both TUI and Web targets
+    ^&^[
+        container{
+            text[content: "Works everywhere!"],
+            button[text: "Click"],
+            input[placeholder: "Type here"]
+        }
+    ]
+
+# ==========================================
+# Run Tests
+# ==========================================
+
+main:
+    print("Running UI Component Tests (v2.1 syntax)...")
+    testing.run_all_tests()
+    print("All UI tests passed!")

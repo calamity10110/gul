@@ -134,22 +134,54 @@ Built-in support for embedding:
 
 ## 2. Language Structure
 
-### 2.1 File Types (v2.0)
+### 2.1 File Types (v2.1)
 
-GUL uses distinct file types for different purposes:
+GUL uses a 5-file architecture. Users write in `.mn` files; compiler separates on publish:
 
-- **`.gul`**: General purpose files (can contain any valid GUL code)
-- **`.def`**: Definition files - Contains `const`, `mut`, `struct`, `@global`, `import`. No control flow
-- **`.fnc`**: Function files - Contains `fn`, `async` functions. Pure logic
-- **`.mn`**: Main files - Contains `main():` entry point and orchestrates execution
-- **`.scrt`**: Secret files - Encrypted storage for API keys/credentials
-- **`.cs`**: Cross-script files - Foreign code blocks (embedded C, Rust, Python, etc.)
+| Extension | Name              | Purpose                     | Content                                   |
+| --------- | ----------------- | --------------------------- | ----------------------------------------- |
+| `.mn`     | Main              | Entry point and user code   | `main:` block, orchestration              |
+| `.def`    | Definition        | Imports and declarations    | `import`, `struct`, `const`, `@global`    |
+| `.fnc`    | Function          | All logic (sync + async)    | `fn`, `async` function bodies             |
+| `.cs`     | Cross-Script      | External language code      | `@extern` references to .py, .rs, .js, .c |
+| `.sct`    | Secret Credential | API keys, passwords, tokens | Ignored by compiler; stub on publish      |
+
+**User Workflow:**
+
+- Users write everything in a single `.mn` file
+- Store secrets in `.sct` files (API keys, passwords, connection strings)
+- Add external files as needed (.py, .rs, .js)
+- Compiler can separate into `.def`, `.fnc`, `.cs` on publish
+- `.sct` files are **never published**; a stub with comments is created instead
+
+**Secret File Behavior:**
+
+```gul
+# secrets.sct - This file is NEVER published
+API_KEY = "sk-live-abc123..."
+DB_PASSWORD = "super_secret"
+JWT_SECRET = "my-jwt-secret-key"
+```
+
+On `gul publish`:
+
+```gul
+# secrets.sct - Stub file (credentials removed)
+# API_KEY = "<REDACTED - set in environment>"
+# DB_PASSWORD = "<REDACTED - set in environment>"
+# JWT_SECRET = "<REDACTED - set in environment>"
+```
+
+**Legacy Extensions (deprecated but still supported):**
+
+- `.gul` - General purpose (deprecated, use `.mn`)
+- `.scrt` - Secrets (deprecated, use `.sct`)
 
 ### 2.2 Module System
 
 Modules map to file paths:
 
-- `import std.math` imports `std/math.gul` or the `std/math` package
+- `import std.math` imports `std/math.mn` or the `std/math` package
 - Folders are packages
 - Each package can have a `package.toml` manifest
 
@@ -325,15 +357,48 @@ f"formatted {variable}"
 
 - `=`, `+=`, `-=`, `*=`, `/=`
 
-### 3.7 Delimiters
+### 3.7 Delimiters and Bracket Equivalence
+
+In GUL v2.1, brackets `()`, `{}`, and `[]` are **semantically equivalent** as long as they match:
+
+**Standard Delimiters:**
 
 - `(`, `)` - Parentheses
-- `[`, `]` - Brackets
-- `{`, `}` - Braces
+- `[`, `]` - Square brackets
+- `{`, `}` - Curly braces
 - `,` - Comma
 - `:` - Colon
 - `.` - Dot
 - `->` - Arrow (return type)
+
+**Bracket Equivalence Rules:**
+
+1. Opening and closing brackets must match type:
+
+   - `(...)` ✓
+   - `[...]` ✓
+   - `{...}` ✓
+   - `(...]` ✗ Error: mismatched
+
+2. All three are semantically equivalent:
+
+   ```gul
+   # All equivalent function calls
+   print("Hello")
+   print["Hello"]
+   print{"Hello"}
+
+   # All equivalent collections
+   data = [1, 2, 3]
+   data = (1, 2, 3)
+   data = {1, 2, 3}
+   ```
+
+3. Can mix within nesting (as long as each matches):
+
+   ```gul
+   result = calculate{arg1, fn[x]: x * 2, (a, b, c)}
+   ```
 
 ### 3.8 Escape Rules
 
@@ -1366,7 +1431,7 @@ Unused variables, dead code detected by linter.
 
 Files map to modules:
 
-- `src/math.gul` is module `math`
+- `src/math.mn` is module `math`
 - Folders are packages
 
 ### 17.2 Import Syntax

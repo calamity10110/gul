@@ -104,7 +104,7 @@ ui.print(^÷^[button])  # LEGACY (still works)
 ### Documentation
 
 - `SYNTAX.md` - Complete syntax update
-- `examples/revised_syntax_demo.gul` - New example file
+- `examples/revised_syntax_demo.mn` - New example file
 
 ### Code
 
@@ -164,7 +164,7 @@ Users can migrate gradually:
 ### Migration Tool (Future)
 
 ```bash
-gul migrate v1-to-v2 file.gul
+gul migrate v1-to-v2 file.mn
 ```
 
 ---

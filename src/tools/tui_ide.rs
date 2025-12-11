@@ -1,8 +1,343 @@
-// GUL TUI IDE - Terminal User Interface IDE for GUL
+// GUL TUI IDE - Terminal User Interface IDE for GUL v2.1
 // Built with Ratatui (formerly tui-rs)
+// Supports v2.1 bracket equivalence and .mn file type
 
 use std::io;
 use std::path::PathBuf;
+
+/// v2.1 Syntax highlighting token types
+#[derive(Clone, Debug, PartialEq)]
+pub enum TokenType {
+    // Core tokens
+    Keyword,
+    Identifier,
+    Function,
+    String,
+    Number,
+    Comment,
+    Operator,
+
+    // v2.1 Brackets (all equivalent semantically)
+    BracketOpen,  // ( [ {
+    BracketClose, // ) ] }
+
+    // v2.1 UI Syntax
+    UiMarker,    // ^&^
+    UiComponent, // button, table, etc.
+    UiProperty,  // text:, data:, etc.
+
+    // v2.1 File Types
+    FileTypeMain, // .mn
+    FileTypeDef,  // .def
+    FileTypeFnc,  // .fnc
+    FileTypeCs,   // .cs
+    FileTypeSct,  // .sct (secret credential)
+
+    // Special
+    Whitespace,
+    Unknown,
+}
+
+/// v2.1 Bracket type for matching validation
+#[derive(Clone, Debug, PartialEq)]
+pub enum BracketType {
+    Paren,  // ()
+    Square, // []
+    Curly,  // {}
+}
+
+/// Bracket pair for highlighting
+#[derive(Clone, Debug)]
+pub struct BracketPair {
+    pub open_pos: usize,
+    pub close_pos: usize,
+    pub bracket_type: BracketType,
+    pub matched: bool, // v2.1: true even if types differ but match logically
+}
+
+/// Syntax highlighting theme for GUL v2.1
+#[derive(Clone, Debug)]
+pub struct GulTheme {
+    pub keyword_color: (u8, u8, u8),
+    pub function_color: (u8, u8, u8),
+    pub string_color: (u8, u8, u8),
+    pub number_color: (u8, u8, u8),
+    pub comment_color: (u8, u8, u8),
+    pub ui_marker_color: (u8, u8, u8),  // ^&^ highlighting
+    pub bracket_match_bg: (u8, u8, u8), // v2.1 bracket pairs
+    pub file_type_color: (u8, u8, u8),  // .mn, .def, .fnc, .cs
+}
+
+impl Default for GulTheme {
+    fn default() -> Self {
+        GulTheme {
+            keyword_color: (198, 120, 221),   // Purple
+            function_color: (97, 175, 239),   // Blue
+            string_color: (152, 195, 121),    // Green
+            number_color: (229, 192, 123),    // Yellow
+            comment_color: (92, 99, 112),     // Gray
+            ui_marker_color: (86, 182, 194),  // Cyan
+            bracket_match_bg: (62, 68, 81),   // Dark gray
+            file_type_color: (152, 195, 121), // Light green
+        }
+    }
+}
+
+/// GUL v2.1 Syntax Highlighter
+pub struct SyntaxHighlighter {
+    #[allow(dead_code)]
+    theme: GulTheme,
+    keywords: Vec<&'static str>,
+    ui_components: Vec<&'static str>,
+}
+
+impl SyntaxHighlighter {
+    pub fn new() -> Self {
+        SyntaxHighlighter {
+            theme: GulTheme::default(),
+            keywords: vec![
+                "main", "fn", "async", "struct", "import", "const", "mut", "if", "elif", "else",
+                "for", "while", "loop", "break", "continue", "return", "await", "try", "catch",
+                "match", "extern", "pub",
+            ],
+            ui_components: vec![
+                // Basic Input Widgets
+                "button",
+                "input",
+                "textarea",
+                "checkbox",
+                "radio",
+                "select",
+                "slider",
+                "toggle",
+                // Display Widgets
+                "label",
+                "text",
+                "bigtext",
+                "paragraph",
+                "sparkline",
+                "gauge",
+                "barchart",
+                "canvas",
+                // Container Widgets
+                "container",
+                "block",
+                "row",
+                "column",
+                "grid",
+                "stack",
+                "split",
+                "tabs",
+                "scrollview",
+                "popup",
+                // Data Widgets
+                "table",
+                "list",
+                "tree",
+                "calendar",
+                "chart",
+                // Feedback Widgets
+                "spinner",
+                "throbber",
+                "progress",
+                "toast",
+                "alert",
+                "badge",
+                // Navigation Widgets
+                "menu",
+                "menubar",
+                "contextmenu",
+                "breadcrumb",
+                "pagination",
+                // Media Widgets
+                "image",
+                "video",
+                "audio",
+                "markdown",
+                "code",
+                // Prompt Widgets
+                "prompt",
+            ],
+        }
+    }
+
+    /// Tokenize a line of GUL code
+    pub fn tokenize_line(&self, line: &str) -> Vec<(TokenType, String)> {
+        let mut tokens = Vec::new();
+        let chars: Vec<char> = line.chars().collect();
+        let mut i = 0;
+
+        while i < chars.len() {
+            let ch = chars[i];
+
+            // Comment
+            if ch == '#' {
+                let comment: String = chars[i..].iter().collect();
+                tokens.push((TokenType::Comment, comment));
+                break;
+            }
+
+            // UI Marker ^&^
+            if ch == '^' && i + 2 < chars.len() && chars[i + 1] == '&' && chars[i + 2] == '^' {
+                tokens.push((TokenType::UiMarker, "^&^".to_string()));
+                i += 3;
+                continue;
+            }
+
+            // v2.1: All brackets are equivalent
+            if ch == '(' || ch == '[' || ch == '{' {
+                tokens.push((TokenType::BracketOpen, ch.to_string()));
+                i += 1;
+                continue;
+            }
+
+            if ch == ')' || ch == ']' || ch == '}' {
+                tokens.push((TokenType::BracketClose, ch.to_string()));
+                i += 1;
+                continue;
+            }
+
+            // String
+            if ch == '"' {
+                let mut string_val = String::new();
+                string_val.push(ch);
+                i += 1;
+                while i < chars.len() && chars[i] != '"' {
+                    if chars[i] == '\\' && i + 1 < chars.len() {
+                        string_val.push(chars[i]);
+                        i += 1;
+                    }
+                    string_val.push(chars[i]);
+                    i += 1;
+                }
+                if i < chars.len() {
+                    string_val.push(chars[i]);
+                    i += 1;
+                }
+                tokens.push((TokenType::String, string_val));
+                continue;
+            }
+
+            // Number
+            if ch.is_ascii_digit() {
+                let mut num = String::new();
+                while i < chars.len() && (chars[i].is_ascii_digit() || chars[i] == '.') {
+                    num.push(chars[i]);
+                    i += 1;
+                }
+                tokens.push((TokenType::Number, num));
+                continue;
+            }
+
+            // Identifier or keyword
+            if ch.is_alphabetic() || ch == '_' {
+                let mut ident = String::new();
+                while i < chars.len() && (chars[i].is_alphanumeric() || chars[i] == '_') {
+                    ident.push(chars[i]);
+                    i += 1;
+                }
+
+                if self.keywords.contains(&ident.as_str()) {
+                    tokens.push((TokenType::Keyword, ident));
+                } else if self.ui_components.contains(&ident.as_str()) {
+                    tokens.push((TokenType::UiComponent, ident));
+                } else {
+                    // Check if followed by bracket (function call)
+                    if i < chars.len() && (chars[i] == '(' || chars[i] == '[' || chars[i] == '{') {
+                        tokens.push((TokenType::Function, ident));
+                    } else {
+                        tokens.push((TokenType::Identifier, ident));
+                    }
+                }
+                continue;
+            }
+
+            // File type extensions
+            if ch == '.' {
+                let _ext_start = i;
+                i += 1;
+                let mut ext = String::from(".");
+                while i < chars.len() && chars[i].is_alphanumeric() {
+                    ext.push(chars[i]);
+                    i += 1;
+                }
+
+                match ext.as_str() {
+                    ".mn" => tokens.push((TokenType::FileTypeMain, ext)),
+                    ".def" => tokens.push((TokenType::FileTypeDef, ext)),
+                    ".fnc" => tokens.push((TokenType::FileTypeFnc, ext)),
+                    ".cs" => tokens.push((TokenType::FileTypeCs, ext)),
+                    ".sct" => tokens.push((TokenType::FileTypeSct, ext)),
+                    _ => tokens.push((TokenType::Identifier, ext)),
+                }
+                continue;
+            }
+
+            // Operators
+            if "+-*/%=<>!&|:.".contains(ch) {
+                tokens.push((TokenType::Operator, ch.to_string()));
+                i += 1;
+                continue;
+            }
+
+            // Whitespace
+            if ch.is_whitespace() {
+                let mut ws = String::new();
+                while i < chars.len() && chars[i].is_whitespace() {
+                    ws.push(chars[i]);
+                    i += 1;
+                }
+                tokens.push((TokenType::Whitespace, ws));
+                continue;
+            }
+
+            // Unknown
+            tokens.push((TokenType::Unknown, ch.to_string()));
+            i += 1;
+        }
+
+        tokens
+    }
+
+    /// Find matching bracket pairs (v2.1: all bracket types can match)
+    pub fn find_bracket_pairs(&self, content: &str) -> Vec<BracketPair> {
+        let mut pairs = Vec::new();
+        let mut stack: Vec<(usize, char)> = Vec::new();
+
+        for (pos, ch) in content.chars().enumerate() {
+            if ch == '(' || ch == '[' || ch == '{' {
+                stack.push((pos, ch));
+            } else if ch == ')' || ch == ']' || ch == '}' {
+                if let Some((open_pos, open_ch)) = stack.pop() {
+                    // v2.1: Brackets match if they're the same type
+                    let matched = matches!((open_ch, ch), ('(', ')') | ('[', ']') | ('{', '}'));
+
+                    let bracket_type = match open_ch {
+                        '(' => BracketType::Paren,
+                        '[' => BracketType::Square,
+                        '{' => BracketType::Curly,
+                        _ => BracketType::Paren,
+                    };
+
+                    pairs.push(BracketPair {
+                        open_pos,
+                        close_pos: pos,
+                        bracket_type,
+                        matched,
+                    });
+                }
+            }
+        }
+
+        pairs
+    }
+}
+
+impl Default for SyntaxHighlighter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 /// Main TUI IDE application state
 pub struct GulTuiIde {
@@ -20,6 +355,10 @@ pub struct GulTuiIde {
     status_message: String,
     /// Whether the IDE is running
     running: bool,
+    /// Syntax highlighter for v2.1
+    syntax_highlighter: SyntaxHighlighter,
+    /// Bracket pairs in current buffer
+    bracket_pairs: Vec<BracketPair>,
 }
 
 /// File browser component
@@ -85,8 +424,10 @@ impl GulTuiIde {
             cursor: (0, 0),
             file_browser: FileBrowser::new(),
             command_palette: CommandPalette::new(),
-            status_message: "Welcome to GUL TUI IDE".to_string(),
+            status_message: "Welcome to GUL TUI IDE v2.1".to_string(),
             running: true,
+            syntax_highlighter: SyntaxHighlighter::new(),
+            bracket_pairs: Vec::new(),
         }
     }
 
@@ -106,8 +447,67 @@ impl GulTuiIde {
         self.buffer = std::fs::read_to_string(&path)?;
         self.current_file = Some(path);
         self.cursor = (0, 0);
-        self.status_message = format!("Opened: {:?}", self.current_file);
+        self.update_bracket_pairs();
+
+        // Check file type
+        let file_type = self.get_file_type();
+        self.status_message = format!("Opened: {:?} ({})", self.current_file, file_type);
         Ok(())
+    }
+
+    /// Get file type description for v2.1
+    fn get_file_type(&self) -> &'static str {
+        if let Some(ref path) = self.current_file {
+            match path.extension().and_then(|s| s.to_str()) {
+                Some("mn") => "Main",
+                Some("def") => "Definition",
+                Some("fnc") => "Function",
+                Some("cs") => "Cross-Script",
+                Some("sct") => "Secret Credential",
+                Some("gul") => "Legacy GUL",
+                _ => "Unknown",
+            }
+        } else {
+            "No file"
+        }
+    }
+
+    /// Update bracket pairs after buffer change
+    fn update_bracket_pairs(&mut self) {
+        self.bracket_pairs = self.syntax_highlighter.find_bracket_pairs(&self.buffer);
+    }
+
+    /// Get syntax-highlighted tokens for a line
+    pub fn get_highlighted_line(&self, line_num: usize) -> Vec<(TokenType, String)> {
+        if let Some(line) = self.buffer.lines().nth(line_num) {
+            self.syntax_highlighter.tokenize_line(line)
+        } else {
+            Vec::new()
+        }
+    }
+
+    /// Find bracket pair at cursor position
+    pub fn get_bracket_pair_at_cursor(&self) -> Option<&BracketPair> {
+        let cursor_offset = self.get_cursor_offset();
+
+        self.bracket_pairs
+            .iter()
+            .find(|pair| pair.open_pos == cursor_offset || pair.close_pos == cursor_offset)
+    }
+
+    /// Get cursor offset in buffer
+    fn get_cursor_offset(&self) -> usize {
+        let (line, col) = self.cursor;
+        let mut offset = 0;
+
+        for (i, l) in self.buffer.lines().enumerate() {
+            if i == line {
+                return offset + col.min(l.len());
+            }
+            offset += l.len() + 1; // +1 for newline
+        }
+
+        offset
     }
 
     /// Save current file
@@ -174,7 +574,33 @@ impl FileBrowser {
             let entry = entry?;
             self.files.push(entry.path());
         }
+        // Sort: directories first, then by name
+        self.files.sort_by(|a, b| match (a.is_dir(), b.is_dir()) {
+            (true, false) => std::cmp::Ordering::Less,
+            (false, true) => std::cmp::Ordering::Greater,
+            _ => a.file_name().cmp(&b.file_name()),
+        });
         Ok(())
+    }
+
+    /// Get file type icon for v2.1 file types
+    pub fn get_file_icon(&self, path: &PathBuf) -> &'static str {
+        if path.is_dir() {
+            return "📁";
+        }
+
+        match path.extension().and_then(|s| s.to_str()) {
+            Some("mn") => "📄",   // Main file
+            Some("def") => "📋",  // Definition
+            Some("fnc") => "⚙️",  // Function
+            Some("cs") => "🔗",   // Cross-script
+            Some("sct") => "🔐",  // Secret credential
+            Some("gul") => "📜",  // Legacy
+            Some("md") => "📝",   // Markdown
+            Some("toml") => "⚙️", // Config
+            Some("json") => "📦", // JSON
+            _ => "📄",
+        }
     }
 
     /// Navigate up one directory
@@ -315,5 +741,70 @@ mod tests {
     fn test_file_browser() {
         let browser = FileBrowser::new();
         assert!(!browser.visible);
+    }
+
+    #[test]
+    fn test_syntax_highlighter_keywords() {
+        let highlighter = SyntaxHighlighter::new();
+        let tokens = highlighter.tokenize_line("main:");
+
+        assert!(!tokens.is_empty());
+        assert_eq!(tokens[0].0, TokenType::Keyword);
+        assert_eq!(tokens[0].1, "main");
+    }
+
+    #[test]
+    fn test_syntax_highlighter_brackets() {
+        let highlighter = SyntaxHighlighter::new();
+
+        // v2.1: All bracket types are tokenized as BracketOpen/BracketClose
+        let tokens = highlighter.tokenize_line("print(x) print[x] print{x}");
+
+        let open_brackets: Vec<_> = tokens
+            .iter()
+            .filter(|(t, _)| *t == TokenType::BracketOpen)
+            .collect();
+        let close_brackets: Vec<_> = tokens
+            .iter()
+            .filter(|(t, _)| *t == TokenType::BracketClose)
+            .collect();
+
+        assert_eq!(open_brackets.len(), 3);
+        assert_eq!(close_brackets.len(), 3);
+    }
+
+    #[test]
+    fn test_syntax_highlighter_ui_marker() {
+        let highlighter = SyntaxHighlighter::new();
+        let tokens = highlighter.tokenize_line("^&^[button{text: \"Click\"}]");
+
+        assert_eq!(tokens[0].0, TokenType::UiMarker);
+        assert_eq!(tokens[0].1, "^&^");
+    }
+
+    #[test]
+    fn test_bracket_pair_matching() {
+        let highlighter = SyntaxHighlighter::new();
+
+        // v2.1: Matching pairs
+        let pairs = highlighter.find_bracket_pairs("(a + b)");
+        assert_eq!(pairs.len(), 1);
+        assert!(pairs[0].matched);
+
+        // v2.1: Mismatched brackets
+        let pairs = highlighter.find_bracket_pairs("(a + b]");
+        assert_eq!(pairs.len(), 1);
+        assert!(!pairs[0].matched);
+    }
+
+    #[test]
+    fn test_file_type_icons() {
+        let browser = FileBrowser::new();
+
+        assert_eq!(browser.get_file_icon(&PathBuf::from("main.mn")), "📄");
+        assert_eq!(browser.get_file_icon(&PathBuf::from("types.def")), "📋");
+        assert_eq!(browser.get_file_icon(&PathBuf::from("utils.fnc")), "⚙️");
+        assert_eq!(browser.get_file_icon(&PathBuf::from("extern.cs")), "🔗");
+        assert_eq!(browser.get_file_icon(&PathBuf::from("secrets.sct")), "🔐");
     }
 }

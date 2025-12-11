@@ -1,0 +1,153 @@
+site_name: GUL Documentation
+site_description: Complete documentation for the GUL Universal Language
+site_author: GUL Team
+site_url: https://docs.gul-lang.org
+
+repo_name: gul-lang/gul
+repo_url: https://github.com/gul-lang/gul
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    # Light mode
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+
+  icon:
+    repo: fontawesome/brands/github
+
+  font:
+    text: Roboto
+    code: Roboto Mono
+
+plugins:
+  - search:
+      lang: en
+  - mermaid2
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - tables
+  - toc:
+      permalink: true
+  - attr_list
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+
+nav:
+  - Home: README.md
+
+  - Getting Started:
+      - Introduction: guides/introduction.md
+      - Installation: guides/installation.md
+      - Quick Start: tutorials/quickstart.md
+      - First Program: tutorials/first-program.md
+
+  - Language Reference:
+      - Syntax: reference/syntax.md
+      - Specification: reference/specification.md
+      - Type System: reference/types.md
+      - Ownership Model: reference/ownership.md
+      - Project Structure: reference/structure.md
+      - Knowledge Base: reference/knowledgebase.md
+
+  - Guides:
+      - Compiler Architecture: guides/compiler.md
+      - Multi-Language Integration: guides/integration.md
+      - Package Management: guides/packages.md
+      - Secret Management: guides/secrets.md
+      - Web Development: guides/web-development.md
+      - Testing & Deployment: guides/testing-deployment.md
+      - TUI Framework: guides/tui.md
+      - Web UI Framework: guides/webui.md
+      - Package Database: guides/package-database.md
+
+  - API Reference:
+      - Standard Library: api/standard-library.md
+      - HTTP Module: api/http.md
+      - Database Module: api/database.md
+      - File System: api/filesystem.md
+      - Math & Science: api/math-science.md
+      - UI Components: api/ui-components.md
+
+  - Tutorials:
+      - Interactive Course: tutorials/course.md
+      - Web Server: tutorials/web-server.md
+      - Data Analysis: tutorials/data-analysis.md
+      - IoT & Embedded: tutorials/iot-embedded.md
+      - Scientific Computing: tutorials/scientific-computing.md
+      - Creating Packages: tutorials/creating-packages.md
+
+  - Package Ecosystem:
+      - Package Catalog: reference/package-catalog.md
+      - Creating Packages: tutorials/creating-packages.md
+      - Package Database: guides/package-database.md
+
+  - Project:
+      - Development Plan: project/plan.md
+      - Change Log: project/changes.md
+      - Contributing: project/contributing.md
+      - Code Review: project/code-review.md
+      - Platform Support: project/platforms.md
+      - CI/CD Automation: project/ci-cd-automation.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/gul-lang/gul
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/gul-lang
+
+  version:
+    provider: mike
+
+  analytics:
+    provider: google
+    property: G-XXXXXXXXXX
+
+extra_css:
+  - assets/extra.css
+
+copyright: Copyright &copy; 2025 GUL Team - MIT License
