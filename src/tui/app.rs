@@ -217,11 +217,9 @@ impl GulTuiApp {
                 }
                 _ => {}
             }
-        } else if self.mode == Mode::Insert {
-            if key.code == KeyCode::Esc {
-                self.mode = Mode::Normal;
-                return Ok(());
-            }
+        } else if self.mode == Mode::Insert && key.code == KeyCode::Esc {
+            self.mode = Mode::Normal;
+            return Ok(());
         }
 
         // Check key bindings
@@ -307,7 +305,11 @@ impl GulTuiApp {
                     }
                 }
                 KeyCode::Right => {
-                    let line = self.buffer.lines().nth(self.editor_state.cursor.0).unwrap_or("");
+                    let line = self
+                        .buffer
+                        .lines()
+                        .nth(self.editor_state.cursor.0)
+                        .unwrap_or("");
                     if self.editor_state.cursor.1 < line.chars().count() {
                         self.editor_state.cursor.1 += 1;
                     }
@@ -348,7 +350,11 @@ impl GulTuiApp {
                     }
                 }
                 KeyCode::Right => {
-                    let line = self.buffer.lines().nth(self.editor_state.cursor.0).unwrap_or("");
+                    let line = self
+                        .buffer
+                        .lines()
+                        .nth(self.editor_state.cursor.0)
+                        .unwrap_or("");
                     if self.editor_state.cursor.1 < line.chars().count() {
                         self.editor_state.cursor.1 += 1;
                     }

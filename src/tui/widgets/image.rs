@@ -13,9 +13,10 @@ use std::path::PathBuf;
 use crate::tui::theme::GulTheme;
 
 /// Image rendering protocol
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub enum ImageProtocol {
     /// Auto-detect best protocol
+    #[default]
     Auto,
     /// Sixel graphics (DEC terminals, mlterm, foot)
     Sixel,
@@ -29,16 +30,11 @@ pub enum ImageProtocol {
     Braille,
 }
 
-impl Default for ImageProtocol {
-    fn default() -> Self {
-        ImageProtocol::Auto
-    }
-}
-
 /// Image fit mode
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub enum ImageFit {
     /// Scale to fit within bounds, maintain aspect ratio
+    #[default]
     Contain,
     /// Scale to cover bounds, may crop
     Cover,
@@ -46,12 +42,6 @@ pub enum ImageFit {
     Fill,
     /// No scaling, original size
     None,
-}
-
-impl Default for ImageFit {
-    fn default() -> Self {
-        ImageFit::Contain
-    }
 }
 
 /// Image state for stateful rendering

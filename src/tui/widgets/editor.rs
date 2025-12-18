@@ -127,7 +127,9 @@ impl<'a> EditorWidget<'a> {
                 let mut ident = String::new();
                 ident.push(ch);
                 i += 1;
-                while i < chars.len() && (chars[i].is_alphanumeric() || chars[i] == '_' || chars[i] == '.') {
+                while i < chars.len()
+                    && (chars[i].is_alphanumeric() || chars[i] == '_' || chars[i] == '.')
+                {
                     ident.push(chars[i]);
                     i += 1;
                 }
@@ -231,13 +233,25 @@ impl<'a> StatefulWidget for EditorWidget<'a> {
 
                 // Render selection overlay
                 if let (Some(start), Some(end)) = (state.selection_start, state.selection_end) {
-                    let (s_row, s_col) = if start < end { (start.0, start.1) } else { (end.0, end.1) };
-                    let (e_row, e_col) = if start < end { (end.0, end.1) } else { (start.0, start.1) };
+                    let (s_row, s_col) = if start < end {
+                        (start.0, start.1)
+                    } else {
+                        (end.0, end.1)
+                    };
+                    let (e_row, e_col) = if start < end {
+                        (end.0, end.1)
+                    } else {
+                        (start.0, start.1)
+                    };
 
                     if line_idx >= s_row && line_idx <= e_row {
                         let line_char_count = line_str.chars().count();
                         let start_x = if line_idx == s_row { s_col } else { 0 };
-                        let end_x = if line_idx == e_row { e_col } else { line_char_count };
+                        let end_x = if line_idx == e_row {
+                            e_col
+                        } else {
+                            line_char_count
+                        };
 
                         for col in start_x..end_x {
                             let sel_x = inner.x + line_num_width + col as u16;

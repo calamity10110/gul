@@ -363,7 +363,7 @@ impl<'a> StatefulWidget for FuzzyFinderWidget<'a> {
                     base_style
                 };
 
-                buf.set_string(x, y, &c.to_string(), style);
+                buf.set_string(x, y, c.to_string(), style);
                 x += 1;
             }
 

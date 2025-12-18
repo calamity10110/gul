@@ -62,7 +62,9 @@ impl GulTheme {
             cursor: Color::Rgb(245, 224, 220),
             line_number: Color::Rgb(88, 91, 112),
             line_number_active: Color::Rgb(205, 214, 244),
-            cursor_style: Style::default().bg(Color::Rgb(245, 224, 220)).fg(Color::Rgb(30, 30, 46)),
+            cursor_style: Style::default()
+                .bg(Color::Rgb(245, 224, 220))
+                .fg(Color::Rgb(30, 30, 46)),
             selection_style: Style::default().bg(Color::Rgb(88, 91, 112)),
 
             // Syntax colors (Catppuccin Mocha inspired)
@@ -123,7 +125,9 @@ impl GulTheme {
             cursor: Color::Rgb(220, 138, 120),
             line_number: Color::Rgb(156, 160, 176),
             line_number_active: Color::Rgb(76, 79, 105),
-            cursor_style: Style::default().bg(Color::Rgb(220, 138, 120)).fg(Color::Rgb(239, 241, 245)),
+            cursor_style: Style::default()
+                .bg(Color::Rgb(220, 138, 120))
+                .fg(Color::Rgb(239, 241, 245)),
             selection_style: Style::default().bg(Color::Rgb(172, 176, 190)),
 
             // Syntax colors (Catppuccin Latte inspired)

@@ -39,6 +39,18 @@ impl PackageManager {
         self.register_tauri();
         self.register_leptos();
 
+        // Batch 1: New Rust packages
+        self.register_actix_web();
+        self.register_sqlx();
+        self.register_regex();
+        self.register_rayon();
+        self.register_diesel();
+
+        // Batch 2: More Rust packages
+        self.register_warp();
+        self.register_tracing();
+        self.register_anyhow();
+
         // Python packages
         self.register_django();
         self.register_flask();
@@ -54,6 +66,18 @@ impl PackageManager {
         self.register_nodejs();
         self.register_express();
         self.register_d3js();
+
+        // Batch 3: New JavaScript packages
+        self.register_nextjs();
+        self.register_svelte();
+        self.register_prisma();
+        self.register_jest();
+        self.register_webpack();
+        self.register_tailwindcss();
+        self.register_axios();
+        self.register_socketio();
+        self.register_graphql();
+        self.register_nestjs();
 
         // Multi-language support
         self.register_cpp_support();
@@ -656,6 +680,263 @@ impl PackageManager {
 
     pub fn get_package_count(&self) -> usize {
         self.packages.len()
+    }
+
+    // Batch 1: New Rust Packages
+    fn register_actix_web(&mut self) {
+        self.packages.insert(
+            "actix-web".to_string(),
+            Package {
+                name: "actix-web".to_string(),
+                language: "rust".to_string(),
+                version: "4.5".to_string(),
+                description: "Powerful, pragmatic, and extremely fast web framework".to_string(),
+                dependencies: vec!["tokio".to_string()],
+                features: vec!["routing".to_string(), "middleware".to_string()],
+            },
+        );
+    }
+
+    fn register_sqlx(&mut self) {
+        self.packages.insert(
+            "sqlx".to_string(),
+            Package {
+                name: "sqlx".to_string(),
+                language: "rust".to_string(),
+                version: "0.7".to_string(),
+                description: "Async SQL toolkit with compile-time checked queries".to_string(),
+                dependencies: vec!["tokio".to_string()],
+                features: vec!["postgres".to_string(), "mysql".to_string()],
+            },
+        );
+    }
+
+    fn register_regex(&mut self) {
+        self.packages.insert(
+            "regex".to_string(),
+            Package {
+                name: "regex".to_string(),
+                language: "rust".to_string(),
+                version: "1.10".to_string(),
+                description: "Regular expressions for Rust".to_string(),
+                dependencies: vec![],
+                features: vec!["unicode".to_string()],
+            },
+        );
+    }
+
+    fn register_rayon(&mut self) {
+        self.packages.insert(
+            "rayon".to_string(),
+            Package {
+                name: "rayon".to_string(),
+                language: "rust".to_string(),
+                version: "1.8".to_string(),
+                description: "Data parallelism library for Rust".to_string(),
+                dependencies: vec![],
+                features: vec!["parallel-iterators".to_string()],
+            },
+        );
+    }
+
+    fn register_diesel(&mut self) {
+        self.packages.insert(
+            "diesel".to_string(),
+            Package {
+                name: "diesel".to_string(),
+                language: "rust".to_string(),
+                version: "2.1".to_string(),
+                description: "Safe, extensible ORM and query builder".to_string(),
+                dependencies: vec![],
+                features: vec!["postgres".to_string(), "mysql".to_string()],
+            },
+        );
+    }
+
+    // Batch 2: More Rust Packages
+    fn register_warp(&mut self) {
+        self.packages.insert(
+            "warp".to_string(),
+            Package {
+                name: "warp".to_string(),
+                language: "rust".to_string(),
+                version: "0.3".to_string(),
+                description: "Composable web framework with filters".to_string(),
+                dependencies: vec!["tokio".to_string()],
+                features: vec!["filters".to_string(), "websockets".to_string()],
+            },
+        );
+    }
+
+    fn register_tracing(&mut self) {
+        self.packages.insert(
+            "tracing".to_string(),
+            Package {
+                name: "tracing".to_string(),
+                language: "rust".to_string(),
+                version: "0.1".to_string(),
+                description: "Application-level tracing for Rust".to_string(),
+                dependencies: vec![],
+                features: vec!["async".to_string(), "log".to_string()],
+            },
+        );
+    }
+
+    fn register_anyhow(&mut self) {
+        self.packages.insert(
+            "anyhow".to_string(),
+            Package {
+                name: "anyhow".to_string(),
+                language: "rust".to_string(),
+                version: "1.0".to_string(),
+                description: "Flexible error handling library".to_string(),
+                dependencies: vec![],
+                features: vec!["backtrace".to_string(), "std".to_string()],
+            },
+        );
+    }
+
+    // Batch 3: JavaScript Packages
+    fn register_nextjs(&mut self) {
+        self.packages.insert(
+            "next.js".to_string(),
+            Package {
+                name: "next.js".to_string(),
+                language: "javascript".to_string(),
+                version: "14.1".to_string(),
+                description: "React framework for production".to_string(),
+                dependencies: vec!["react".to_string()],
+                features: vec!["ssr".to_string(), "routing".to_string()],
+            },
+        );
+    }
+
+    fn register_svelte(&mut self) {
+        self.packages.insert(
+            "svelte".to_string(),
+            Package {
+                name: "svelte".to_string(),
+                language: "javascript".to_string(),
+                version: "4.2".to_string(),
+                description: "Cybernetically enhanced web apps".to_string(),
+                dependencies: vec![],
+                features: vec!["reactive".to_string(), "compiler".to_string()],
+            },
+        );
+    }
+
+    fn register_prisma(&mut self) {
+        self.packages.insert(
+            "prisma".to_string(),
+            Package {
+                name: "prisma".to_string(),
+                language: "javascript".to_string(),
+                version: "5.9".to_string(),
+                description: "Next-generation ORM for Node.js and TypeScript".to_string(),
+                dependencies: vec![],
+                features: vec!["migrations".to_string(), "type-safety".to_string()],
+            },
+        );
+    }
+
+    fn register_jest(&mut self) {
+        self.packages.insert(
+            "jest".to_string(),
+            Package {
+                name: "jest".to_string(),
+                language: "javascript".to_string(),
+                version: "29.7".to_string(),
+                description: "Delightful JavaScript testing framework".to_string(),
+                dependencies: vec![],
+                features: vec!["snapshots".to_string(), "mocking".to_string()],
+            },
+        );
+    }
+
+    fn register_webpack(&mut self) {
+        self.packages.insert(
+            "webpack".to_string(),
+            Package {
+                name: "webpack".to_string(),
+                language: "javascript".to_string(),
+                version: "5.90".to_string(),
+                description: "Module bundler for modern JavaScript applications".to_string(),
+                dependencies: vec![],
+                features: vec!["bundling".to_string(), "code-splitting".to_string()],
+            },
+        );
+    }
+
+    fn register_tailwindcss(&mut self) {
+        self.packages.insert(
+            "tailwindcss".to_string(),
+            Package {
+                name: "tailwindcss".to_string(),
+                language: "javascript".to_string(),
+                version: "3.4".to_string(),
+                description: "Utility-first CSS framework".to_string(),
+                dependencies: vec![],
+                features: vec!["jit".to_string(), "dark-mode".to_string()],
+            },
+        );
+    }
+
+    fn register_axios(&mut self) {
+        self.packages.insert(
+            "axios".to_string(),
+            Package {
+                name: "axios".to_string(),
+                language: "javascript".to_string(),
+                version: "1.6".to_string(),
+                description: "Promise-based HTTP client".to_string(),
+                dependencies: vec![],
+                features: vec!["interceptors".to_string(), "cancellation".to_string()],
+            },
+        );
+    }
+
+    fn register_socketio(&mut self) {
+        self.packages.insert(
+            "socket.io".to_string(),
+            Package {
+                name: "socket.io".to_string(),
+                language: "javascript".to_string(),
+                version: "4.6".to_string(),
+                description: "Real-time bidirectional event-based communication".to_string(),
+                dependencies: vec![],
+                features: vec!["websockets".to_string(), "rooms".to_string()],
+            },
+        );
+    }
+
+    fn register_graphql(&mut self) {
+        self.packages.insert(
+            "graphql".to_string(),
+            Package {
+                name: "graphql".to_string(),
+                language: "javascript".to_string(),
+                version: "16.8".to_string(),
+                description: "Query language for APIs".to_string(),
+                dependencies: vec![],
+                features: vec!["schema".to_string(), "resolvers".to_string()],
+            },
+        );
+    }
+
+    fn register_nestjs(&mut self) {
+        self.packages.insert(
+            "nestjs".to_string(),
+            Package {
+                name: "nestjs".to_string(),
+                language: "javascript".to_string(),
+                version: "10.3".to_string(),
+                description:
+                    "Progressive Node.js framework for building efficient server-side applications"
+                        .to_string(),
+                dependencies: vec!["express".to_string()],
+                features: vec!["dependency-injection".to_string(), "modules".to_string()],
+            },
+        );
     }
 }
 

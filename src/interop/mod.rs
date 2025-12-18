@@ -1,7 +1,7 @@
 // Multi-Language Integration Module
 
-pub mod c;
 pub mod javascript;
+pub mod js_runtime;
 pub mod python;
-pub mod rust;
-pub mod sql;
+pub mod python_runtime;
+pub mod rust_loader;

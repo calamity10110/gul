@@ -268,8 +268,7 @@ impl DeployProvider {
 "#,
                 project
             ),
-            DeployProvider::Netlify => format!(
-                r#"[build]
+            DeployProvider::Netlify => r#"[build]
   publish = "dist"
   command = "wasm-pack build --target web"
 
@@ -278,9 +277,8 @@ impl DeployProvider {
   [headers.values]
     Content-Type = "application/wasm"
 "#
-            ),
-            DeployProvider::GitHubPages => format!(
-                r#"name: Deploy to GitHub Pages
+            .to_string(),
+            DeployProvider::GitHubPages => r#"name: Deploy to GitHub Pages
 
 on:
   push:
@@ -299,10 +297,10 @@ jobs:
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{{{ secrets.GITHUB_TOKEN }}}}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
 "#
-            ),
+            .to_string(),
             DeployProvider::CloudflarePages => format!(
                 r#"name = "{}"
 compatibility_date = "2024-01-01"

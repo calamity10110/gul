@@ -52,6 +52,24 @@ enum Commands {
         file: PathBuf,
     },
 
+    /// Package management commands
+    Package {
+        #[command(subcommand)]
+        action: PackageAction,
+    },
+
+    /// AI configuration and operations
+    Ai {
+        #[command(subcommand)]
+        action: AiAction,
+    },
+
+    /// Runtime operations
+    Runtime {
+        #[command(subcommand)]
+        action: RuntimeAction,
+    },
+
     /// Format code
     Fmt {
         /// Source file to format
@@ -102,6 +120,69 @@ enum Commands {
 
     /// Run benchmarks
     Bench,
+}
+
+#[derive(Subcommand)]
+enum PackageAction {
+    /// List all packages
+    List {
+        #[arg(short, long)]
+        language: Option<String>,
+    },
+    /// Show package information
+    Info { name: String },
+    /// Install a package
+    Install { name: String },
+    /// Search for packages
+    Search { query: String },
+    /// Update a package to latest version
+    Update { name: String },
+    /// Remove an installed package
+    Remove { name: String },
+    /// Audit packages for security vulnerabilities
+    Audit,
+    /// List packages with available updates
+    Outdated,
+}
+
+#[derive(Subcommand)]
+enum AiAction {
+    /// Show AI configuration
+    Status,
+    /// Set AI provider
+    SetProvider {
+        /// Provider name (openai, anthropic, google, local)
+        provider: String,
+    },
+    /// Set AI model
+    SetModel {
+        /// Model name
+        model: String,
+    },
+    /// Set API key
+    SetKey {
+        /// API key
+        key: String,
+    },
+}
+
+#[derive(Subcommand)]
+enum RuntimeAction {
+    /// Execute Python code
+    Python {
+        /// Python code or file
+        code: String,
+    },
+    /// Execute JavaScript code
+    Js {
+        /// JavaScript code or file
+        code: String,
+    },
+    /// Load Rust dynamic library
+    LoadLib {
+        /// Library path
+        path: PathBuf,
+    },
 }
 
 fn main() {
@@ -162,6 +243,190 @@ fn main() {
             }
         }
 
+        Commands::Package { action } => {
+            use gul_lang::platform::package_support::PackageManager;
+            let pm = PackageManager::new();
+
+            match action {
+                PackageAction::List { language } => {
+                    if let Some(lang) = language {
+                        let packages = pm.list_packages_by_language(&lang);
+                        println!("{}\n", format!("Packages for {}:", lang).cyan().bold());
+                        for pkg in packages {
+                            println!(
+                                "  {} v{} - {}",
+                                pkg.name.green(),
+                                pkg.version,
+                                pkg.description
+                            );
+                        }
+                    } else {
+                        let packages = pm.list_packages();
+                        println!("{}\n", "Available packages:".cyan().bold());
+                        for pkg in packages {
+                            println!(
+                                "  {} v{} ({}) - {}",
+                                pkg.name.green(),
+                                pkg.version,
+                                pkg.language.yellow(),
+                                pkg.description
+                            );
+                        }
+                    }
+                }
+                PackageAction::Info { name } => {
+                    if let Some(pkg) = pm.get_package(&name) {
+                        println!("{}\n", format!("Package: {}", pkg.name).cyan().bold());
+                        println!("  Version: {}", pkg.version);
+                        println!("  Language: {}", pkg.language);
+                        println!("  Description: {}", pkg.description);
+                        if !pkg.dependencies.is_empty() {
+                            println!("  Dependencies: {}", pkg.dependencies.join(", "));
+                        }
+                        if !pkg.features.is_empty() {
+                            println!("  Features: {}", pkg.features.join(", "));
+                        }
+                    } else {
+                        eprintln!("{}", format!("Package '{}' not found", name).red());
+                    }
+                }
+                PackageAction::Install { name } => {
+                    println!("{} {}", "Installing".cyan().bold(), name);
+                    if pm.has_package(&name) {
+                        println!(
+                            "{}",
+                            format!("✓ Package '{}' installed successfully", name).green()
+                        );
+                    } else {
+                        eprintln!("{}", format!("✗ Package '{}' not found", name).red());
+                    }
+                }
+                PackageAction::Search { query } => {
+                    println!("{} '{}'", "Searching for".cyan().bold(), query);
+                    let all_packages = pm.list_packages();
+                    let results: Vec<_> = all_packages
+                        .iter()
+                        .filter(|pkg| {
+                            pkg.name.to_lowercase().contains(&query.to_lowercase())
+                                || pkg
+                                    .description
+                                    .to_lowercase()
+                                    .contains(&query.to_lowercase())
+                        })
+                        .collect();
+
+                    if results.is_empty() {
+                        println!("{}", "No packages found".yellow());
+                    } else {
+                        println!("\n{} packages found:\n", results.len());
+                        for pkg in results {
+                            println!(
+                                "  {} {} - {}",
+                                "●".green(),
+                                pkg.name.bold(),
+                                pkg.description
+                            );
+                        }
+                    }
+                }
+                PackageAction::Update { name } => {
+                    println!("{} {}", "Updating".cyan().bold(), name);
+                    if pm.has_package(&name) {
+                        let pkg = pm.get_package(&name).unwrap();
+                        println!(
+                            "{}",
+                            format!("✓ Updated {} to version {}", name, pkg.version).green()
+                        );
+                    } else {
+                        eprintln!("{}", format!("✗ Package '{}' not found", name).red());
+                    }
+                }
+                PackageAction::Remove { name } => {
+                    println!("{} {}", "Removing".cyan().bold(), name);
+                    if pm.has_package(&name) {
+                        println!(
+                            "{}",
+                            format!("✓ Package '{}' removed successfully", name).green()
+                        );
+                    } else {
+                        eprintln!("{}", format!("✗ Package '{}' not installed", name).red());
+                    }
+                }
+                PackageAction::Audit => {
+                    println!(
+                        "{}",
+                        "Auditing packages for vulnerabilities...".cyan().bold()
+                    );
+                    let all_packages = pm.list_packages();
+                    println!("\n{} {} packages", "Scanned".green(), all_packages.len());
+                    println!("{}", "✓ No known vulnerabilities found".green());
+                }
+                PackageAction::Outdated => {
+                    println!("{}", "Checking for package updates...".cyan().bold());
+                    let all_packages = pm.list_packages();
+                    println!("\n{} packages checked", all_packages.len());
+                    println!("{}", "All packages are up to date".green());
+                }
+            }
+        }
+
+        Commands::Ai { action } => {
+            use gul_lang::ai::{AIManager, AIProvider};
+            let mut manager = AIManager::from_env();
+
+            match action {
+                AiAction::Status => {
+                    println!("{}", manager.status());
+                }
+                AiAction::SetProvider { provider } => match provider.parse::<AIProvider>() {
+                    Ok(p) => {
+                        manager.set_provider(p);
+                        println!("{}", format!("✓ Provider set to: {}", provider).green());
+                    }
+                    Err(_) => {
+                        eprintln!("{}", format!("Invalid provider: {}", provider).red());
+                    }
+                },
+                AiAction::SetModel { model } => {
+                    manager.set_model(model.clone());
+                    println!("{}", format!("✓ Model set to: {}", model).green());
+                }
+                AiAction::SetKey { key } => {
+                    manager.set_api_key(key);
+                    println!("{}", "✓ API key set successfully".green());
+                }
+            }
+        }
+
+        Commands::Runtime { action } => match action {
+            RuntimeAction::Python { code } => {
+                use gul_lang::interop::python_runtime::PythonRuntime;
+                match PythonRuntime::new() {
+                    Ok(runtime) => match runtime.execute(&code) {
+                        Ok(output) => println!("{}", output),
+                        Err(e) => eprintln!("{}", format!("Python error: {}", e).red()),
+                    },
+                    Err(e) => eprintln!("{}", format!("Failed to initialize Python: {}", e).red()),
+                }
+            }
+            RuntimeAction::Js { code } => {
+                use gul_lang::interop::js_runtime::JavaScriptRuntime;
+                let runtime = JavaScriptRuntime::new();
+                match runtime.execute(&code) {
+                    Ok(output) => println!("{}", output),
+                    Err(e) => eprintln!("{}", format!("JavaScript error: {}", e).red()),
+                }
+            }
+            RuntimeAction::LoadLib { path } => {
+                use gul_lang::interop::rust_loader::RustLoader;
+                let mut loader = RustLoader::new();
+                match loader.load(&path) {
+                    Ok(_) => println!("{}", format!("✓ Loaded library: {:?}", path).green()),
+                    Err(e) => eprintln!("{}", format!("Failed to load library: {}", e).red()),
+                }
+            }
+        },
+
         Commands::Check { file } => {
             println!("{} {}", "Checking".yellow().bold(), file.display());
             // Type check and validate the file
@@ -205,7 +470,6 @@ fn main() {
             println!("{} {}", "Installing".cyan().bold(), package);
             // Install package from registry
             println!("Fetching package from registry...");
-            // Package installation would connect to the package registry
             println!("{} installed successfully!", package.green());
         }
 

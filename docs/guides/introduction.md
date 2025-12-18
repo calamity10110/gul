@@ -41,7 +41,7 @@ GUL is a modern, multi-paradigm programming language that combines:
 
 - Native support for scientific units (m/s, kg, etc.)
 - Built-in linear algebra and numerical computing
-- Physics, chemistry, and biology libraries included
+- Standard physics, chemistry, and biology libraries included
 
 ### For Web Developers
 
@@ -51,15 +51,15 @@ GUL is a modern, multi-paradigm programming language that combines:
 
 ## Installation
 
-### Quick Install (Linux/macOS)
+### Quick Install (Linux/macOS) - Not working yet
 
 ```bash
-curl -sSf https://gul-lang.org/install.sh | sh
+## curl -sSf https://gul-lang.org/install.sh | sh
 ```
 
 ### Manual Installation
 
-1. **Download the latest release** from [GitHub Releases](https://github.com/gul-lang/gul/releases)
+1. **Download the latest release** from [GitHub Releases]
 2. **Extract the archive**:
 
    ```bash

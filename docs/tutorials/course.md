@@ -291,7 +291,7 @@ Use '?' after 'def' to make a variable mutable.
       count = count + 1
 ──────────────────────────────────────────────────────────────────
 
-Options: [N]ext, [P]revious, [H]ints, [E]xercise, [Q]uit:
+Options: [N]ext, [P]revious, [H]ints, [E]xercise, Play[G]round, [Q]uit:
 ```
 
 ---
@@ -301,7 +301,8 @@ Options: [N]ext, [P]revious, [H]ints, [E]xercise, [Q]uit:
 ### 1. Take Your Time
 
 - Don't rush through lessons
-- Experiment with the code examples
+- Excercise with the code examples
+- Experiment in playground
 - Try variations of the exercises
 
 ### 2. Practice Actively

@@ -123,13 +123,12 @@ impl<'a> StatefulWidget for FileTreeWidget<'a> {
         let mut visible_entries = Vec::new();
         let mut skip_depth: Option<usize> = None;
 
-        for entry in self.entries {
+        for entry in self.entries.iter() {
             if let Some(depth) = skip_depth {
                 if entry.depth > depth {
                     continue;
-                } else {
-                    skip_depth = None;
                 }
+                skip_depth = None;
             }
 
             visible_entries.push(entry);
@@ -140,8 +139,15 @@ impl<'a> StatefulWidget for FileTreeWidget<'a> {
         }
 
         let selected_path = self.entries.get(state.selected).map(|e| &e.path);
+        let start = state.scroll;
+        let visible_count = inner.height as usize;
 
-        for (i, entry) in visible_entries.iter().skip(start).take(visible_count).enumerate() {
+        for (i, entry) in visible_entries
+            .iter()
+            .skip(start)
+            .take(visible_count)
+            .enumerate()
+        {
             let y = inner.y + i as u16;
             let is_expanded = state.is_expanded(&entry.path);
 
@@ -181,13 +187,27 @@ mod tests {
             is_dir: false,
             depth: 0,
         };
-        assert_eq!(widget.get_icon(&mn_entry), "📄");
+        assert_eq!(widget.get_icon(&mn_entry, false), "📄");
 
         let sct_entry = FileEntry {
             path: PathBuf::from("secrets.sct"),
             is_dir: false,
             depth: 0,
         };
-        assert_eq!(widget.get_icon(&sct_entry), "🔐");
+        assert_eq!(widget.get_icon(&sct_entry, false), "🔐");
+
+        let fnc_entry = FileEntry {
+            path: PathBuf::from("my_function.fnc"),
+            is_dir: false,
+            depth: 0,
+        };
+        assert_eq!(widget.get_icon(&fnc_entry, false), "⚙️");
+
+        let cs_entry = FileEntry {
+            path: PathBuf::from("cross_script.cs"),
+            is_dir: false,
+            depth: 0,
+        };
+        assert_eq!(widget.get_icon(&cs_entry, false), "🔗");
     }
 }

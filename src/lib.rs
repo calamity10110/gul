@@ -1,6 +1,7 @@
 // Universal Language Library
 
 pub mod advanced;
+pub mod ai;
 pub mod ast;
 pub mod autonomous;
 pub mod benchmarks;

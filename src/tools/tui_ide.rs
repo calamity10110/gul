@@ -3,7 +3,7 @@
 // Supports v2.1 bracket equivalence and .mn file type
 
 use std::io;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 /// v2.1 Syntax highlighting token types
 #[derive(Clone, Debug, PartialEq)]
@@ -584,7 +584,7 @@ impl FileBrowser {
     }
 
     /// Get file type icon for v2.1 file types
-    pub fn get_file_icon(&self, path: &PathBuf) -> &'static str {
+    pub fn get_file_icon(&self, path: &Path) -> &'static str {
         if path.is_dir() {
             return "📁";
         }
