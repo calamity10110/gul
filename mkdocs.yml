@@ -92,6 +92,8 @@ nav:
       - Ownership Model: reference/ownership.md
       - Project Structure: reference/structure.md
       - Knowledge Base: reference/knowledgebase.md
+      - Knowledge Base Backup: reference/knowledgebase-backup.md
+      - v2.1 Update Summary: reference/v21-update-summary.md
 
   - Guides:
       - Compiler Architecture: guides/compiler.md
@@ -103,6 +105,7 @@ nav:
       - TUI Framework: guides/tui.md
       - Web UI Framework: guides/webui.md
       - Package Database: guides/package-database.md
+      - Usage Instructions: guides/instruction.md
 
   - API Reference:
       - Standard Library: api/standard-library.md
@@ -132,6 +135,15 @@ nav:
       - Code Review: project/code-review.md
       - Platform Support: project/platforms.md
       - CI/CD Automation: project/ci-cd-automation.md
+      - Agents Guide: project/agents.md
+      - Documentation Review: project/documentation-review.md
+      - Full Stack Review: project/full-stack-review.md
+      - Future Development: project/future-development.md
+      - Native Test Implementation: project/native-test-implementation.md
+      - V2 Implementation Summary: project/v2-implementation-summary.md
+      - Package Database Enterprise Review: project/package-database-enterprise-review.md
+      - Syntax Structure Compiler Review: project/syntax-structure-compiler-review.md
+      - Reorganization Report: project/reorganization-report.md
 
 extra:
   social:

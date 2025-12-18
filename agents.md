@@ -1,6 +1,7 @@
 # Agent Guidelines for GUL Language Repository
 
 ## Build/Test Commands
+
 - **Build**: `cargo build --verbose`
 - **Test all**: `cargo test --all-features --verbose`
 - **Test single**: `cargo test <test_name>` (e.g., `cargo test test_sql_bridge_creation`)
@@ -13,6 +14,7 @@
 ## GUL Language Syntax (v2.0)
 
 ### Keywords
+
 - **Variables**: `const` (immutable), `mut` (mutable)
 - **Functions**: `fn` (sync), `async` (async)
 - **Imports**: `import` (with optional grouping `{...}`)
@@ -21,12 +23,14 @@
 - **Ownership**: `own`, `ref`, `copy` (unchanged)
 
 ### File Types
+
 - **.mn**: General purpose files
 - **.def**: Definition files (types, constants, imports)
 - **.fnc**: Function files (pure logic)
 - **.mn**: Main files (entry point and orchestration)
 
 ### Examples
+
 ```gul
 import std.io
 import python{numpy, pandas}
@@ -51,6 +55,7 @@ main():
 ```
 
 ## Code Style Guidelines
+
 - **Language**: Rust 2021 edition
 - **Error handling**: Use `Result<T, String>` or `anyhow::Result<T>`; avoid panics
 - **Types**: Derive `Debug`, `Clone`, `PartialEq` for data structures

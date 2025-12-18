@@ -1,46 +1,39 @@
-# GUL v2.0 Syntax Examples
-# Demonstrating modern v2.0 syntax
+# GUL v3.0 Syntax Examples
+# Demonstrating modern v3.0 syntax
 
 # ============================================
-# 1. MUTABILITY - 'mut' and 'const' keywords
+# 1. MUTABILITY - 'let' and 'var' keywords
 # ============================================
 
-# Immutable constants
-const PI = 3.14159
-const MAX_USERS = 100
+# Immutable constants (let)
+let PI = 3.14159
+let MAX_USERS = 100
 
-# Mutable variables
-mut count = 0
-mut total = 100
-
-# Regular variables (inferred types)
-name = "Alice"
-age = 25
+# Mutable variables (var)
+var count = 0
+var total = 100
 
 # Type annotations
-username: str = "Bob"
-user_age: int = 30
-
+let name: str = "Alice"
+var counter: int = 0
 
 # ============================================
-# 2. IMPORTS - 'import' keyword
+# 2. IMPORTS - '@imp' syntax (3 styles)
 # ============================================
 
-# Standard imports
-import std.io
-import std.http
+# Style 1: Single line
+@imp std.io
+@imp std.http
 
-# Multi-language imports
-import python{numpy, pandas}
-import rust{tokio, serde}
+# Style 2: Grouped
+@imp python{numpy, pandas}
+@imp rust{tokio, serde}
 
-# Grouped imports
-import {
+# Style 3: Block (indented)
+@imp:
     std.math,
     std.collections,
     python{matplotlib}
-}
-
 
 # ============================================
 # 3. FUNCTIONS - 'fn' and 'async' keywords
@@ -50,18 +43,17 @@ import {
 fn greet(name: str) -> str:
     return "Hello, " + name
 
-# Async function
+# Async function (no fn keyword)
 async fetch_data(url: str) -> dict:
     response = await http.get(url)
     return response.json()
 
-
 # ============================================
-# 4. MULTI-LANGUAGE - 'extern' keyword
+# 4. MULTI-LANGUAGE - '@lang' blocks
 # ============================================
 
-extern python {
-    fn analyze_data(data: list) -> dict {
+@python {
+    def analyze_data(data):
         import numpy as np
         arr = np.array(data)
         return {
@@ -69,26 +61,24 @@ extern python {
             "std": float(np.std(arr)),
             "count": len(data)
         }
+}
+
+@rust {
+    fn fast_compute(n: i32) -> i32 {
+        n * n
     }
 }
 
-extern rust {
-    fn fast_compute(n: int) -> int {
-        return n * n
-    }
-}
-
-
 # ============================================
-# 5. MAIN FUNCTION
+# 5. MAIN ENTRY - 'mn:' block
 # ============================================
 
-main():
-    print("Hello from GUL v2.0!")
+mn:
+    print("Hello from GUL v3.0!")
 
     # Use modern syntax
-    mut counter = 0
-    const max_count = 10
+    var counter = 0
+    let max_count = 10
 
     while counter < max_count:
         print("Count:", counter)

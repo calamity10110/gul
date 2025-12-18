@@ -1,16 +1,16 @@
-# GUL Web Fetch - v2.1
+# GUL Web Fetch - v3.0
 
-import std{http}
+@imp std{http}
 
 async fetch_data(url):
     res = await http.get(url)
     return res.json()
 
-# v2.1: main block without parentheses
-main:
+# v3.0: main block with mn:
+mn:
     data = await fetch_data("https://api.example.com/users")
     print("Fetched data:", data)
     
-    # v2.1: Bracket equivalence for function calls
+    # v3.0: Bracket equivalence for function calls
     print["Using square brackets"]
     print{"Using curly braces"}

@@ -21,6 +21,8 @@ pub struct StatusBarWidget<'a> {
     modified: bool,
     /// Theme
     theme: &'a GulTheme,
+    /// Current mode
+    mode: &'a str,
 }
 
 impl<'a> StatusBarWidget<'a> {
@@ -33,6 +35,7 @@ impl<'a> StatusBarWidget<'a> {
             git_branch: None,
             modified: false,
             theme,
+            mode: "NORMAL",
         }
     }
 
@@ -54,6 +57,11 @@ impl<'a> StatusBarWidget<'a> {
 
     pub fn modified(mut self, modified: bool) -> Self {
         self.modified = modified;
+        self
+    }
+
+    pub fn mode(mut self, mode: &'a str) -> Self {
+        self.mode = mode;
         self
     }
 }
@@ -80,6 +88,11 @@ impl<'a> Widget for StatusBarWidget<'a> {
         }
 
         buf.set_string(area.x + 1, area.y, &left, self.theme.status_bar);
+
+        // Center: Mode
+        let mode_str = format!("-- {} --", self.mode);
+        let mode_x = area.x + (area.width / 2) - (mode_str.len() as u16 / 2);
+        buf.set_string(mode_x, area.y, &mode_str, self.theme.status_bar);
 
         // Right side: cursor, encoding, branch
         let mut right_parts = Vec::new();

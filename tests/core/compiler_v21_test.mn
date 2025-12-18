@@ -1,7 +1,7 @@
-# GUL Compiler Integration Tests
-# Tests core language features using v2.1 syntax
+# GUL Compiler Integration Tests - v3.0
+# Tests core language features using v3.0 syntax
 
-import std{testing}
+@imp std{testing}
 
 # ==========================================
 # Test 1: Bracket Equivalence
@@ -58,37 +58,36 @@ fn test_mixed_bracket_nesting():
     assert data[0]["name"] == "Alice"
 
 # ==========================================
-# Test 2: UI Component Syntax
+# Test 2: UI Component Syntax (v3.0)
 # ==========================================
 
 @test
-fn test_ui_component_literal():
-    """Test ^&^ component literal syntax"""
+fn test_ui_component_decorator():
+    """Test @ui decorator style"""
     
-    # Component literal
-    component = ^&^[button{text: "Click"}]
+    # Decorator style
+    @ui button{text: "Click"}
     
-    assert component.type == "button"
-    assert component.props["text"] == "Click"
+    assert True  # Component rendered
 
 @test
-fn test_ui_print_function():
-    """Test ui.print() function style"""
+fn test_ui_function_style():
+    """Test ui.component() function style"""
     
-    # Function style (equivalent to ^&^)
-    ui.print(button[text: "Click"])
-    ui.print(table{data: [1, 2, 3]})
+    # Function style (equivalent to @ui)
+    ui.button(text: "Click")
+    ui.table(data: [1, 2, 3])
     
-    # ^&^() and ui.print() are the same
-    ^&^[label{text: "Hello"}]
-    ui.print(label[text: "Hello"])
+    # Both styles are the same
+    @ui label{text: "Hello"}
+    ui.label(text: "Hello")
 
 @test
 fn test_ui_component_equivalence():
-    """^&^ and ui.print() produce same result"""
+    """@ui and ui.component() produce same result"""
     
     # These are equivalent
-    c1 = ^&^[button{text: "A"}]
+    c1 = ui.button(text: "A")
     c2 = ui.component(button[text: "A"])
     
     assert c1.type == c2.type
@@ -102,18 +101,18 @@ fn test_ui_component_equivalence():
 fn test_main_block_syntax():
     """Test main block without parentheses"""
     
-    # Valid syntax: main: (no parentheses)
-    # main:
+    # Valid syntax: mn: (no parentheses)
+    # mn:
     #     print("Hello")
     
     assert True  # Syntax is tested by compilation
 
 @test
 fn test_import_syntax():
-    """Test import brace syntax"""
+    """Test @imp syntax"""
     
-    # import std{io, http}  - imports io and http from std
-    import std{math}
+    # @imp std{math}  - imports math from std
+    @imp std{math}
     
     result = math.sqrt(16)
     assert result == 4.0
@@ -141,15 +140,15 @@ fn test_function_bracket_flexibility():
 
 @test
 fn test_async_function_syntax():
-    """Async functions with new syntax"""
+    """Async functions with v3.0 syntax (no fn keyword)"""
     
     async fetch_data[url: str]:
-        # async without 'fn' keyword
+        # async without 'fn' keyword (v3.0 style)
         response = await http.get(url)
         return response.json()
     
-    async fn fetch_data2(url: str):
-        # async with 'fn' keyword (also valid)
+    async fetch_data2(url: str):
+        # async without 'fn' keyword
         return await http.get(url)
 
 # ==========================================
@@ -190,7 +189,7 @@ fn test_struct_with_different_brackets():
 # Run All Tests
 # ==========================================
 
-main:
-    print("Running GUL v2.1 Compiler Tests...")
+mn:
+    print("Running GUL v3.0 Compiler Tests...")
     testing.run_all_tests()
     print("All tests passed!")

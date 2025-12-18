@@ -1,13 +1,13 @@
-# GUL Hello World - v2.1
-# Demonstrates basic syntax with v2.1 features
+# GUL Hello World - v3.0
+# Demonstrates basic syntax with v3.0 features
 
-main:
-    const message: str = "Hello, World!"
-    mut count: int = 42
+mn:
+    let message: str = "Hello, World!"
+    var count: int = 42
     print(message)
     print("Count:", count)
 
-    # v2.1: Bracket equivalence - all valid
+    # v3.0: Bracket equivalence - all valid
     print["Using square brackets"]
     print{"Using curly braces"}
 

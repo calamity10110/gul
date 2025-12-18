@@ -42,6 +42,10 @@ pub enum Token {
     Static, // @static
     Local,  // @local
 
+    // New keywords (v3.0)
+    Let, // let (immutable, replaces const/def)
+    Var, // var (mutable, replaces mut/?)
+
     // Literals
     Integer(i64),
     Float(f64),
@@ -529,13 +533,29 @@ impl Lexer {
 
         // Check for keywords first - v2.0 keywords take priority
         let token = match value.as_str() {
+            // v3.0 keywords (highest priority)
+            "let" => Token::Let,
+            "var" => Token::Var,
+
             // v2.0 keywords (primary)
             "import" | "use" => Token::Import,
-            "const" => Token::Const,
-            "mut" => Token::Mut,
+            "const" => {
+                eprintln!("Warning: 'const' is deprecated, use 'let' instead");
+                Token::Const
+            }
+            "mut" => {
+                eprintln!("Warning: 'mut' is deprecated, use 'var' instead");
+                Token::Mut
+            }
             "async" => Token::Async,
-            "extern" => Token::Extern,
-            "main" => Token::Main,
+            "extern" => {
+                eprintln!("Warning: 'extern' is deprecated, use @python/@rust/@sql blocks instead");
+                Token::Extern
+            }
+            "main" => {
+                eprintln!("Warning: 'main' is deprecated, use 'mn:' block instead");
+                Token::Main
+            }
             "struct" => Token::Struct,
             "global" => Token::Global,
             "static" => Token::Static,
@@ -559,10 +579,7 @@ impl Lexer {
                 eprintln!("Warning: 'cs' is deprecated, use 'extern' instead");
                 Token::Cs
             }
-            "mn" => {
-                eprintln!("Warning: 'mn' is deprecated, use 'main' instead");
-                Token::Mn
-            }
+            "mn" => Token::Mn,   // mn is v3.0 main entry (no deprecation)
             "own" => Token::Own, // ownership keywords still valid
             "ref" => Token::Ref,
             "copy" => Token::Copy,

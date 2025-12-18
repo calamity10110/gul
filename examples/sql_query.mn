@@ -1,6 +1,8 @@
-import db
+# GUL SQL Query - v3.0
 
-extern sql {
+@imp db
+
+@sql {
     create table if not exists users (
         id integer primary key,
         name text not null,
@@ -9,14 +11,14 @@ extern sql {
     );
 }
 
-extern sql {
+@sql {
     insert into users (name, email, age) values
         ('Alice', 'alice@example.com', 30),
         ('Bob', 'bob@example.com', 25),
         ('Charlie', 'charlie@example.com', 35);
 }
 
-main():
+mn:
     db.execute(create_table)
     db.execute(insert_users)
 

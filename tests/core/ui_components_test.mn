@@ -1,72 +1,64 @@
-# GUL UI Component Tests
-# Tests UI syntax using v2.1 specification
+# GUL UI Component Tests - v3.0
+# Tests UI syntax using v3.0 specification
 
-import std.testing
-import std.ui
+@imp std.testing
+@imp std.ui
 
 # ==========================================
-# UI Syntax Tests
+# UI Syntax Tests (v3.0)
 # ==========================================
 
 @test
-fn test_ui_component_literal_basic():
-    """Basic ^&^ component syntax"""
+fn test_ui_decorator_basic():
+    """Basic @ui decorator style"""
     
-    # Standalone component literal
-    ^&^[button{text: "Click Me"}]
-    ^&^[input{type: "text", placeholder: "Enter name"}]
-    ^&^[label{text: "Hello World"}]
+    # Standalone component decorator
+    @ui button{text: "Click Me"}
+    @ui input{type: "text", placeholder: "Enter name"}
+    @ui label{text: "Hello World"}
 
 @test
-fn test_ui_print_function_basic():
-    """Basic ui.print() function syntax"""
+fn test_ui_function_basic():
+    """Basic ui.component() function syntax"""
     
-    # Function call style (equivalent to ^&^)
-    ui.print(button[text: "Submit"])
-    ui.print(input[type: "password"])
-    ui.print(label[text: "Welcome"])
+    # Function call style (equivalent to @ui)
+    ui.button(text: "Submit")
+    ui.input(type: "password")
+    ui.label(text: "Welcome")
 
 @test
 fn test_ui_components_equivalent():
-    """^&^ and ui.print() are interchangeable"""
-    
-    # These produce the same result
-    ^&^()  # Empty component
-    ui.print()  # Same as above
+    """@ui and ui.component() are interchangeable"""
     
     # With content
-    ^&^[div{class: "container"}]
-    ui.print(div[class: "container"])
+    @ui div{class: "container"}
+    ui.div(class: "container")
 
 @test
 fn test_ui_nested_components():
     """Nested UI components"""
     
-    ^&^[
-        container{
-            header[text: "My App"],
-            main{
-                sidebar[width: 200],
-                content[flex: 1]
-            },
-            footer[text: "© 2025"]
-        }
-    ]
+    @ui container{
+        header: ui.header(text: "My App"),
+        main: ui.main{
+            sidebar: ui.sidebar(width: 200),
+            content: ui.content(flex: 1)
+        },
+        footer: ui.footer(text: "© 2025")
+    }
 
 @test
 fn test_ui_mixed_brackets():
     """UI with mixed bracket styles (all valid)"""
     
-    ^&^{
-        layout(direction: "vertical")[
-            panel{title: "Dashboard"},
-            grid(cols: 3){
-                card[title: "Card 1"],
-                card(title: "Card 2"),
-                card{title: "Card 3"}
-            }
-        ]
-    }
+    ui.layout(direction: "vertical")[
+        ui.panel{title: "Dashboard"},
+        ui.grid(cols: 3){
+            ui.card[title: "Card 1"],
+            ui.card(title: "Card 2"),
+            ui.card{title: "Card 3"}
+        }
+    ]
 
 @test
 fn test_ui_with_data_binding():
@@ -77,14 +69,12 @@ fn test_ui_with_data_binding():
         {name: "Bob", age: 25}
     ]
     
-    ^&^[
-        table{
-            data: data,
-            columns: ["Name", "Age"]
-        }
-    ]
+    @ui table{
+        data: data,
+        columns: ["Name", "Age"]
+    }
     
-    ui.print(table[data: data, columns: ["Name", "Age"]])
+    ui.table(data: data, columns: ["Name", "Age"])
 
 @test
 fn test_ui_event_handlers():
@@ -93,12 +83,10 @@ fn test_ui_event_handlers():
     fn handle_click():
         print("Clicked!")
     
-    ^&^[
-        button{
-            text: "Click Me",
-            onclick: handle_click
-        }
-    ]
+    @ui button{
+        text: "Click Me",
+        onclick: handle_click
+    }
 
 @test
 fn test_ui_conditional_rendering():
@@ -106,13 +94,11 @@ fn test_ui_conditional_rendering():
     
     show_sidebar = True
     
-    ^&^[
-        layout{
-            if show_sidebar:
-                sidebar[width: 200]
-            main[flex: 1]
-        }
-    ]
+    ui.layout{
+        if show_sidebar:
+            ui.sidebar(width: 200)
+        ui.main(flex: 1)
+    }
 
 @test
 fn test_ui_list_rendering():
@@ -120,30 +106,26 @@ fn test_ui_list_rendering():
     
     items = ["Item 1", "Item 2", "Item 3"]
     
-    ^&^[
-        list{
-            [li{text: item} for item in items]
-        }
-    ]
+    @ui list{
+        [ui.li(text: item) for item in items]
+    }
 
 @test
 fn test_tui_vs_webui_compatibility():
     """Same syntax works for TUI and Web UI"""
     
     # This syntax works for both TUI and Web targets
-    ^&^[
-        container{
-            text[content: "Works everywhere!"],
-            button[text: "Click"],
-            input[placeholder: "Type here"]
-        }
-    ]
+    @ui container{
+        text: ui.text(content: "Works everywhere!"),
+        button: ui.button(text: "Click"),
+        input: ui.input(placeholder: "Type here")
+    }
 
 # ==========================================
 # Run Tests
 # ==========================================
 
-main:
-    print("Running UI Component Tests (v2.1 syntax)...")
+mn:
+    print("Running UI Component Tests (v3.0 syntax)...")
     testing.run_all_tests()
     print("All UI tests passed!")

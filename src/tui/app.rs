@@ -141,9 +141,17 @@ impl GulTuiApp {
         while self.running {
             terminal.draw(|frame| self.render(frame))?;
 
-            if event::poll(Duration::from_millis(100))? {
-                if let Event::Key(key) = event::read()? {
-                    self.handle_key(key)?;
+            if event::poll(Duration::from_millis(50))? {
+                match event::read()? {
+                    Event::Key(key) => {
+                        if key.kind == event::KeyEventKind::Press {
+                            self.handle_key(key)?;
+                        }
+                    }
+                    Event::Resize(w, h) => {
+                        terminal.resize(Rect::new(0, 0, w, h))?;
+                    }
+                    _ => {}
                 }
             }
         }
@@ -185,6 +193,30 @@ impl GulTuiApp {
                 _ => {}
             }
             return Ok(());
+        }
+
+        // Handle mode switching in Normal mode
+        if self.mode == Mode::Normal {
+            match key.code {
+                KeyCode::Char('i') => {
+                    self.mode = Mode::Insert;
+                    return Ok(());
+                }
+                KeyCode::Char(':') => {
+                    self.mode = Mode::Command;
+                    return Ok(());
+                }
+                KeyCode::Char('/') => {
+                    self.mode = Mode::Search;
+                    return Ok(());
+                }
+                _ => {}
+            }
+        } else if self.mode == Mode::Insert {
+            if key.code == KeyCode::Esc {
+                self.mode = Mode::Normal;
+                return Ok(());
+            }
         }
 
         // Check key bindings
@@ -251,31 +283,73 @@ impl GulTuiApp {
     }
 
     fn handle_editor_key(&mut self, key: event::KeyEvent) -> io::Result<()> {
-        match key.code {
-            KeyCode::Up => {
-                if self.editor_state.cursor.0 > 0 {
-                    self.editor_state.cursor.0 -= 1;
+        match self.mode {
+            Mode::Normal => match key.code {
+                KeyCode::Up => {
+                    if self.editor_state.cursor.0 > 0 {
+                        self.editor_state.cursor.0 -= 1;
+                    }
                 }
-            }
-            KeyCode::Down => {
-                self.editor_state.cursor.0 += 1;
-            }
-            KeyCode::Left => {
-                if self.editor_state.cursor.1 > 0 {
-                    self.editor_state.cursor.1 -= 1;
+                KeyCode::Down => {
+                    let max_lines = self.buffer.lines().count().saturating_sub(1);
+                    if self.editor_state.cursor.0 < max_lines {
+                        self.editor_state.cursor.0 += 1;
+                    }
                 }
-            }
-            KeyCode::Right => {
-                self.editor_state.cursor.1 += 1;
-            }
-            KeyCode::Tab if key.modifiers == KeyModifiers::NONE => {
-                // Switch focus
-                self.focus = if self.show_file_tree {
-                    Focus::FileTree
-                } else {
-                    Focus::Output
-                };
-            }
+                KeyCode::Left => {
+                    if self.editor_state.cursor.1 > 0 {
+                        self.editor_state.cursor.1 -= 1;
+                    }
+                }
+                KeyCode::Right => {
+                    let line = self.buffer.lines().nth(self.editor_state.cursor.0).unwrap_or("");
+                    if self.editor_state.cursor.1 < line.chars().count() {
+                        self.editor_state.cursor.1 += 1;
+                    }
+                }
+                KeyCode::Tab if key.modifiers == KeyModifiers::NONE => {
+                    self.focus = if self.show_file_tree {
+                        Focus::FileTree
+                    } else {
+                        Focus::Output
+                    };
+                }
+                _ => {}
+            },
+            Mode::Insert => match key.code {
+                KeyCode::Char(c) => {
+                    self.insert_char(c);
+                }
+                KeyCode::Backspace => {
+                    self.delete_char();
+                }
+                KeyCode::Enter => {
+                    self.insert_newline();
+                }
+                KeyCode::Up => {
+                    if self.editor_state.cursor.0 > 0 {
+                        self.editor_state.cursor.0 -= 1;
+                    }
+                }
+                KeyCode::Down => {
+                    let max_lines = self.buffer.lines().count().saturating_sub(1);
+                    if self.editor_state.cursor.0 < max_lines {
+                        self.editor_state.cursor.0 += 1;
+                    }
+                }
+                KeyCode::Left => {
+                    if self.editor_state.cursor.1 > 0 {
+                        self.editor_state.cursor.1 -= 1;
+                    }
+                }
+                KeyCode::Right => {
+                    let line = self.buffer.lines().nth(self.editor_state.cursor.0).unwrap_or("");
+                    if self.editor_state.cursor.1 < line.chars().count() {
+                        self.editor_state.cursor.1 += 1;
+                    }
+                }
+                _ => {}
+            },
             _ => {}
         }
         Ok(())
@@ -555,7 +629,93 @@ impl GulTuiApp {
             }
         }
 
-        Ok(())
+    /// Insert a character at the cursor position
+    fn insert_char(&mut self, c: char) {
+        let mut lines: Vec<String> = self.buffer.lines().map(|s| s.to_string()).collect();
+        if lines.is_empty() {
+            lines.push(String::new());
+        }
+
+        let (row, col) = (self.editor_state.cursor.0, self.editor_state.cursor.1);
+        while lines.len() <= row {
+            lines.push(String::new());
+        }
+
+        let line = &mut lines[row];
+        let byte_idx = line
+            .char_indices()
+            .nth(col)
+            .map(|(i, _)| i)
+            .unwrap_or(line.len());
+        line.insert(byte_idx, c);
+        self.editor_state.cursor.1 += 1;
+
+        self.buffer = lines.join("\n");
+        if let Some(tab) = self.tabs.get_mut(self.active_tab) {
+            tab.modified = true;
+        }
+    }
+
+    /// Delete a character at the cursor position
+    fn delete_char(&mut self) {
+        let mut lines: Vec<String> = self.buffer.lines().map(|s| s.to_string()).collect();
+        if lines.is_empty() {
+            return;
+        }
+
+        let (row, col) = (self.editor_state.cursor.0, self.editor_state.cursor.1);
+        if col > 0 {
+            if row < lines.len() {
+                let line = &mut lines[row];
+                let byte_idx_opt = line.char_indices().nth(col - 1).map(|(i, _)| i);
+                if let Some(byte_idx) = byte_idx_opt {
+                    line.remove(byte_idx);
+                    self.editor_state.cursor.1 -= 1;
+                    self.buffer = lines.join("\n");
+                }
+            }
+        } else if row > 0 {
+            // Merge with previous line
+            let current_line = lines.remove(row);
+            let prev_line = &mut lines[row - 1];
+            self.editor_state.cursor.1 = prev_line.chars().count();
+            prev_line.push_str(&current_line);
+            self.editor_state.cursor.0 -= 1;
+            self.buffer = lines.join("\n");
+        }
+
+        if let Some(tab) = self.tabs.get_mut(self.active_tab) {
+            tab.modified = true;
+        }
+    }
+
+    /// Insert a newline at the cursor position
+    fn insert_newline(&mut self) {
+        let mut lines: Vec<String> = self.buffer.lines().map(|s| s.to_string()).collect();
+        if lines.is_empty() {
+            lines.push(String::new());
+        }
+
+        let (row, col) = (self.editor_state.cursor.0, self.editor_state.cursor.1);
+        while lines.len() <= row {
+            lines.push(String::new());
+        }
+
+        let line = &mut lines[row];
+        let byte_idx = line
+            .char_indices()
+            .nth(col)
+            .map(|(i, _)| i)
+            .unwrap_or(line.len());
+        let next_line_part = line.split_off(byte_idx);
+        lines.insert(row + 1, next_line_part);
+        self.editor_state.cursor.0 += 1;
+        self.editor_state.cursor.1 = 0;
+
+        self.buffer = lines.join("\n");
+        if let Some(tab) = self.tabs.get_mut(self.active_tab) {
+            tab.modified = true;
+        }
     }
 }
 

@@ -1,7 +1,7 @@
 # GUL (GUL Universal Language) Knowledgebase
 
-Version: 0.13.0 (v2.0 Syntax)
-Date: 2025-12-09
+Version: 0.14.0 (v3.0 Syntax)
+Date: 2025-12-11
 
 ## 1. Project Overview
 
@@ -41,12 +41,12 @@ The GUL ecosystem is organized into a modular package structure in `gul_packages
 
 ## 3. Language Features
 
-### Syntax (v2.0)
+### Syntax (v3.0)
 
 - **File Extensions:** `.mn` (General), `.def` (Definitions), `.fnc` (Functions), `.mn` (Main).
 - **Blocks:** Indentation-based (Python-style).
 - **Comments:** `# Single line`, `#[ Multi-line ]#`.
-- **Keywords:** `import`, `const`, `mut`, `fn`, `async`, `extern`, `main`, `struct`.
+- **Keywords:** `@imp`, `let`, `var`, `fn`, `async`, `@python`, `@rust`, `mn`, `struct`.
 
 ### Ownership Model (Unchanged)
 
@@ -54,28 +54,28 @@ The GUL ecosystem is organized into a modular package structure in `gul_packages
 - `ref`: Borrows a reference (Immutable default).
 - `copy`: Creates a duplicate.
 
-### Multi-Language Integration (`extern` blocks)
+### Multi-Language Integration (`@lang` blocks)
 
 Embed foreign code directly:
 
-- `extern python {...}`: Embed Python code.
-- `extern rust {...}`: Embed Rust code.
-- `extern js {...}`: Embed JavaScript.
-- `extern sql {...}`: Embed SQL queries.
+- `@python {...}`: Embed Python code.
+- `@rust {...}`: Embed Rust code.
+- `@js {...}`: Embed JavaScript.
+- `@sql {...}`: Embed SQL queries.
 
 ### UI Syntax
 
-First-class UI component literals:
+First-class UI component syntax (two equivalent styles):
 
-- `^&^[button{text="Click"}]`
-- `^&^[chart{data=...}]`
+- `@ui button{text="Click"}` (Decorator style)
+- `ui.button(text="Click")` (Function style)
 
 ### Scientific Computing
 
 Native support for units:
 
-- `def speed = 10 m/s`
-- `def force = 100 N`
+- `let speed = 10 m/s`
+- `let force = 100 N`
 
 ## 4. Directory Structure
 
@@ -285,8 +285,8 @@ Common: `own`, `ref`, `copy`, `await`, `loop`, `if`, `elif`, `else`, `for`, `whi
 
   4.10 Type Inference
   GUL infers types where possible:
-  `def x = 10` (inferred as `int`).
-  `def y = 10 m` (inferred as `float<m>`).
+  `let x = 10` (inferred as `int`).
+  `let y = 10 m` (inferred as `float<m>`).
 
 5. Ownership Model
 
@@ -314,8 +314,8 @@ Primitive types (`int`, `bool`, `float`) are `copy` by default (implicit copy on
   Assignment transfers ownership for non-copy types:
 
 ```gul
-def list1 = [1, 2, 3]
-def list2 = list1  # list1 is now invalid
+let list1 = [1, 2, 3]
+let list2 = list1  # list1 is now invalid
 ```
 
 5.7 Lifetimes
@@ -333,21 +333,22 @@ Async tasks must own their data or act on `ref` strictly scoped execution contex
 6. Variables
 
 6.1 Declarations
-`def name = value`: Standard declaration. Inferred type.
-`def name: type = value`: Explicit type.
+`let name = value`: Immutable declaration. Inferred type.
+`let name: type = value`: Explicit type.
+`var name = value`: Mutable declaration.
 
 6.2 Mutability
 Variables are immutable by default.
-`def ?x = 10`: Mutable local variable (syntactic sugar for mutable binding).
-`?x = 20`: Assignment to mutable variable.
+`var x = 10`: Mutable variable.
+`x = 20`: Assignment to mutable variable.
 
 6.3 Shadowing
 Variables can be shadowed in inner scopes:
 
 ```gul
-def x = 10
+let x = 10
 if true:
-    def x = 20  # Shadows outer x
+    let x = 20  # Shadows outer x
 ```
 
 6.4 Global Variables

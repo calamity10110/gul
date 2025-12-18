@@ -1,40 +1,41 @@
-# GUL Beginner Tutorial - v2.1
-# This example demonstrates the core features of GUL with v2.1 syntax.
+# GUL Beginner Tutorial - v3.0
+# This example demonstrates the core features of GUL with v3.0 syntax.
 
-# 1. Flexible Imports (v2.1 brace syntax)
-import std{io, math}
-import python{random}
+# 1. Flexible Imports (v3.0 @imp syntax)
+@imp std{io, math}
+@imp python{random}
 
-# 2. Constants
-const MAX_GUESSES = 5
-const MIN_NUMBER = 1
-const MAX_NUMBER = 100
+# 2. Constants (let - immutable)
+let MAX_GUESSES = 5
+let MIN_NUMBER = 1
+let MAX_NUMBER = 100
 
-# 3. Global State (Mutable)
-mut game_state = {
+# 3. Global State (var - mutable with @global)
+@global var game_state = {
     high_score: 0,
     games_played: 0
 }
 
 # 4. Functions
+
 # Pure logic function
 fn generate_secret_number() -> int:
     # Foreign Block (Python)
-    extern python {
-        fn get_random(min_val, max_val):
+    @python {
+        def get_random(min_val, max_val):
             import random
             return random.randint(min_val, max_val)
     }
 
     return get_random(MIN_NUMBER, MAX_NUMBER)
 
-# Async function
+# Async function (no fn keyword in v3.0)
 async play_game():
     print(f"Welcome to Guess the Number! ({MIN_NUMBER}-{MAX_NUMBER})")
     
     secret = generate_secret_number()
-    mut guesses_left = MAX_GUESSES
-    mut won = false
+    var guesses_left = MAX_GUESSES
+    var won = false
 
     loop:
         if guesses_left <= 0:
@@ -67,8 +68,8 @@ async play_game():
     if won:
         game_state.high_score = game_state.high_score + 1
 
-# Main Entry Point (v2.1: no parentheses needed)
-main:
+# Main Entry Point (v3.0: mn:)
+mn:
     await play_game()
     print("Thanks for playing!")
     print(f"Total games played: {game_state.games_played}")

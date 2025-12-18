@@ -124,18 +124,35 @@ impl Parser {
 
     fn parse_statement(&mut self) -> Result<Statement, String> {
         match self.current_token() {
+            // v3.0 keywords (highest priority)
+            Token::Let => self.parse_let_definition(),
+            Token::Var => self.parse_var_definition(),
+
+            // Import statements
             Token::Imp | Token::Import => self.parse_import(),
+
+            // Legacy definition keywords
             Token::Def => self.parse_definition(),
             Token::Const => self.parse_const_definition(),
             Token::Mut => self.parse_mut_definition(),
+
+            // Struct
             Token::Struct => self.parse_struct(),
+
+            // Functions
             Token::Fn => self.parse_function(false),
-            Token::Async => self.parse_function(true),
+            Token::Async => self.parse_async_function(),
             Token::Asy => self.parse_function(true), // legacy support
+
+            // Foreign code blocks
             Token::Extern => self.parse_extern_block(),
             Token::Cs => self.parse_custom_block(), // legacy support
+
+            // Main entry
             Token::Main => self.parse_main(),
-            Token::Mn => self.parse_main(), // legacy support
+            Token::Mn => self.parse_main(),
+
+            // Control flow
             Token::If => self.parse_if(),
             Token::Loop => self.parse_loop(),
             Token::For => self.parse_for(),
@@ -152,8 +169,13 @@ impl Parser {
                 Ok(Statement::Continue)
             }
             Token::Try => self.parse_try_catch(),
+
+            // Annotations (@)
             Token::At => self.parse_annotation_statement(),
+
+            // Mutable assignment (?var)
             Token::QuestionMark => self.parse_mutable_assignment(),
+
             Token::Throw => {
                 self.advance();
                 let expr = self.parse_expression()?;
@@ -168,11 +190,22 @@ impl Parser {
         self.advance(); // Skip '@'
 
         match self.current_token() {
+            // v3.0 annotations
+            Token::Identifier(name) if name == "imp" => self.parse_at_import(),
+            Token::Identifier(name) if name == "ui" => self.parse_at_ui(),
+            Token::Identifier(name) if name == "python" => self.parse_at_lang_block("python"),
+            Token::Identifier(name) if name == "rust" => self.parse_at_lang_block("rust"),
+            Token::Identifier(name) if name == "sql" => self.parse_at_lang_block("sql"),
+            Token::Identifier(name) if name == "js" => self.parse_at_lang_block("js"),
+            Token::Identifier(name) if name == "cpp" => self.parse_at_lang_block("cpp"),
+            Token::Identifier(name) if name == "test" => self.parse_test_annotation(),
+
+            // Legacy/existing annotations
             Token::Global => self.parse_global_def(),
             Token::Fn => self.parse_function(false),
             Token::Asy => self.parse_function(true),
             Token::Cs => self.parse_custom_block(), // @cs syntax
-            _ => Err("Unexpected annotation".to_string()),
+            _ => Err(format!("Unexpected annotation: {:?}", self.current_token())),
         }
     }
 
@@ -1310,6 +1343,322 @@ impl Parser {
             })
         } else {
             Err("Expected identifier after 'mut'".to_string())
+        }
+    }
+
+    // v3.0 parsing methods
+    fn parse_let_definition(&mut self) -> Result<Statement, String> {
+        self.advance(); // Skip 'let'
+
+        if let Token::Identifier(name) = self.current_token() {
+            let var_name = name.clone();
+            self.advance();
+
+            // Optional type annotation
+            let type_annotation = if self.current_token() == &Token::Colon {
+                self.advance();
+                Some(self.parse_type()?)
+            } else {
+                None
+            };
+
+            self.expect(Token::Equal)?;
+            let mut value = self.parse_expression()?;
+            self.skip_newlines();
+
+            // If we have a type annotation, wrap the expression
+            if let Some(ty) = type_annotation {
+                value = Expression::Typed {
+                    expr: Box::new(value),
+                    ty,
+                };
+            }
+
+            Ok(Statement::Definition {
+                name: var_name,
+                value,
+            })
+        } else {
+            Err("Expected identifier after 'let'".to_string())
+        }
+    }
+
+    fn parse_var_definition(&mut self) -> Result<Statement, String> {
+        self.advance(); // Skip 'var'
+
+        if let Token::Identifier(name) = self.current_token() {
+            let var_name = name.clone();
+            self.advance();
+
+            // Optional type annotation
+            let type_annotation = if self.current_token() == &Token::Colon {
+                self.advance();
+                Some(self.parse_type()?)
+            } else {
+                None
+            };
+
+            self.expect(Token::Equal)?;
+            let mut value = self.parse_expression()?;
+            self.skip_newlines();
+
+            // If we have a type annotation, wrap the expression
+            if let Some(ty) = type_annotation {
+                value = Expression::Typed {
+                    expr: Box::new(value),
+                    ty,
+                };
+            }
+
+            // For v3.0, 'var' creates a mutable variable
+            // We use the same Definition node but could track mutability in AST
+            Ok(Statement::Definition {
+                name: var_name,
+                value,
+            })
+        } else {
+            Err("Expected identifier after 'var'".to_string())
+        }
+    }
+
+    fn parse_async_function(&mut self) -> Result<Statement, String> {
+        self.advance(); // Skip 'async'
+
+        // v3.0: async can be followed directly by identifier (no 'fn' keyword)
+        // or by 'fn' keyword (backward compatible)
+        if self.current_token() == &Token::Fn {
+            self.advance(); // Skip 'fn'
+        }
+
+        if let Token::Identifier(name) = self.current_token() {
+            let func_name = name.clone();
+            self.advance();
+
+            // Handle any bracket type for parameters
+            if !self.current_token().is_open_bracket() {
+                return Err("Expected '(' after function name".to_string());
+            }
+            self.advance(); // Skip opening bracket
+
+            let mut params = Vec::new();
+            while !self.current_token().is_close_bracket() && self.current_token() != &Token::Eof {
+                // Handle ownership keywords
+                if matches!(self.current_token(), Token::Own | Token::Ref | Token::Copy) {
+                    self.advance();
+                }
+
+                if let Token::Identifier(param) = self.current_token() {
+                    params.push(param.clone());
+                    self.advance();
+
+                    // Skip type annotation if present (e.g., name: str)
+                    if self.current_token() == &Token::Colon {
+                        self.advance();
+                        let _ = self.parse_type()?;
+                    }
+
+                    if self.current_token() == &Token::Comma {
+                        self.advance();
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            // Skip closing bracket
+            if self.current_token().is_close_bracket() {
+                self.advance();
+            }
+
+            // Optional return type (->)
+            if self.current_token() == &Token::Arrow {
+                self.advance();
+                let _ = self.parse_type()?;
+            }
+
+            self.expect(Token::Colon)?;
+            self.skip_newlines();
+
+            let body = self.parse_block()?;
+
+            Ok(Statement::Function {
+                name: func_name,
+                params,
+                body,
+                is_async: true,
+            })
+        } else {
+            Err("Expected function name after 'async'".to_string())
+        }
+    }
+
+    fn parse_at_import(&mut self) -> Result<Statement, String> {
+        self.advance(); // Skip 'imp'
+
+        // v3.0 @imp syntax:
+        // Style 1: @imp std{io} - single line
+        // Style 2: @imp: (followed by indented list)
+        // Style 3: @imp(std{io}, python{numpy}) - parenthesized
+
+        if self.current_token() == &Token::Colon {
+            // Style 2: Block style with colon
+            self.advance(); // Skip ':'
+            self.skip_newlines();
+            // For now, treat as grouped placeholder
+            // Would need to parse indented list
+            return Ok(Statement::Import("@imp_block_placeholder".to_string()));
+        }
+
+        if self.current_token() == &Token::LeftParen {
+            // Style 3: Parenthesized
+            self.advance();
+            while !matches!(self.current_token(), Token::RightParen | Token::Eof) {
+                self.advance();
+            }
+            if self.current_token() == &Token::RightParen {
+                self.advance();
+            }
+            self.skip_newlines();
+            return Ok(Statement::Import("@imp_paren_placeholder".to_string()));
+        }
+
+        // Style 1: Single line - same as regular import
+        if let Token::Identifier(first_part) = self.current_token() {
+            let mut module_path = first_part.clone();
+            self.advance();
+
+            // Handle grouped imports: std{io, http}
+            if self.current_token() == &Token::LeftBrace {
+                self.advance();
+                module_path.push('{');
+                while !matches!(self.current_token(), Token::RightBrace | Token::Eof) {
+                    if let Token::Identifier(part) = self.current_token() {
+                        module_path.push_str(part);
+                    }
+                    self.advance();
+                    if self.current_token() == &Token::Comma {
+                        module_path.push(',');
+                        self.advance();
+                    }
+                }
+                module_path.push('}');
+                if self.current_token() == &Token::RightBrace {
+                    self.advance();
+                }
+            }
+
+            // Handle dotted imports
+            while self.current_token() == &Token::Dot {
+                self.advance();
+                module_path.push('.');
+                if let Token::Identifier(part) = self.current_token() {
+                    module_path.push_str(part);
+                    self.advance();
+                }
+            }
+
+            self.skip_newlines();
+            Ok(Statement::Import(module_path))
+        } else {
+            Err("Expected module name after '@imp'".to_string())
+        }
+    }
+
+    fn parse_at_ui(&mut self) -> Result<Statement, String> {
+        self.advance(); // Skip 'ui'
+
+        // Parse component name and properties
+        // @ui button{text: "Click"}
+        if let Token::Identifier(component) = self.current_token() {
+            let component_name = component.clone();
+            self.advance();
+
+            // Parse properties in braces
+            if self.current_token() == &Token::LeftBrace {
+                self.advance();
+                while !matches!(self.current_token(), Token::RightBrace | Token::Eof) {
+                    self.advance();
+                }
+                if self.current_token() == &Token::RightBrace {
+                    self.advance();
+                }
+            }
+
+            self.skip_newlines();
+
+            // Return as expression statement with UI component call
+            // ui.component_name() - represented as Call with qualified name
+            Ok(Statement::Expression(Expression::Call {
+                function: Box::new(Expression::Identifier(format!("ui.{}", component_name))),
+                args: vec![],
+            }))
+        } else {
+            Err("Expected component name after '@ui'".to_string())
+        }
+    }
+
+    fn parse_at_lang_block(&mut self, language: &str) -> Result<Statement, String> {
+        self.advance(); // Skip language identifier (python/rust/sql/etc.)
+
+        // Expect { to start the block
+        self.expect(Token::LeftBrace)?;
+
+        // Collect code until closing brace
+        let mut code = String::new();
+        let mut brace_depth = 1;
+
+        while self.current_token() != &Token::Eof && brace_depth > 0 {
+            match self.current_token() {
+                Token::LeftBrace => {
+                    brace_depth += 1;
+                    code.push('{');
+                    self.advance();
+                }
+                Token::RightBrace => {
+                    brace_depth -= 1;
+                    if brace_depth > 0 {
+                        code.push('}');
+                    }
+                    self.advance();
+                }
+                Token::Newline => {
+                    code.push('\n');
+                    self.advance();
+                }
+                Token::String(s) => {
+                    code.push('"');
+                    code.push_str(s);
+                    code.push('"');
+                    self.advance();
+                }
+                Token::Identifier(id) => {
+                    code.push_str(id);
+                    code.push(' ');
+                    self.advance();
+                }
+                _ => {
+                    self.advance();
+                }
+            }
+        }
+
+        self.skip_newlines();
+
+        Ok(Statement::ForeignBlock {
+            language: language.to_string(),
+            code,
+        })
+    }
+
+    fn parse_test_annotation(&mut self) -> Result<Statement, String> {
+        self.advance(); // Skip 'test'
+        self.skip_newlines();
+
+        // Next should be a function definition
+        if self.current_token() == &Token::Fn {
+            self.parse_function(false)
+        } else {
+            Err("Expected 'fn' after '@test'".to_string())
         }
     }
 
