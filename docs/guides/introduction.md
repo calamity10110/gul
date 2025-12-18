@@ -95,12 +95,12 @@ gul --version
 
 ## Your First GUL Program
 
-Create a file called `hello.mn`:
+Create a file called `hello.gul`:
 
 ```gul
-# hello.mn - Your first GUL program
+# hello.gul - Your first GUL program
 
-main():
+mn:
     print("Hello, GUL!")
     print("Welcome to the future of programming!")
 ```
@@ -108,7 +108,7 @@ main():
 Run it:
 
 ```bash
-gul run hello.mn
+gul run hello.gul
 ```
 
 Output:
@@ -123,12 +123,12 @@ Welcome to the future of programming!
 ### Variables
 
 ```gul
-# Immutable by default
-const name = "Alice"
-const age = 25
+# Immutable by default (v3.0)
+let name = "Alice"
+let age = 25
 
-# Mutable variables
-mut count = 0
+# Mutable variables (v3.0)
+var count = 0
 count = count + 1
 ```
 
@@ -144,7 +144,7 @@ fn add(a: int, b: int) -> int:
     return a + b
 
 # Async function
-async fn fetch_data(url):
+async fetch_data(url):
     response = await http.get(url)
     return response.json()
 ```
@@ -173,18 +173,18 @@ while count < 10:
 
 ```gul
 # Lists
-numbers = [1, 2, 3, 4, 5]
-names = ["Alice", "Bob", "Charlie"]
+let numbers = [1, 2, 3, 4, 5]
+let names = ["Alice", "Bob", "Charlie"]
 
 # Dictionaries
-user = {
+let user = {
     name: "Alice",
     age: 25,
     active: true
 }
 
-# Tuples
-point = (10, 20)
+# Tuples (planned)
+let point = (10, 20)
 ```
 
 ## Example: Web Server
@@ -192,7 +192,7 @@ point = (10, 20)
 ```gul
 import std{http}
 
-const PORT = 8080
+let PORT = 8080
 
 async handle_request(request):
     return {
@@ -201,8 +201,8 @@ async handle_request(request):
         body: {message: "Hello from GUL!"}
     }
 
-main():
-    server = http.Server(PORT)
+mn:
+    let server = http.Server(PORT)
     server.on("request", handle_request)
     await server.start()
     print(f"Server running on http://localhost:{PORT}")

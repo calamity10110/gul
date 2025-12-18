@@ -1,192 +1,278 @@
-# GUL Language Specification v2.0
+# GUL Language Syntax Reference v3.0
 
 **GUL** (GUL Universal Language) is a unified, multi-paradigm language designed for modern full-stack development.
 
-## 1. File Structure
+## Current Implementation Status
 
-GUL uses a strict file organization system to enforce separation of concerns:
+This document reflects the **actual implemented syntax** in GUL v0.13.0.
 
-- **.def** (Definitions): Imports, constants, global variables, data structures.
-- **.fnc** (Functions): Logic, algorithms, and process flows.
-- **.mn** (Main): The single entry point for the application.
-- **.scrt** (Secrets): Secure, encrypted credentials (stripped from public builds).
-- **.cs** (Cross-Script): Embedded foreign code (Python, Rust, SQL, etc.).
+## 1. Keywords
 
----
+### v3.0 Keywords (Current)
 
-## 2. Definitions (.def)
+- `let` - Immutable variable declaration
+- `var` - Mutable variable declaration
+- `fn` - Function declaration
+- `async` - Async function
+- `import` / `use` - Module imports
+- `struct` - Structure definition
+- `mn` - Main entry point block
 
-The `.def` file is the universal declaration file. It handles imports, constants, and global state.
+### Control Flow
 
-### 2.1 Imports
+- `if`, `elif`, `else` - Conditionals
+- `for`, `while`, `loop` - Loops
+- `in` - Iterator keyword
+- `break`, `continue` - Loop control
+- `return` - Function return
 
-Flexible syntax supporting grouping `[]`, `{}`, `()`.
+### Async/Error Handling
+
+- `await` - Await async operations
+- `try`, `catch`, `finally` - Exception handling
+- `throw` - Throw exceptions
+
+### Ownership (Planned)
+
+- `own` - Exclusive ownership
+- `ref` - Borrowed reference
+- `copy` - Explicit duplication
+
+### Annotations
+
+- `@global`, `@static`, `@local` - Scope modifiers
+
+### Deprecated (Backward Compatible)
+
+- `const` → use `let`
+- `mut` → use `var`
+- `def` → use `let` or `fn`
+- `imp` → use `import`
+- `asy` → use `async`
+- `extern` → use `@python`, `@rust`, etc.
+
+## 2. Variables
+
+### Immutable Variables
 
 ```gul
-# Recommended syntax
-import std{io, math}
-import python{numpy, random}
-
-# Loading external data definitions
-import matrix.4d from list.txt
+let name = "Alice"
+let age = 25
+let pi = 3.14159
 ```
 
-### 2.2 Constants
-
-Immutable by default using `def`.
+### Mutable Variables
 
 ```gul
-const MAX_GUESSES = 5
-const API_VERSION = "2.0"
+var count = 0
+count = count + 1
+
+var items = [1, 2, 3]
+items.push(4)
 ```
 
-### 2.3 Global State
+## 3. Functions
 
-Global mutable state must be marked with `@global` and `?`.
+### Synchronous Functions
 
 ```gul
-@global ?game_state = {
-    high_score: 0,
-    games_played: 0
-}
+fn greet(name):
+    return "Hello, " + name
+
+fn add(a: int, b: int) -> int:
+    return a + b
 ```
 
-### 2.4 Multi-Dimensional Structures (Lisp-Style)
-
-Built-in list system supporting 1D-4D (x, y, z, t) structures.
+### Async Functions
 
 ```gul
-# 4D list definition
-const matrix4d = list[
-    x0[y0[z0[t0]]]
-]
-```
-
----
-
-## 3. Functions (.fnc)
-
-The `.fnc` file contains all application logic.
-
-### 3.1 Function Declarations
-
-Unified syntax for sync `@fn` and async `@asy` functions.
-
-```gul
-# Synchronous function
-fn calculate(x: int) -> int:
-    return x * 2
-
-# Async function
 async fetch_data(url):
-    data = await http.get(url)
-    return data
+    response = await http.get(url)
+    return response.json()
 ```
 
-### 3.2 List Operations
+## 4. Data Types
 
-Native Lisp-style list manipulation functions:
+### Primitive Types
 
-- `car(list)`: Head
-- `cdr(list)`: Tail
-- `cons(a, list)`: Construct
-- `map(fn, list)`: Apply
-- `fold(fn, init, list)`: Reduce
-- `slice(list, x, y, z, t)`: Multi-dimensional slicing
+- `int` - Integer (i64)
+- `float` - Floating point (f64)
+- `string` - UTF-8 string
+- `bool` - Boolean (true/false)
 
-### 3.3 Control Flow
+### Collection Types
 
-Supports standard controls with annotation-based syntax options.
+- `list` - Dynamic array: `[1, 2, 3]`
+- `dict` - Hash map: `{name: "Alice", age: 25}`
+
+### Special Types
+
+- `any` - Gradual typing
+- `null` - Null value
+
+## 5. Control Flow
+
+### If Statements
 
 ```gul
-while count > 0:
-    print(count)
-    count = count - 1
-
-if x < 5:
-    return x
+if age >= 18:
+    print("Adult")
+elif age >= 13:
+    print("Teenager")
 else:
-    return 0
+    print("Child")
 ```
 
----
-
-### 3. First-Class UI Components
-
-UI elements are part of the language syntax:
+### For Loops
 
 ```gul
-# Create UI components inline
-ui.print(&[button{text="Click Me", color="blue"}])
-ui.print(&[slider{min=0, max=100, value=50}])
-ui.print(&[chart{type="bar", data=values}])
-ui.print(&[table{headers=["Name", "Age"], rows=data}])
+for i in 0..10:
+    print(i)
+
+for item in items:
+    print(item)
 ```
 
----
-
-## 4. Main Entry (.mn)
-
-The `.mn` file is the sole entry point.
+### While Loops
 
 ```gul
-main():
-    await play_game()
-    print("Done!")
-    print(f"Games played: {game_state.games_played}")
+while count < 10:
+    count = count + 1
 ```
 
----
+## 6. Imports
 
-## 5. Ownership Model
-
-GUL enforces a strong ownership model without Garbage Collection.
-
-- **own**: Exclusive ownership (move semantics).
-- **ref**: Borrowed reference (immutable).
-- **copy**: Explicit duplication.
+### Standard Library
 
 ```gul
-const data = list[1, 2, 3]
-def ref view = data     # Allowed
-def copy backup = data  # Duplicates data
+import std{http, math}
+import std.fs
 ```
 
----
-
-## 6. Multi-Language Integration (.cs)
-
-Embed foreign code directly with automatic binding generation.
+### Python Integration
 
 ```gul
-# Python Integration
-fn generate_secret() -> int:
-    extern python {
-        fn get_random():
-            import random
-            return random.randint(1, 100)
-    }
-
-    return get_random()
+import python{numpy, pandas}
 ```
 
-Supported languages: Python, Rust, JS, SQL, C, Go, Java.
-
----
-
-## 7. Secrets (.scrt)
-
-Secure file for sensitive data. Encrypted on disk.
+## 7. Main Entry Point
 
 ```gul
-# api_keys.scrt
-const STRIPE_KEY = "sk_test_..."
+mn:
+    print("Hello, GUL!")
+    await run_app()
 ```
 
----
+## 8. Operators
 
-## 8. Development Style
+### Arithmetic
 
-- **Indentation**: Python-style significant whitespace.
-- **Annotations**: `@int`, `@str`, `@global`, `@fn` used for clarity and compiler hints.
-- **Mutability**: `?variable` indicates mutable state.
+`+`, `-`, `*`, `/`, `%`, `^`
+
+### Comparison
+
+`==`, `!=`, `<`, `>`, `<=`, `>=`
+
+### Logical
+
+`&&` (and), `||` (or), `!` (not)
+
+### Bitwise
+
+`&`, `|`, `<<`, `>>`
+
+### Assignment
+
+`=`
+
+### Other
+
+`->` (function return type), `.` (member access), `:` (type annotation)
+
+## 9. Comments
+
+```gul
+# Single line comment
+
+#[
+Multi-line
+comment
+]#
+```
+
+## 10. Indentation
+
+GUL uses **significant whitespace** (Python-style):
+
+- Indent with 4 spaces (or 1 tab = 4 spaces)
+- Consistent indentation required
+- Blocks defined by indentation level
+
+## 11. UI Components (Experimental)
+
+```gul
+# UI sprite syntax
+let button = ^&^[button{text="Click", color="blue"}]
+
+# Alternative syntax
+ui![button{text="Click", color="blue"}]
+```
+
+## 12. Scientific Units (Experimental)
+
+```gul
+let speed = 10 m/s
+let acceleration = 9.81 m/s^2
+let mass = 5 kg
+```
+
+## 13. Type Annotations
+
+```gul
+fn calculate(x: int, y: float) -> float:
+    return x * y
+
+let numbers: list = [1, 2, 3]
+let user: dict = {name: "Alice"}
+```
+
+## 14. String Literals
+
+```gul
+let simple = "Hello"
+let multiline = "Line 1
+Line 2
+Line 3"
+```
+
+## 15. Boolean Literals
+
+```gul
+let is_active = true
+let is_disabled = false
+```
+
+## Implementation Notes
+
+- **Lexer**: Tokenizes source code with indentation tracking
+- **Parser**: Builds AST from tokens
+- **Interpreter**: Executes AST (current implementation)
+- **Compiler**: Planned for future releases
+
+## Migration Guide
+
+### From v2.0 to v3.0
+
+```gul
+# Old (v2.0)          # New (v3.0)
+const x = 5           let x = 5
+mut y = 10            var y = 10
+def add(a, b):        fn add(a, b):
+asy fetch():          async fetch():
+```
+
+## See Also
+
+- [Language Specification](specification.md) - Complete language spec
+- [Standard Library](../api/standard-library.md) - Built-in functions
+- [Examples](../../examples/) - Code examples

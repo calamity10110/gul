@@ -1,6 +1,6 @@
 # Quick Start Tutorial
 
-Get up and running with GUL in just 5 minutes!
+Get up and running with GUL v0.13.0 in just 5 minutes!
 
 ## ⚡ Installation
 
@@ -12,43 +12,55 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 git clone https://github.com/gul-lang/gul.git
 cd gul
 cargo build --release
+
+# Optionally install globally
 cargo install --path .
 ```
 
 ## 🎯 Your First Program
 
-Create a file called `hello.mn`:
+Create a file called `hello.gul`:
 
 ```gul
-main:
+# hello.gul - Your first GUL program
+
+mn:
     print("Hello, GUL!")
+    print("Welcome to v3.0!")
 ```
 
 Run it:
 
 ```bash
-gul run hello.mn
+cargo run -- run hello.gul
+# or if installed globally:
+gul run hello.gul
 ```
 
 Output:
 
 ```
 Hello, GUL!
+Welcome to v3.0!
 ```
 
-## 🔢 Variables and Types
+## 🔢 Variables and Types (v3.0 Syntax)
 
 ```gul
-main:
-    # Variables with type inference
-    name = "Alice"
-    age = 30
-    height = 5.7
-    is_active = True
+mn:
+    # Immutable variables (v3.0)
+    let name = "Alice"
+    let age = 30
+    let height = 5.7
+    let is_active = true
 
-    # Explicit types
-    score: int = 100
-    price: float = 19.99
+    # Mutable variables (v3.0)
+    var score = 100
+    score = score + 10
+
+    # Type annotations
+    let price: float = 19.99
+    var count: int = 0
 
     print(f"{name} is {age} years old")
 ```
@@ -56,157 +68,171 @@ main:
 ## 🔄 Control Flow
 
 ```gul
-main:
+mn:
     # If statements
-    age = 25
+    let age = 25
     if age >= 18:
         print("Adult")
+    elif age >= 13:
+        print("Teenager")
     else:
-        print("Minor")
+        print("Child")
 
     # For loops
-    for i in range(5):
+    for i in 0..5:
         print(i)
 
     # While loops
-    count = 0
+    var count = 0
     while count < 3:
         print(count)
-        count += 1
+        count = count + 1
 ```
 
 ## 📦 Functions
 
 ```gul
-fn greet(name: str):
-    print(f"Hello, {name}!")
+# Simple function
+fn greet(name):
+    return "Hello, " + name
 
-fn add(a: int, b: int): int:
+# Typed function
+fn add(a: int, b: int) -> int:
     return a + b
 
-main:
-    greet("Alice")
-    result = add(5, 3)
+# Async function
+async fetch_data(url):
+    let response = await http.get(url)
+    return response.json()
+
+mn:
+    print(greet("Alice"))
+    let result = add(5, 3)
     print(f"5 + 3 = {result}")
 ```
 
 ## 📊 Data Structures
 
 ```gul
-main:
+mn:
     # Lists
-    numbers = vec[1, 2, 3, 4, 5]
-    numbers.push(6)
+    let numbers = [1, 2, 3, 4, 5]
+    var items = [1, 2, 3]
+    items.push(4)
     print(numbers[0])  # 1
 
-    # Maps
-    person = map{
-        "name": "Bob",
-        "age": 30,
-        "city": "NYC"
+    # Dictionaries
+    let person = {
+        name: "Bob",
+        age: 30,
+        city: "NYC"
     }
-    print(person["name"])  # Bob
-
-    # Sets
-    tags = set{"python", "rust", "gul"}
-    tags.add("javascript")
+    print(person.name)  # Bob
 ```
 
-## 🌐 Simple Web Server
-
-Create `server.mn`:
-
-```gul
-import std.http
-
-server = http.Server(port=8080)
-
-@server.get("/")
-fn home(request):
-    return "Welcome to GUL!"
-
-@server.get("/hello/{name}")
-fn hello(request, name: str):
-    return f"Hello, {name}!"
-
-main:
-    print("Server running on http://localhost:8080")
-    server.start()
-```
-
-Run it:
+## 📦 Package Management
 
 ```bash
-gul run server.mn
+# List all packages
+gul package list
+
+# Search for packages
+gul package search web
+
+# Get package info
+gul package info actix-web
+
+# Install a package
+gul package install actix-web
+
+# Audit packages
+gul package audit
 ```
 
-Visit http://localhost:8080 in your browser!
+## 🌐 Imports
+
+```gul
+# Import standard library
+import std{http, math}
+
+# Import specific module
+import std.fs
+
+# Python integration
+import python{numpy, pandas}
+
+mn:
+    let result = math.sqrt(16)
+    print(result)  # 4.0
+```
 
 ## 📁 File Operations
 
 ```gul
-import std.filesystem as fs
+import std{fs}
 
-main:
+mn:
     # Write to file
-    fs.write_text("message.txt", "Hello from GUL!")
+    fs.write_file("message.txt", "Hello from GUL!")
 
     # Read from file
-    content = fs.read_text("message.txt")
+    let content = fs.read_file("message.txt")
     print(content)
 
     # List directory
-    files = fs.list_files(".")
+    let files = fs.list_dir(".")
     for file in files:
         print(file)
 ```
 
-## 🔐 Working with Secrets
-
-```gul
-import std.secrets
-
-secret api_key = env("API_KEY", default="dev-key")
-
-main:
-    print(f"Using API key: {api_key}")
-```
-
 ## 🚀 Next Steps
 
-1. **Learn More**: Read the [First Program Guide](first-program.md)
-2. **Build a Web App**: Follow the [Web Server Tutorial](web-server.md)
-3. **Explore Examples**: Check out [`examples/`](../../examples/)
-4. **Read the Docs**: Browse the [Language Reference](../reference/syntax.md)
+1. **Learn More**: Read the [Introduction Guide](../guides/introduction.md)
+2. **Syntax Reference**: Check the [v3.0 Syntax Guide](../reference/syntax.md)
+3. **Explore Examples**: Browse [`examples/`](../../examples/)
+4. **API Reference**: See the [Standard Library](../api/standard-library.md)
 
 ## 🎓 Key Concepts
 
-- **main** block: Entry point of your program
-- **Type inference**: Often optional type annotations
-- **Imports**: Use standard library with `import std.*`
-- **Functions**: Define with `fn name(params): return_type`
-- **Routes**: Web endpoints with `@server.get("/path")`
+- **mn:** block - Main entry point (v3.0)
+- **let/var** - Immutable/mutable variables (v3.0)
+- **fn** - Function declaration
+- **async** - Async functions (no `fn` keyword needed)
+- **import** - Module imports
 
-## 💡 Tips
+## 💡 CLI Commands
 
-- Use `gul --help` to see all commands
-- Try `gul ide` to launch the interactive IDE
-- Run `gul fmt file.mn` to format your code
-- Use `gul check file.mn` to type-check without running
+```bash
+# Run a program
+gul run file.gul
+
+# Package management
+gul package list
+gul package search <query>
+gul package info <name>
+
+# AI configuration
+gul ai status
+gul ai set-provider openai
+
+# Runtime operations
+gul runtime python "print('hello')"
+gul runtime js "console.log('hello')"
+```
 
 ## 📚 Resources
 
 - [Language Specification](../reference/specification.md)
 - [Standard Library API](../api/standard-library.md)
-- [Web Development Guide](../guides/web-development.md)
-- [Examples Repository](../../examples/)
+- [Quick Reference](../QUICK_REFERENCE.md)
+- [Package Catalog](../reference/package-catalog.md)
 
 ---
 
-**Congratulations!** 🎉 You've completed the GUL Quick Start. Happy coding!
+**Congratulations!** 🎉 You've completed the GUL Quick Start with v3.0 syntax!
 
 ---
 
-**Last Updated**: 2025-12-10  
-**Version**: 1.0.0  
+**Last Updated**: 2025-12-18  
+**Version**: 0.13.0  
 **License**: MIT
