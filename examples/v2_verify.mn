@@ -1,11 +1,14 @@
-import std.math
+# GUL v3.0 Verification Example
+# This file demonstrates v3.0 syntax features
 
-mut counter: int = 10
+@imp std.math
 
-const data: list = [100, 200, 300]
+var counter: int = 10
 
-main():
-    print("--- GUL v2.0 Verification ---")
+let data: list = [100, 200, 300]
+
+mn:
+    print("--- GUL v3.0 Verification ---")
     print("Initial Counter:", counter)
 
     counter = 20
@@ -14,8 +17,8 @@ main():
     print("Data:", data)
 
     # Type annotations and gradual typing
-    const message: str = "Hello, GUL v2.0!"
-    mut result: any = 42
+    let message: str = "Hello, GUL v3.0!"
+    var result: any = 42
 
     print(message)
     print("Result:", result)
@@ -29,13 +32,13 @@ main():
         print("Caught error:", error)
 
     # List Operations
-    h = car(data)
+    let h = car(data)
     print("Car (Head):", h)
 
-    t = cdr(data)
+    let t = cdr(data)
     print("Cdr (Tail):", t)
 
-    new_list = cons(50, data)
+    let new_list = cons(50, data)
     print("Cons (Prepend):", new_list)
 
     print("--- Verification Complete ---")

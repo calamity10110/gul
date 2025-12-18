@@ -1,8 +1,7 @@
-# Foreign C Block
-# Note: In GUL v2, pure .mn files can contain foreign blocks.
-# The previous .cs extension is for dedicated foreign source files.
+# Foreign C Block - v3.0
+# GUL v3.0 supports foreign code blocks with @c syntax
 
-cs c:
+@c {
     #include <math.h>
     #include <string.h>
 
@@ -21,13 +20,14 @@ cs c:
             str[len-1-i] = temp;
         }
     }
+}
 
-mn main():
+mn:
     # Call foreign function
-    distance = c.calculate_distance(0.0, 0.0, 3.0, 4.0)
+    let distance = c.calculate_distance(0.0, 0.0, 3.0, 4.0)
     print("Distance:", distance)
     
     # Ownership transfer to foreign code (ref)
-    def own text = "Hello, World!"
+    let text = "Hello, World!"
     c.reverse_string(ref text)
     print("Reversed:", text)

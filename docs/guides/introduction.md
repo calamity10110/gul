@@ -1,6 +1,10 @@
-# Getting Started with GUL
+# Getting Started with GUL v3.0
 
-Welcome to GUL (GUL Universal Language)! This guide will help you get started quickly.
+Welcome to GUL (GUL Universal Language)! This guide uses **v3.0 syntax exclusively**.
+
+**Version**: 0.13.0 | **Status**: Production Ready
+
+---
 
 ## What is GUL?
 
@@ -9,68 +13,19 @@ GUL is a modern, multi-paradigm programming language that combines:
 - 🐍 **Python's** simplicity and readability
 - 🦀 **Rust's** safety and performance
 - ⚡ **JavaScript's** async capabilities
-- 🔬 **Scientific notation** for math, physics, and chemistry
-- 🎨 **First-class UI components** as syntax
-- 🌐 **Multi-language integration** (Python, Rust, JS, SQL, and more)
+- 🔬 **Scientific notation** for math and physics
+- 🌐 **Multi-language integration** (Python, Rust, JS, SQL)
 
 ## Key Features
 
-✅ **Beginner-Friendly** - Easy to learn, hard to master  
-✅ **Production-Ready** - 100% test coverage, battle-tested  
-✅ **Multi-Paradigm** - Functional, OOP, async, reactive  
-✅ **Auto-Organizing** - Compiler organizes your code automatically  
-✅ **Safe by Default** - Rust-inspired ownership model  
-✅ **Universal** - Runs everywhere (native, WASM, embedded, mobile)
-
-## Why Choose GUL?
-
-### For Beginners
-
-- Python-like syntax that's easy to read and write
-- Helpful error messages guide you to solutions
-- Automatic code organization keeps your projects clean
-
-### For Professionals
-
-- Native performance without garbage collection
-- Strong type system catches errors at compile-time
-- Built-in async/await for concurrent programming
-- Seamless integration with existing ecosystems
-
-### For Scientists & Engineers
-
-- Native support for scientific units (m/s, kg, etc.)
-- Built-in linear algebra and numerical computing
-- Standard physics, chemistry, and biology libraries included
-
-### For Web Developers
-
-- Modern web framework built-in
-- Server-side rendering and client-side WASM
-- Full-stack development in one language
+✅ **v3.0 Syntax** - Modern `let`/`var` keywords  
+✅ **58 Packages** - Cross-language ecosystem  
+✅ **13 Stdlib Modules** - Including networking  
+✅ **3 Runtimes** - Python, JavaScript, Rust  
+✅ **AI Integration** - Multi-provider support  
+✅ **Production Ready** - 0 errors, 0 warnings
 
 ## Installation
-
-### Quick Install (Linux/macOS) - Not working yet
-
-```bash
-## curl -sSf https://gul-lang.org/install.sh | sh
-```
-
-### Manual Installation
-
-1. **Download the latest release** from [GitHub Releases]
-2. **Extract the archive**:
-
-   ```bash
-   tar -xzf gul-v0.13.0-linux-x64.tar.gz
-   ```
-
-3. **Add to PATH**:
-
-   ```bash
-   export PATH="$PATH:$HOME/.mn/bin"
-   ```
 
 ### Build from Source
 
@@ -95,39 +50,39 @@ gul --version
 
 ## Your First GUL Program
 
-Create a file called `hello.gul`:
+Create a file called `hello.mn`:
 
 ```gul
-# hello.gul - Your first GUL program
+# hello.mn
 
 mn:
     print("Hello, GUL!")
-    print("Welcome to the future of programming!")
+    print("Welcome to v3.0!")
 ```
 
 Run it:
 
 ```bash
-gul run hello.gul
+gul run hello.mn
 ```
 
 Output:
 
 ```text
 Hello, GUL!
-Welcome to the future of programming!
+Welcome to v3.0!
 ```
 
-## Basic Syntax
+## Basic Syntax (v3.0)
 
 ### Variables
 
 ```gul
-# Immutable by default (v3.0)
+# Immutable (v3.0)
 let name = "Alice"
 let age = 25
 
-# Mutable variables (v3.0)
+# Mutable (v3.0)
 var count = 0
 count = count + 1
 ```
@@ -136,15 +91,15 @@ count = count + 1
 
 ```gul
 # Simple function
-fn greet(name):
+fn greet(name: str) -> str:
     return "Hello, " + name
 
-# Function with type annotations
+# Typed function
 fn add(a: int, b: int) -> int:
     return a + b
 
 # Async function
-async fetch_data(url):
+async fetch_data(url: str) -> dict:
     response = await http.get(url)
     return response.json()
 ```
@@ -182,15 +137,27 @@ let user = {
     age: 25,
     active: true
 }
+```
 
-# Tuples (planned)
-let point = (10, 20)
+## Imports (v3.0)
+
+```gul
+@imp std.http
+@imp std.math
+
+# Grouped
+@imp python{numpy, pandas}
+
+# Block style
+@imp:
+    std.fs,
+    std.collections
 ```
 
 ## Example: Web Server
 
 ```gul
-import std{http}
+@imp std.http
 
 let PORT = 8080
 
@@ -211,43 +178,89 @@ mn:
 ## Example: Data Analysis
 
 ```gul
-import python{pandas, matplotlib}
+@imp python{numpy, pandas}
 
-extern python {
+@python {
     import pandas as pd
-    import matplotlib.pyplot as plt
+    import numpy as np
 
-    fn analyze(filename):
+    def analyze(filename):
         df = pd.read_csv(filename)
-        return df.describe()
+        return {
+            "mean": float(df['value'].mean()),
+            "std": float(df['value'].std())
+        }
 }
 
-main():
-    stats = analyze("data.csv")
-    print(stats)
+mn:
+    let stats = analyze("data.csv")
+    print("Statistics:", stats)
+```
+
+## Package Management
+
+```bash
+# List all packages
+gul package list
+
+# Search for packages
+gul package search web
+
+# Get package info
+gul package info actix-web
+
+# Install a package
+gul package install actix-web
+```
+
+## CLI Commands
+
+### Package Management
+
+```bash
+gul package list [--language rust]
+gul package info <name>
+gul package search <query>
+gul package install <name>
+gul package update <name>
+gul package remove <name>
+gul package audit
+gul package outdated
+```
+
+### AI Configuration
+
+```bash
+gul ai status
+gul ai set-provider <provider>
+gul ai set-model <model>
+gul ai set-key <key>
+```
+
+### Runtime Operations
+
+```bash
+gul runtime python "<code>"
+gul runtime js "<code>"
+gul runtime load-lib <path>
 ```
 
 ## Next Steps
 
-Now that you have GUL installed and running, explore these resources:
-
-1. **[Quick Start Tutorial](../tutorials/quickstart.md)** - Learn the basics step by step
-2. **[Syntax Reference](../reference/syntax.md)** - Complete language syntax guide
-3. **[Project Structure](../reference/structure.md)** - How GUL organizes code
-4. **[Examples](../../examples/)** - Real-world code examples
-5. **[Standard Library](../api/standard-library.md)** - Built-in functionality
+1. **[Syntax Reference](../reference/syntax.md)** - Complete v3.0 syntax guide
+2. **[Quick Start Tutorial](../tutorials/quickstart.md)** - Learn by doing
+3. **[Standard Library](../api/standard-library.md)** - Built-in modules
+4. **[Package Catalog](../reference/package-catalog.md)** - 58 available packages
 
 ## Getting Help
 
-- 📚 **Documentation**: You're reading it!
-- 💬 **Community Forum**: [community.mn-lang.org](https://community.mn-lang.org)
+- 📚 **Documentation**: [docs/](../README.md)
 - 🐛 **Issue Tracker**: [GitHub Issues](https://github.com/gul-lang/gul/issues)
-- 💼 **Discord**: Join our [Discord server](https://discord.gg/gul-lang)
-
-## Contributing
-
-GUL is open source and welcomes contributions! See our [Contributing Guide](../project/contributing.md) to get started.
+- � **Community**: [Discord](https://discord.gg/gul-lang)
 
 ---
 
-**Happy coding with GUL!** 🚀
+**Happy coding with GUL v3.0!** 🚀
+
+**Last Updated**: 2025-12-18  
+**Version**: 0.13.0

@@ -36,8 +36,8 @@ cargo build --release
 
 # Run your first program
 echo 'mn:
-    print("Hello, GUL!")' > hello.gul
-cargo run -- run hello.gul
+    print("Hello, GUL!")' > hello.mn
+cargo run -- run hello.mn
 ```
 
 ## 📦 Package Management

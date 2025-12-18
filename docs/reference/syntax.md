@@ -1,57 +1,8 @@
-# GUL Language Syntax Reference v3.0
+# GUL v3.0 Syntax Reference
 
-**GUL** (GUL Universal Language) is a unified, multi-paradigm language designed for modern full-stack development.
+**ENFORCED**: This document uses **v3.0 syntax only**. While v2.0 syntax still works for backward compatibility, all new code should use v3.0.
 
-## Current Implementation Status
-
-This document reflects the **actual implemented syntax** in GUL v0.13.0.
-
-## 1. Keywords
-
-### v3.0 Keywords (Current)
-
-- `let` - Immutable variable declaration
-- `var` - Mutable variable declaration
-- `fn` - Function declaration
-- `async` - Async function
-- `import` / `use` - Module imports
-- `struct` - Structure definition
-- `mn` - Main entry point block
-
-### Control Flow
-
-- `if`, `elif`, `else` - Conditionals
-- `for`, `while`, `loop` - Loops
-- `in` - Iterator keyword
-- `break`, `continue` - Loop control
-- `return` - Function return
-
-### Async/Error Handling
-
-- `await` - Await async operations
-- `try`, `catch`, `finally` - Exception handling
-- `throw` - Throw exceptions
-
-### Ownership (Planned)
-
-- `own` - Exclusive ownership
-- `ref` - Borrowed reference
-- `copy` - Explicit duplication
-
-### Annotations
-
-- `@global`, `@static`, `@local` - Scope modifiers
-
-### Deprecated (Backward Compatible)
-
-- `const` → use `let`
-- `mut` → use `var`
-- `def` → use `let` or `fn`
-- `imp` → use `import`
-- `asy` → use `async`
-- `extern` → use `@python`, `@rust`, etc.
-
-## 2. Variables
+## 1. Variables
 
 ### Immutable Variables
 
@@ -71,12 +22,20 @@ var items = [1, 2, 3]
 items.push(4)
 ```
 
-## 3. Functions
+### Type Annotations
+
+```gul
+let name: str = "Alice"
+var counter: int = 0
+let data: list = [1, 2, 3]
+```
+
+## 2. Functions
 
 ### Synchronous Functions
 
 ```gul
-fn greet(name):
+fn greet(name: str) -> str:
     return "Hello, " + name
 
 fn add(a: int, b: int) -> int:
@@ -86,29 +45,35 @@ fn add(a: int, b: int) -> int:
 ### Async Functions
 
 ```gul
-async fetch_data(url):
+async fetch_data(url: str) -> dict:
     response = await http.get(url)
     return response.json()
 ```
 
-## 4. Data Types
+## 3. Main Entry Point
 
-### Primitive Types
+```gul
+mn:
+    print("Hello, GUL!")
+    let x = 10
+    print(x)
+```
 
-- `int` - Integer (i64)
-- `float` - Floating point (f64)
-- `string` - UTF-8 string
-- `bool` - Boolean (true/false)
+## 4. Imports
 
-### Collection Types
+```gul
+@imp std.io
+@imp std.http
 
-- `list` - Dynamic array: `[1, 2, 3]`
-- `dict` - Hash map: `{name: "Alice", age: 25}`
+# Grouped imports
+@imp python{numpy, pandas}
+@imp rust{tokio, serde}
 
-### Special Types
-
-- `any` - Gradual typing
-- `null` - Null value
+# Block style
+@imp:
+    std.math,
+    std.collections
+```
 
 ## 5. Control Flow
 
@@ -140,54 +105,80 @@ while count < 10:
     count = count + 1
 ```
 
-## 6. Imports
-
-### Standard Library
+### Loop
 
 ```gul
-import std{http, math}
-import std.fs
+loop:
+    if done:
+        break
 ```
 
-### Python Integration
+## 6. Error Handling
 
 ```gul
-import python{numpy, pandas}
+try:
+    let result = risky_operation()
+    print(result)
+catch error:
+    print("Error:", error)
+finally:
+    cleanup()
 ```
 
-## 7. Main Entry Point
+## 7. Data Types
+
+### Primitives
 
 ```gul
-mn:
-    print("Hello, GUL!")
-    await run_app()
+let num: int = 42
+let pi: float = 3.14159
+let name: str = "GUL"
+let active: bool = true
 ```
 
-## 8. Operators
+### Collections
 
-### Arithmetic
+```gul
+let numbers: list = [1, 2, 3, 4, 5]
+let user: dict = {name: "Alice", age: 25}
+```
 
-`+`, `-`, `*`, `/`, `%`, `^`
+### Gradual Typing
 
-### Comparison
+```gul
+var result: any = 42
+result = "now a string"
+```
 
-`==`, `!=`, `<`, `>`, `<=`, `>=`
+## 8. Foreign Code Integration
 
-### Logical
+### Python
 
-`&&` (and), `||` (or), `!` (not)
+```gul
+@python {
+    def analyze_data(data):
+        import numpy as np
+        return np.mean(data)
+}
+```
 
-### Bitwise
+### Rust
 
-`&`, `|`, `<<`, `>>`
+```gul
+@rust {
+    fn fast_compute(n: i32) -> i32 {
+        n * n
+    }
+}
+```
 
-### Assignment
+### SQL
 
-`=`
-
-### Other
-
-`->` (function return type), `.` (member access), `:` (type annotation)
+```gul
+@sql {
+    SELECT * FROM users WHERE age > 18
+}
+```
 
 ## 9. Comments
 
@@ -200,79 +191,83 @@ comment
 ]#
 ```
 
-## 10. Indentation
+## 10. Operators
 
-GUL uses **significant whitespace** (Python-style):
+### Arithmetic
 
-- Indent with 4 spaces (or 1 tab = 4 spaces)
-- Consistent indentation required
-- Blocks defined by indentation level
+`+`, `-`, `*`, `/`, `%`, `^`
 
-## 11. UI Components (Experimental)
+### Comparison
 
-```gul
-# UI sprite syntax
-let button = ^&^[button{text="Click", color="blue"}]
+`==`, `!=`, `<`, `>`, `<=`, `>=`
 
-# Alternative syntax
-ui![button{text="Click", color="blue"}]
-```
+### Logical
 
-## 12. Scientific Units (Experimental)
+`&&`, `||`, `!`
 
-```gul
-let speed = 10 m/s
-let acceleration = 9.81 m/s^2
-let mass = 5 kg
-```
+### Bitwise
 
-## 13. Type Annotations
+`&`, `|`, `<<`, `>>`
+
+## Complete Example
 
 ```gul
-fn calculate(x: int, y: float) -> float:
-    return x * y
+# app.mn
 
-let numbers: list = [1, 2, 3]
-let user: dict = {name: "Alice"}
+@imp std.http
+@imp python{numpy}
+
+let API_URL = "https://api.example.com"
+var request_count = 0
+
+fn process_data(data: list) -> dict:
+    return {
+        "count": len(data),
+        "sum": sum(data)
+    }
+
+async fetch_api() -> dict:
+    response = await http.get(API_URL)
+    return response.json()
+
+@python {
+    def analyze(data):
+        import numpy as np
+        return float(np.mean(data))
+}
+
+mn:
+    print("Starting...")
+
+    let data = [1, 2, 3, 4, 5]
+    let stats = process_data(data)
+    print("Stats:", stats)
+
+    let avg = analyze(data)
+    print("Average:", avg)
 ```
 
-## 14. String Literals
+## v3.0 Keywords
 
-```gul
-let simple = "Hello"
-let multiline = "Line 1
-Line 2
-Line 3"
-```
+**Variables**: `let`, `var`
 
-## 15. Boolean Literals
+**Functions**: `fn`, `async`
 
-```gul
-let is_active = true
-let is_disabled = false
-```
+**Entry**: `mn:`
 
-## Implementation Notes
+**Imports**: `@imp`
 
-- **Lexer**: Tokenizes source code with indentation tracking
-- **Parser**: Builds AST from tokens
-- **Interpreter**: Executes AST (current implementation)
-- **Compiler**: Planned for future releases
+**Foreign**: `@python`, `@rust`, `@sql`
 
-## Migration Guide
+**Control**: `if`, `elif`, `else`, `for`, `while`, `loop`, `in`, `break`, `continue`, `return`
 
-### From v2.0 to v3.0
+**Error**: `try`, `catch`, `finally`, `throw`, `await`
 
-```gul
-# Old (v2.0)          # New (v3.0)
-const x = 5           let x = 5
-mut y = 10            var y = 10
-def add(a, b):        fn add(a, b):
-asy fetch():          async fetch():
-```
+## File Extension
 
-## See Also
+Use `.mn` for all GUL files.
 
-- [Language Specification](specification.md) - Complete language spec
-- [Standard Library](../api/standard-library.md) - Built-in functions
-- [Examples](../../examples/) - Code examples
+---
+
+**Version**: v3.0 (Enforced)  
+**Last Updated**: 2025-12-18

@@ -1,43 +1,8 @@
 # GUL v3.0 Quick Reference
 
-## Keywords
+**All syntax examples use v3.0 exclusively.**
 
-### Variables
-
-- `let` - Immutable variable
-- `var` - Mutable variable
-
-### Functions
-
-- `fn` - Function declaration
-- `async` - Async function
-- `return` - Return value
-
-### Control Flow
-
-- `if`, `elif`, `else` - Conditionals
-- `for`, `while`, `loop` - Loops
-- `in` - Iterator
-- `break`, `continue` - Loop control
-
-### Imports
-
-- `import` - Import modules
-- `use` - Alternative import syntax
-
-### Entry Point
-
-- `mn:` - Main entry block
-
-### Error Handling
-
-- `try`, `catch`, `finally` - Exception handling
-- `throw` - Throw exception
-- `await` - Await async
-
-## Syntax Examples
-
-### Variables
+## Variables
 
 ```gul
 let x = 10          # Immutable
@@ -45,20 +10,31 @@ var y = 20          # Mutable
 y = y + 1
 ```
 
-### Functions
+## Functions
 
 ```gul
-fn add(a, b):
+fn add(a: int, b: int) -> int:
     return a + b
 
-fn typed(x: int) -> int:
-    return x * 2
-
-async fetch(url):
+async fetch(url: str) -> dict:
     return await http.get(url)
 ```
 
-### Control Flow
+## Main Entry
+
+```gul
+mn:
+    print("Hello, GUL!")
+```
+
+## Imports
+
+```gul
+@imp std.http
+@imp python{numpy}
+```
+
+## Control Flow
 
 ```gul
 if x > 10:
@@ -75,64 +51,56 @@ while x < 100:
     x = x * 2
 ```
 
-### Data Structures
+## Data Types
 
 ```gul
-let list = [1, 2, 3]
-let dict = {name: "Alice", age: 25}
+let num: int = 42
+let pi: float = 3.14
+let name: str = "GUL"
+let active: bool = true
+let list: list = [1, 2, 3]
+let dict: dict = {name: "Alice"}
 ```
 
-### Imports
+## Foreign Code
 
 ```gul
-import std{http, math}
-import python{numpy, pandas}
-```
+@python {
+    def analyze(data):
+        import numpy as np
+        return np.mean(data)
+}
 
-### Main Entry
-
-```gul
-mn:
-    print("Hello, GUL!")
-    await run_app()
+@rust {
+    fn compute(n: i32) -> i32 {
+        n * n
+    }
+}
 ```
 
 ## CLI Commands
 
-### Package Management
-
 ```bash
-gul package list                    # List all packages
-gul package list --language rust    # Filter by language
-gul package info <name>             # Package details
-gul package search <query>          # Search packages
-gul package install <name>          # Install package
-gul package update <name>           # Update package
-gul package remove <name>           # Remove package
-gul package audit                   # Security audit
-gul package outdated                # Check updates
-```
+# Package management
+gul package list
+gul package search <query>
+gul package info <name>
+gul package install <name>
+gul package update <name>
+gul package remove <name>
+gul package audit
+gul package outdated
 
-### AI Commands
+# AI
+gul ai status
+gul ai set-provider <provider>
 
-```bash
-gul ai status                       # Show AI config
-gul ai set-provider openai          # Set provider
-gul ai set-model gpt-4              # Set model
-gul ai set-key <key>                # Set API key
-```
-
-### Runtime Commands
-
-```bash
-gul runtime python "print('hi')"    # Run Python
-gul runtime js "console.log('hi')"  # Run JavaScript
-gul runtime load-lib lib.so         # Load Rust lib
+# Runtime
+gul runtime python "<code>"
+gul runtime js "<code>"
 ```
 
 ## Standard Library (13 Modules)
-
-### Core
 
 - `std.fs` - File system
 - `std.path` - Path manipulation
@@ -141,54 +109,35 @@ gul runtime load-lib lib.so         # Load Rust lib
 - `std.process` - Process management
 - `std.random` - Random numbers
 - `std.crypto` - Cryptography
-
-### Data
-
 - `std.collections` - Data structures
 - `std.string` - String utilities
 - `std.bytes` - Binary data
+- `std.http` - HTTP (experimental)
+- `std.websocket` - WebSocket (experimental)
+- `std.tcp` - TCP sockets (experimental)
+- `std.udp` - UDP sockets (experimental)
 
-### Networking
+## Keywords
 
-- `std.http` - HTTP client/server
-- `std.websocket` - WebSocket (9 functions)
-- `std.tcp` - TCP sockets (13 functions)
-- `std.udp` - UDP sockets (14 functions)
+**Variables**: `let`, `var`
 
-## Package Ecosystem (58 Packages)
+**Functions**: `fn`, `async`
 
-### Rust (15)
+**Entry**: `mn:`
 
-actix-web, axum, warp, tokio, serde, sqlx, diesel, dioxus, tauri, leptos, regex, rayon, tracing, anyhow, clap, reqwest
+**Imports**: `@imp`
 
-### Python (6)
+**Foreign**: `@python`, `@rust`, `@sql`
 
-django, flask, fastapi, numpy, pandas, pydantic
+**Control**: `if`, `elif`, `else`, `for`, `while`, `loop`, `in`, `break`, `continue`, `return`
 
-### JavaScript (16)
+**Error**: `try`, `catch`, `finally`, `throw`, `await`
 
-react, angular, vue, next.js, svelte, nestjs, nodejs, express, d3.js, jest, webpack, tailwindcss, axios, socket.io, graphql, prisma
+## File Extension
 
-### Multi-language (21)
+Use `.mn` for all GUL files.
 
-C++, Java, Go, C#, TypeScript, Ruby, PostgreSQL, MySQL, SQLite, MongoDB, Redis, etc.
+---
 
-## Migration from v2.0
-
-```gul
-# v2.0              # v3.0
-const x = 5         let x = 5
-mut y = 10          var y = 10
-def add(a, b):      fn add(a, b):
-asy fetch():        async fetch():
-main():             mn:
-```
-
-## File Extensions
-
-- `.gul` - GUL source files (recommended)
-- `.mn` - Main entry files (legacy)
-
-## Version
-
-Current: **v0.13.0** (Production Ready)
+**Version**: v3.0 (Enforced)  
+**Last Updated**: 2025-12-18

@@ -1,13 +1,12 @@
-# GUL UI Slider - v2.1
+# GUL UI Slider - v3.0
 
-import std{ui}
+@imp std.ui
 
-# v2.1: UI component literal syntax
-const slider = ^&^[slider{min: 0, max: 100, value: 50}]
+# v3.0: UI component literal syntax
+let slider = ^&^[slider{min: 0, max: 100, value: 50}]
 
-# v2.1: main block without parentheses
-main:
-    # v2.1: Both ui.print() and ^&^ work
+mn:
+    # UI component rendering
     ui.print(slider)
     
     # Alternative: function call style (equivalent)

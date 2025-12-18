@@ -1,13 +1,15 @@
-imp embedded.gpio
-imp embedded.time
+# Embedded LED Blink - v3.0
 
-asy blink(pin, delay_ms):
+@imp embedded.gpio
+@imp embedded.time
+
+async blink(pin: int, delay_ms: int):
     loop:
         gpio.high(pin)
         await time.sleep(delay_ms)
         gpio.low(pin)
         await time.sleep(delay_ms)
 
-mn main():
+mn:
     gpio.set_mode(5, OUTPUT)
     await blink(5, 500)

@@ -1,6 +1,8 @@
-# Quick Start Tutorial
+# Quick Start Tutorial - GUL v3.0
 
-Get up and running with GUL v0.13.0 in just 5 minutes!
+Get up and running with GUL v3.0 in just 5 minutes!
+
+**All examples use v3.0 syntax exclusively.**
 
 ## ⚡ Installation
 
@@ -19,10 +21,10 @@ cargo install --path .
 
 ## 🎯 Your First Program
 
-Create a file called `hello.gul`:
+Create a file called `hello.mn`:
 
 ```gul
-# hello.gul - Your first GUL program
+# hello.mn
 
 mn:
     print("Hello, GUL!")
@@ -32,29 +34,29 @@ mn:
 Run it:
 
 ```bash
-cargo run -- run hello.gul
+cargo run -- run hello.mn
 # or if installed globally:
-gul run hello.gul
+gul run hello.mn
 ```
 
 Output:
 
-```
+```text
 Hello, GUL!
 Welcome to v3.0!
 ```
 
-## 🔢 Variables and Types (v3.0 Syntax)
+## 🔢 Variables (v3.0 Syntax)
 
 ```gul
 mn:
-    # Immutable variables (v3.0)
+    # Immutable variables
     let name = "Alice"
     let age = 30
     let height = 5.7
     let is_active = true
 
-    # Mutable variables (v3.0)
+    # Mutable variables
     var score = 100
     score = score + 10
 
@@ -93,7 +95,7 @@ mn:
 
 ```gul
 # Simple function
-fn greet(name):
+fn greet(name: str) -> str:
     return "Hello, " + name
 
 # Typed function
@@ -101,8 +103,8 @@ fn add(a: int, b: int) -> int:
     return a + b
 
 # Async function
-async fetch_data(url):
-    let response = await http.get(url)
+async fetch_data(url: str) -> dict:
+    response = await http.get(url)
     return response.json()
 
 mn:
@@ -130,6 +132,44 @@ mn:
     print(person.name)  # Bob
 ```
 
+## 🌐 Imports (v3.0)
+
+```gul
+@imp std.http
+@imp std.math
+
+# Grouped
+@imp python{numpy, pandas}
+
+# Block style
+@imp:
+    std.fs,
+    std.collections
+
+mn:
+    let result = math.sqrt(16)
+    print(result)  # 4.0
+```
+
+## 📁 File Operations
+
+```gul
+@imp std.fs
+
+mn:
+    # Write to file
+    fs.write_file("message.txt", "Hello from GUL!")
+
+    # Read from file
+    let content = fs.read_file("message.txt")
+    print(content)
+
+    # List directory
+    let files = fs.list_dir(".")
+    for file in files:
+        print(file)
+```
+
 ## 📦 Package Management
 
 ```bash
@@ -149,62 +189,11 @@ gul package install actix-web
 gul package audit
 ```
 
-## 🌐 Imports
-
-```gul
-# Import standard library
-import std{http, math}
-
-# Import specific module
-import std.fs
-
-# Python integration
-import python{numpy, pandas}
-
-mn:
-    let result = math.sqrt(16)
-    print(result)  # 4.0
-```
-
-## 📁 File Operations
-
-```gul
-import std{fs}
-
-mn:
-    # Write to file
-    fs.write_file("message.txt", "Hello from GUL!")
-
-    # Read from file
-    let content = fs.read_file("message.txt")
-    print(content)
-
-    # List directory
-    let files = fs.list_dir(".")
-    for file in files:
-        print(file)
-```
-
-## 🚀 Next Steps
-
-1. **Learn More**: Read the [Introduction Guide](../guides/introduction.md)
-2. **Syntax Reference**: Check the [v3.0 Syntax Guide](../reference/syntax.md)
-3. **Explore Examples**: Browse [`examples/`](../../examples/)
-4. **API Reference**: See the [Standard Library](../api/standard-library.md)
-
-## 🎓 Key Concepts
-
-- **mn:** block - Main entry point (v3.0)
-- **let/var** - Immutable/mutable variables (v3.0)
-- **fn** - Function declaration
-- **async** - Async functions (no `fn` keyword needed)
-- **import** - Module imports
-
 ## 💡 CLI Commands
 
 ```bash
 # Run a program
-gul run file.gul
+gul run file.mn
 
 # Package management
 gul package list
@@ -220,6 +209,21 @@ gul runtime python "print('hello')"
 gul runtime js "console.log('hello')"
 ```
 
+## 🚀 Next Steps
+
+1. **[Introduction Guide](../guides/introduction.md)** - Complete overview
+2. **[Syntax Reference](../reference/syntax.md)** - v3.0 syntax guide
+3. **[Standard Library](../api/standard-library.md)** - Built-in modules
+4. **[Package Catalog](../reference/package-catalog.md)** - Available packages
+
+## 🎓 Key Concepts
+
+- **mn:** - Main entry point (v3.0)
+- **let/var** - Immutable/mutable variables (v3.0)
+- **fn** - Function declaration
+- **async** - Async functions
+- **@imp** - Module imports (v3.0)
+
 ## 📚 Resources
 
 - [Language Specification](../reference/specification.md)
@@ -229,7 +233,7 @@ gul runtime js "console.log('hello')"
 
 ---
 
-**Congratulations!** 🎉 You've completed the GUL Quick Start with v3.0 syntax!
+**Congratulations!** 🎉 You've completed the GUL v3.0 Quick Start!
 
 ---
 
