@@ -1,0 +1,486 @@
+    // New Rust Packages
+
+    fn register_actix_web(&mut self) {
+        self.packages.insert(
+            "actix-web".to_string(),
+            Package {
+                name: "actix-web".to_string(),
+                language: "rust".to_string(),
+                version: "4.5".to_string(),
+                description: "Powerful, pragmatic, and extremely fast web framework".to_string(),
+                dependencies: vec!["tokio".to_string(), "actix-rt".to_string()],
+                features: vec![
+                    "http_server".to_string(),
+                    "routing".to_string(),
+                    "middleware".to_string(),
+                    "websockets".to_string()
+                ],
+                categories: vec![PackageCategory::Web, PackageCategory::Async],
+                license: "MIT OR Apache-2.0".to_string(),
+                repository: Some("https://github.com/actix/actix-web".to_string()),
+                homepage: Some("https://actix.rs".to_string()),
+                keywords: vec!["web".to_string(), "http".to_string(), "server".to_string(), "async".to_string()],
+            },
+        );
+    }
+
+    fn register_sqlx(&mut self) {
+        self.packages.insert(
+            "sqlx".to_string(),
+            Package {
+                name: "sqlx".to_string(),
+                language: "rust".to_string(),
+                version: "0.7".to_string(),
+                description: "Async SQL toolkit with compile-time checked queries".to_string(),
+                dependencies: vec!["tokio".to_string()],
+                features: vec![
+                    "async_sql".to_string(),
+                    "compile_time_checked".to_string(),
+                    "postgresql".to_string(),
+                    "mysql".to_string(),
+                    "sqlite".to_string()
+                ],
+                categories: vec![PackageCategory::Database, PackageCategory::Async],
+                license: "MIT OR Apache-2.0".to_string(),
+                repository: Some("https://github.com/launchbadge/sqlx".to_string()),
+                homepage: Some("https://github.com/launchbadge/sqlx".to_string()),
+                keywords: vec!["sql".to_string(), "async".to_string(), "database".to_string(), "orm".to_string()],
+            },
+        );
+    }
+
+    fn register_clap(&mut self) {
+        self.packages.insert(
+            "clap".to_string(),
+            Package {
+                name: "clap".to_string(),
+                language: "rust".to_string(),
+                version: "4.5".to_string(),
+                description: "Command Line Argument Parser for Rust".to_string(),
+                dependencies: vec![],
+                features: vec![
+                    "cli_parsing".to_string(),
+                    "derive_macros".to_string(),
+                    "subcommands".to_string(),
+                    "validation".to_string()
+                ],
+                categories: vec![PackageCategory::CLI],
+                license: "MIT OR Apache-2.0".to_string(),
+                repository: Some("https://github.com/clap-rs/clap".to_string()),
+                homepage: Some("https://docs.rs/clap".to_string()),
+                keywords: vec!["cli".to_string(), "argument".to_string(), "parser".to_string(), "command".to_string()],
+            },
+        );
+    }
+
+    fn register_regex(&mut self) {
+        self.packages.insert(
+            "regex".to_string(),
+            Package {
+                name: "regex".to_string(),
+                language: "rust".to_string(),
+                version: "1.10".to_string(),
+                description: "Regular expressions for Rust".to_string(),
+                dependencies: vec![],
+                features: vec![
+                    "pattern_matching".to_string(),
+                    "unicode".to_string(),
+                    "performance".to_string(),
+                    "captures".to_string()
+                ],
+                categories: vec![PackageCategory::Utility],
+                license: "MIT OR Apache-2.0".to_string(),
+                repository: Some("https://github.com/rust-lang/regex".to_string()),
+                homepage: Some("https://docs.rs/regex".to_string()),
+                keywords: vec!["regex".to_string(), "pattern".to_string(), "matching".to_string(), "text".to_string()],
+            },
+        );
+    }
+
+    fn register_rayon(&mut self) {
+        self.packages.insert(
+            "rayon".to_string(),
+            Package {
+                name: "rayon".to_string(),
+                language: "rust".to_string(),
+                version: "1.8".to_string(),
+                description: "Data parallelism library for Rust".to_string(),
+                dependencies: vec![],
+                features: vec![
+                    "data_parallelism".to_string(),
+                    "work_stealing".to_string(),
+                    "thread_pools".to_string(),
+                    "parallel_iterators".to_string()
+                ],
+                categories: vec![PackageCategory::Async],
+                license: "MIT OR Apache-2.0".to_string(),
+                repository: Some("https://github.com/rayon-rs/rayon".to_string()),
+                homepage: Some("https://docs.rs/rayon".to_string()),
+                keywords: vec!["parallel".to_string(), "concurrency".to_string(), "threading".to_string(), "performance".to_string()],
+            },
+        );
+    }
+
+    fn register_reqwest(&mut self) {
+        self.packages.insert(
+            "reqwest".to_string(),
+            Package {
+                name: "reqwest".to_string(),
+                language: "rust".to_string(),
+                version: "0.11".to_string(),
+                description: "Higher level HTTP client library".to_string(),
+                dependencies: vec!["tokio".to_string()],
+                features: vec![
+                    "http_client".to_string(),
+                    "async".to_string(),
+                    "json".to_string(),
+                    "cookies".to_string()
+                ],
+                categories: vec![PackageCategory::Networking, PackageCategory::Async],
+                license: "MIT OR Apache-2.0".to_string(),
+                repository: Some("https://github.com/seanmonstar/reqwest".to_string()),
+                homepage: Some("https://docs.rs/reqwest".to_string()),
+                keywords: vec!["http".to_string(), "client".to_string(), "async".to_string(), "request".to_string()],
+            },
+        );
+    }
+
+    fn register_diesel(&mut self) {
+        self.packages.insert(
+            "diesel".to_string(),
+            Package {
+                name: "diesel".to_string(),
+                language: "rust".to_string(),
+                version: "2.1".to_string(),
+                description: "Safe, extensible ORM and Query Builder".to_string(),
+                dependencies: vec![],
+                features: vec![
+                    "orm".to_string(),
+                    "query_builder".to_string(),
+                    "migrations".to_string(),
+                    "type_safe".to_string()
+                ],
+                categories: vec![PackageCategory::Database],
+                license: "MIT OR Apache-2.0".to_string(),
+                repository: Some("https://github.com/diesel-rs/diesel".to_string()),
+                homepage: Some("https://diesel.rs".to_string()),
+                keywords: vec!["orm".to_string(), "database".to_string(), "sql".to_string(), "query".to_string()],
+            },
+        );
+    }
+
+    fn register_warp(&mut self) {
+        self.packages.insert(
+            "warp".to_string(),
+            Package {
+                name: "warp".to_string(),
+                language: "rust".to_string(),
+                version: "0.3".to_string(),
+                description: "Composable web framework with filters".to_string(),
+                dependencies: vec!["tokio".to_string()],
+                features: vec![
+                    "web_framework".to_string(),
+                    "filters".to_string(),
+                    "async".to_string(),
+                    "composable".to_string()
+                ],
+                categories: vec![PackageCategory::Web, PackageCategory::Async],
+                license: "MIT".to_string(),
+                repository: Some("https://github.com/seanmonstar/warp".to_string()),
+                homepage: Some("https://docs.rs/warp".to_string()),
+                keywords: vec!["web".to_string(), "framework".to_string(), "async".to_string(), "http".to_string()],
+            },
+        );
+    }
+
+    fn register_tracing(&mut self) {
+        self.packages.insert(
+            "tracing".to_string(),
+            Package {
+                name: "tracing".to_string(),
+                language: "rust".to_string(),
+                version: "0.1".to_string(),
+                description: "Application-level tracing for Rust".to_string(),
+                dependencies: vec![],
+                features: vec![
+                    "structured_logging".to_string(),
+                    "async_aware".to_string(),
+                    "spans".to_string(),
+                    "events".to_string()
+                ],
+                categories: vec![PackageCategory::Utility],
+                license: "MIT".to_string(),
+                repository: Some("https://github.com/tokio-rs/tracing".to_string()),
+                homepage: Some("https://docs.rs/tracing".to_string()),
+                keywords: vec!["logging".to_string(), "tracing".to_string(), "diagnostics".to_string(), "async".to_string()],
+            },
+        );
+    }
+
+    fn register_anyhow(&mut self) {
+        self.packages.insert(
+            "anyhow".to_string(),
+            Package {
+                name: "anyhow".to_string(),
+                language: "rust".to_string(),
+                version: "1.0".to_string(),
+                description: "Flexible concrete Error type built on std::error::Error".to_string(),
+                dependencies: vec![],
+                features: vec![
+                    "error_handling".to_string(),
+                    "context".to_string(),
+                    "backtrace".to_string(),
+                    "downcasting".to_string()
+                ],
+                categories: vec![PackageCategory::Utility],
+                license: "MIT OR Apache-2.0".to_string(),
+                repository: Some("https://github.com/dtolnay/anyhow".to_string()),
+                homepage: Some("https://docs.rs/anyhow".to_string()),
+                keywords: vec!["error".to_string(), "handling".to_string(), "result".to_string(), "context".to_string()],
+            },
+        );
+    }
+
+
+    // New JavaScript/TypeScript Packages
+
+    fn register_nextjs(&mut self) {
+        self.packages.insert(
+            "next.js".to_string(),
+            Package {
+                name: "next.js".to_string(),
+                language: "javascript".to_string(),
+                version: "14.1".to_string(),
+                description: "The React Framework for Production".to_string(),
+                dependencies: vec!["react".to_string()],
+                features: vec![
+                    "ssr".to_string(),
+                    "ssg".to_string(),
+                    "routing".to_string(),
+                    "api_routes".to_string()
+                ],
+                categories: vec![PackageCategory::Web],
+                license: "MIT".to_string(),
+                repository: Some("https://github.com/vercel/next.js".to_string()),
+                homepage: Some("https://nextjs.org".to_string()),
+                keywords: vec!["react".to_string(), "ssr".to_string(), "framework".to_string(), "web".to_string()],
+            },
+        );
+    }
+
+    fn register_svelte(&mut self) {
+        self.packages.insert(
+            "svelte".to_string(),
+            Package {
+                name: "svelte".to_string(),
+                language: "javascript".to_string(),
+                version: "4.2".to_string(),
+                description: "Cybernetically enhanced web apps".to_string(),
+                dependencies: vec![],
+                features: vec![
+                    "reactive".to_string(),
+                    "compiler".to_string(),
+                    "no_virtual_dom".to_string(),
+                    "components".to_string()
+                ],
+                categories: vec![PackageCategory::Web, PackageCategory::GUI],
+                license: "MIT".to_string(),
+                repository: Some("https://github.com/sveltejs/svelte".to_string()),
+                homepage: Some("https://svelte.dev".to_string()),
+                keywords: vec!["ui".to_string(), "framework".to_string(), "reactive".to_string(), "compiler".to_string()],
+            },
+        );
+    }
+
+    fn register_prisma(&mut self) {
+        self.packages.insert(
+            "prisma".to_string(),
+            Package {
+                name: "prisma".to_string(),
+                language: "typescript".to_string(),
+                version: "5.9".to_string(),
+                description: "Next-generation ORM for Node.js and TypeScript".to_string(),
+                dependencies: vec![],
+                features: vec![
+                    "orm".to_string(),
+                    "type_safe".to_string(),
+                    "migrations".to_string(),
+                    "prisma_studio".to_string()
+                ],
+                categories: vec![PackageCategory::Database],
+                license: "Apache-2.0".to_string(),
+                repository: Some("https://github.com/prisma/prisma".to_string()),
+                homepage: Some("https://www.prisma.io".to_string()),
+                keywords: vec!["orm".to_string(), "database".to_string(), "typescript".to_string(), "sql".to_string()],
+            },
+        );
+    }
+
+    fn register_jest(&mut self) {
+        self.packages.insert(
+            "jest".to_string(),
+            Package {
+                name: "jest".to_string(),
+                language: "javascript".to_string(),
+                version: "29.7".to_string(),
+                description: "Delightful JavaScript Testing Framework".to_string(),
+                dependencies: vec![],
+                features: vec![
+                    "testing".to_string(),
+                    "mocking".to_string(),
+                    "snapshots".to_string(),
+                    "coverage".to_string()
+                ],
+                categories: vec![PackageCategory::Testing],
+                license: "MIT".to_string(),
+                repository: Some("https://github.com/jestjs/jest".to_string()),
+                homepage: Some("https://jestjs.io".to_string()),
+                keywords: vec!["testing".to_string(), "jest".to_string(), "javascript".to_string(), "test".to_string()],
+            },
+        );
+    }
+
+    fn register_webpack(&mut self) {
+        self.packages.insert(
+            "webpack".to_string(),
+            Package {
+                name: "webpack".to_string(),
+                language: "javascript".to_string(),
+                version: "5.90".to_string(),
+                description: "A bundler for javascript and friends".to_string(),
+                dependencies: vec![],
+                features: vec![
+                    "bundling".to_string(),
+                    "code_splitting".to_string(),
+                    "loaders".to_string(),
+                    "plugins".to_string()
+                ],
+                categories: vec![PackageCategory::Utility],
+                license: "MIT".to_string(),
+                repository: Some("https://github.com/webpack/webpack".to_string()),
+                homepage: Some("https://webpack.js.org".to_string()),
+                keywords: vec!["bundler".to_string(), "webpack".to_string(), "build".to_string(), "module".to_string()],
+            },
+        );
+    }
+
+    fn register_tailwindcss(&mut self) {
+        self.packages.insert(
+            "tailwindcss".to_string(),
+            Package {
+                name: "tailwindcss".to_string(),
+                language: "javascript".to_string(),
+                version: "3.4".to_string(),
+                description: "A utility-first CSS framework".to_string(),
+                dependencies: vec![],
+                features: vec![
+                    "utility_first".to_string(),
+                    "jit".to_string(),
+                    "responsive".to_string(),
+                    "customizable".to_string()
+                ],
+                categories: vec![PackageCategory::Web],
+                license: "MIT".to_string(),
+                repository: Some("https://github.com/tailwindlabs/tailwindcss".to_string()),
+                homepage: Some("https://tailwindcss.com".to_string()),
+                keywords: vec!["css".to_string(), "utility".to_string(), "framework".to_string(), "styling".to_string()],
+            },
+        );
+    }
+
+    fn register_axios(&mut self) {
+        self.packages.insert(
+            "axios".to_string(),
+            Package {
+                name: "axios".to_string(),
+                language: "javascript".to_string(),
+                version: "1.6".to_string(),
+                description: "Promise based HTTP client for the browser and node.js".to_string(),
+                dependencies: vec![],
+                features: vec![
+                    "http_client".to_string(),
+                    "promises".to_string(),
+                    "interceptors".to_string(),
+                    "cancellation".to_string()
+                ],
+                categories: vec![PackageCategory::Networking],
+                license: "MIT".to_string(),
+                repository: Some("https://github.com/axios/axios".to_string()),
+                homepage: Some("https://axios-http.com".to_string()),
+                keywords: vec!["http".to_string(), "client".to_string(), "promise".to_string(), "ajax".to_string()],
+            },
+        );
+    }
+
+    fn register_socketio(&mut self) {
+        self.packages.insert(
+            "socket.io".to_string(),
+            Package {
+                name: "socket.io".to_string(),
+                language: "javascript".to_string(),
+                version: "4.6".to_string(),
+                description: "Realtime application framework (Node.JS server)".to_string(),
+                dependencies: vec!["nodejs".to_string()],
+                features: vec![
+                    "websocket".to_string(),
+                    "realtime".to_string(),
+                    "fallbacks".to_string(),
+                    "rooms".to_string()
+                ],
+                categories: vec![PackageCategory::Networking],
+                license: "MIT".to_string(),
+                repository: Some("https://github.com/socketio/socket.io".to_string()),
+                homepage: Some("https://socket.io".to_string()),
+                keywords: vec!["websocket".to_string(), "realtime".to_string(), "socket".to_string(), "io".to_string()],
+            },
+        );
+    }
+
+    fn register_graphql(&mut self) {
+        self.packages.insert(
+            "graphql".to_string(),
+            Package {
+                name: "graphql".to_string(),
+                language: "javascript".to_string(),
+                version: "16.8".to_string(),
+                description: "A query language for APIs and a runtime for fulfilling those queries".to_string(),
+                dependencies: vec![],
+                features: vec![
+                    "query_language".to_string(),
+                    "schema".to_string(),
+                    "resolvers".to_string(),
+                    "introspection".to_string()
+                ],
+                categories: vec![PackageCategory::Web],
+                license: "MIT".to_string(),
+                repository: Some("https://github.com/graphql/graphql-js".to_string()),
+                homepage: Some("https://graphql.org".to_string()),
+                keywords: vec!["graphql".to_string(), "query".to_string(), "api".to_string(), "schema".to_string()],
+            },
+        );
+    }
+
+    fn register_nestjs(&mut self) {
+        self.packages.insert(
+            "nestjs".to_string(),
+            Package {
+                name: "nestjs".to_string(),
+                language: "typescript".to_string(),
+                version: "10.3".to_string(),
+                description: "A progressive Node.js framework for building efficient and scalable server-side applications".to_string(),
+                dependencies: vec!["nodejs".to_string(), "typescript".to_string()],
+                features: vec![
+                    "backend_framework".to_string(),
+                    "dependency_injection".to_string(),
+                    "modules".to_string(),
+                    "decorators".to_string()
+                ],
+                categories: vec![PackageCategory::Web],
+                license: "MIT".to_string(),
+                repository: Some("https://github.com/nestjs/nest".to_string()),
+                homepage: Some("https://nestjs.com".to_string()),
+                keywords: vec!["backend".to_string(), "framework".to_string(), "typescript".to_string(), "server".to_string()],
+            },
+        );
+    }
+
