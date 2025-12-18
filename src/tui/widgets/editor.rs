@@ -123,9 +123,11 @@ impl<'a> EditorWidget<'a> {
             }
 
             // Identifier or keyword
-            if ch.is_alphabetic() || ch == '_' {
+            if ch.is_alphabetic() || ch == '_' || ch == '@' {
                 let mut ident = String::new();
-                while i < chars.len() && (chars[i].is_alphanumeric() || chars[i] == '_') {
+                ident.push(ch);
+                i += 1;
+                while i < chars.len() && (chars[i].is_alphanumeric() || chars[i] == '_' || chars[i] == '.') {
                     ident.push(chars[i]);
                     i += 1;
                 }
@@ -135,6 +137,9 @@ impl<'a> EditorWidget<'a> {
                     | "elif" | "else" | "for" | "while" | "loop" | "break" | "continue"
                     | "return" | "await" | "try" | "catch" | "match" | "extern" | "pub"
                     | "true" | "false" => self.theme.keyword,
+
+                    // v3.0 Annotations and Foreign Blocks
+                    s if s.starts_with('@') => self.theme.ui_marker,
 
                     // UI components
                     "button" | "input" | "textarea" | "checkbox" | "radio" | "select"
@@ -214,13 +219,45 @@ impl<'a> StatefulWidget for EditorWidget<'a> {
 
             // Line content
             if line_idx < self.content.len() {
-                let spans = self.tokenize_line(self.content[line_idx]);
+                let line_str = self.content[line_idx];
+                let spans = self.tokenize_line(line_str);
                 let mut x = inner.x + line_num_width;
 
                 for span in spans {
                     let text = span.content.to_string();
                     buf.set_string(x, y, &text, span.style);
                     x += text.len() as u16;
+                }
+
+                // Render selection overlay
+                if let (Some(start), Some(end)) = (state.selection_start, state.selection_end) {
+                    let (s_row, s_col) = if start < end { (start.0, start.1) } else { (end.0, end.1) };
+                    let (e_row, e_col) = if start < end { (end.0, end.1) } else { (start.0, start.1) };
+
+                    if line_idx >= s_row && line_idx <= e_row {
+                        let line_char_count = line_str.chars().count();
+                        let start_x = if line_idx == s_row { s_col } else { 0 };
+                        let end_x = if line_idx == e_row { e_col } else { line_char_count };
+
+                        for col in start_x..end_x {
+                            let sel_x = inner.x + line_num_width + col as u16;
+                            if sel_x < inner.x + inner.width {
+                                if let Some(cell) = buf.cell_mut((sel_x, y)) {
+                                    cell.set_style(self.theme.selection_style);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Render cursor
+            if line_idx == state.cursor.0 && self.theme.cursor_style != Style::default() {
+                let cursor_x = inner.x + line_num_width + state.cursor.1 as u16;
+                if cursor_x < inner.x + inner.width {
+                    if let Some(cell) = buf.cell_mut((cursor_x, y)) {
+                        cell.set_style(self.theme.cursor_style);
+                    }
                 }
             }
         }

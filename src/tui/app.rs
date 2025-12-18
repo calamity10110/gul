@@ -6,13 +6,13 @@ use std::path::PathBuf;
 use std::time::Duration;
 
 use crossterm::{
-    event::{self, Event, KeyCode, KeyModifiers},
+    event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyModifiers},
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
 use ratatui::{
     backend::CrosstermBackend,
-    layout::{Constraint, Direction, Layout},
+    layout::{Constraint, Direction, Layout, Rect},
     Frame, Terminal,
 };
 
@@ -133,7 +133,7 @@ impl GulTuiApp {
         // Setup terminal
         enable_raw_mode()?;
         let mut stdout = io::stdout();
-        execute!(stdout, EnterAlternateScreen)?;
+        execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
         let backend = CrosstermBackend::new(stdout);
         let mut terminal = Terminal::new(backend)?;
 
@@ -158,7 +158,12 @@ impl GulTuiApp {
 
         // Restore terminal
         disable_raw_mode()?;
-        execute!(terminal.backend_mut(), LeaveAlternateScreen)?;
+        execute!(
+            terminal.backend_mut(),
+            LeaveAlternateScreen,
+            DisableMouseCapture
+        )?;
+        terminal.show_cursor()?;
 
         Ok(())
     }
@@ -356,21 +361,46 @@ impl GulTuiApp {
     }
 
     fn handle_file_tree_key(&mut self, key: event::KeyEvent) -> io::Result<()> {
+        let visible_indices: Vec<usize> = {
+            let mut indices = Vec::new();
+            let mut skip_depth: Option<usize> = None;
+            for (i, entry) in self.file_entries.iter().enumerate() {
+                if let Some(depth) = skip_depth {
+                    if entry.depth > depth {
+                        continue;
+                    } else {
+                        skip_depth = None;
+                    }
+                }
+                indices.push(i);
+                if entry.is_dir && !self.file_tree_state.is_expanded(&entry.path) {
+                    skip_depth = Some(entry.depth);
+                }
+            }
+            indices
+        };
+
+        let current_visible_pos = visible_indices
+            .iter()
+            .position(|&idx| idx == self.file_tree_state.selected)
+            .unwrap_or(0);
+
         match key.code {
             KeyCode::Up => {
-                if self.file_tree_state.selected > 0 {
-                    self.file_tree_state.selected -= 1;
+                if current_visible_pos > 0 {
+                    self.file_tree_state.selected = visible_indices[current_visible_pos - 1];
                 }
             }
             KeyCode::Down => {
-                if self.file_tree_state.selected < self.file_entries.len().saturating_sub(1) {
-                    self.file_tree_state.selected += 1;
+                if current_visible_pos < visible_indices.len().saturating_sub(1) {
+                    self.file_tree_state.selected = visible_indices[current_visible_pos + 1];
                 }
             }
             KeyCode::Enter => {
-                // Open selected file
                 if let Some(entry) = self.file_entries.get(self.file_tree_state.selected) {
-                    if !entry.is_dir {
+                    if entry.is_dir {
+                        self.file_tree_state.toggle_expanded(entry.path.clone());
+                    } else {
                         self.open_file(entry.path.clone())?;
                     }
                 }
@@ -485,7 +515,19 @@ impl GulTuiApp {
 
         let mut status = StatusBarWidget::new(&self.theme)
             .file(file_name, file_type)
-            .cursor(line, col);
+            .cursor(line, col)
+            .modified(
+                self.tabs
+                    .get(self.active_tab)
+                    .map(|t| t.modified)
+                    .unwrap_or(false),
+            )
+            .mode(match self.mode {
+                Mode::Normal => "NORMAL",
+                Mode::Insert => "INSERT",
+                Mode::Command => "COMMAND",
+                Mode::Search => "SEARCH",
+            });
 
         if let Some(ref branch) = self.git_branch {
             status = status.git_branch(branch);
@@ -628,6 +670,8 @@ impl GulTuiApp {
                 self.load_directory_recursive(&entry_path, depth + 1)?;
             }
         }
+        Ok(())
+    }
 
     /// Insert a character at the cursor position
     fn insert_char(&mut self, c: char) {

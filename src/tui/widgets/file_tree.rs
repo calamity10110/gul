@@ -22,6 +22,20 @@ pub struct FileTreeState {
     pub expanded: Vec<PathBuf>,
 }
 
+impl FileTreeState {
+    pub fn is_expanded(&self, path: &PathBuf) -> bool {
+        self.expanded.contains(path)
+    }
+
+    pub fn toggle_expanded(&mut self, path: PathBuf) {
+        if let Some(pos) = self.expanded.iter().position(|p| p == &path) {
+            self.expanded.remove(pos);
+        } else {
+            self.expanded.push(path);
+        }
+    }
+}
+
 /// File tree entry
 #[derive(Debug, Clone)]
 pub struct FileEntry {
@@ -55,9 +69,9 @@ impl<'a> FileTreeWidget<'a> {
     }
 
     /// Get icon for file type
-    fn get_icon(&self, entry: &FileEntry) -> &'static str {
+    fn get_icon(&self, entry: &FileEntry, is_expanded: bool) -> &'static str {
         if entry.is_dir {
-            return "📁";
+            return if is_expanded { "📂" } else { "📁" };
         }
 
         match entry.path.extension().and_then(|s| s.to_str()) {
@@ -106,24 +120,41 @@ impl<'a> StatefulWidget for FileTreeWidget<'a> {
         let inner = block.inner(area);
         block.render(area, buf);
 
-        let visible = inner.height as usize;
-        let start = state.scroll;
-        let end = (start + visible).min(self.entries.len());
+        let mut visible_entries = Vec::new();
+        let mut skip_depth: Option<usize> = None;
 
-        for (i, idx) in (start..end).enumerate() {
+        for entry in self.entries {
+            if let Some(depth) = skip_depth {
+                if entry.depth > depth {
+                    continue;
+                } else {
+                    skip_depth = None;
+                }
+            }
+
+            visible_entries.push(entry);
+
+            if entry.is_dir && !state.is_expanded(&entry.path) {
+                skip_depth = Some(entry.depth);
+            }
+        }
+
+        let selected_path = self.entries.get(state.selected).map(|e| &e.path);
+
+        for (i, entry) in visible_entries.iter().skip(start).take(visible_count).enumerate() {
             let y = inner.y + i as u16;
-            let entry = &self.entries[idx];
+            let is_expanded = state.is_expanded(&entry.path);
 
             // Indentation
             let indent = "  ".repeat(entry.depth);
-            let icon = self.get_icon(entry);
+            let icon = self.get_icon(entry, is_expanded);
             let name = entry
                 .path
                 .file_name()
                 .and_then(|s| s.to_str())
                 .unwrap_or("");
 
-            let style = if idx == state.selected {
+            let style = if Some(&entry.path) == selected_path {
                 self.theme.menu_selected
             } else {
                 self.get_style(entry)
