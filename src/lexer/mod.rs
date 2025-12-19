@@ -47,13 +47,12 @@ pub enum Token {
     Var, // var (mutable, replaces mut/?)
 
     // Data-flow node system (v3.0)
-    Node,     // node declaration
-    ReIn,     // re_in: required input
-    ReOut,    // re_out: required output
-    OptIn,    // opt_in: optional input
-    OptOut,   // opt_out: optional output
-    Trait,    // trait definition
-
+    Node,   // node declaration
+    ReIn,   // re_in: required input
+    ReOut,  // re_out: required output
+    OptIn,  // opt_in: optional input
+    OptOut, // opt_out: optional output
+    Trait,  // trait definition
 
     // Literals
     Integer(i64),

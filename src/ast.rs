@@ -179,16 +179,16 @@ pub enum ListOp {
 /// Type annotation for data-flow contracts (e.g., @int, @float, @str)
 #[derive(Debug, Clone, PartialEq)]
 pub struct TypeAnnotation {
-    pub base_type: String,      // e.g., "int", "float", "str"
-    pub is_list: bool,          // @int[] vs @int
-    pub traits: Vec<String>,    // Associated traits
+    pub base_type: String,   // e.g., "int", "float", "str"
+    pub is_list: bool,       // @int[] vs @int
+    pub traits: Vec<String>, // Associated traits
 }
 
 /// Port parameter with name and label
 #[derive(Debug, Clone, PartialEq)]
 pub struct PortParam {
-    pub name: String,   // Parameter name (lowercase)
-    pub label: String,  // Label (uppercase)
+    pub name: String,  // Parameter name (lowercase)
+    pub label: String, // Label (uppercase)
 }
 
 /// Port contract for node input/output
@@ -211,8 +211,8 @@ pub struct NodeDeclaration {
 /// Reference to a node port (e.g., node1: c)
 #[derive(Debug, Clone, PartialEq)]
 pub struct PortRef {
-    pub node_name: String,      // "node1" or "input" or "print"
-    pub port_name: String,      // "c" or "a"
+    pub node_name: String, // "node1" or "input" or "print"
+    pub port_name: String, // "c" or "a"
 }
 
 /// Data-flow connection (source : target)
@@ -234,14 +234,14 @@ pub struct ExternalInput {
 pub struct DataFlowBlock {
     pub connections: Vec<DataFlowConnection>,
     pub external_inputs: Vec<(ExternalInput, PortRef)>,
-    pub outputs: Vec<PortRef>,  // Ports connected to print/output
+    pub outputs: Vec<PortRef>, // Ports connected to print/output
 }
 
 /// Trait definition
 #[derive(Debug, Clone, PartialEq)]
 pub struct TraitDef {
     pub name: String,
-    pub methods: Vec<String>,   // Optional trait methods
+    pub methods: Vec<String>, // Optional trait methods
 }
 
 /// Node function implementation output binding
@@ -270,15 +270,17 @@ pub enum BuiltinTrait {
     Sync,
 }
 
-impl BuiltinTrait {
-    pub fn from_str(s: &str) -> Option<Self> {
+impl std::str::FromStr for BuiltinTrait {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "serialize" => Some(BuiltinTrait::Serialize),
-            "trainable" => Some(BuiltinTrait::Trainable),
-            "stream" => Some(BuiltinTrait::Stream),
-            "async" => Some(BuiltinTrait::Async),
-            "sync" => Some(BuiltinTrait::Sync),
-            _ => None,
+            "serialize" => Ok(BuiltinTrait::Serialize),
+            "trainable" => Ok(BuiltinTrait::Trainable),
+            "stream" => Ok(BuiltinTrait::Stream),
+            "async" => Ok(BuiltinTrait::Async),
+            "sync" => Ok(BuiltinTrait::Sync),
+            _ => Err(()),
         }
     }
 }
@@ -309,4 +311,3 @@ impl PortRef {
         }
     }
 }
-

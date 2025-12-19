@@ -2,10 +2,9 @@
 // Defines semantic traits for data-flow nodes
 
 pub mod builtin;
-pub mod matcher;
 pub mod inference;
+pub mod matcher;
 
-use crate::ast::BuiltinTrait;
 use std::collections::HashMap;
 
 /// Trait registry
@@ -30,7 +29,7 @@ impl TraitRegistry {
             traits: HashMap::new(),
             inheritance: HashMap::new(),
         };
-        
+
         // Register built-in traits
         registry.register_builtin_traits();
         registry
@@ -88,7 +87,7 @@ impl TraitRegistry {
     pub fn add_inheritance(&mut self, child: &str, parent: &str) {
         self.inheritance
             .entry(child.to_string())
-            .or_insert_with(Vec::new)
+            .or_default()
             .push(parent.to_string());
     }
 

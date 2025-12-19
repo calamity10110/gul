@@ -29,4 +29,10 @@ impl<'a> TraitInference<'a> {
 
         traits
     }
+
+    /// Check if inferred trait is valid
+    pub fn is_valid_inferred_trait(&self, type_name: &str, trait_name: &str) -> bool {
+        let inferred = self.infer_traits(type_name);
+        inferred.contains(&trait_name.to_string()) && self.registry.has_trait(trait_name)
+    }
 }

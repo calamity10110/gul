@@ -1,7 +1,7 @@
 // Contract definitions and validation
 // Validates port contracts and type compatibility
 
-use crate::ast::{PortContract, TypeAnnotation, BuiltinTrait};
+use crate::ast::{PortContract, TypeAnnotation};
 
 /// Contract validation result
 #[derive(Debug, Clone)]
@@ -56,7 +56,7 @@ impl ContractValidator {
         if output.base_type == "int" && input.base_type == "float" {
             return true;
         }
-        
+
         // any accepts everything
         if input.base_type == "any" {
             return true;
@@ -76,6 +76,16 @@ impl ContractValidator {
         true
     }
 
+    /// Check if a trait is registered
+    pub fn is_valid_trait(&self, trait_name: &str) -> bool {
+        self.traits.contains(&trait_name.to_string())
+    }
+
+    /// Get all registered traits
+    pub fn get_traits(&self) -> &[String] {
+        &self.traits
+    }
+
     /// Validate port contract satisfaction
     pub fn validate_connection(
         &self,
@@ -93,8 +103,7 @@ impl ContractValidator {
             result.valid = false;
             result.errors.push(format!(
                 "Type mismatch: {} -> {}",
-                source.port_type.base_type,
-                target.port_type.base_type
+                source.port_type.base_type, target.port_type.base_type
             ));
         }
 

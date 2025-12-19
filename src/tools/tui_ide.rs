@@ -97,17 +97,13 @@ impl SyntaxHighlighter {
             theme: GulTheme::default(),
             keywords: vec![
                 // v3.0 keywords (primary)
-                "let", "var", "mn", "fn", "async", "struct",
-                // v3.0 imports
-                "@imp", "@python", "@rust", "@sql", "@c",
-                // Control flow
+                "let", "var", "mn", "fn", "async", "struct", // v3.0 imports
+                "@imp", "@python", "@rust", "@sql", "@c", // Control flow
                 "if", "elif", "else", "for", "while", "loop", "break", "continue", "return",
                 // Async/Error
                 "await", "try", "catch", "finally", "throw",
                 // v2.0 (deprecated but supported)
-                "const", "mut", "main", "import",
-
-                "match", "extern", "pub",
+                "const", "mut", "main", "import", "match", "extern", "pub",
             ],
             ui_components: vec![
                 // Basic Input Widgets

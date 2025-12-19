@@ -1,7 +1,7 @@
 // Data-flow graph validator
 // Validates that all contracts are satisfied
 
-use super::{DataFlowGraph, contracts::ContractValidator};
+use super::{contracts::ContractValidator, DataFlowGraph};
 use crate::ast::PortRef;
 
 /// Validation error
@@ -69,6 +69,11 @@ impl GraphValidator {
         } else {
             Err(errors)
         }
+    }
+
+    /// Get the contract validator
+    pub fn contract_validator(&self) -> &ContractValidator {
+        &self.contract_validator
     }
 
     /// Check if input port is connected

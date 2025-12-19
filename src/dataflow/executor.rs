@@ -52,16 +52,17 @@ impl Executor {
     /// Execute a data-flow graph
     pub fn execute(&mut self, graph: &DataFlowGraph) -> Result<Vec<Value>, String> {
         // 1. Set external inputs
-        for (input, target) in &graph.external_inputs {
+        for (_input, target) in &graph.external_inputs {
             // Convert ExternalInput value to Value
             // This would use the interpreter to evaluate the expression
             let value = Value::Integer(0); // Placeholder
-            self.context.set_port_value(&target.node_name, &target.port_name, value);
+            self.context
+                .set_port_value(&target.node_name, &target.port_name, value);
         }
 
         // 2. Execute nodes in topological order
         let execution_order = self.topological_sort(graph)?;
-        
+
         for node_name in &execution_order {
             self.execute_node(graph, node_name)?;
         }
@@ -69,7 +70,10 @@ impl Executor {
         // 3. Collect outputs
         let mut outputs = Vec::new();
         for output in &graph.outputs {
-            if let Some(value) = self.context.get_port_value(&output.node_name, &output.port_name) {
+            if let Some(value) = self
+                .context
+                .get_port_value(&output.node_name, &output.port_name)
+            {
                 outputs.push(value.clone());
             }
         }
@@ -105,7 +109,7 @@ mod tests {
     fn test_execution_context() {
         let mut ctx = ExecutionContext::new();
         ctx.set_port_value("node1", "a", Value::Integer(42));
-        
+
         let value = ctx.get_port_value("node1", "a");
         assert!(value.is_some());
         assert_eq!(*value.unwrap(), Value::Integer(42));

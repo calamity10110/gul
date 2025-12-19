@@ -81,11 +81,11 @@ pub enum TokenType {
     Fn,
     Async,
     // v3.0 imports
-    ImpDecorator,  // @imp
-    PythonBlock,   // @python
-    RustBlock,     // @rust
-    CBlock,        // @c
-    SqlBlock,      // @sql
+    ImpDecorator, // @imp
+    PythonBlock,  // @python
+    RustBlock,    // @rust
+    CBlock,       // @c
+    SqlBlock,     // @sql
     // Standard tokens
     Identifier,
     String,
@@ -174,7 +174,7 @@ pub struct AiAssistant {
 
 /// Chat message
 pub struct ChatMessage {
-    pub role: String,  // "user" or "assistant"
+    pub role: String, // "user" or "assistant"
     pub content: String,
     pub timestamp: String,
 }
@@ -208,18 +208,18 @@ impl GulWebIde {
             },
         });
         self.file_tree.root = root.clone();
-        
+
         // Create v3.0 template file
         self.create_v3_template(&root, &name);
     }
 
     /// Create v3.0 template file
-    fn create_v3_template(&mut self, root: &PathBuf, name: &str) {
+    fn create_v3_template(&mut self, root: &std::path::Path, name: &str) {
         let template = format!(
             "# {} - GUL v3.0 Project\n\n@imp std.io\n\nmn:\n    print(\"Hello from {}!\")\n",
             name, name
         );
-        
+
         let main_file = root.join("main.mn");
         if let Ok(()) = std::fs::write(&main_file, template) {
             let _ = self.open_file(main_file);
@@ -248,7 +248,7 @@ impl GulWebIde {
         let mut tokens = Vec::new();
         let keywords_v3 = ["let", "var", "mn", "fn", "async"];
         let deprecated = ["const", "mut", "main"];
-        
+
         // Simple tokenization (real implementation would use proper lexer)
         for (i, word) in content.split_whitespace().enumerate() {
             let token_type = if keywords_v3.contains(&word) {
@@ -336,7 +336,7 @@ impl GulWebIde {
         } else {
             None
         };
-        
+
         // Re-tokenize after save
         if let Some(content_str) = content {
             let tokens = self.tokenize_v3(&content_str);
@@ -344,7 +344,7 @@ impl GulWebIde {
                 tab.tokens = tokens;
             }
         }
-        
+
         Ok(())
     }
 
@@ -361,7 +361,7 @@ impl GulWebIde {
     /// Build the current project
     pub fn build_project(&mut self) -> std::io::Result<()> {
         self.build_output = "Building project with GUL v3.0...\n".to_string();
-        
+
         // Check for deprecated syntax
         if self.settings.warn_deprecated {
             self.check_deprecated_syntax();
@@ -374,7 +374,7 @@ impl GulWebIde {
     /// Check for deprecated syntax and warn
     fn check_deprecated_syntax(&mut self) {
         let mut warnings = Vec::new();
-        
+
         for tab in &self.open_files {
             if tab.content.contains("const ") {
                 warnings.push("⚠️  Warning: 'const' is deprecated, use 'let'\n");
@@ -386,7 +386,7 @@ impl GulWebIde {
                 warnings.push("⚠️  Warning: 'main():' is deprecated, use 'mn:'\n");
             }
         }
-        
+
         for warning in warnings {
             self.build_output.push_str(warning);
         }
@@ -394,7 +394,9 @@ impl GulWebIde {
 
     /// Run the current project
     pub fn run_project(&mut self) -> std::io::Result<()> {
-        self.terminal.output.push("Running GUL v3.0 project...".to_string());
+        self.terminal
+            .output
+            .push("Running GUL v3.0 project...".to_string());
         Ok(())
     }
 
@@ -423,6 +425,16 @@ impl GulWebIde {
         }
 
         results
+    }
+
+    /// Get package manager
+    pub fn package_manager(&self) -> &PackageManager {
+        &self.package_manager
+    }
+
+    /// Get mutable package manager
+    pub fn package_manager_mut(&mut self) -> &mut PackageManager {
+        &mut self.package_manager
     }
 
     /// Toggle terminal visibility
@@ -548,9 +560,8 @@ impl PackageManager {
     }
 }
 
-impl ProjectConfig {
-    /// Create default project configuration for v3.0
-    pub fn default() -> Self {
+impl Default for ProjectConfig {
+    fn default() -> Self {
         ProjectConfig {
             target: "native".to_string(),
             optimize: false,
@@ -560,9 +571,8 @@ impl ProjectConfig {
     }
 }
 
-impl IdeSettings {
-    /// Create default IDE settings with v3.0 features
-    pub fn default() -> Self {
+impl Default for IdeSettings {
+    fn default() -> Self {
         IdeSettings {
             theme: "dark".to_string(),
             font_size: 14,

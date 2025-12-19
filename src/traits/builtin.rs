@@ -26,9 +26,10 @@ impl TraitBehavior for BuiltinTrait {
         }
 
         // async and sync are mutually exclusive
-        if matches!((self, other), 
-            (BuiltinTrait::Async, BuiltinTrait::Sync) |
-            (BuiltinTrait::Sync, BuiltinTrait::Async)) {
+        if matches!(
+            (self, other),
+            (BuiltinTrait::Async, BuiltinTrait::Sync) | (BuiltinTrait::Sync, BuiltinTrait::Async)
+        ) {
             return false;
         }
 

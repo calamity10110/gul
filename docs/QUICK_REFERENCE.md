@@ -1,22 +1,23 @@
-# GUL v3.0 Quick Reference
+# GUL Quick Reference
 
-**All syntax examples use v3.0 exclusively.**
+**v3.0 Syntax Cheat Sheet**
+
+---
 
 ## Variables
 
 ```gul
-let x = 10          # Immutable
-var y = 20          # Mutable
-y = y + 1
+let name = "Alice"    # Immutable
+var count = 0         # Mutable
 ```
 
 ## Functions
 
 ```gul
-fn add(a: int, b: int) -> int:
+fn add(a, b):
     return a + b
 
-async fetch(url: str) -> dict:
+async fetch():
     return await http.get(url)
 ```
 
@@ -24,120 +25,87 @@ async fetch(url: str) -> dict:
 
 ```gul
 mn:
-    print("Hello, GUL!")
+    print("Hello!")
 ```
 
 ## Imports
 
 ```gul
 @imp std.http
-@imp python{numpy}
-```
-
-## Control Flow
-
-```gul
-if x > 10:
-    print("big")
-elif x > 5:
-    print("medium")
-else:
-    print("small")
-
-for i in 0..10:
-    print(i)
-
-while x < 100:
-    x = x * 2
-```
-
-## Data Types
-
-```gul
-let num: int = 42
-let pi: float = 3.14
-let name: str = "GUL"
-let active: bool = true
-let list: list = [1, 2, 3]
-let dict: dict = {name: "Alice"}
+@imp python{numpy, pandas}
 ```
 
 ## Foreign Code
 
 ```gul
-@python {
-    def analyze(data):
-        import numpy as np
-        return np.mean(data)
+@python { import numpy as np }
+@rust { fn compute() -> i32 { 42 } }
+@c { int add(int a, int b) { return a+b; } }
+```
+
+## Data-Flow (Node System)
+
+```gul
+node add {
+    re_in: @int[ a: A, b: B ],
+    re_out: @int[ result: Sum ],
 }
 
-@rust {
-    fn compute(n: i32) -> i32 {
-        n * n
-    }
-}
+fn add(@int[a, b]) -> @int:
+    return result : a + b
+
+mn: [
+    input(@int(5)) : add: a
+    input(@int(3)) : add: b
+    print: add: result
+]
+```
+
+## Control Flow
+
+```gul
+if x > 0:
+    print("positive")
+elif x < 0:
+    print("negative")
+else:
+    print("zero")
+
+for item in items:
+    print(item)
+
+while running:
+    process()
+```
+
+## Types
+
+```gul
+@int, @float, @str, @bool
+@list, @dict, @any
+```
+
+## Traits
+
+```gul
+trait serialize
+trait trainable
+trait stream
+trait async
+trait sync
 ```
 
 ## CLI Commands
 
 ```bash
-# Package management
-gul package list
-gul package search <query>
-gul package info <name>
-gul package install <name>
-gul package update <name>
-gul package remove <name>
-gul package audit
-gul package outdated
-
-# AI
-gul ai status
-gul ai set-provider <provider>
-
-# Runtime
-gul runtime python "<code>"
-gul runtime js "<code>"
+gul run file.mn      # Run
+gul build file.mn    # Build
+gul check file.mn    # Check
+gul test             # Test
+gul fmt file.mn      # Format
+gul tui              # TUI IDE
 ```
-
-## Standard Library (13 Modules)
-
-- `std.fs` - File system
-- `std.path` - Path manipulation
-- `std.env` - Environment
-- `std.time` - Time/date
-- `std.process` - Process management
-- `std.random` - Random numbers
-- `std.crypto` - Cryptography
-- `std.collections` - Data structures
-- `std.string` - String utilities
-- `std.bytes` - Binary data
-- `std.http` - HTTP (experimental)
-- `std.websocket` - WebSocket (experimental)
-- `std.tcp` - TCP sockets (experimental)
-- `std.udp` - UDP sockets (experimental)
-
-## Keywords
-
-**Variables**: `let`, `var`
-
-**Functions**: `fn`, `async`
-
-**Entry**: `mn:`
-
-**Imports**: `@imp`
-
-**Foreign**: `@python`, `@rust`, `@sql`
-
-**Control**: `if`, `elif`, `else`, `for`, `while`, `loop`, `in`, `break`, `continue`, `return`
-
-**Error**: `try`, `catch`, `finally`, `throw`, `await`
-
-## File Extension
-
-Use `.mn` for all GUL files.
 
 ---
 
-**Version**: v3.0 (Enforced)  
-**Last Updated**: 2025-12-18
+**Docs**: [Full Documentation](README.md)

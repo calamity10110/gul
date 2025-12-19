@@ -1,15 +1,12 @@
 // GUL Data-Flow Engine
 // Implements data-flow graph construction, validation, and execution
 
-pub mod graph;
 pub mod contracts;
-pub mod validator;
 pub mod executor;
+pub mod graph;
+pub mod validator;
 
-use crate::ast::{
-    NodeDeclaration, PortContract, PortRef, DataFlowConnection, 
-    TypeAnnotation, TraitDef, DataFlowBlock, ExternalInput
-};
+use crate::ast::{DataFlowConnection, ExternalInput, NodeDeclaration, PortRef};
 
 /// Data-flow graph representing a program
 #[derive(Debug, Clone)]
@@ -84,7 +81,7 @@ impl Default for DataFlowGraph {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ast::{PortParam, PortContract};
+    use crate::ast::{PortContract, PortParam};
 
     #[test]
     fn test_dataflow_graph_creation() {
@@ -101,20 +98,27 @@ mod tests {
             required_inputs: PortContract {
                 port_type: TypeAnnotation::new("int"),
                 params: vec![
-                    PortParam { name: "a".to_string(), label: "A".to_string() },
-                    PortParam { name: "b".to_string(), label: "B".to_string() },
+                    PortParam {
+                        name: "a".to_string(),
+                        label: "A".to_string(),
+                    },
+                    PortParam {
+                        name: "b".to_string(),
+                        label: "B".to_string(),
+                    },
                 ],
             },
             required_outputs: PortContract {
                 port_type: TypeAnnotation::new("int"),
-                params: vec![
-                    PortParam { name: "result".to_string(), label: "Sum".to_string() },
-                ],
+                params: vec![PortParam {
+                    name: "result".to_string(),
+                    label: "Sum".to_string(),
+                }],
             },
             optional_inputs: None,
             optional_outputs: None,
         };
-        
+
         let id = graph.add_node("add1", decl);
         assert_eq!(id, 0);
         assert_eq!(graph.nodes.len(), 1);

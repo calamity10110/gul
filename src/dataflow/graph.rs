@@ -1,8 +1,8 @@
 // Data-flow graph builder
 // Constructs a data-flow graph from parsed AST
 
-use crate::ast::{DataFlowBlock, NodeDeclaration, PortRef};
-use super::{DataFlowGraph, NodeInstance};
+use super::DataFlowGraph;
+use crate::ast::{DataFlowBlock, NodeDeclaration};
 
 /// Graph builder for constructing data-flow graphs
 pub struct GraphBuilder {
@@ -40,7 +40,8 @@ impl GraphBuilder {
 
         // Add connections
         for conn in &block.connections {
-            self.graph.add_connection(conn.source.clone(), conn.target.clone());
+            self.graph
+                .add_connection(conn.source.clone(), conn.target.clone());
         }
 
         // Add outputs
@@ -53,10 +54,11 @@ impl GraphBuilder {
 
     /// Instantiate a node from declaration
     pub fn instantiate_node(&mut self, name: &str, instance_name: &str) -> Result<usize, String> {
-        let decl = self.get_declaration(name)
+        let decl = self
+            .get_declaration(name)
             .ok_or_else(|| format!("Node '{}' not found", name))?
             .clone();
-        
+
         Ok(self.graph.add_node(instance_name, decl))
     }
 }
