@@ -1,140 +1,67 @@
 # GUL Documentation
 
-Welcome to the GUL (GUL Universal Language) Documentation!
-
-**Version**: 0.13.0 | **Status**: Production Ready
+**Version**: 0.13.0 | **Syntax**: v3.0
 
 ---
 
-## 📚 Documentation Structure
+## Quick Links
 
-### 1. **Getting Started**
-
-- [Introduction to GUL](guides/introduction.md) - Overview and key features
-- [Quick Start Tutorial](tutorials/quickstart.md) - Get started in 5 minutes
-- [Quick Reference](QUICK_REFERENCE.md) - v3.0 cheat sheet
-
-### 2. **Language Reference**
-
-- [v3.0 Syntax Reference](reference/syntax.md) - Complete syntax guide
-- [Language Specification](reference/specification.md) - Full language spec
-- [Type System](reference/types.md) - Type system details
-
-### 3. **Standard Library**
-
-- [Standard Library Overview](api/standard-library.md) - 13 modules, 110+ functions
-- [HTTP Module](api/http.md) - HTTP client/server
-- [Database Module](api/database.md) - Database operations
-- [File System](api/filesystem.md) - File operations
-- [Math & Science](api/math-science.md) - Mathematical functions
-
-### 4. **Package Ecosystem**
-
-- [Package Catalog](reference/package-catalog.md) - 58 available packages
-- [Package Management](guides/package-database.md) - Using the package manager
-- [Creating Packages](tutorials/creating-packages.md) - Build your own
-
-### 5. **Development Guides**
-
-- [Compiler Architecture](guides/compiler.md) - How GUL works
-- [Multi-Language Integration](guides/integration.md) - Python, Rust, JS interop
-- [TUI Framework](guides/tui.md) - Terminal UI development
-- [Web Development](guides/web-development.md) - Building web apps
-
-### 6. **Tutorials**
-
-- [Building a Web Server](tutorials/web-server.md)
-- [Data Analysis](tutorials/data-analysis.md)
-- [Scientific Computing](tutorials/scientific-computing.md)
-- [IoT & Embedded](tutorials/iot-embedded.md)
-
-### 7. **Project Information**
-
-- [Development Plan](project/plan.md) - Roadmap and status
-- [Platform Support](project/platforms.md) - Supported platforms
-- [Contributing](project/future-development.md) - How to contribute
-
----
-
-## 🚀 Quick Links
-
-### For New Users
-
-- **Start Here**: [Introduction](guides/introduction.md)
-- **Learn Syntax**: [v3.0 Syntax Guide](reference/syntax.md)
-- **Quick Tutorial**: [5-Minute Start](tutorials/quickstart.md)
-
-### For Developers
-
-- **API Reference**: [Standard Library](api/standard-library.md)
-- **Package List**: [58 Packages](reference/package-catalog.md)
-- **CLI Commands**: [Quick Reference](QUICK_REFERENCE.md)
-
-### For Contributors
-
-- **Compiler Guide**: [Architecture](guides/compiler.md)
-- **Contributing**: [Development Guide](project/future-development.md)
-
----
-
-## 🎯 Key Features
-
-- **v3.0 Syntax**: Modern `let`/`var` keywords
-- **58 Packages**: Cross-language ecosystem
-- **13 Stdlib Modules**: 110+ functions
-- **3 Runtimes**: Python, JavaScript, Rust
-- **AI Integration**: Multi-provider support
-- **Production Ready**: 0 errors, 0 warnings, 33+ tests
-
----
-
-## 📖 How to Use This Documentation
-
-1. **New to GUL?** → [Introduction](guides/introduction.md) → [Quick Start](tutorials/quickstart.md)
-2. **Learning Syntax?** → [Syntax Reference](reference/syntax.md) → [Specification](reference/specification.md)
-3. **Building Projects?** → [Guides](guides/) → [Tutorials](tutorials/)
-4. **Need API Details?** → [Standard Library](api/standard-library.md)
-5. **Package Management?** → [Package Catalog](reference/package-catalog.md)
-
----
-
-## 🔍 Documentation Index
-
-### Core Documentation
-
-- [README](../README.md) - Project overview
 - [Quick Reference](QUICK_REFERENCE.md) - Cheat sheet
-- [Syntax Guide](reference/syntax.md) - v3.0 syntax
-- [Standard Library](api/standard-library.md) - Built-in modules
-
-### Advanced Topics
-
-- [Compiler Architecture](guides/compiler.md)
-- [Multi-Language Integration](guides/integration.md)
-- [Package Database](guides/package-database.md)
+- [Syntax Guide](reference/syntax.md) - Complete syntax
+- [Standard Library](api/standard-library.md) - 13 modules, 110+ functions
+- [Data-Flow Guide](guides/dataflow.md) - Node-based programming
 
 ---
 
-## 📊 Project Status
+## Getting Started
 
-- ✅ Phase 1: Core Package Manager (100%)
-- ✅ Phase 2: Standard Library - 13 modules (100%)
-- ✅ Phase 3: 58 Packages (100%)
-- ✅ Phase 4: Cross-Language Runtimes (100%)
-- ✅ Phase 5: CLI Commands (100%)
-- ✅ Phase 6: CI/CD + Tests (100%)
+```gul
+@imp std.io
 
-**Total**: 1,600+ lines of production code, 33+ tests, 0 warnings
+mn:
+    print("Hello, GUL!")
+```
 
----
-
-## 🔗 External Resources
-
-- **Repository**: [github.com/gul-lang/gul](https://github.com/gul-lang/gul)
-- **Version**: 0.13.0
-- **License**: MIT
+**Run**: `gul run hello.mn`
 
 ---
 
-**Last Updated**: 2025-12-18  
-**Documentation Version**: 3.0.0
+## Documentation Structure
+
+### Guides
+
+- [Introduction](guides/introduction.md) - Language overview
+- [Data-Flow](guides/dataflow.md) - Contract-based programming
+- [Installation](guides/installation.md) - Setup
+- [TUI IDE](guides/tui.md) - Terminal IDE
+
+### Reference
+
+- [Syntax](reference/syntax.md) - Complete syntax
+- [Types](reference/types.md) - Type system
+- [Ownership](reference/ownership.md) - Memory model
+- [Specification](reference/specification.md) - Language spec
+
+### API
+
+- [Standard Library](api/standard-library.md) - Core modules
+
+### History
+
+- [Development History](devhistory.md) - v1.0 → v3.0 evolution
+
+---
+
+## v3.0 Syntax
+
+```gul
+let name = "value"    # Immutable
+var count = 0         # Mutable
+mn:                   # Main entry
+@imp std.http         # Import
+@python { }           # Foreign code
+```
+
+---
+
+**Last Updated**: 2025-12-18
