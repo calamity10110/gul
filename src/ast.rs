@@ -171,3 +171,142 @@ pub enum ListOp {
     Fold,
     Slice,
 }
+
+// ============================================
+// Data-Flow Node System (v3.0)
+// ============================================
+
+/// Type annotation for data-flow contracts (e.g., @int, @float, @str)
+#[derive(Debug, Clone, PartialEq)]
+pub struct TypeAnnotation {
+    pub base_type: String,      // e.g., "int", "float", "str"
+    pub is_list: bool,          // @int[] vs @int
+    pub traits: Vec<String>,    // Associated traits
+}
+
+/// Port parameter with name and label
+#[derive(Debug, Clone, PartialEq)]
+pub struct PortParam {
+    pub name: String,   // Parameter name (lowercase)
+    pub label: String,  // Label (uppercase)
+}
+
+/// Port contract for node input/output
+#[derive(Debug, Clone, PartialEq)]
+pub struct PortContract {
+    pub port_type: TypeAnnotation,
+    pub params: Vec<PortParam>,
+}
+
+/// Node declaration (in .def files)
+#[derive(Debug, Clone, PartialEq)]
+pub struct NodeDeclaration {
+    pub name: String,
+    pub required_inputs: PortContract,
+    pub required_outputs: PortContract,
+    pub optional_inputs: Option<PortContract>,
+    pub optional_outputs: Option<PortContract>,
+}
+
+/// Reference to a node port (e.g., node1: c)
+#[derive(Debug, Clone, PartialEq)]
+pub struct PortRef {
+    pub node_name: String,      // "node1" or "input" or "print"
+    pub port_name: String,      // "c" or "a"
+}
+
+/// Data-flow connection (source : target)
+#[derive(Debug, Clone, PartialEq)]
+pub struct DataFlowConnection {
+    pub source: PortRef,
+    pub target: PortRef,
+}
+
+/// External input with type and value
+#[derive(Debug, Clone, PartialEq)]
+pub struct ExternalInput {
+    pub input_type: TypeAnnotation,
+    pub value: Expression,
+}
+
+/// Data-flow main block
+#[derive(Debug, Clone, PartialEq)]
+pub struct DataFlowBlock {
+    pub connections: Vec<DataFlowConnection>,
+    pub external_inputs: Vec<(ExternalInput, PortRef)>,
+    pub outputs: Vec<PortRef>,  // Ports connected to print/output
+}
+
+/// Trait definition
+#[derive(Debug, Clone, PartialEq)]
+pub struct TraitDef {
+    pub name: String,
+    pub methods: Vec<String>,   // Optional trait methods
+}
+
+/// Node function implementation output binding
+#[derive(Debug, Clone, PartialEq)]
+pub struct OutputBinding {
+    pub name: String,           // Output parameter name
+    pub expression: Expression, // The computation
+}
+
+/// Node function return with multiple outputs
+#[derive(Debug, Clone, PartialEq)]
+pub struct NodeReturn {
+    pub bindings: Vec<OutputBinding>,
+}
+
+// Add to Statement enum (extend existing)
+// These are for reference - actual integration in parser
+
+/// Built-in traits for the data-flow system
+#[derive(Debug, Clone, PartialEq)]
+pub enum BuiltinTrait {
+    Serialize,
+    Trainable,
+    Stream,
+    Async,
+    Sync,
+}
+
+impl BuiltinTrait {
+    pub fn from_str(s: &str) -> Option<Self> {
+        match s {
+            "serialize" => Some(BuiltinTrait::Serialize),
+            "trainable" => Some(BuiltinTrait::Trainable),
+            "stream" => Some(BuiltinTrait::Stream),
+            "async" => Some(BuiltinTrait::Async),
+            "sync" => Some(BuiltinTrait::Sync),
+            _ => None,
+        }
+    }
+}
+
+impl TypeAnnotation {
+    pub fn new(base_type: &str) -> Self {
+        TypeAnnotation {
+            base_type: base_type.to_string(),
+            is_list: false,
+            traits: Vec::new(),
+        }
+    }
+
+    pub fn with_traits(base_type: &str, traits: Vec<String>) -> Self {
+        TypeAnnotation {
+            base_type: base_type.to_string(),
+            is_list: false,
+            traits,
+        }
+    }
+}
+
+impl PortRef {
+    pub fn new(node_name: &str, port_name: &str) -> Self {
+        PortRef {
+            node_name: node_name.to_string(),
+            port_name: port_name.to_string(),
+        }
+    }
+}
+

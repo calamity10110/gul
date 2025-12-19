@@ -1,11 +1,11 @@
-// GUL TUI IDE - Terminal User Interface IDE for GUL v2.1
+// GUL TUI IDE - Terminal User Interface IDE for GUL v3.0
 // Built with Ratatui (formerly tui-rs)
-// Supports v2.1 bracket equivalence and .mn file type
+// Supports v3.0 syntax: let/var, mn:, @imp
 
 use std::io;
 use std::path::{Path, PathBuf};
 
-/// v2.1 Syntax highlighting token types
+/// v3.0 Syntax highlighting token types
 #[derive(Clone, Debug, PartialEq)]
 pub enum TokenType {
     // Core tokens
@@ -17,16 +17,16 @@ pub enum TokenType {
     Comment,
     Operator,
 
-    // v2.1 Brackets (all equivalent semantically)
+    // v3.0 Brackets (all equivalent semantically)
     BracketOpen,  // ( [ {
     BracketClose, // ) ] }
 
-    // v2.1 UI Syntax
+    // v3.0 UI Syntax
     UiMarker,    // ^&^
     UiComponent, // button, table, etc.
     UiProperty,  // text:, data:, etc.
 
-    // v2.1 File Types
+    // v3.0 File Types
     FileTypeMain, // .mn
     FileTypeDef,  // .def
     FileTypeFnc,  // .fnc
@@ -38,7 +38,7 @@ pub enum TokenType {
     Unknown,
 }
 
-/// v2.1 Bracket type for matching validation
+/// v3.0 Bracket type for matching validation
 #[derive(Clone, Debug, PartialEq)]
 pub enum BracketType {
     Paren,  // ()
@@ -52,10 +52,10 @@ pub struct BracketPair {
     pub open_pos: usize,
     pub close_pos: usize,
     pub bracket_type: BracketType,
-    pub matched: bool, // v2.1: true even if types differ but match logically
+    pub matched: bool, // v3.0: true even if types differ but match logically
 }
 
-/// Syntax highlighting theme for GUL v2.1
+/// Syntax highlighting theme for GUL v3.0
 #[derive(Clone, Debug)]
 pub struct GulTheme {
     pub keyword_color: (u8, u8, u8),
@@ -64,7 +64,7 @@ pub struct GulTheme {
     pub number_color: (u8, u8, u8),
     pub comment_color: (u8, u8, u8),
     pub ui_marker_color: (u8, u8, u8),  // ^&^ highlighting
-    pub bracket_match_bg: (u8, u8, u8), // v2.1 bracket pairs
+    pub bracket_match_bg: (u8, u8, u8), // v3.0 bracket pairs
     pub file_type_color: (u8, u8, u8),  // .mn, .def, .fnc, .cs
 }
 
@@ -83,7 +83,7 @@ impl Default for GulTheme {
     }
 }
 
-/// GUL v2.1 Syntax Highlighter
+/// GUL v3.0 Syntax Highlighter
 pub struct SyntaxHighlighter {
     #[allow(dead_code)]
     theme: GulTheme,
@@ -96,8 +96,17 @@ impl SyntaxHighlighter {
         SyntaxHighlighter {
             theme: GulTheme::default(),
             keywords: vec![
-                "main", "fn", "async", "struct", "import", "const", "mut", "if", "elif", "else",
-                "for", "while", "loop", "break", "continue", "return", "await", "try", "catch",
+                // v3.0 keywords (primary)
+                "let", "var", "mn", "fn", "async", "struct",
+                // v3.0 imports
+                "@imp", "@python", "@rust", "@sql", "@c",
+                // Control flow
+                "if", "elif", "else", "for", "while", "loop", "break", "continue", "return",
+                // Async/Error
+                "await", "try", "catch", "finally", "throw",
+                // v2.0 (deprecated but supported)
+                "const", "mut", "main", "import",
+
                 "match", "extern", "pub",
             ],
             ui_components: vec![

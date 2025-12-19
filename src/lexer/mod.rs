@@ -46,6 +46,15 @@ pub enum Token {
     Let, // let (immutable, replaces const/def)
     Var, // var (mutable, replaces mut/?)
 
+    // Data-flow node system (v3.0)
+    Node,     // node declaration
+    ReIn,     // re_in: required input
+    ReOut,    // re_out: required output
+    OptIn,    // opt_in: optional input
+    OptOut,   // opt_out: optional output
+    Trait,    // trait definition
+
+
     // Literals
     Integer(i64),
     Float(f64),
