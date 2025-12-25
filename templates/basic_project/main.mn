@@ -1,9 +1,11 @@
-imp ui
+# GUL v3.1 Basic Project Template
 
-def tree = ^÷^[tree]
-def slider = ^÷^[slider{min=0, max=100, value=50}]
+@imp std.ui
 
-mn main():
+let tree = ^÷^[tree]
+let slider = ^÷^[slider{min=0, max=100, value=50}]
+
+mn:
     ui.print(tree)
     ui.print(slider)
     print("Basic project initialized!")

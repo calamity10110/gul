@@ -27,7 +27,7 @@ The language supports seamless integration with multiple programming languages t
 ### Example
 
 ```
-imp std.io
+@imp std.io
 
 @cs rust:
     fn process_image(pixels: &mut [u8], width: usize, height: usize) {
@@ -36,8 +36,8 @@ imp std.io
         }
     }
 
-fn main():
-    own image = load_image("photo.png")
+mn:
+    let image = load_image("photo.png")
     rust.process_image(ref image.pixels, image.width, image.height)
     save_image(image, "output.png")
 ```
@@ -51,7 +51,7 @@ fn main():
     import numpy as np
     import pandas as pd
 
-    def analyze_data(data):
+    fn analyze_data(data):
         df = pd.DataFrame(data)
         return df.describe().to_dict()
 ```
@@ -68,11 +68,11 @@ fn main():
 @cs python:
     import tensorflow as tf
 
-    def predict(model_path, input_data):
+    fn predict(model_path, input_data):
         model = tf.keras.models.load_model(model_path)
         return model.predict(input_data).tolist()
 
-asy run_inference():
+async run_inference():
     data = load_data("input.csv")
     result = python.predict("model.h5", data)
     print(result)
@@ -113,7 +113,7 @@ asy run_inference():
         }));
     }
 
-fn main():
+mn:
     data = load_json("data.json")
     processed = js.processJSON(data)
     save_json(processed, "output.json")
@@ -172,7 +172,7 @@ fn main():
         };
     }
 
-asy main():
+async mn:
     config = {
         apiKey: secret.API_KEY,
         endpoint: "https://api.example.com",
@@ -224,8 +224,8 @@ asy main():
         }
     }
 
-fn main():
-    own text = "Hello, World!"
+mn:
+    let text = "Hello, World!"
     c.reverse_string(ref text)
     print(text)  # "!dlroW ,olleH"
 ```
@@ -258,7 +258,7 @@ fn main():
 ### Example
 
 ```
-imp db
+@imp db
 
 @cs sql:
     create table if not exists users (
@@ -272,7 +272,7 @@ imp db
         ('Alice', 'alice@example.com'),
         ('Bob', 'bob@example.com');
 
-fn main():
+mn:
     db.execute(sql.create_table)
     db.execute(sql.insert_users)
 

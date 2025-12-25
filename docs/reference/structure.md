@@ -49,7 +49,7 @@ Blocks are separate files that contain specific types of code. GUL automatically
 | `async.asy`       | Async Functions   | All `asy` functions           |
 | `functions.fnc`   | Sync Functions    | All `fn` functions            |
 | `custom.cs`       | Foreign Code      | All `cs` language blocks      |
-| `main.mn`         | Entry Point       | Only the `mn main()` function |
+| `main.mn`         | Entry Point       | Only the `mn:` function |
 
 ### How It Works
 
@@ -57,19 +57,19 @@ Blocks are separate files that contain specific types of code. GUL automatically
 ┌─────────────────────────────────────┐
 │  You Write: main.mn                 │
 │                                     │
-│  imp std.io                         │
-│  imp std.http                       │
+│  @imp std.io                         │
+│  @imp std.http                       │
 │                                     │
 │  def API_URL = "https://..."        │
 │  def MAX_RETRIES = 3                │
 │                                     │
-│  asy fetch_data(url):               │
+│  async fetch_data(url):               │
 │      return await http.get(url)     │
 │                                     │
 │  fn process(data):                  │
 │      return transform(data)         │
 │                                     │
-│  mn main():                         │
+│  mn:                         │
 │      data = await fetch_data(url)   │
 │      print(data)                    │
 └─────────────────────────────────────┘
@@ -80,21 +80,21 @@ Blocks are separate files that contain specific types of code. GUL automatically
 │  Generated Files:                   │
 │                                     │
 │  imports.imp                        │
-│  ├─ imp std.io                      │
-│  └─ imp std.http                    │
+│  ├─ @imp std.io                      │
+│  └─ @imp std.http                    │
 │                                     │
 │  definitions.def                    │
 │  ├─ def API_URL = "https://..."     │
 │  └─ def MAX_RETRIES = 3             │
 │                                     │
-│  async.asy                          │
-│  └─ asy fetch_data(url): ...        │
+│  async.async                          │
+│  └─ async fetch_data(url): ...        │
 │                                     │
 │  functions.fnc                      │
 │  └─ fn process(data): ...           │
 │                                     │
 │  main.mn (cleaned)                  │
-│  └─ mn main(): ...                  │
+│  └─ mn: ...                  │
 └─────────────────────────────────────┘
 ```
 
@@ -109,7 +109,7 @@ my-project/
 ├── main.mn              # Your main file (you write this)
 ├── imports.imp          # Auto-generated imports
 ├── definitions.def      # Auto-generated definitions
-├── async.asy           # Auto-generated async functions
+├── async.async           # Auto-generated async functions
 ├── functions.fnc       # Auto-generated sync functions
 ├── custom.cs           # Auto-generated foreign code
 ├── package.toml        # Package metadata
@@ -128,16 +128,16 @@ This is where you write ALL your code initially:
 # main.mn - You write everything here!
 
 # Imports
-imp std.io
-imp std.http
-imp python: numpy
+@@imp std.io
+@@imp std.http
+@imp python: numpy
 
 # Constants
 def API_KEY = "your-key"
 def MAX_USERS = 100
 
 # Async functions
-asy fetch_users():
+async fetch_users():
     return await http.get("/users")
 
 # Sync functions
@@ -145,7 +145,7 @@ fn calculate_total(items):
     return sum(items)
 
 # Main entry point
-mn main():
+mn:
     users = await fetch_users()
     print(users)
 ```
@@ -157,9 +157,9 @@ Contains all your import statements:
 ```glob
 # imports.imp - Auto-generated from main.mn
 
-imp std.io
-imp std.http
-imp python: numpy
+@@imp std.io
+@@imp std.http
+@imp python: numpy
 ```
 
 #### 3. `definitions.def` - Constants & Types (Auto-generated)
@@ -178,9 +178,9 @@ def MAX_USERS = 100
 Contains all async functions:
 
 ```glob
-# async.asy - Auto-generated from main.mn
+# async.async - Auto-generated from main.mn
 
-asy fetch_users():
+async fetch_users():
     return await http.get("/users")
 ```
 
@@ -204,7 +204,7 @@ Contains all embedded language blocks:
 
 cs python:
     import numpy as np
-    def analyze(data):
+    fn analyze(data):
         return np.mean(data)
 
 cs rust:
@@ -220,7 +220,7 @@ Contains only the main function:
 ```glob
 # main.mn - Auto-generated (cleaned version)
 
-mn main():
+mn:
     users = await fetch_users()
     print(users)
 ```
@@ -236,22 +236,22 @@ GUL v0.11.0 introduces multiple equivalent import syntaxes. Choose the style tha
 **Individual Imports:**
 
 ```glob
-imp std.io
-imp python: numpy
-imp rust: tokio
+@@imp std.io
+@imp python: numpy
+@imp rust: tokio
 ```
 
 **Grouped Imports:**
 
 ```glob
 # Using brackets
-imp [python: (numpy, pandas), std: (io, http)]
+@imp [python: (numpy, pandas), std: (io, http)]
 
 # Using braces
-imp {python: {numpy, pandas}, std: {io, http}}
+@imp {python: {numpy, pandas}, std: {io, http}}
 
 # Using parentheses
-imp (python: (numpy, pandas), std: (io, http))
+@imp (python: (numpy, pandas), std: (io, http))
 ```
 
 **Key Feature:** `[]`, `{}`, and `()` are interchangeable!
@@ -304,7 +304,7 @@ Comprehensive `@` prefix annotations for types, functions, and more:
 **Function Annotations:**
 
 ```glob
-@asy fetch_data(url):
+@async fetch_data(url):
     return await http.get(url)
 
 @fn calculate(x, y):
@@ -405,11 +405,11 @@ Import from other files:
 
 ```glob
 # main.mn
-imp myproject.utils      # Imports from src/utils.mn
-imp myproject.models     # Imports from src/models.mn
-imp myproject.api        # Imports from src/api.mn
+@imp myproject.utils      # Imports from src/utils.mn
+@imp myproject.models     # Imports from src/models.mn
+@imp myproject.api        # Imports from src/api.mn
 
-mn main():
+mn:
     user = models.User("Alice", 25)
     result = utils.process_data(user)
     print(result)
@@ -506,17 +506,17 @@ Public file with placeholders:
 # main.mn
 
 # Load secrets (automatically decrypted from project.scrt)
-imp secrets
+@imp secrets
 
 # Use secrets in your code
-asy connect_to_api():
+async connect_to_api():
     client = http.Client(
         api_key=secrets.API_KEY,
         api_secret=secrets.API_SECRET
     )
     return client
 
-asy connect_to_database():
+async connect_to_database():
     db = database.connect(
         host=secrets.DB_HOST,
         user=secrets.DB_USER,
@@ -524,7 +524,7 @@ asy connect_to_database():
     )
     return db
 
-mn main():
+mn:
     api = await connect_to_api()
     db = await connect_to_database()
     print("Connected successfully!")
@@ -564,14 +564,14 @@ Edit `main.mn`:
 ```glob
 # main.mn
 
-imp std.io
+@@imp std.io
 
 def GREETING = "Hello, GUL!"
 
 fn greet(name):
     return GREETING + " " + name
 
-mn main():
+mn:
     message = greet("World")
     print(message)
 ```
@@ -661,9 +661,9 @@ glob add my-awesome-package
 ## Usage
 
 \`\`\`glob
-imp my-awesome-package
+@imp my-awesome-package
 
-mn main():
+mn:
 result = my-awesome-package.do_something()
 print(result)
 \`\`\`
@@ -733,17 +733,17 @@ web-api-project/
 └── project.scrt
 
 # main.mn
-imp std.http
+@@imp std.http
 
 def PORT = 8080
 
-asy handle_request(request):
+async handle_request(request):
     return {
         status: 200,
         body: "Hello from GUL!"
     }
 
-mn main():
+mn:
     server = http.Server(PORT)
     server.on("request", handle_request)
     await server.start()
@@ -754,10 +754,10 @@ After compilation:
 
 ```
 web-api-project/
-├── imports.imp          # imp std.http
+├── imports.imp          # @imp std.http
 ├── definitions.def      # def PORT = 8080
-├── async.asy           # asy handle_request(...)
-├── main.mn             # mn main(): ...
+├── async.async           # async handle_request(...)
+├── main.mn             # mn: ...
 └── package.toml
 ```
 
@@ -770,9 +770,9 @@ data-analysis/
 └── project.scrt
 
 # main.mn
-imp std.io
-imp python: pandas
-imp python: matplotlib
+@@imp std.io
+@imp python: pandas
+@imp python: matplotlib
 
 def DATA_FILE = "data.csv"
 
@@ -780,18 +780,18 @@ cs python:
     import pandas as pd
     import matplotlib.pyplot as plt
 
-    def analyze(filename):
+    fn analyze(filename):
         df = pd.read_csv(filename)
         return df.describe()
 
-    def plot(data):
+    fn plot(data):
         plt.plot(data)
         plt.savefig('output.png')
 
 fn load_data():
     return file.read(DATA_FILE)
 
-mn main():
+mn:
     data = load_data()
     stats = analyze(DATA_FILE)
     print(stats)
@@ -806,7 +806,7 @@ data-analysis/
 ├── definitions.def      # def DATA_FILE = "data.csv"
 ├── custom.cs           # Python code block
 ├── functions.fnc       # fn load_data()
-├── main.mn             # mn main(): ...
+├── main.mn             # mn: ...
 └── package.toml
 ```
 
@@ -819,8 +819,8 @@ iot-controller/
 └── project.scrt
 
 # main.mn
-imp embedded.gpio
-imp std.time
+@imp embedded.gpio
+@@imp std.time
 
 def LED_PIN = 13
 def BLINK_INTERVAL = 1000  # milliseconds
@@ -835,7 +835,7 @@ fn blink_led(pin, interval):
         gpio.low(pin)
         time.sleep(interval)
 
-mn main():
+mn:
     setup_pin(LED_PIN)
     blink_led(LED_PIN, BLINK_INTERVAL)
 ```

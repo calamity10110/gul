@@ -34,16 +34,16 @@ struct Model:
     fn new() -> Model:
         return Model { layers: [] }
     
-    fn add(mut self, layer: Layer):
+    fn add(var self, layer: Layer):
         self.layers.push(layer)
         
     fn predict(self, input: Tensor) -> Tensor:
-        mut output = input
+        var output = input
         for layer in self.layers:
             output = layer.forward(output)
         return output
         
-    fn train(mut self, x: Tensor, y: Tensor, epochs: int):
+    fn train(var self, x: Tensor, y: Tensor, epochs: int):
         print("Training for " + epochs.to_string() + " epochs...")
         # Mock training loop
         

@@ -1,0 +1,28 @@
+{
+  "cli_version": "0.7.1 (03ab7fa)",
+  "rust_version": "rustc 1.91.1 (ed61e7d7e 2025-11-07)",
+  "assets": {
+    "assets": {
+      "/media/vu/512gb/blob/gul/web/public/index.html": [
+        {
+          "absolute_source_path": "/media/vu/512gb/blob/gul/web/public/index.html",
+          "bundled_path": "../index.html",
+          "options": {
+            "add_hash": false,
+            "variant": "Unknown"
+          }
+        }
+      ],
+      "/media/vu/512gb/blob/gul/web/public/style.css": [
+        {
+          "absolute_source_path": "/media/vu/512gb/blob/gul/web/public/style.css",
+          "bundled_path": "../style.css",
+          "options": {
+            "add_hash": false,
+            "variant": "Unknown"
+          }
+        }
+      ]
+    }
+  }
+}

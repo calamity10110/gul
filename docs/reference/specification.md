@@ -499,15 +499,15 @@ def user: Option<User> = Some(user_data)
 GUL infers types where possible:
 
 ```gul
-const x = 10             # Inferred as int
-const y = 10 m           # Inferred as float<m>
-const name = "Alice"     # Inferred as str
+let x = 10             # Inferred as int
+let y = 10 m           # Inferred as float<m>
+let name = "Alice"     # Inferred as str
 ```
 
 Explicit types can override:
 
 ```gul
-const x: float = 10      # Explicitly float
+let x: float = 10      # Explicitly float
 ```
 
 ---
@@ -521,7 +521,7 @@ GUL uses a move-by-default system inspired by Rust. Variables are transferred un
 ### 5.2 `own` Semantics
 
 ```gul
-const own x = value  # Explicitly claims ownership
+let own x = value  # Explicitly claims ownership
 
 fn take(own x):
     # Function takes full ownership of x
@@ -539,7 +539,7 @@ fn peek(ref x):
     print(x)
     # x is still owned by caller
 
-fn mut_peek(ref mut x):
+fn mut_peek(ref var x):
     # Borrows x mutably (planned)
     x.value = x.value + 1
 ```
@@ -547,7 +547,7 @@ fn mut_peek(ref mut x):
 ### 5.4 `copy` Semantics
 
 ```gul
-const y = copy x  # Creates a deep clone of x
+let y = copy x  # Creates a deep clone of x
 ```
 
 Primitive types (`int`, `bool`, `float`) are `copy` by default (implicit copy on assignment).
@@ -563,8 +563,8 @@ Primitive types (`int`, `bool`, `float`) are `copy` by default (implicit copy on
 Assignment transfers ownership for non-copy types:
 
 ```gul
-const list1 = [1, 2, 3]
-const list2 = list1  # list1 is now invalid (moved)
+let list1 = [1, 2, 3]
+let list2 = list1  # list1 is now invalid (moved)
 # print(list1)  # ERROR: value moved
 ```
 
@@ -591,8 +591,8 @@ Async tasks must own their data or act on `ref` strictly scoped execution contex
 ### 6.1 Declarations
 
 ```gul
-const name = value           # Standard declaration. Inferred type
-const name: type = value     # Explicit type
+let name = value           # Standard declaration. Inferred type
+let name: type = value     # Explicit type
 ```
 
 ### 6.2 Mutability
@@ -600,8 +600,8 @@ const name: type = value     # Explicit type
 Variables are immutable by default:
 
 ```gul
-const x = 10         # Immutable
-mut x = 10           # Mutable local variable
+let x = 10         # Immutable
+var x = 10           # Mutable local variable
 x = 20               # Assignment to mutable variable
 ```
 
@@ -610,9 +610,9 @@ x = 20               # Assignment to mutable variable
 Variables can be shadowed in inner scopes:
 
 ```gul
-const x = 10
+let x = 10
 if true:
-    const x = 20  # Shadows outer x
+    let x = 20  # Shadows outer x
     print(x)      # Prints 20
 print(x)          # Prints 10
 ```
@@ -631,7 +631,7 @@ Declared with `@global` annotation:
 
 ```gul
 fn counter():
-    @static mut count = 0
+    @static var count = 0
     count = count + 1
     return count
 ```
@@ -645,13 +645,13 @@ lazy const x = expensive_computation()  # Evaluated on first access (planned)
 ### 6.7 Compile-Time Constants
 
 ```gul
-const CONSTANT_NAME = value  # Treated as constant if uppercase
+let CONSTANT_NAME = value  # Treated as constant if uppercase
 ```
 
 ### 6.8 Variable Units
 
 ```gul
-const distance = 100 m  # Variable holds both value 100 and unit m
+let distance = 100 m  # Variable holds both value 100 and unit m
 ```
 
 ### 6.9 Time-Dimension Variables
@@ -748,8 +748,8 @@ calculate()  # Return value ignored
 ### 8.2 Variable Bindings
 
 ```gul
-const x = 10
-mut y = 20
+let x = 10
+var y = 20
 ```
 
 ### 8.3 Assignment
@@ -841,7 +841,7 @@ struct Point:
 ### 9.4 List & Tuple Definitions
 
 ```gul
-const DATA = [1, 2, 3]
+let DATA = [1, 2, 3]
 ```
 
 ### 9.5 Class Definitions
@@ -882,15 +882,15 @@ Definitions in `module.def` are accessed via `module.Name`.
 ### 10.1 Basic Lists
 
 ```gul
-const numbers: [int] = [1, 2, 3, 4, 5]
-const mixed = [1, "a"]  # Typed as [any]
+let numbers: [int] = [1, 2, 3, 4, 5]
+let mixed = [1, "a"]  # Typed as [any]
 ```
 
 ### 10.2 Basic Tuples
 
 ```gul
-const point = (10, 20)
-const user = ("Alice", 25, true)
+let point = (10, 20)
+let user = ("Alice", 25, true)
 ```
 
 ### 10.3 List/Tuple Functions (Lisp-Style)
@@ -906,7 +906,7 @@ fold(fn, init, list)  # Reduce
 ### 10.4 2D Lists
 
 ```gul
-const matrix = [[1, 2], [3, 4]]
+let matrix = [[1, 2], [3, 4]]
 ```
 
 Matrix operations supported via `std.math`.
@@ -916,7 +916,7 @@ Matrix operations supported via `std.math`.
 Volumetric data:
 
 ```gul
-const volume = [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
+let volume = [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
 ```
 
 ### 10.6 4D Lists (x-y-z-time)
@@ -924,15 +924,15 @@ const volume = [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
 Specialized for physics simulations:
 
 ```gul
-const spacetime = [[[[1, 2], [3, 4]], [[5, 6], [7, 8]]]]
+let spacetime = [[[[1, 2], [3, 4]], [[5, 6], [7, 8]]]]
 # Access via data[t][z][y][x]
 ```
 
 ### 10.7 Mutable vs Static Lists
 
 ```gul
-const own list = [...]  # Mutable (growable)
-const list = [...]      # Immutable view by default
+let own list = [...]  # Mutable (growable)
+let list = [...]      # Immutable view by default
 ```
 
 ### 10.8 Predictive Timelines
@@ -990,9 +990,9 @@ struct Calculator:
 Static method `new` is conventional:
 
 ```gul
-const user = User.new("Bob", 30)
+let user = User.new("Bob", 30)
 # Or struct literal:
-const user = User{name: "Bob", age: 30}
+let user = User{name: "Bob", age: 30}
 ```
 
 ### 11.5 Destructors
@@ -1236,7 +1236,7 @@ result = await future
 Moved values stay in task. Shared values must be wrapped:
 
 ```gul
-@shareable mut data = {}
+@shareable var data = {}
 ```
 
 ### 14.7 Time-Based Async
@@ -1600,7 +1600,7 @@ ui.print(^&^[slider{min=0, max=100, value=50}])
 ### 19.4 Data Binding
 
 ```gul
-mut value = 50
+var value = 50
 ^&^[slider{
     value: value,  # Two-way binding
     on_change: (new_val) => value = new_val
@@ -1673,8 +1673,8 @@ length(m) + time(s)  # ERROR: incompatible dimensions
 
 ```gul
 import std.science{c, G, h}
-const speed_of_light = c  # 299792458 m/s
-const gravity = G         # 6.67430e-11 m^3/kg/s^2
+let speed_of_light = c  # 299792458 m/s
+let gravity = G         # 6.67430e-11 m^3/kg/s^2
 ```
 
 ### 20.6 Scientific Functions
@@ -1694,7 +1694,7 @@ Native matrix/tensor types via 4D lists.
 Native support for `t` axis in arrays:
 
 ```gul
-const signal[t][x] = ...
+let signal[t][x] = ...
 ```
 
 ### 20.9 Simulation Environment
@@ -1731,7 +1731,7 @@ key = "sk_live_abc123"
 
 ```gul
 import secrets
-const api_key = secrets.API_KEY
+let api_key = secrets.API_KEY
 ```
 
 ### 21.3 Encryption Rules
@@ -1747,7 +1747,7 @@ AES-256 by default for `.scrt` files.
 Sensitive variables marked `@secure` are zeroed:
 
 ```gul
-@secure mut password = "..."
+@secure var password = "..."
 ```
 
 ### 21.6 Safe APIs

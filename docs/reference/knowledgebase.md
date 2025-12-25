@@ -1,11 +1,14 @@
 # GUL (GUL Universal Language) Knowledgebase
+
 Version: 0.13.0 (v2.0 Syntax)
 Date: 2025-12-09
 
 ## 1. Project Overview
+
 GUL is a modern, multi-paradigm programming language designed to combine Python's readability with Rust's safety and performance. It features built-in capabilities for scientific computing, UI development, and multi-language integration.
 
 **Key Philosophies:**
+
 - **Simplicity:** Indentation-based, readable syntax.
 - **Performance:** Native compilation via Rust-based toolchain.
 - **Safety:** Strong ownership model (`own`, `ref`, `copy`) without garbage collection.
@@ -13,21 +16,25 @@ GUL is a modern, multi-paradigm programming language designed to combine Python'
 - **Universality:** Runs on Desktop, Web (WASM), and Embedded devices.
 
 ## 2. Package Ecosystem
+
 The GUL ecosystem is organized into a modular package structure in `gul_packages/`.
 
 ### 2.1 Core Standard Library (`gul_packages/std/`)
+
 - **http.mn**: HTTP client/server (Requests/Reqwest inspired).
 - **json.mn**: JSON parsing and serialization (Serde inspired).
 - **ml.mn**: Machine Learning primitives (Tensors, Models, Layers).
 - **utils.mn**: Common utilities (Regex, DateTime, Crypto).
 
 ### 2.2 Extended Standard Library
+
 - **net.mn**: Low-level networking (TCP/UDP sockets).
 - **db.mn**: Database abstractions (PostgreSQL, SQLite).
 - **tui.mn**: Terminal User Interface framework (Widgets, Layouts).
 - **web.mn**: Web application framework (Routing, Middleware).
 
 ### 2.3 Domain Specific Libraries
+
 - **data.mn**: Data science tools (DataFrames, Arrays).
 - **science.mn**: Scientific modules (Physics, Chemistry, Biology, Math).
 - **robotics.mn**: IoT and Robotics (GPIO, Sensors, ROS integration).
@@ -35,34 +42,43 @@ The GUL ecosystem is organized into a modular package structure in `gul_packages
 ## 3. Language Features
 
 ### Syntax (v2.0)
+
 - **File Extensions:** `.mn` (General), `.def` (Definitions), `.fnc` (Functions), `.mn` (Main).
 - **Blocks:** Indentation-based (Python-style).
 - **Comments:** `# Single line`, `#[ Multi-line ]#`.
 - **Keywords:** `import`, `const`, `mut`, `fn`, `async`, `extern`, `main`, `struct`.
 
 ### Ownership Model (Unchanged)
+
 - `own`: Transfers ownership (Move semantics).
 - `ref`: Borrows a reference (Immutable default).
 - `copy`: Creates a duplicate.
 
 ### Multi-Language Integration (`extern` blocks)
+
 Embed foreign code directly:
+
 - `extern python {...}`: Embed Python code.
 - `extern rust {...}`: Embed Rust code.
 - `extern js {...}`: Embed JavaScript.
 - `extern sql {...}`: Embed SQL queries.
 
 ### UI Syntax
+
 First-class UI component literals:
+
 - `^÷^[button{text="Click"}]`
 - `^÷^[chart{data=...}]`
 
 ### Scientific Computing
+
 Native support for units:
+
 - `def speed = 10 m/s`
 - `def force = 100 N`
 
 ## 4. Directory Structure
+
 ```
 /
 ├── gul_packages/           # GUL Implementation Packages
@@ -78,7 +94,8 @@ Native support for units:
 └── target/                 # Build artifacts
 ```
 
-## 5. GUL — Reference Manual  
+## 5. GUL — Reference Manual
+
 0. Front Matter
 
 0.1 Preface
@@ -88,20 +105,22 @@ This manual defines the GUL (GUL Universal Language) programming language, versi
 This document covers the language syntax, semantics, standard library interfaces, and toolchain usage.
 
 0.3 Conventions Used
+
 - `code` fixed-width font for code.
 - **Bold** for emphasized terms.
 - `[ ... ]` denotes optional syntax in grammar sections.
 
-0.4 Versioning Scheme
-GUL follows Semantic Versioning 2.0.0.
+  0.4 Versioning Scheme
+  GUL follows Semantic Versioning 2.0.0.
 
-0.5 Glossary
+  0.5 Glossary
+
 - **Ownership**: The system by which memory is managed without a garbage collector.
 - **Foreign Block**: A block of code in another language (e.g., Python, C) embedded within GUL.
 - **Unit**: A scientific unit of measurement (e.g., `m/s`) attached to a numeric value.
 
-0.6 Notational Conventions
-Grammar is presented in simplified EBNF.
+  0.6 Notational Conventions
+  Grammar is presented in simplified EBNF.
 
 1. Language Overview
 
@@ -109,78 +128,87 @@ Grammar is presented in simplified EBNF.
 GUL aims to be a "universal" language, suitable for systems programming, web development, data science, and scripting.
 
 1.2 Design Philosophy
+
 - **Readability First**: Syntax should be obvious and clean.
 - **Safety by Default**: Memory safety without GC pause times.
 - **Interoperability**: Seamless integration with existing ecosystems (Python, Rust, C).
 
-1.3 Core Principles
+  1.3 Core Principles
+
 - Strict File Roles: logic (`.fnc`) is separated from definitions (`.def`) and orchestration (`.mn`).
 - Explicit Ownership: `own`, `ref`, `copy` keywords make memory intent clear.
 
-1.4 Compilation Pipeline Summary
-Source -> Lexer -> AST -> Semantic Analysis -> IR -> CodeGen (LLVM/Rust/WASM).
+  1.4 Compilation Pipeline Summary
+  Source -> Lexer -> AST -> Semantic Analysis -> IR -> CodeGen (LLVM/Rust/WASM).
 
-1.5 Execution Model
-Compiled to native machine code or WebAssembly. No VM required for pure GUL code.
+  1.5 Execution Model
+  Compiled to native machine code or WebAssembly. No VM required for pure GUL code.
 
-1.6 Supported Paradigms
+  1.6 Supported Paradigms
+
 - Imperative
 - Functional (Lisp-style list ops, first-class functions)
 - Object-Oriented (Structs/Classes with methods)
 - Async/Concurrent
 
-1.7 Static vs Dynamic Features
-Statically typed with type inference. Dynamic features available via `any` type or foreign blocks.
+  1.7 Static vs Dynamic Features
+  Statically typed with type inference. Dynamic features available via `any` type or foreign blocks.
 
-1.8 Use Cases
+  1.8 Use Cases
+
 - High-performance web servers.
 - Scientific simulations (native units).
 - Embedded systems (no GC).
 
-1.9 Integration Ecosystem
-Built-in support for embedding Rust, Python, and C via `cs` blocks.
+  1.9 Integration Ecosystem
+  Built-in support for embedding Rust, Python, and C via `cs` blocks.
 
-1.10 Toolchain Overview
+  1.10 Toolchain Overview
+
 - `gul`: The primary CLI tool (compiler, runner, package manager).
 
 2. Language Structure
 
 2.1 File Types (v2.0)
+
 - `.def`: Definition files. Contains `const`, `mut`, `struct`, `@global`, `import`. No control flow.
 - `.fnc`: Function files. Contains `fn`, `async` functions. Pure logic.
-- `.mn`: Main files. Contains `main():` entry point and orchestrates execution.
+- `.mn`: Main files. Contains `mn:` entry point and orchestrates execution.
 - `.scrt`: Secret files. Encrypted storage for API keys/credentials.
 - `.mn`: General purpose files (can contain any valid GUL code).
 
-2.2 Module System
-Modules map to file paths. `imp std.math` imports `std/math.mn` or `std/math` package.
+  2.2 Module System
+  Modules map to file paths. `@imp std.math` imports `std/math.mn` or `std/math` package.
 
-2.3 Naming Rules
+  2.3 Naming Rules
+
 - Variables/Functions: `snake_case` (e.g., `my_variable`).
 - Types/Structs: `PascalCase` (e.g., `MyStruct`).
 - Constants: `SCREAMING_SNAKE_CASE` (e.g., `MAX_RETRY`).
 
-2.4 Unicode Support
-Source code must be UTF-8. Identifiers can contain Unicode characters.
+  2.4 Unicode Support
+  Source code must be UTF-8. Identifiers can contain Unicode characters.
 
-2.5 Code Blocks & Indentation
-GUL uses significant indentation (4 spaces recommended). Blocks are denoted by `:`.
+  2.5 Code Blocks & Indentation
+  GUL uses significant indentation (4 spaces recommended). Blocks are denoted by `:`.
+
 ```gul
 if x > 0:
     print("Positive")
 ```
 
 2.6 Comments
+
 - `#`: Single line comment.
 - `#[ ... ]#`: Multi-line comment.
 
-2.7 Documentation Blocks
-Triple-quoted strings `""" ... """` at the start of functions/modules act as docstrings.
+  2.7 Documentation Blocks
+  Triple-quoted strings `""" ... """` at the start of functions/modules act as docstrings.
 
-2.8 Metadata Headers
-Files can start with metadata comments:
-`# @version: 1.0`
-`# @author: Jane`
+  2.8 Metadata Headers
+  Files can start with metadata comments:
+  `# @version: 1.0`
+  `# @author: Jane`
 
 3. Lexical Structure
 
@@ -199,6 +227,7 @@ Legacy (deprecated): `imp`, `def`, `asy`, `cs`, `mn`.
 Common: `own`, `ref`, `copy`, `await`, `loop`, `if`, `elif`, `else`, `for`, `while`, `return`, `break`, `continue`, `try`, `catch`.
 
 3.5 Literals
+
 - **String**: `"hello"` or `'hello'`.
 - **Number**: `123`, `12.34`, `0xFF`.
 - **Unit**: `10 kg`, `9.8 m/s^2` (Number followed by Unit identifier).
@@ -206,56 +235,58 @@ Common: `own`, `ref`, `copy`, `await`, `loop`, `if`, `elif`, `else`, `for`, `whi
 - **List**: `[1, 2, 3]`.
 - **Dict**: `{key: val}`.
 
-3.6 Operators
-`+`, `-`, `*`, `/`, `%`, `^` (power), `==`, `!=`, `<`, `>`, `<=`, `>=`.
-`and`, `or`, `not`.
+  3.6 Operators
+  `+`, `-`, `*`, `/`, `%`, `^` (power), `==`, `!=`, `<`, `>`, `<=`, `>=`.
+  `and`, `or`, `not`.
 
-3.7 Delimiters
-`()`, `[]`, `{}`, `,`, `:`, `.`, `->`.
+  3.7 Delimiters
+  `()`, `[]`, `{}`, `,`, `:`, `.`, `->`.
 
-3.8 Escape Rules
-Standard C-style escapes: `\n`, `\t`, `\"`, `\\`.
+  3.8 Escape Rules
+  Standard C-style escapes: `\n`, `\t`, `\"`, `\\`.
 
 4. Types
 
 4.1 Primitive Types
+
 - `int` (64-bit signed).
 - `float` (64-bit IEEE).
 - `bool` (`true`, `false`).
 - `str` (UTF-8 string).
 - `char` (Unicode scalar).
 
-4.2 Compound Types
+  4.2 Compound Types
+
 - **Structs**: User-defined records.
 - **Enums**: Tagged unions (planned).
 
-4.3 Tuple Types
-`(int, str)` - Fixed size, mixed types.
+  4.3 Tuple Types
+  `(int, str)` - Fixed size, mixed types.
 
-4.4 List Types (4-D)
-`[int]` - Dynamic arrays.
-Native support for up to 4 dimensions for scientific data: `x`, `y`, `z`, `t` (time).
+  4.4 List Types (4-D)
+  `[int]` - Dynamic arrays.
+  Native support for up to 4 dimensions for scientific data: `x`, `y`, `z`, `t` (time).
 
-4.5 Dictionary Types
-`{str: int}` - Hash map.
+  4.5 Dictionary Types
+  `{str: int}` - Hash map.
 
-4.6 Range Types
-`0..10` (exclusive), `0..=10` (inclusive).
+  4.6 Range Types
+  `0..10` (exclusive), `0..=10` (inclusive).
 
-4.7 Unit Types (Scientific Units)
-Types can include dimensions: `float<m/s>`.
-Arithmetic operations enforce dimensional consistency (e.g., `L / T = V`).
+  4.7 Unit Types (Scientific Units)
+  Types can include dimensions: `float<m/s>`.
+  Arithmetic operations enforce dimensional consistency (e.g., `L / T = V`).
 
-4.8 Time-Aware Types
-Variables can track history if enabled: `?history` annotation (planned).
+  4.8 Time-Aware Types
+  Variables can track history if enabled: `?history` annotation (planned).
 
-4.9 Optional Types
-`int?` or `Option<int>`.
+  4.9 Optional Types
+  `int?` or `Option<int>`.
 
-4.10 Type Inference
-GUL infers types where possible:
-`def x = 10` (inferred as `int`).
-`def y = 10 m` (inferred as `float<m>`).
+  4.10 Type Inference
+  GUL infers types where possible:
+  `def x = 10` (inferred as `int`).
+  `def y = 10 m` (inferred as `float<m>`).
 
 5. Ownership Model
 
@@ -275,11 +306,13 @@ GUL uses a move-by-default system. Variables are transferred unless specified ot
 Primitive types (`int`, `bool`, `float`) are `copy` by default (implicit copy on assignment).
 
 5.5 Borrow Checker Rules
+
 - One mutable reference OR multiple immutable references.
 - References cannot outlive the owner.
 
-5.6 Move Semantics
-Assignment transfers ownership for non-copy types:
+  5.6 Move Semantics
+  Assignment transfers ownership for non-copy types:
+
 ```gul
 def list1 = [1, 2, 3]
 def list2 = list1  # list1 is now invalid
@@ -310,6 +343,7 @@ Variables are immutable by default.
 
 6.3 Shadowing
 Variables can be shadowed in inner scopes:
+
 ```gul
 def x = 10
 if true:
@@ -328,7 +362,7 @@ Declared with `@global`.
 
 6.7 Compile-Time Constants
 `def CONSTANT_NAME = value`: Treated as constant if uppercase.
-`const X = 10`: Explicit constant keyword (v2).
+`let X = 10`: Explicit constant keyword (v2).
 
 6.8 Variable Units
 `def distance = 100 m`: Variable holds both value `100` and unit `m`.
@@ -388,6 +422,7 @@ Statements that evaluate to a value but return ignored (e.g., function call).
 `return own x` (explicit transfer).
 
 8.5 if Blocks
+
 ```gul
 if condition:
     ...
@@ -408,6 +443,7 @@ else:
 `for i in 0..10: ...`
 
 8.9 match
+
 ```gul
 match value:
     1: print("One")
@@ -416,6 +452,7 @@ match value:
 ```
 
 8.10 try/except/finally
+
 ```gul
 try:
     danger()
@@ -429,7 +466,7 @@ catch e:
 `.def` files define the structure of a program or module. They cannot contain executable logic blocks (like `if` at top level).
 
 9.2 Imports
-`imp std.io` works here to bring types into scope.
+`@imp std.io` works here to bring types into scope.
 
 9.3 Type Definitions
 `struct Point { x: float, y: float }`
@@ -465,41 +502,44 @@ Heterogeneous lists are allowed `[1, "a"]` (typed as `[any]`), but homogeneous `
 Immutable fixed-size sequences `(1, 2)`.
 
 10.3 List/Tuple Functions (LISP-style)
+
 - `car(list)`: Head.
 - `cdr(list)`: Tail.
 - `cons(item, list)`: Prepend.
 
-10.4 2D Lists
-`[[1, 2], [3, 4]]`. Matrix operations supported via `std.math`.
+  10.4 2D Lists
+  `[[1, 2], [3, 4]]`. Matrix operations supported via `std.math`.
 
-10.5 3D Lists
-Volumetric data.
+  10.5 3D Lists
+  Volumetric data.
 
-10.6 4D Lists (z-y-x-time)
-Specialized for physics simulations. Access via `data[t][z][y][x]`.
+  10.6 4D Lists (z-y-x-time)
+  Specialized for physics simulations. Access via `data[t][z][y][x]`.
 
-10.7 Mutable vs Static Lists
-`def own list = [...]` is mutable (growable).
-`def list = [...]` is immutable view by default.
+  10.7 Mutable vs Static Lists
+  `def own list = [...]` is mutable (growable).
+  `def list = [...]` is immutable view by default.
 
-10.8 Predictive Timelines
-Using ML to predict `t+1` in 4D lists (integrated with `std.ml`).
+  10.8 Predictive Timelines
+  Using ML to predict `t+1` in 4D lists (integrated with `std.ml`).
 
-10.9 Memory Rules for 4-D Lists
-Large 4D lists use sparse storage or disk-backed tensors.
+  10.9 Memory Rules for 4-D Lists
+  Large 4D lists use sparse storage or disk-backed tensors.
 
-10.10 Interpolation & Projection
-Built-in `interpolate(list, t=1.5)` methods.
+  10.10 Interpolation & Projection
+  Built-in `interpolate(list, t=1.5)` methods.
 
 11. Classes & Objects
 
 11.1 Class Syntax
 GUL v2 uses `struct` for data and `impl` blocks (planned) for methods.
+
 ```gul
 struct User:
     name: str
     age: int
 ```
+
 Legacy `class` syntax is deprecated.
 
 11.2 Fields
@@ -507,6 +547,7 @@ Defined in `struct` block. Typed.
 
 11.3 Methods
 Defined in `impl` block (or `struct` body in current parser version).
+
 ```gul
 struct User:
     fn grow_older(self):
@@ -541,7 +582,7 @@ Structs own their fields. Accessing a non-copy field moves it unless borrowed.
 `fn name(params) -> return_type:`
 
 12.2 Async Functions (async "name")
-`asy name():` or `fn name() -> async:`
+`async name():` or `fn name() -> async:`
 V2 keyword: `asy` or `async fn`.
 
 12.3 Non-Async Functions
@@ -707,17 +748,17 @@ Unused variables, dead code (linter).
 Files map to modules. `src/math.mn` is `math`. Folders are packages.
 
 17.2 Import Syntax
-`imp std.io` or `import std.io`.
-`imp [std.math, std.io]` (Grouped).
+`@imp std.io` or `import std.io`.
+`@imp [std.math, std.io]` (Grouped).
 
 17.3 Circular Imports
 Allowed but discouraged. Resolved at link time.
 
 17.4 Importing Classes
-`imp module.StructName`.
+`@imp module.StructName`.
 
 17.5 Importing Functions
-`imp module.func_name`.
+`@imp module.func_name`.
 
 17.6 Importing Ownership
 Imports do not transfer ownership of global state, only references.
@@ -738,6 +779,7 @@ Unused imports are stripped during optimization.
 
 18.1 Foreign Block Overview
 Embed code using `cs language:` syntax.
+
 ```gul
 cs rust:
     let x = 5;
@@ -773,10 +815,8 @@ Foreign dependencies must be specified in `gul.toml`.
 19. UI Language
 
 19.1 Syntax for UI Blocks
-    GUL supports two equivalent syntaxes for UI components:
-    1. Sprite Syntax: `^&^[ component_name { props } ]`
-    2. Macro Syntax:  `ui![ component_name { props } ]`
-    
+GUL supports two equivalent syntaxes for UI components: 1. Sprite Syntax: `^&^[ component_name { props } ]` 2. Macro Syntax: `ui![ component_name { props } ]`
+
     Both syntaxes are semantically identical.
 
 19.2 Button
@@ -795,19 +835,19 @@ Foreign dependencies must be specified in `gul.toml`.
     GUL v2.0 includes a robust web server in `std.web`.
 
 20.1 Basic Server
-    ```gul
-    imp std.web
+```gul
+@@imp std.web
 
-    mn main():
+    mn:
         app = web.App()
 
         # Routing (Express/Flask style)
-        app.get("/", asy (req, res):
+        app.get("/", async (req, res):
             return res.json({message: "Hello GUL Web!"})
         )
 
         # Path Parameters
-        app.get("/users/:id", asy (req, res):
+        app.get("/users/:id", async (req, res):
             user_id = req.params.id
             return res.send(f"User {user_id}")
         )
@@ -816,25 +856,25 @@ Foreign dependencies must be specified in `gul.toml`.
     ```
 
 20.2 Database Integration (std.db)
-    The `std.db` module provides a unified interface for SQL and NoSQL.
+The `std.db` module provides a unified interface for SQL and NoSQL.
 
     ```gul
-    imp std.db
+    @@imp std.db
 
     # Query
     users = await db.query("SELECT * FROM users WHERE active = ?", [true])
     ```
 
 20.3 JSON Handling
-    `std.json` is used for parsing and stringifying.
-    `data = json.parse(string)`
-    `string = json.stringify(object)`
+`std.json` is used for parsing and stringifying.
+`data = json.parse(string)`
+`string = json.stringify(object)`
 
 21. TESTING
     GUL has a built-in test runner. Tests live in `tests/` directory or alongside code.
 
 21.1 Writing Tests
-    Use the `test` keyword (or `@test` annotation in legacy).
+Use the `test` keyword (or `@test` annotation in legacy).
 
     ```gul
     # In my_file.mn
@@ -842,41 +882,41 @@ Foreign dependencies must be specified in `gul.toml`.
 
     test "addition works":
         assert_eq(add(1, 2), 3)
-    
+
     test "negative numbers":
         assert(add(-1, -1) == -2)
     ```
 
 21.2 Running Tests
-    `gul test` -> Runs all tests.
-    `gul test my_file.mn` -> Runs tests in specific file.
+`gul test` -> Runs all tests.
+`gul test my_file.mn` -> Runs tests in specific file.
 
 21.3 Assertions
-    `assert(condition)`
-    `assert_eq(a, b)`
-    `assert_ne(a, b)`
+`assert(condition)`
+`assert_eq(a, b)`
+`assert_ne(a, b)`
 
 22. DEPLOYMENT & DEVOPS
     Building for production requires specific flags.
 
 22.1 Building for Production
-    Use the `--release` flag to optimize the binary.
-    `gul build --release`
-    
+Use the `--release` flag to optimize the binary.
+`gul build --release`
+
     To build a static binary (for Alpine/Scratch containers):
     `gul build --release --target x86_64-unknown-linux-musl`
 
 22.2 Environment Variables
-    GUL loads `.env` files automatically in development. In production, use system env vars.
-    `imp std.env`
-    `db_host = env.get("DB_HOST", "localhost")`
+GUL loads `.env` files automatically in development. In production, use system env vars.
+`@imp std.env`
+`db_host = env.get("DB_HOST", "localhost")`
 
 22.3 Docker
-    Example Dockerfile:
-    ```dockerfile
-    FROM gul-lang/builder:latest AS builder
-    COPY . .
-    RUN gul build --release
+Example Dockerfile:
+```dockerfile
+FROM gul-lang/builder:latest AS builder
+COPY . .
+RUN gul build --release
 
     FROM alpine:latest
     COPY --from=builder /app/dist/my_app /my_app
@@ -884,8 +924,8 @@ Foreign dependencies must be specified in `gul.toml`.
     ```
 
 22.4 Secrets
-    In Dev: Use `.scrt` files (encrypted).
-    In Prod: Use Environment Variables or Secret Managers. `.scrt` files are excluded from git.
+In Dev: Use `.scrt` files (encrypted).
+In Prod: Use Environment Variables or Secret Managers. `.scrt` files are excluded from git.
 
 23.6 Events
 `on_click`, `on_hover`.
@@ -1078,33 +1118,33 @@ expr ::= literal | ident | binary_op | call
 (See `gul_packages/std/README.md` and generated docs).
 
 200. Package database and Manager
-Central registry at `registry.mn-lang.org` (mock).
+     Central registry at `registry.mn-lang.org` (mock).
 
 201. Builtin features
-`print`, `len`, `range`, `car`, `cdr`, `cons`.
+     `print`, `len`, `range`, `car`, `cdr`, `cons`.
 
 202. Builtin compiler
-Self-hosting (planned).
+     Self-hosting (planned).
 
 203. Supported targets
-Linux (x64, ARM), Windows, macOS, WASM.
+     Linux (x64, ARM), Windows, macOS, WASM.
 
 204. Installation
-`curl https://gul-lang.org/install.sh | sh`
+     `curl https://gul-lang.org/install.sh | sh`
 
 205. Usage
-`gul new my_project`
-`cd my_project`
-`gul run`
+     `gul new my_project`
+     `cd my_project`
+     `gul run`
 
 206. Best Practices
+
 - Use `.def` for config, `.fnc` for logic.
 - Prefer `own` for clear data flow.
 - Use units for all physical quantities.
 
-
-
 ### GUL v2.0 Language Refactor (December 2025)
+
 - **Core Goal**: Unified language specification with strict file type roles and stronger memory safety.
 - **New File Types**:
   - `.def`: Definitions (variables, constants, external interfaces). No logic allowed.

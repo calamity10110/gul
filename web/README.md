@@ -1,66 +1,66 @@
-# GUL Official Website
+# GUL Official Website & Web IDE
 
-The official website for the GUL Programming Language, built with Dioxus.
+The official website for the GUL Programming Language, featuring an interactive playground/IDE, built with Dioxus 0.6.
 
-## Features
+## ✨ Features
 
-- **Modern Design**: Beautiful, responsive UI with dark theme
-- **Multi-Page**: Home, Learn, Docs, Playground, Community, Download
-- **Interactive**: Code examples, playground, and learning resources
+- **Modern Design**: Beautiful, responsive dark theme with glassmorphism effects
+- **Interactive Playground**: Write, run, and share GUL code in the browser
+- **Multi-Page**: Home, Docs, Playground, Blog, Community, Download
+- **Code Highlighting**: Syntax-highlighted code examples with GUL 101 syntax
 - **SEO Optimized**: Meta tags, semantic HTML, and performance optimized
 - **Responsive**: Works on desktop, tablet, and mobile devices
 
-## Pages
+## 📄 Pages
 
 ### Home (`/`)
 
-- Hero section with value proposition
+- Hero section with animated code example
 - Feature cards highlighting GUL's capabilities
-- Quick start guide
-- Code examples
-- Call-to-action
-
-### Learn (`/learn`)
-
-- Learning paths for different skill levels
-- Getting Started tutorials
-- Multi-language integration guides
-- Advanced topics
-
-### Docs (`/docs`)
-
-- Complete documentation
-- API reference
-- Syntax guide
-- Standard library docs
-- Examples
+- Quick start guide with installation steps
+- Interactive code showcase with multiple examples
+- Statistics and call-to-action
 
 ### Playground (`/playground`)
 
-- Interactive code editor
-- Run GUL code in the browser
-- Real-time output
-- Share code snippets
+- Full-featured code editor
+- Example code templates
+- Simulated code execution
+- Share functionality
+- Keyboard shortcuts
+
+### Docs (`/docs`)
+
+- Getting started guide
+- GUL 101 syntax reference
+- FFI integration guides
+- Standard library documentation
+- Sidebar navigation
+
+### Blog (`/blog`)
+
+- Latest news and updates
+- Featured post highlighting
+- Release announcements
 
 ### Community (`/community`)
 
-- Discord server
-- Forum
-- GitHub repository
-- Social media links
+- Discord, GitHub, Twitter links
+- Contribution guidelines
+- Community statistics
 
 ### Download (`/download`)
 
-- Installation instructions for all platforms
-- Version information
-- Changelog
+- Platform-specific installation
+- Alternative methods (Cargo, Docker, source)
+- Changelog and what's new
 
-## Development
+## 🛠️ Development
 
 ### Prerequisites
 
 - Rust (latest stable)
-- Dioxus CLI
+- Dioxus CLI (`dx`)
 
 ### Install Dioxus CLI
 
@@ -85,45 +85,105 @@ dx build --release
 
 The built files will be in `dist/`
 
-## Project Structure
+## 📁 Project Structure
 
-```
+```text
 web/
 ├── src/
-│   └── main.rs          # Main application code
+│   └── main.rs          # Main Dioxus application
 ├── public/
 │   ├── index.html       # HTML template
-│   └── style.css        # Styles
-├── assets/              # Static assets
+│   └── style.css        # Complete CSS (1100+ lines)
+├── assets/              # Static assets (images, fonts)
 ├── Cargo.toml           # Rust dependencies
 ├── Dioxus.toml          # Dioxus configuration
 └── README.md            # This file
 ```
 
-## Technologies
+## 🎨 Design System
 
-- **Dioxus 0.6**: Modern Rust UI framework
-- **Dioxus Router**: Client-side routing
-- **CSS3**: Modern styling with animations
-- **Google Fonts**: Inter and Fira Code fonts
+### Color Palette
 
-## Deployment
+| Color      | Hex       | Usage                   |
+| ---------- | --------- | ----------------------- |
+| Primary    | `#6366f1` | Buttons, links, accents |
+| Secondary  | `#8b5cf6` | Gradients, highlights   |
+| Accent     | `#ec4899` | Featured items, CTAs    |
+| Background | `#0f172a` | Page background         |
+| Surface    | `#1e293b` | Cards, panels           |
+| Text       | `#f1f5f9` | Primary text            |
+
+### Typography
+
+- **Headings**: Inter (900, 800, 700)
+- **Body**: Inter (400, 500)
+- **Code**: Fira Code (400, 500)
+
+### Effects
+
+- Glassmorphism with `backdrop-filter: blur()`
+- Gradient text with `-webkit-background-clip`
+- Animated border glow effects
+- Smooth hover transitions
+
+## 🔧 Technologies
+
+- **Dioxus 0.6**: Modern Rust UI framework for web
+- **Dioxus Router**: Client-side navigation
+- **WebAssembly**: Compiled Rust running in browser
+- **CSS3**: Modern styling with custom properties
+- **Google Fonts**: Inter and Fira Code
+
+## 🚀 Deployment
 
 The website can be deployed to any static hosting service:
 
-- **Netlify**: Connect GitHub repo, build command: `dx build --release`
-- **Vercel**: Similar to Netlify
-- **GitHub Pages**: Use GitHub Actions
-- **Cloudflare Pages**: Direct integration
+### Netlify
 
-## Contributing
+```bash
+# Build command
+dx build --release
 
-Contributions are welcome! Please see the main GUL repository for contribution guidelines.
+# Publish directory
+dist/
+```
 
-## License
+### Vercel
 
-Same as the main GUL project.
+Similar configuration to Netlify
 
-## Version
+### GitHub Pages
 
-Current version: 0.11.0
+Use GitHub Actions with the `dx build --release` command
+
+### Cloudflare Pages
+
+Direct GitHub integration with `dx build --release`
+
+## 📊 Performance
+
+- Optimized WebAssembly bundle with LTO
+- Lazy-loaded components
+- CSS-only animations (no JS overhead)
+- Efficient virtual DOM updates
+
+## 🔜 Roadmap
+
+- [ ] Real WASM-based GUL interpreter for playground
+- [ ] Code sharing with unique URLs
+- [ ] Dark/light theme toggle
+- [ ] Search functionality
+- [ ] User accounts for saved snippets
+- [ ] API documentation generator
+
+## 📝 Contributing
+
+Contributions are welcome! See the main GUL repository for contribution guidelines.
+
+## 📄 License
+
+Same as the main GUL project (MIT).
+
+## 🏷️ Version
+
+Website Version: **0.13.0** (synced with GUL)

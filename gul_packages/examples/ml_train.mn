@@ -1,11 +1,11 @@
 # Example: ML Model Training
 use std::ml
 
-fn main():
+mn:
     print("--- Machine Learning Example ---")
     
     # Create model
-    mut model = ml::Model::new()
+    var model = ml::Model::new()
     
     # Add layers
     model.add(ml::dense(784, 128, ml::Activation::ReLU))

@@ -40,7 +40,7 @@ mn:
 - [Syntax](reference/syntax.md) - Complete syntax
 - [Types](reference/types.md) - Type system
 - [Ownership](reference/ownership.md) - Memory model
-- [Specification](reference/specification.md) - Language spec
+- [Language Spec](language_spec.md) - **GUL 101** - Complete specification
 
 ### API
 

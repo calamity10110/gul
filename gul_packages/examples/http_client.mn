@@ -2,7 +2,7 @@
 use std::http
 use std::json
 
-fn main():
+mn:
     print("--- HTTP Client Example ---")
     
     # Create client

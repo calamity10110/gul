@@ -1,16 +1,18 @@
-imp http
-imp ui
+# GUL v3.1 Web App Template
 
-asy fetch_users():
+@imp std.http
+@imp std.ui
+
+async fetch_users():
     res = await http.get("https://api.example.com/users")
     return res.json()
 
-def user_list = ^÷^[table{
+let user_list = ^÷^[table{
     headers=["ID", "Name", "Email"],
     rows=[]
 }]
 
-mn main():
+mn:
     users = await fetch_users()
     ui.print(user_list)
     print("Web app running!")

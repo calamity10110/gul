@@ -4,6 +4,7 @@
 pub mod contracts;
 pub mod executor;
 pub mod graph;
+pub mod ir;
 pub mod validator;
 
 use crate::ast::{DataFlowConnection, ExternalInput, NodeDeclaration, PortRef};
@@ -81,7 +82,7 @@ impl Default for DataFlowGraph {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::ast::{PortContract, PortParam};
+    use crate::ast::{PortContract, PortParam, TypeAnnotation};
 
     #[test]
     fn test_dataflow_graph_creation() {

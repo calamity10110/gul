@@ -157,9 +157,48 @@ pub enum UnaryOp {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Ownership {
-    Own,
-    Ref,
+    // GUL 101 Ownership Modes (current)
+    Own,    // Exactly one owner, does not move (use in node contracts)
+    Borrow, // Temporary mutable access, no ownership move
+    Ref,    // Shared immutable access, no ownership move
+    Take,   // Ownership transfer (move)
+    Gives,  // Ownership transfer via copy
+
+    // DEPRECATED - use Gives instead
+    #[deprecated(since = "0.14.0", note = "use Gives instead")]
     Copy,
+}
+
+impl Ownership {
+    /// Check if this mode moves ownership
+    pub fn moves_ownership(&self) -> bool {
+        matches!(self, Ownership::Take | Ownership::Gives)
+    }
+
+    /// Check if this mode allows mutation
+    pub fn is_mutable(&self) -> bool {
+        matches!(self, Ownership::Own | Ownership::Borrow | Ownership::Take)
+    }
+
+    /// Check if this mode copies data
+    #[allow(deprecated)]
+    pub fn copies_data(&self) -> bool {
+        matches!(self, Ownership::Gives | Ownership::Copy)
+    }
+
+    /// Parse from string
+    #[allow(deprecated)]
+    pub fn from_keyword(s: &str) -> Option<Self> {
+        match s {
+            "own" => Some(Ownership::Own),
+            "borrow" => Some(Ownership::Borrow),
+            "ref" => Some(Ownership::Ref),
+            "take" => Some(Ownership::Take),
+            "gives" => Some(Ownership::Gives),
+            "copy" => Some(Ownership::Gives), // Map deprecated 'copy' to 'gives'
+            _ => None,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]

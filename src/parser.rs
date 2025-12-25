@@ -567,7 +567,7 @@ impl Parser {
                     }
                     Token::Copy => {
                         self.advance();
-                        Some(Ownership::Copy)
+                        Some(Ownership::Gives) // Map deprecated 'copy' to 'gives'
                     }
                     _ => None,
                 };
@@ -696,48 +696,50 @@ impl Parser {
     }
 
     fn parse_main(&mut self) -> Result<Statement, String> {
-        let is_new_syntax = matches!(self.current_token(), Token::Main);
+        let token = self.current_token().clone();
         self.advance(); // Skip 'mn' or 'main'
 
-        if is_new_syntax {
-            // New syntax: main(): (no 'main' identifier needed)
-            self.expect(Token::LeftParen)?;
-            self.expect(Token::RightParen)?;
-            self.expect(Token::Colon)?;
-            self.skip_newlines();
-
-            let body = self.parse_block()?;
-            Ok(Statement::Main { body })
-        } else {
-            // Legacy syntax: mn main():
-            // Note: 'main' might be tokenized as Token::Main (keyword) or Token::Identifier("main")
-            match self.current_token() {
-                Token::Main => {
-                    // 'main' was tokenized as keyword
-                    self.advance(); // Skip 'main' keyword
-
-                    self.expect(Token::LeftParen)?;
-                    self.expect(Token::RightParen)?;
-                    self.expect(Token::Colon)?;
+        match token {
+            Token::Mn => {
+                // v3 syntax: mn:
+                // Just expect colon directly after 'mn'
+                if self.current_token() == &Token::Colon {
+                    self.advance(); // Skip ':'
                     self.skip_newlines();
-
                     let body = self.parse_block()?;
                     Ok(Statement::Main { body })
-                }
-                Token::Identifier(name) if name == "main" => {
-                    // 'main' was tokenized as identifier (shouldn't happen but handle it)
-                    self.advance(); // Skip 'main' identifier
-
-                    self.expect(Token::LeftParen)?;
-                    self.expect(Token::RightParen)?;
-                    self.expect(Token::Colon)?;
+                } else if self.current_token() == &Token::LeftBracket {
+                    // v3 graph syntax: mn: [...]
+                    self.advance(); // Skip '['
                     self.skip_newlines();
-
-                    let body = self.parse_block()?;
+                    // Parse graph items (simplified - treat as block for now)
+                    let mut body = Vec::new();
+                    while self.current_token() != &Token::RightBracket
+                        && self.current_token() != &Token::Eof
+                    {
+                        body.push(self.parse_statement()?);
+                        self.skip_newlines();
+                    }
+                    self.expect(Token::RightBracket)?;
                     Ok(Statement::Main { body })
+                } else {
+                    Err(format!(
+                        "Expected ':' or '[' after 'mn', found {:?}",
+                        self.current_token()
+                    ))
                 }
-                _ => Err("Expected 'main' after 'mn'".to_string()),
             }
+            Token::Main => {
+                // Deprecated v2 syntax: main():
+                eprintln!("Warning: 'main' keyword is deprecated, use 'mn:' instead");
+                self.expect(Token::LeftParen)?;
+                self.expect(Token::RightParen)?;
+                self.expect(Token::Colon)?;
+                self.skip_newlines();
+                let body = self.parse_block()?;
+                Ok(Statement::Main { body })
+            }
+            _ => Err("Expected 'mn' or 'main'".to_string()),
         }
     }
 
@@ -1900,7 +1902,8 @@ mod tests {
 
     #[test]
     fn test_parse_main_function() {
-        let mut lexer = Lexer::new("mn main():\n    print(\"Hello, World!\")\n    ui.print(^&^[tree])\n    data = await fetch(\"https://api.example.com\")\n    print(data)");
+        // v3 syntax: just `mn:` without main() or parentheses
+        let mut lexer = Lexer::new("mn:\n    print(\"Hello, World!\")\n    ui.print(^&^[tree])\n    data = await fetch(\"https://api.example.com\")\n    print(data)");
         let tokens = lexer.tokenize();
         let mut parser = Parser::new(tokens);
         let program = parser.parse().unwrap();

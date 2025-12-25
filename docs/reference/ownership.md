@@ -23,7 +23,7 @@ GUL follows three fundamental ownership rules:
 
 ```gul
 # Ownership example
-fn main():
+mn:
     x = "Hello"          # x owns the string
     y = x                # ownership transfers to y
     # print(x)           # Error: x no longer owns the value
@@ -37,7 +37,7 @@ fn take_ownership(s: str):
     print(s)             # s owns the string here
     # s is dropped when function ends
 
-fn main():
+mn:
     text = "GUL"
     take_ownership(text) # ownership moves to function parameter
     # print(text)        # Error: text no longer owns the value
@@ -51,7 +51,7 @@ fn main():
 fn calculate_length(s: &str): int:
     return len(s)        # Can read, but not modify
 
-fn main():
+mn:
     text = "Hello, GUL!"
     length = calculate_length(&text)  # Borrow immutably
     print(f"'{text}' has {length} characters")  # text still valid
@@ -63,17 +63,17 @@ fn main():
 fn append_text(s: &mut str, suffix: str):
     s += suffix          # Can modify borrowed value
 
-fn main():
-    mut text = "Hello"
-    append_text(&mut text, ", World!")
+mn:
+    var text = "Hello"
+    append_text(&var text, ", World!")
     print(text)          # Output: "Hello, World!"
 ```
 
 ### Borrowing Rules
 
 ```gul
-fn main():
-    mut x = vec[1, 2, 3]
+mn:
+    var x = vec[1, 2, 3]
 
     # Multiple immutable borrows allowed
     r1 = &x
@@ -81,11 +81,11 @@ fn main():
     print(r1, r2)        # OK
 
     # Can't have mutable borrow while immutable borrows exist
-    # r3 = &mut x        # Error: already borrowed as immutable
+    # r3 = &var x        # Error: already borrowed as immutable
 
     # Can have one mutable borrow
     {
-        r_mut = &mut x
+        r_mut = &var x
         r_mut.push(4)
     }                    # r_mut goes out of scope
 
@@ -157,7 +157,7 @@ fn longest(x: &str, y: &str): &str:
     else:
         return y
 
-fn main():
+mn:
     s1 = "short"
     s2 = "much longer string"
     result = longest(&s1, &s2)
@@ -190,7 +190,7 @@ struct TextAnalyzer<'a>:
     fn word_count(self): int:
         return len(self.text.split())
 
-fn main():
+mn:
     content = "Hello world from GUL"
     analyzer = TextAnalyzer { text: &content }
     print(analyzer.word_count())
@@ -281,7 +281,7 @@ import std.refcell
 counter = RefCell.new(0)
 
 fn increment(r: &RefCell[int]):
-    mut value = r.borrow_mut()
+    var value = r.borrow_mut()
     *value += 1
 
 increment(&counter)
@@ -303,7 +303,7 @@ shared_state = Rc.new(RefCell.new(map{
 
 # Multiple owners can mutate
 fn update_stats(state: Rc[RefCell[map]]):
-    mut s = state.borrow_mut()
+    var s = state.borrow_mut()
     s["count"] += 1
     s["total"] += 100
 
@@ -343,7 +343,7 @@ import std.sync.mutex
 counter = Mutex.new(0)
 
 fn increment_counter(m: &Mutex[int]):
-    mut guard = m.lock()
+    var guard = m.lock()
     *guard += 1
     # Lock automatically released when guard goes out of scope
 
@@ -374,7 +374,7 @@ fn read_data(lock: &RwLock[map]):
 
 # Single write
 fn write_data(lock: &RwLock[map]):
-    mut guard = lock.write()
+    var guard = lock.write()
     guard["key"] = "new value"
 ```
 
@@ -398,7 +398,7 @@ struct FileHandler:
         print(f"Closing file: {self.path}")
         self.handle.close()
 
-fn main():
+mn:
     {
         file = FileHandler.new("data.txt")
         # Use file...
@@ -410,7 +410,7 @@ fn main():
 ```gul
 import std.mem
 
-fn main():
+mn:
     resource = allocate_resource()
 
     # Use resource...
@@ -448,7 +448,7 @@ struct QueryBuilder:
         return self
 
     fn build(self): str:
-        mut query = f"SELECT * FROM {self.table}"
+        var query = f"SELECT * FROM {self.table}"
 
         if len(self.conditions) > 0:
             query += " WHERE " + " AND ".join(self.conditions)
@@ -542,7 +542,7 @@ fn debug_ownership():
 GUL provides helpful error messages:
 
 ```gul
-fn main():
+mn:
     x = "hello"
     y = x
     print(x)

@@ -50,12 +50,115 @@ impl Linter {
         self.issues.clear();
 
         for (line_num, line) in content.lines().enumerate() {
+            let trimmed = line.trim();
+
+            // v3 syntax checks - deprecated main syntax
+            if trimmed.starts_with("mn main()") || trimmed.starts_with("mn main ") {
+                self.add_issue(
+                    LintLevel::Warning,
+                    "Deprecated syntax: use 'mn:' instead of 'mn main():'".to_string(),
+                    line_num + 1,
+                    0,
+                    "deprecated-main-syntax",
+                    Some(
+                        trimmed
+                            .replace("mn main():", "mn:")
+                            .replace("mn main:", "mn:"),
+                    ),
+                );
+            }
+
+            if trimmed.starts_with("main():") || trimmed == "main():" {
+                self.add_issue(
+                    LintLevel::Warning,
+                    "Deprecated syntax: use 'mn:' instead of 'main():'".to_string(),
+                    line_num + 1,
+                    0,
+                    "deprecated-main-syntax",
+                    Some("mn:".to_string()),
+                );
+            }
+
+            // v3 syntax checks - deprecated keywords
+            if trimmed.starts_with("def ") && !trimmed.contains("(") {
+                self.add_issue(
+                    LintLevel::Warning,
+                    "Deprecated: use 'let' for immutable or 'var' for mutable variables"
+                        .to_string(),
+                    line_num + 1,
+                    0,
+                    "deprecated-def-keyword",
+                    Some(trimmed.replacen("def ", "let ", 1)),
+                );
+            }
+
+            if trimmed.starts_with("imp ") {
+                self.add_issue(
+                    LintLevel::Info,
+                    "Consider using '@imp' for v3 import syntax".to_string(),
+                    line_num + 1,
+                    0,
+                    "deprecated-imp-keyword",
+                    Some(trimmed.replacen("imp ", "@imp ", 1)),
+                );
+            }
+
+            if trimmed.starts_with("asy ") {
+                self.add_issue(
+                    LintLevel::Warning,
+                    "Deprecated: use 'async' instead of 'asy'".to_string(),
+                    line_num + 1,
+                    0,
+                    "deprecated-asy-keyword",
+                    Some(trimmed.replacen("asy ", "async ", 1)),
+                );
+            }
+
+            if trimmed.starts_with("cs ") {
+                self.add_issue(
+                    LintLevel::Info,
+                    "Consider using '@python', '@rust', '@sql' blocks instead of 'cs'".to_string(),
+                    line_num + 1,
+                    0,
+                    "deprecated-cs-keyword",
+                    None,
+                );
+            }
+
+            // v3.1 syntax checks - deprecated const/mut keywords
+            if trimmed.starts_with("const ") {
+                self.add_issue(
+                    LintLevel::Warning,
+                    "Deprecated: use 'let' instead of 'const'".to_string(),
+                    line_num + 1,
+                    0,
+                    "deprecated-const-keyword",
+                    Some(trimmed.replacen("const ", "let ", 1)),
+                );
+            }
+
+            if trimmed.starts_with("mut ") && !trimmed.contains("&mut") {
+                self.add_issue(
+                    LintLevel::Warning,
+                    "Deprecated: use 'var' instead of 'mut'".to_string(),
+                    line_num + 1,
+                    0,
+                    "deprecated-mut-keyword",
+                    Some(trimmed.replacen("mut ", "var ", 1)),
+                );
+            }
+
             // Check for naming conventions
-            if line.contains("def ") {
-                let parts: Vec<&str> = line.split_whitespace().collect();
+            if trimmed.starts_with("def ")
+                || trimmed.starts_with("let ")
+                || trimmed.starts_with("var ")
+            {
+                let parts: Vec<&str> = trimmed.split_whitespace().collect();
                 if parts.len() >= 2 {
-                    let name = parts[1];
-                    if !self.is_snake_case(name) {
+                    let name = parts[1].trim_end_matches(':');
+                    if !self.is_snake_case(name)
+                        && !name.chars().all(|c| c.is_uppercase() || c == '_')
+                    {
                         self.add_issue(
                             LintLevel::Warning,
                             format!("Variable '{}' should use snake_case", name),

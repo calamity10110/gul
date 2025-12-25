@@ -156,7 +156,7 @@ result = "now a string"
 
 ```gul
 @python {
-    def analyze_data(data):
+    fn analyze_data(data):
         import numpy as np
         return np.mean(data)
 }
@@ -231,7 +231,7 @@ async fetch_api() -> dict:
     return response.json()
 
 @python {
-    def analyze(data):
+    fn analyze(data):
         import numpy as np
         return float(np.mean(data))
 }

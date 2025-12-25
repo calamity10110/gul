@@ -36,7 +36,7 @@ The IDE will be available at `http://localhost:8080`
 ├──────────┬──────────────────────────────────────────────────┤
 │ FILES    │  main.mn                                    [×]  │
 │          │                                                   │
-│ 📁 src   │  1  mn main():                                   │
+│ 📁 src   │  1  mn:                                   │
 │  📄 main │  2      print("Hello, Web!")                     │
 │  📄 utils│  3                                               │
 │ 📁 tests │  4                                               │
@@ -65,9 +65,9 @@ The IDE will be available at `http://localhost:8080`
 ### Basic Web App Structure
 
 ```gul
-imp web
+@imp web
 
-mn main():
+mn:
     # Create a web application
     app = web.App.new()
 
@@ -99,7 +99,7 @@ mn main():
 ### Using Dioxus for Interactive UIs
 
 ```gul
-imp dioxus
+@imp dioxus
 
 @fn App():
     ?count = 0
@@ -118,14 +118,14 @@ imp dioxus
         }
     )
 
-mn main():
+mn:
     dioxus.launch(App)
 ```
 
 ### REST API Example
 
 ```gul
-imp web, json
+@imp web, json
 
 # Define data model
 @map User = {
@@ -159,7 +159,7 @@ imp web, json
     @else:
         return web.json({error: "User not found"}, status=404)
 
-mn main():
+mn:
     app = web.App.new()
 
     app.post("/api/users", create_user)
@@ -172,7 +172,7 @@ mn main():
 ### Database Integration
 
 ```gul
-imp web, db
+@imp web, db
 
 @cs sql:
     CREATE TABLE IF NOT EXISTS posts (
@@ -196,7 +196,7 @@ imp web, db
 
     return web.json({id: result.last_insert_id}, status=201)
 
-mn main():
+mn:
     # Initialize database
     db.init("blog.db")
     db.execute(sql.create_table)
@@ -440,7 +440,7 @@ self.addEventListener("fetch", (event) => {
 ### Server-Side Rendering (SSR)
 
 ```gul
-imp dioxus.ssr
+@imp dioxus.ssr
 
 @fn render_to_string(component):
     return dioxus.ssr.render(component)
@@ -485,7 +485,7 @@ imp dioxus.ssr
 ### Caching Strategy
 
 ```gul
-imp web.cache
+@imp web.cache
 
 # Cache API responses
 @cache(ttl=3600)  # Cache for 1 hour
@@ -524,7 +524,7 @@ app.cors({
 ### CSRF Protection
 
 ```gul
-imp web.csrf
+@imp web.csrf
 
 app.use_csrf_protection()
 
@@ -538,7 +538,7 @@ app.use_csrf_protection()
 ### Rate Limiting
 
 ```gul
-imp web.ratelimit
+@imp web.ratelimit
 
 @ratelimit(max_requests=100, window=60)  # 100 requests per minute
 @fn api_endpoint(request):

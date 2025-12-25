@@ -6,7 +6,7 @@ import std.filesystem as fs
 import std.process
 
 # Test categories
-const TEST_CATEGORIES = [
+let TEST_CATEGORIES = [
     "interop",
     "packages",
     "core",

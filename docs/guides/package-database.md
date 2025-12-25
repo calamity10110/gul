@@ -95,7 +95,7 @@ Example documentation page:
 │                                                     │
 │ ## Usage                                            │
 │ ```                                                 │
-│ imp http-client                                     │
+│ @imp http-client                                     │
 │                                                     │
 │ asy fetch_data():                                   │
 │     res = await http.get("https://api.example.com")│
@@ -152,7 +152,7 @@ When compiler encounters undefined symbol:
 Error: Undefined function 'http.get'
 
 Suggestions:
-  1. Add import: imp std.http
+  1. Add import: @imp std.http
   2. Install package: ulc install http-client
   3. Did you mean: http.post?
 ```

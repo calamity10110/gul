@@ -21,9 +21,9 @@ greet("GUL");
 fn test_js_array_operations():
     """Test JavaScript array methods"""
     result = js.exec("""
-const numbers = [1, 2, 3, 4, 5];
-const doubled = numbers.map(x => x * 2);
-const sum = doubled.reduce((a, b) => a + b, 0);
+let numbers = [1, 2, 3, 4, 5];
+let doubled = numbers.map(x => x * 2);
+let sum = doubled.reduce((a, b) => a + b, 0);
 sum;
 """)
     
@@ -33,7 +33,7 @@ sum;
 fn test_js_object_manipulation():
     """Test JavaScript object operations"""
     result = js.exec("""
-const person = {
+let person = {
     name: "Alice",
     age: 30,
     greet() {
@@ -85,7 +85,7 @@ class Calculator {
     }
 }
 
-const calc = new Calculator();
+let calc = new Calculator();
 calc.add(5).multiply(3).getResult();
 """)
     
@@ -95,7 +95,7 @@ calc.add(5).multiply(3).getResult();
 fn test_js_destructuring():
     """Test JavaScript destructuring"""
     result = js.exec("""
-const data = {
+let data = {
     user: {
         name: "Bob",
         details: {
@@ -105,7 +105,7 @@ const data = {
     }
 };
 
-const { user: { details: { age } } } = data;
+let { user: { details: { age } } } = data;
 age;
 """)
     
@@ -115,9 +115,9 @@ age;
 fn test_js_spread_operator():
     """Test JavaScript spread operator"""
     result = js.exec("""
-const arr1 = [1, 2, 3];
-const arr2 = [4, 5, 6];
-const combined = [...arr1, ...arr2];
+let arr1 = [1, 2, 3];
+let arr2 = [4, 5, 6];
+let combined = [...arr1, ...arr2];
 combined.length;
 """)
     
@@ -136,7 +136,7 @@ function createUser(name: string, age: number): User {
     return { name, age };
 }
 
-const user = createUser("Charlie", 35);
+let user = createUser("Charlie", 35);
 user.age;
 """)
     
@@ -154,7 +154,7 @@ function wrapInArray<T>(item: T): T[] {
     return [item];
 }
 
-const result = wrapInArray(42);
+let result = wrapInArray(42);
 result[0];
 """)
     
@@ -164,8 +164,8 @@ result[0];
 fn test_nodejs_module_import():
     """Test Node.js module imports"""
     result = js.exec("""
-const fs = require('fs');
-const path = require('path');
+let fs = require('fs');
+let path = require('path');
 
 // Test path operations
 path.join('a', 'b', 'c');

@@ -188,7 +188,7 @@ extern rust:
 **Entry Points**:
 
 - `main():` - Main entry point
-- `mn main():` - Alternative form
+- `mn:` - Alternative form
 
 **Imports**:
 

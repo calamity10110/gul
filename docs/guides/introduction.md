@@ -184,7 +184,7 @@ mn:
     import pandas as pd
     import numpy as np
 
-    def analyze(filename):
+    fn analyze(filename):
         df = pd.read_csv(filename)
         return {
             "mean": float(df['value'].mean()),

@@ -1,5 +1,5 @@
 // Integration tests for GUL package manager
-use gul::platform::package_support::PackageManager;
+use gul_lang::platform::package_support::PackageManager;
 
 #[test]
 fn test_package_installation_flow() {

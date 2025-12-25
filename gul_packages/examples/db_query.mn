@@ -1,7 +1,7 @@
 # Example: Database Query
 use std::db
 
-fn main():
+mn:
     print("--- Database Example ---")
     
     # Connect to Postgres

@@ -1,19 +1,21 @@
-imp embedded.gpio
-imp embedded.wifi
-imp embedded.time
+# GUL v3.1 Embedded Template
 
-asy blink_led(pin, interval_ms):
+@imp embedded.gpio
+@imp embedded.wifi
+@imp embedded.time
+
+async blink_led(pin, interval_ms):
     loop:
         gpio.high(pin)
         await time.sleep(interval_ms)
         gpio.low(pin)
         await time.sleep(interval_ms)
 
-asy connect_wifi():
+async connect_wifi():
     await wifi.connect("YOUR_SSID", "YOUR_PASSWORD")
     print("Connected! IP:", wifi.ip())
 
-mn main():
+mn:
     gpio.set_mode(2, OUTPUT)
     await connect_wifi()
     await blink_led(2, 1000)

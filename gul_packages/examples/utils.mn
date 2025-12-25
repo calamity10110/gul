@@ -1,7 +1,7 @@
 # Example: Utilities
 use std::utils
 
-fn main():
+mn:
     print("--- Utilities Example ---")
     
     # DateTime

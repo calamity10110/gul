@@ -1,0 +1,5 @@
+/media/vu/512gb/blob/gul/web/target/wasm-dev/build/serde_json-9c1db12e84e8b00a/build_script_build-9c1db12e84e8b00a.d: /home/vu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_json-1.0.145/build.rs
+
+/media/vu/512gb/blob/gul/web/target/wasm-dev/build/serde_json-9c1db12e84e8b00a/build_script_build-9c1db12e84e8b00a: /home/vu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_json-1.0.145/build.rs
+
+/home/vu/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/serde_json-1.0.145/build.rs:

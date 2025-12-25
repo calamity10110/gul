@@ -5,7 +5,7 @@ The GUL TUI (Terminal User Interface) framework provides:
 ````gul
 use std::tui
 
-fn main():
+mn:
     term = tui::Terminal::init()
     term.draw(|frame| {
         // ...
@@ -42,7 +42,7 @@ gul ide --tui
 ├──────────────┬────────────────────────────┬─────────────────┤
 │  EXPLORER    │  EDITOR - main.mn          │    SYSTEM       │
 │              │                            │                 │
-│ ├── src      │  mn main():                │ CPU Usage       │
+│ ├── src      │  mn:                │ CPU Usage       │
 │ │   ├── main │      print("Hello!")       │ [████░░░] 45%   │
 │ │   └── utils│                            │                 │
 │ ├── tests    │                            │ Memory          │
@@ -210,9 +210,9 @@ ui.print(^&^[tree{
 ### Basic TUI App Structure
 
 ```gul
-imp ui
+@imp ui
 
-mn main():
+mn:
     # Initialize UI runtime
     runtime = ui.Runtime.new()
     runtime.clear()
@@ -262,9 +262,9 @@ confirmed = ui.confirm("Are you sure?")  # Returns true/false
 ### Real-time Updates
 
 ```gul
-imp ui, time
+@imp ui, time
 
-mn main():
+mn:
     runtime = ui.Runtime.new()
 
     ?count = 0
@@ -388,7 +388,7 @@ gul add ui-widgets   # Add widget library
 ### Using Charts
 
 ```gul
-imp ui.charts
+@imp ui.charts
 
 data = [10, 20, 15, 30, 25, 40]
 labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"]

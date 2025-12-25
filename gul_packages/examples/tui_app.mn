@@ -14,7 +14,7 @@ fn draw_ui(f: tui::Frame):
     
     f.render_widget(block, layout)
 
-fn main():
+mn:
     print("--- TUI App Example ---")
     
     term = tui::Terminal::init()

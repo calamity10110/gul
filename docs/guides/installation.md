@@ -61,7 +61,7 @@ gul --version
 
 You should see output like:
 
-```
+```bash
 gul 0.13.0
 ```
 
@@ -185,7 +185,7 @@ Launch the web-based IDE:
 gul ide --mode web
 ```
 
-This will start a local web server (default: http://localhost:8080).
+This will start a local web server default: <http://localhost:8080>
 
 ### VS Code Integration (Coming Soon)
 
@@ -294,7 +294,7 @@ gul run hello.mn
 
 Expected output:
 
-```
+```bash
 Hello, GUL!
 ```
 

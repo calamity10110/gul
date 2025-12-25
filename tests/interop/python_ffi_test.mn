@@ -7,7 +7,7 @@ import std{testing, python}
 fn test_python_inline_execution():
     """Test inline Python code execution"""
     result = python.exec("""
-def greet(name):
+fn greet(name):
     return f"Hello, {name}!"
 
 result = greet("GUL")
@@ -69,7 +69,7 @@ fn test_bidirectional_python_gul_calls():
     
     # Call from Python
     result = python.exec("""
-def use_gul_function():
+fn use_gul_function():
     return gul.multiply(6, 7)
 
 result = use_gul_function()
@@ -108,10 +108,10 @@ fn test_python_class_instantiation():
     """Test creating Python class instances"""
     result = python.exec("""
 class Counter:
-    def __init__(self):
+    fn __init__(self):
         self.count = 0
     
-    def increment(self):
+    fn increment(self):
         self.count += 1
         return self.count
 

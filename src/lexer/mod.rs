@@ -54,6 +54,11 @@ pub enum Token {
     OptOut, // opt_out: optional output
     Trait,  // trait definition
 
+    // Ownership modes (GUL 101) - extends legacy Own/Ref/Copy
+    Borrow,  // borrow<T> - mutable access, no move
+    TakeOwn, // take - ownership transfer
+    Gives,   // gives - ownership via copy
+
     // Literals
     Integer(i64),
     Float(f64),
@@ -587,10 +592,28 @@ impl Lexer {
                 eprintln!("Warning: 'cs' is deprecated, use 'extern' instead");
                 Token::Cs
             }
-            "mn" => Token::Mn,   // mn is v3.0 main entry (no deprecation)
-            "own" => Token::Own, // ownership keywords still valid
-            "ref" => Token::Ref,
-            "copy" => Token::Copy,
+            "mn" => Token::Mn, // mn is v3.0 main entry (no deprecation)
+            // Legacy ownership (deprecated in GUL 101)
+            "own" => {
+                eprintln!(
+                    "Warning: 'own' is deprecated, use explicit port ownership in node contracts"
+                );
+                Token::Own
+            }
+            "ref" => {
+                eprintln!(
+                    "Warning: 'ref' as standalone keyword is deprecated, use in node contracts"
+                );
+                Token::Ref
+            }
+            "copy" => {
+                eprintln!("Warning: 'copy' is deprecated, use 'gives' instead");
+                Token::Copy
+            }
+            // GUL 101 ownership modes (current)
+            "borrow" => Token::Borrow,
+            "take" => Token::TakeOwn,
+            "gives" => Token::Gives,
             "await" => Token::Await,
             "loop" => Token::Loop,
             "if" => Token::If,
@@ -821,6 +844,7 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::approx_constant)]
     fn test_float_numbers() {
         let mut lexer = Lexer::new("3.14 2.718 0.5");
         let tokens = lexer.tokenize();
@@ -988,10 +1012,11 @@ mod tests {
 
     #[test]
     fn test_main_entry_point() {
-        let mut lexer = Lexer::new("mn main():\n    print(\"Hello, World!\")\n    ui.print(^&^[tree])\n    data = await fetch(\"https://api.example.com\")\n    print(data)");
+        // v3 syntax: just `mn:` without main() or parentheses
+        let mut lexer = Lexer::new("mn:\n    print(\"Hello, World!\")\n    ui.print(^&^[tree])\n    data = await fetch(\"https://api.example.com\")\n    print(data)");
         let tokens = lexer.tokenize();
 
-        // Check for main keyword
+        // Check for mn keyword
         assert!(tokens.iter().any(|t| matches!(t, Token::Mn)));
 
         // Check for await keyword

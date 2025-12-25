@@ -21,6 +21,25 @@ pub enum Value {
     Null,
 }
 
+impl PartialEq for Value {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Value::Integer(a), Value::Integer(b)) => a == b,
+            (Value::Float(a), Value::Float(b)) => a == b,
+            (Value::String(a), Value::String(b)) => a == b,
+            (Value::Bool(a), Value::Bool(b)) => a == b,
+            (Value::List(a), Value::List(b)) => a == b,
+            (Value::Dict(a), Value::Dict(b)) => a == b,
+            (Value::Object(n1, f1), Value::Object(n2, f2)) => n1 == n2 && f1 == f2,
+            (Value::Function(p1, b1), Value::Function(p2, b2)) => p1 == p2 && b1 == b2,
+            (Value::NativeFunction(_), Value::NativeFunction(_)) => false, // Can't compare fn ptrs
+            (Value::Any(a), Value::Any(b)) => a == b,
+            (Value::Null, Value::Null) => true,
+            _ => false,
+        }
+    }
+}
+
 impl fmt::Debug for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {

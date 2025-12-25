@@ -3,7 +3,7 @@
 // For web deployment of the GUL IDE
 
 #[cfg(feature = "web-tui")]
-pub mod web {
+pub mod web_tui {
     //! Web TUI implementation using Ratzilla
     //!
     //! This module enables running the GUL TUI IDE in a web browser

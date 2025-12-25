@@ -12,6 +12,7 @@ pub mod interop;
 pub mod interpreter;
 pub mod lexer;
 pub mod memory;
+pub mod ownership;
 pub mod parser;
 pub mod platform;
 pub mod runtime;

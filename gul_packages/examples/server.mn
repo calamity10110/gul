@@ -1,7 +1,7 @@
 # Example: TCP Server
 use std::net
 
-fn main():
+mn:
     print("--- TCP Server Example ---")
     
     addr = net::SocketAddr::new("127.0.0.1", 8080)

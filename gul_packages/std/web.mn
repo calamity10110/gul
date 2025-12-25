@@ -20,7 +20,7 @@ struct App:
     fn new() -> App:
         return App { routes: [] }
     
-    fn route(mut self, path: string, handler: fn(Request) -> http::Response):
+    fn route(var self, path: string, handler: fn(Request) -> http::Response):
         self.routes.push(Route { path, handler })
         
     fn run(self, host: string = "127.0.0.1", port: int = 8080):

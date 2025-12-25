@@ -19,7 +19,7 @@
 - **Functions**: `fn` (sync), `async` (async)
 - **Imports**: `import` (with optional grouping `{...}`)
 - **Multi-language**: `extern language {...}`
-- **Entry point**: `main():`
+- **Entry point**: `mn:`
 - **Ownership**: `own`, `ref`, `copy` (unchanged)
 
 ### File Types
@@ -35,8 +35,8 @@
 import std.io
 import python{numpy, pandas}
 
-const PI = 3.14159
-mut counter = 0
+let PI = 3.14159
+var counter = 0
 
 fn greet(name: str) -> str:
     return "Hello, " + name
@@ -48,7 +48,7 @@ extern python {
     }
 }
 
-main():
+mn:
     print("Hello, GUL v2.0!")
     result = analyze([1, 2, 3, 4, 5])
     print("Analysis:", result)

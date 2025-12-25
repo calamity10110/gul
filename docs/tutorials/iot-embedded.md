@@ -19,9 +19,9 @@ GUL supports:
 import std.embedded.gpio
 import std.time
 
-const LED_PIN = 2
+let LED_PIN = 2
 
-main:
+mn:
     # Configure GPIO
     led = gpio.Pin(LED_PIN, mode=gpio.OUTPUT)
 

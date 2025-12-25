@@ -1,7 +1,9 @@
-imp http
-imp ui
+# GUL v3.1 AI App Template
 
-cs python:
+@imp std.http
+@imp std.ui
+
+@python {
     import tensorflow as tf
     import numpy as np
     
@@ -10,14 +12,15 @@ cs python:
     
     def predict(model, input_data):
         return model.predict(np.array(input_data)).tolist()
+}
 
-asy fetch_data(url):
+async fetch_data(url):
     res = await http.get(url)
     return res.json()
 
-def result_display = ^÷^[text{content="Waiting for prediction..."}]
+let result_display = ^÷^[text{content="Waiting for prediction..."}]
 
-mn main():
+mn:
     ui.print(result_display)
     
     model = python.load_model("model.h5")
