@@ -35,8 +35,8 @@
 import std.io
 import python{numpy, pandas}
 
-let PI = 3.14159
-var counter = 0
+let PI = @float(3.14159)
+var @int(counter) = 0
 
 fn greet(name: str) -> str:
     return "Hello, " + name
