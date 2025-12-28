@@ -1,181 +1,225 @@
-# GUL Quick Reference
+# GUL v3.2 Quick Reference
 
-**v3.1 Syntax Cheat Sheet** | **GUL 101**
+**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+
+---
+
+## Table of Contents
+
+1. [Type System](#type-system)
+2. [Variables](#variables)
+3. [Collections](#collections)
+4. [Functions](#functions)
+5. [Structs](#structs)
+6. [Control Flow](#control-flow)
+7. [Foreign Code](#foreign-code)
+8. [MCP Commands](#mcp-commands)
+
+---
+
+## Type System
+
+### Primitive Types (@ prefix)
+
+```gul
+let name = @str("Alice")      # String
+let age = @int(30)            # Integer
+let score = @float(95.5)      # Float
+let active = @bool(true)      # Boolean
+```
+
+### Collection Types
+
+```gul
+let numbers = @list[1, 2, 3]           # List
+let point = @tuple(10, 20)             # Tuple
+let tags = @set{"a", "b", "c"}         # Set
+let user = @dict{name: "Bob", age: 25} # Dictionary
+```
 
 ---
 
 ## Variables
 
 ```gul
-# Immutable bindings
-let name = "Alice"
-let age = @int(30)           # Type annotation (value style)
-let @int(count) = 0          # Type annotation (decorator style)
+let x = @int(10)     # Immutable
+var y = @int(20)     # Mutable
 
-# Mutable bindings
-var total = 0
-var message = @str("Hello")  # Type annotation (value style)
-var @float(price) = 19.99    # Type annotation (decorator style)
+y = 30               # OK
+# x = 15             # Error: x is immutable
 ```
 
-> **Note**: Both type annotation styles are equivalent. Choose one for consistency in your project.
+---
+
+## Collections
+
+### Lists
+
+```gul
+let nums = @list[1, 2, 3, 4, 5]
+nums.append(6)
+nums.remove(1)
+let first = nums[0]
+```
+
+### Tuples
+
+```gul
+let coords = @tuple(10.5, 20.3, 30.1)
+let x = coords.0
+let y = coords.1
+```
+
+### Sets
+
+```gul
+let tags = @set{"rust", "python", "js"}
+tags.add("go")
+tags.remove("js")
+```
+
+### Dictionaries
+
+```gul
+let config = @dict{
+    host: "localhost",
+    port: 8080,
+    debug: true
+}
+let port = config["port"]
+```
 
 ---
 
 ## Functions
 
-```gul
-# Single-line (expression body - implicit return)
-fn add(a, b): a + b
-async fetch(url): http.get(url)
+### Basic Functions
 
-# Multi-line (block body - explicit return/await)
-fn add(a, b):
+```gul
+fn @int add(a, b):
     return a + b
 
-async fetch(url):
-    await http.get(url)
+fn @str greet(name):
+    return "Hello, " + name
+```
 
-# With explicit types
-fn add(@int(a, b)):
-    return @int(a + b)
+### Arrow Functions
+
+```gul
+let double = (x) => x * 2
+let add = (a, b) => a + b
+```
+
+### Async Functions
+
+```gul
+async @dict fetch_data(url):
+    let response = await http.get(url)
+    return response.json()
 ```
 
 ---
 
-## Bracket Equivalence (v3.0+)
+## Structs
 
 ```gul
-# All bracket types are equivalent in GUL
-func(a, b)   # Parentheses
-func[a, b]   # Brackets
-func{a, b}   # Braces
+struct Point:
+    x: @float
+    y: @float
 
-# Same for collections
-list1 = [1, 2, 3]
-list2 = (1, 2, 3)
-list3 = {1, 2, 3}
+    fn @float distance(self):
+        return math.sqrt(self.x^2 + self.y^2)
 
-# Same for named parameters
-config = {host: "localhost", port: 8080}
-config = [host: "localhost", port: 8080]
-config = (host: "localhost", port: 8080)
+    fn @str to_string(self):
+        return "Point(" + str(self.x) + ", " + str(self.y) + ")"
+
+# Usage
+let p = Point{x: 3.0, y: 4.0}
+print(p.distance())  # 5.0
 ```
 
 ---
 
-## Ownership (GUL 101)
+## Control Flow
 
-### Ownership Modes
-
-| Mode     | Access    | Ownership                |
-| -------- | --------- | ------------------------ |
-| `borrow` | Mutable   | Stays with upstream node |
-| `ref`    | Read-only | Stays upstream           |
-| `move`   | Mutable   | Transfers to downstream  |
-| `kept`   | Read-only | Transfers downstream     |
-
-> Ownership is compiler-dictated based on usage patterns.
-
-### In Node Contracts
+### If/Else
 
 ```gul
-node process(data, config) {
-    re_in:
-        data: borrow @Image(input.png)   # Mutable, no transfer
-        config: ref @Config(settings)     # Read-only, no transfer
-    re_out:
-        result: @Image(output.png)        # Output ownership
-}
+if x > 10:
+    print("Large")
+elif x > 5:
+    print("Medium")
+else:
+    print("Small")
 ```
 
-### In Function Signatures
+### Loops
 
 ```gul
-fn consume(data: move @Image(a.png)):    # Ownership transfers in
-    process(data)
+# While loop
+while count < 10:
+    print(count)
+    count = count + 1
 
-fn view(data: ref @Image(a.png)):        # Read-only, ownership stays upstream
-    display(data)
+# For loop
+for item in items:
+    print(item)
+
+# Range
+for i in range(10):
+    print(i)
 ```
 
----
-
-## Main Entry
+### Match
 
 ```gul
-# Sequential style
-mn:
-    print("Hello!")
-    result = compute()
-    print(result)
-
-# Graph style (data-flow)
-mn: [
-    input(5) -> double -> print
-]
-```
-
----
-
-## Data-Flow (Node System)
-
-```gul
-# Define a node
-node add {
-    re_in:
-        a: borrow @int
-        b: move @int
-    re_out:
-        result: @int
-}
-
-# Implement the node
-fn add(@int(a, b)):
-    return @int(a + b)
-
-# Simple pipeline
-mn: [
-    input(5) -> double -> print
-]
-
-# Explicit connections
-mn: [
-    input(@int(5)) : add : a
-    input(@int(3)) : add : b
-    add : result -> print
-]
-```
-
----
-
-## Imports
-
-```gul
-@imp std.http
-@imp std.math
-@imp python{numpy, pandas}
-@imp rust{serde, tokio}
+match value:
+    1 => print("One")
+    2 => print("Two")
+    _ => print("Other")
 ```
 
 ---
 
 ## Foreign Code
 
+### Python
+
 ```gul
 @python {
+    import pandas as pd
     import numpy as np
-    result = np.array([1, 2, 3])
+
+    df = pd.read_csv("data.csv")
+    mean = df['age'].mean()
 }
 
+let result = python.mean
+```
+
+### Rust
+
+```gul
 @rust {
-    fn compute() -> i32 { 42 }
+    fn fast_fibonacci(n: u64) -> u64 {
+        if n <= 1 { return n; }
+        let mut a = 0;
+        let mut b = 1;
+        for _ in 2..=n {
+            let c = a + b;
+            a = b;
+            b = c;
+        }
+        b
+    }
 }
 
-@c {
-    int add(int a, int b) { return a + b; }
-}
+let fib = rust.fast_fibonacci(20)
+```
 
+### SQL
+
+```gul
 @sql {
     SELECT * FROM users WHERE age > 18
 }
@@ -183,151 +227,210 @@ mn: [
 
 ---
 
-## Common Patterns
+## MCP Commands
 
-### Error Handling
-
-```gul
-try:
-    data = await fetch(url)
-catch e:
-    print("Error:", e)
-finally:
-    cleanup()
-```
-
-### List Comprehension
-
-```gul
-squares = [x^2 for x in range(10)]
-evens = [x for x in numbers if x % 2 == 0]
-```
-
-### Structs
-
-```gul
-struct User:
-    name: @str
-    age: @int
-
-    fn greet(self):
-        print("Hello, " + self.name)
-
-# Usage
-user = User{name: "Alice", age: 30}
-user.greet()
-```
-
----
-
-## Control Flow
-
-```gul
-# Conditionals
-if x > 0:
-    print("positive")
-elif x < 0:
-    print("negative")
-else:
-    print("zero")
-
-# For loop
-for item in items:
-    print(item)
-
-# While loop
-while running:
-    process()
-
-# Loop with break
-loop:
-    data = read()
-    if data == nil:
-        break
-    process(data)
-```
-
----
-
-## Types
-
-```gul
-# Primitives
-@int, @float, @str, @bool
-
-# Collections
-@list<T>, @dict<K,V>, @set<T>
-
-# Special
-@any, @nil, @fn<Args, Return>
-```
-
----
-
-## Traits
-
-```gul
-trait Serialize:
-    fn to_json(self): @str
-    fn from_json(data: @str): Self
-
-trait Trainable:
-    fn train(self, data): Self
-    fn predict(self, input): @any
-
-# Apply trait
-struct Model with Trainable:
-    weights: @list<@float>
-```
-
----
-
-## CLI Commands
+### Code Generation
 
 ```bash
-gul run file.mn       # Run a file
-gul build file.mn     # Build binary
-gul check file.mn     # Syntax check
-gul test              # Run tests
-gul fmt file.mn       # Format code
-gul lint file.mn      # Lint code
-gul tui               # Launch TUI IDE
-gul new project       # Create new project
-gul install pkg       # Install package
+# Generate from description
+gul-mcp generate "REST API for users" --type application
+
+# Create package
+gul-mcp create my-app --type web
+
+# Run code
+gul-mcp run main.mn
+
+# Install dependencies
+gul-mcp install pandas numpy tensorflow
+```
+
+### Auto-Maintenance
+
+```bash
+# Individual tasks
+gul-mcp auto lint      # cargo clippy
+gul-mcp auto fmt       # cargo fmt
+gul-mcp auto check     # cargo check
+gul-mcp auto audit     # cargo audit
+
+# All at once
+gul-mcp auto all
+```
+
+### Workflows
+
+```bash
+# List workflows
+gul-mcp workflow list
+
+# Run workflow
+gul-mcp workflow run ci_workflow
+
+# Add custom workflow
+gul-mcp workflow add deploy deploy.json
+```
+
+### Scheduling
+
+```bash
+# List schedules
+gul-mcp schedule list
+
+# Enable/disable
+gul-mcp schedule enable auto_lint
+gul-mcp schedule disable weekly_deps
+```
+
+### Server
+
+```bash
+# Start MCP server
+gul-mcp serve --port 3000
+
+# TUI dashboard
+gul-mcp tui
+
+# Web UI
+gul-mcp webui --port 8080
+
+# Status
+gul-mcp status
+gul-mcp tools
 ```
 
 ---
 
-## Quick Examples
+## Import System
 
-### Hello World
+```gul
+@imp std.io                    # Single module
+@imp std{io, math, http}       # Multiple modules
+@imp python{pandas, numpy}     # Foreign modules
+```
+
+---
+
+## Main Entry Point
 
 ```gul
 mn:
     print("Hello, World!")
-```
 
-### Web Fetch
+# Or with function
+fn main():
+    print("Hello!")
 
-```gul
-@imp std.http
-
-async mn:
-    response = await http.get("https://api.example.com/data")
-    print(response.json())
-```
-
-### Data Pipeline
-
-```gul
-mn: [
-    read_csv("data.csv")
-        -> filter(row: row.age > 18)
-        -> transform(row: row.name.upper())
-        -> write_csv("output.csv")
-]
+mn:
+    main()
 ```
 
 ---
 
-**Docs**: [Full Documentation](README.md) | [Language Spec](language_spec.md) | [Tutorials](guides/introduction.md)
+## Common Patterns
+
+### Web Server
+
+```gul
+@imp std.http
+
+fn @dict handler(req):
+    return @dict{status: "ok"}
+
+mn:
+    http.listen(8080, handler)
+```
+
+### Data Analysis
+
+```gul
+@imp python{pandas}
+
+@python {
+    df = pd.read_csv("data.csv")
+    stats = {
+        "mean": float(df.mean().mean()),
+        "count": len(df)
+    }
+}
+```
+
+### Async Operations
+
+```gul
+async main():
+    let data = await fetch("https://api.example.com")
+    print(data)
+
+mn:
+    await main()
+```
+
+---
+
+## Error Handling
+
+```gul
+try:
+    let result = risky_operation()
+catch error:
+    print("Error:", error)
+finally:
+    cleanup()
+```
+
+---
+
+## Ownership Modes
+
+```gul
+fn process(data: borrow @list):    # Borrow
+    # Can read but not modify
+
+fn mutate(data: ref @list):        # Mutable reference
+    data.append(10)
+
+fn consume(data: move @list):      # Move ownership
+    # Takes ownership
+
+fn keep(data: kept @list):         # Keep copy
+    # Makes a copy
+```
+
+---
+
+## Quick Start Example
+
+```gul
+@imp std.io
+@imp python{numpy, pandas}
+
+struct DataProcessor:
+    filepath: @str
+
+    fn @dict analyze(self):
+        @python {
+            df = pd.read_csv(self.filepath)
+            return {
+                "count": len(df),
+                "mean": float(df.mean().mean())
+            }
+        }
+        return python.result
+
+fn main():
+    let processor = DataProcessor{
+        filepath: "data.csv"
+    }
+    let results = processor.analyze()
+    print("Results:", results)
+
+mn:
+    main()
+```
+
+---
+
+**More**: See [complete documentation](README.md)  
+**MCP Guide**: [MCP_QUICKSTART.md](guides/MCP_QUICKSTART.md)  
+**Advanced**: [MCP_ADVANCED.md](../MCP_ADVANCED.md)
