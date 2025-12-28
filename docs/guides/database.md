@@ -1,3 +1,9 @@
+# Database
+
+**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+
+---
+
 # Database Module API Reference
 
 The `std.database` module provides a unified interface for database operations across multiple database systems including PostgreSQL, MySQL, SQLite, MongoDB, and Redis.
@@ -124,5 +130,5 @@ db.transaction(fn():
 ```
 
 **Last Updated**: 2025-12-28  
-**Version**: 1.0.0  
+**Version: 0.13.0  
 **License**: MIT

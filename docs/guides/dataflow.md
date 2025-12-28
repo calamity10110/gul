@@ -1,6 +1,6 @@
 # GUL Data-Flow Programming Guide
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+**Version: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
 
 ---
 
@@ -419,5 +419,5 @@ gul-mcp generate "data pipeline: load → clean → analyze → save"
 ---
 
 **Last Updated**: 2025-12-28  
-**Version**: 0.13.0  
+**Version: 0.13.0  
 **Syntax**: v3.2

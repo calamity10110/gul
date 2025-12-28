@@ -1,3 +1,9 @@
+# Webui
+
+**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+
+---
+
 # GUL Web IDE & Web Development Guide
 
 Complete guide to using the GUL Web IDE and developing web applications.

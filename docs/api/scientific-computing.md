@@ -1,3 +1,9 @@
+# Scientific Computing
+
+**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+
+---
+
 # Scientific Computing with GUL Tutorial
 
 Perform advanced scientific computations, simulations, and numerical analysis with GUL.
@@ -247,5 +253,5 @@ peaks = fft.find_peaks(power_spectrum)
 ---
 
 **Last Updated**: 2025-12-28  
-**Version**: 1.0.0  
+**Version: 0.13.0  
 **License**: MIT

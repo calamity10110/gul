@@ -1,3 +1,9 @@
+# Ui Components
+
+**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+
+---
+
 # UI Components API Reference
 
 GUL provides rich UI components for both Terminal UI (TUI) and Web UI applications.
@@ -342,5 +348,5 @@ count.watch(fn(new_value):
 ---
 
 **Last Updated**: 2025-12-28  
-**Version**: 1.0.0  
+**Version: 0.13.0  
 **License**: MIT

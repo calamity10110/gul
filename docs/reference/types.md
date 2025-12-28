@@ -1,3 +1,9 @@
+# Types
+
+**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+
+---
+
 # Type System Reference
 
 GUL features a rich, flexible type system that supports static typing, type inference, generics, and advanced type features. This reference covers all aspects of the GUL type system.
@@ -726,5 +732,5 @@ fn find_user(id: int): User?:
 ---
 
 **Last Updated**: 2025-12-28  
-**Version**: 1.0.0  
+**Version: 0.13.0  
 **License**: MIT

@@ -1,3 +1,9 @@
+# Syntax
+
+**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+
+---
+
 # GUL v3.2 Syntax Reference
 
 **ENFORCED**: This document uses **v3.2 syntax only**. While v2.0 syntax still works for backward compatibility, all new code should use v3.2.

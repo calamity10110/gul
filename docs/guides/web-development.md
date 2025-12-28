@@ -1,3 +1,9 @@
+# Web Development
+
+**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+
+---
+
 # Web Development with GUL
 
 This guide covers building modern web applications with GUL, including HTTP servers, routing, middleware, templates, and full-stack development patterns.
@@ -882,5 +888,5 @@ server.start()
 ---
 
 **Last Updated**: 2025-12-28  
-**Version**: 1.0.0  
+**Version: 0.13.0  
 **License**: MIT

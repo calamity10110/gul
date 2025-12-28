@@ -1,3 +1,9 @@
+# Http
+
+**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+
+---
+
 # HTTP Module API Reference
 
 The `std.http` module provides comprehensive HTTP client and server capabilities for building web applications and services.
@@ -474,5 +480,5 @@ fn event_stream(request):
 ---
 
 **Last Updated**: 2025-12-28  
-**Version**: 1.0.0  
+**Version: 0.13.0  
 **License**: MIT

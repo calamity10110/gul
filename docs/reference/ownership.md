@@ -1,3 +1,9 @@
+# Ownership
+
+**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+
+---
+
 # Ownership Model Deep Dive
 
 GUL implements a sophisticated ownership model that ensures memory safety while providing flexibility for different programming patterns. This guide explores the ownership system in detail.
@@ -625,5 +631,5 @@ consumer2 = Consumer.new(shared_data.clone())
 ---
 
 **Last Updated**: 2025-12-28  
-**Version**: 1.0.0  
+**Version: 0.13.0  
 **License**: MIT

@@ -1,3 +1,9 @@
+# Creating Packages
+
+**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+
+---
+
 # Creating Packages Tutorial
 
 Learn how to create, publish, and maintain GUL packages for the community.
@@ -318,5 +324,5 @@ full = ["basic", "advanced"]
 ---
 
 **Last Updated**: 2025-12-28  
-**Version**: 1.0.0  
+**Version: 0.13.0  
 **License**: MIT

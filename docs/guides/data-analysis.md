@@ -1,3 +1,9 @@
+# Data Analysis
+
+**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+
+---
+
 # Data Analysis with GUL Tutorial
 
 Learn to perform data analysis, statistical computing, and visualization with GUL.
@@ -169,5 +175,5 @@ main:
 ---
 
 **Last Updated**: 2025-12-28  
-**Version**: 1.0.0  
+**Version: 0.13.0  
 **License**: MIT

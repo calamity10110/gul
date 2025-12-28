@@ -1,3 +1,9 @@
+# Math Science
+
+**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+
+---
+
 # Math & Science Module API Reference
 
 The `std.math` and `std.science` modules provide comprehensive mathematical and scientific computing capabilities.
@@ -167,5 +173,5 @@ random.shuffle(items)
 ---
 
 **Last Updated**: 2025-12-28  
-**Version**: 1.0.0  
+**Version: 0.13.0  
 **License**: MIT

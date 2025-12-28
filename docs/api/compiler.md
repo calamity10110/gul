@@ -1,3 +1,9 @@
+# Compiler
+
+**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+
+---
+
 # Compiler Architecture
 
 ## Compilation Pipeline

@@ -1,3 +1,9 @@
+# First Program
+
+**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+
+---
+
 # Your First GUL Program
 
 This tutorial walks you through creating your first complete GUL program, explaining every concept along the way.
@@ -353,5 +359,5 @@ gul build --release
 ---
 
 **Last Updated**: 2025-12-28  
-**Version**: 1.0.0  
+**Version: 0.13.0  
 **License**: MIT

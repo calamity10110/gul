@@ -1,3 +1,9 @@
+# Web Server
+
+**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+
+---
+
 # Building a Web Server Tutorial
 
 Learn to build a complete REST API web server with GUL, including routing, database integration, and authentication.
@@ -441,5 +447,5 @@ curl http://localhost:8080/api/posts
 ---
 
 **Last Updated**: 2025-12-28  
-**Version**: 1.0.0  
+**Version: 0.13.0  
 **License**: MIT

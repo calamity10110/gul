@@ -1,6 +1,12 @@
+# Course
+
+**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+
+---
+
 # GUL Interactive TUI Course
 
-**Version:** v0.13.0  
+**Version: 0.13.0  
 **Status:** ✅ Complete  
 **Lessons:** 10  
 **Difficulty:** Beginner to Intermediate
@@ -502,7 +508,7 @@ Special thanks to:
 ---
 
 **Created:** 2025-12-28 16:29:51 PST  
-**Version:** v0.13.0  
+**Version: 0.13.0  
 **Status:** ✅ Production Ready  
 **Lessons:** 10  
 **Tests:** 5/5 passing

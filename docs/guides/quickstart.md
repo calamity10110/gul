@@ -1,3 +1,9 @@
+# Quickstart
+
+**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+
+---
+
 # Quick Start Tutorial - GUL v3.2
 
 Get up and running with GUL v3.2 in just 5 minutes!
@@ -238,5 +244,5 @@ gul runtime js "console.log('hello')"
 ---
 
 **Last Updated**: 2025-12-28  
-**Version**: 0.13.0  
+**Version: 0.13.0  
 **License**: MIT

@@ -1,8 +1,14 @@
+# Introduction
+
+**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+
+---
+
 # Getting Started with GUL v3.2
 
 Welcome to GUL (GUL Universal Language)! This guide uses **v3.2 syntax exclusively**.
 
-**Version**: 0.13.0 | **Status**: Production Ready
+**Version: 0.13.0 | **Status**: Production Ready
 
 ---
 
@@ -263,4 +269,4 @@ gul runtime load-lib <path>
 **Happy coding with GUL v3.2!** 🚀
 
 **Last Updated**: 2025-12-28  
-**Version**: 0.13.0
+**Version: 0.13.0

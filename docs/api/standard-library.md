@@ -1,6 +1,6 @@
 # GUL Standard Library API Reference
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+**Version: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
 
 Complete reference for GUL's 13 standard library modules with 110+ functions.
 
@@ -397,5 +397,5 @@ mn:
 ---
 
 **Last Updated**: 2025-12-28  
-**Version**: 0.13.0  
+**Version: 0.13.0  
 **Syntax**: v3.2
