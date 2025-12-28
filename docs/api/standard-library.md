@@ -1,275 +1,401 @@
-# GUL Standard Library Reference v3.0
+# GUL Standard Library API Reference
 
-The GUL Standard Library provides 13 comprehensive modules for common programming tasks.
+**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
 
-**Version**: 0.13.0 | **Status**: Production Ready
+Complete reference for GUL's 13 standard library modules with 110+ functions.
 
-## Overview
+---
 
-GUL's standard library includes:
+## Table of Contents
 
-- **7 Core Modules**: fs, path, env, time, process, random, crypto
-- **3 Data Modules**: collections, string, bytes
-- **3 Network Modules**: http, websocket, tcp, udp (experimental)
-
-Total: **110+ functions** across all modules
+1. [Core Modules](#core-modules)
+2. [I/O Module](#io-module)
+3. [HTTP Module](#http-module)
+4. [Math Module](#math-module)
+5. [Database Module](#database-module)
+6. [File System](#file-system)
+7. [JSON Module](#json-module)
+8. [Time Module](#time-module)
+9. [Crypto Module](#crypto-module)
+10. [Collections](#collections)
+11. [String Operations](#string-operations)
+12. [System Module](#system-module)
+13. [Async Runtime](#async-runtime)
 
 ---
 
 ## Core Modules
 
-### std.fs - File System
-
-File system operations for reading, writing, and managing files.
+### `std.io` - Input/Output
 
 ```gul
-import std{fs}
+@imp std.io
 
-mn:
-    # Check if file exists
-    if fs.exists("config.json"):
-        print("Config found")
+# Print to console
+io.print("Hello")                    # Simple print
+io.println("With newline")           # Print with newline
+io.printf("Name: %s", name)          # Formatted print
 
-    # Read/write files
-    content = fs.read_file("data.txt")
-    fs.write_file("output.txt", "Hello!")
-
-    # Directory operations
-    fs.mkdir("output")
-    files = fs.list_dir(".")
+# Input
+let name = io.input("Enter name: ")
+let age = io.input_int("Age: ")
 ```
 
-### std.path - Path Manipulation
-
-Cross-platform path handling.
+### `std.math` - Mathematics
 
 ```gul
-import std{path}
+@imp std.math
 
-mn:
-    let full_path = path.join("dir", "file.txt")
-    let filename = path.basename(full_path)
-    let extension = path.extension(full_path)
+# Basic operations
+let result = math.sqrt(@float(16.0))   # 4.0
+let power = math.pow(@float(2.0), 3.0) # 8.0
+let abs_val = math.abs(@int(-5))       # 5
+
+# Trigonometry
+let sin_val = math.sin(@float(1.57))
+let cos_val = math.cos(@float(0.0))
+
+# Constants
+let pi = math.PI
+let e = math.E
 ```
 
-### std.env - Environment
-
-Access environment variables and system information.
+### `std.http` - HTTP Client/Server
 
 ```gul
-import std{env}
+@imp std.http
 
-mn:
-    let api_key = env.get("API_KEY", "default")
-    let home = env.home_dir()
-    let cwd = env.current_dir()
-```
-
-### std.time - Time and Dates
-
-Time, duration, and date functionality.
-
-```gul
-import std{time}
-
-mn:
-    let now = time.now()
-    await time.sleep(1000)  # Sleep 1 second
-    let formatted = time.format(now, "%Y-%m-%d")
-```
-
-### std.process - Process Management
-
-Spawn and manage system processes.
-
-```gul
-import std{process}
-
-mn:
-    let output = process.run("ls", ["-la"])
-    print(output.stdout)
-```
-
-### std.random - Random Numbers
-
-Generate random numbers and UUIDs.
-
-```gul
-import std{random}
-
-mn:
-    let num = random.int(1, 100)
-    let uuid = random.uuid()
-    let choice = random.choice([1, 2, 3])
-```
-
-### std.crypto - Cryptography
-
-Hashing and encryption functions.
-
-```gul
-import std{crypto}
-
-mn:
-    let hash = crypto.sha256("password")
-    let encoded = crypto.base64_encode("data")
-```
-
----
-
-## Data Modules
-
-### std.collections - Data Structures
-
-Advanced data structures (Set, Queue, Stack, Heap).
-
-```gul
-import std{collections}
-
-mn:
-    let set = collections.Set()
-    set.insert(1)
-    set.insert(2)
-
-    let queue = collections.Queue()
-    queue.push(1)
-    let item = queue.pop()
-```
-
-### std.string - String Utilities
-
-String manipulation and formatting.
-
-```gul
-import std{string}
-
-mn:
-    let parts = string.split("a,b,c", ",")
-    let joined = string.join(parts, "-")
-    let upper = string.to_upper("hello")
-```
-
-### std.bytes - Binary Data (NEW in v0.13.0)
-
-Binary data operations.
-
-```gul
-import std{bytes}
-
-mn:
-    let data = bytes.from_string("Hello")
-    let hex = bytes.to_hex(data)
-    let b64 = bytes.to_base64(data)
-    let concat = bytes.concat(data1, data2)
-```
-
-**Functions** (10 total):
-
-- `from_string(s: String) -> Bytes`
-- `to_string(b: Bytes) -> String`
-- `from_hex(hex: String) -> Bytes`
-- `to_hex(b: Bytes) -> String`
-- `from_base64(b64: String) -> Bytes`
-- `to_base64(b: Bytes) -> String`
-- `concat(b1: Bytes, b2: Bytes) -> Bytes`
-- `slice(b: Bytes, start: Number, end: Number) -> Bytes`
-- `length(b: Bytes) -> Number`
-- `equals(b1: Bytes, b2: Bytes) -> Boolean`
-
----
-
-## Network Modules (Experimental)
-
-### std.http - HTTP Client/Server
-
-HTTP requests and server functionality.
-
-```gul
-import std{http}
-
+# GET request
 async fetch_data():
-    let response = await http.get("https://api.example.com")
+    let response = await http.get("https://api.example.com/data")
+    let data = response.json()
+    return data
+
+# POST request
+async post_data():
+    let data = @dict{name: "Alice", age: 30}
+    let response = await http.post("https://api.example.com/users", data)
     return response.json()
 
-mn:
-    let data = await fetch_data()
-    print(data)
-```
-
-### std.websocket - WebSocket (9 functions)
-
-WebSocket client and server.
-
-```gul
-import std{websocket}
+# Server
+fn @dict handler(request):
+    return @dict{status: "ok", message: "Hello!"}
 
 mn:
-    let ws = websocket.connect("ws://localhost:8080")
-    websocket.send(ws, "Hello")
-    let msg = websocket.receive(ws)
-```
-
-**Functions**:
-
-- `connect(url: String) -> WebSocket`
-- `send(ws: WebSocket, data: String)`
-- `receive(ws: WebSocket) -> String`
-- `listen(port: Number) -> WebSocketServer`
-- `accept(server: WebSocketServer) -> WebSocket`
-- `ping(ws: WebSocket)`
-- `pong(ws: WebSocket)`
-- `close(ws: WebSocket)`
-- `is_open(ws: WebSocket) -> Boolean`
-
-### std.tcp - TCP Sockets (13 functions)
-
-TCP client and server operations.
-
-```gul
-import std{tcp}
-
-mn:
-    let socket = tcp.connect("localhost", 8080)
-    tcp.send(socket, "Hello")
-    let data = tcp.receive(socket)
-```
-
-### std.udp - UDP Sockets (14 functions)
-
-UDP socket operations with multicast support.
-
-```gul
-import std{udp}
-
-mn:
-    let socket = udp.bind("0.0.0.0", 8080)
-    udp.send_to(socket, "Hello", "localhost", 9000)
+    http.listen(8080, handler)
 ```
 
 ---
 
-## Module Loading
+## Database Module
+
+### `std.db` - Database Operations
 
 ```gul
-# Single module
-import std.fs
+@imp std.db
 
-# Multiple modules
-import std{fs, path, env}
+# Connect
+let conn = db.connect("postgresql://localhost/mydb")
 
-# Aliasing
-import std.collections as col
+# Query
+let users = conn.query("SELECT * FROM users WHERE age > ?", @list[18])
+
+# Insert
+conn.execute("INSERT INTO users (name, age) VALUES (?, ?)",
+             @list["Alice", 30])
+
+# Transaction
+conn.begin()
+try:
+    conn.execute("UPDATE users SET age = ? WHERE id = ?", @list[31, 1])
+    conn.commit()
+catch error:
+    conn.rollback()
 ```
+
+---
+
+## File System
+
+### `std.fs` - File Operations
+
+```gul
+@imp std.fs
+
+# Read file
+let content = fs.read_file("data.txt")
+let lines = fs.read_lines("data.txt")
+
+# Write file
+fs.write_file("output.txt", "Hello, World!")
+fs.append_file("log.txt", "New log entry\n")
+
+# File info
+let size = fs.file_size("data.txt")
+let exists = fs.exists("data.txt")
+
+# Directory operations
+fs.create_dir("new_folder")
+let files = fs.list_dir(".")
+fs.remove_file("temp.txt")
+```
+
+---
+
+## JSON Module
+
+### `std.json` - JSON Operations
+
+```gul
+@imp std.json
+
+# Parse JSON
+let data = json.parse('{"name": "Alice", "age": 30}')
+let name = data["name"]
+
+# Stringify
+let obj = @dict{name: "Bob", age: 25}
+let json_str = json.stringify(obj)
+
+# Pretty print
+let pretty = json.stringify_pretty(obj, indent=2)
+```
+
+---
+
+## Time Module
+
+### `std.time` - Time/Date Operations
+
+```gul
+@imp std.time
+
+# Current time
+let now = time.now()
+let timestamp = time.timestamp()
+
+# Formatting
+let formatted = time.format(now, "%Y-%m-%d %H:%M:%S")
+
+# Sleep
+time.sleep(@int(1))              # Sleep 1 second
+time.sleep_ms(@int(500))         # Sleep 500ms
+
+# Parsing
+let date = time.parse("2025-12-28", "%Y-%m-%d")
+```
+
+---
+
+## Crypto Module
+
+### `std.crypto` - Cryptography
+
+```gul
+@imp std.crypto
+
+# Hashing
+let hash = crypto.sha256("password")
+let md5 = crypto.md5("data")
+
+# Encoding
+let encoded = crypto.base64_encode("Hello")
+let decoded = crypto.base64_decode(encoded)
+
+# Random
+let random_bytes = crypto.random_bytes(@int(16))
+let uuid = crypto.uuid()
+```
+
+---
+
+## Collections
+
+### `std.collections` - Advanced Collections
+
+```gul
+@imp std.collections
+
+# Queue
+let queue = collections.Queue()
+queue.enqueue(@int(1))
+let item = queue.dequeue()
+
+# Stack
+let stack = collections.Stack()
+stack.push(@int(1))
+let top = stack.pop()
+
+# HashMap
+let map = collections.HashMap()
+map.set("key", "value")
+let val = map.get("key")
+```
+
+---
+
+## String Operations
+
+### `std.str` - String Utilities
+
+```gul
+@imp std.str
+
+# Operations
+let upper = str.to_upper("hello")     # "HELLO"
+let lower = str.to_lower("WORLD")     # "world"
+let trimmed = str.trim("  hi  ")      # "hi"
+
+# Checking
+let starts = str.starts_with("hello", "he")  # true
+let contains = str.contains("hello", "ll")   # true
+
+# Splitting/Joining
+let parts = str.split("a,b,c", ",")   # ["a", "b", "c"]
+let joined = str.join(@list["a", "b"], ",")  # "a,b"
+
+# Replace
+let replaced = str.replace("hello world", "world", "GUL")
+```
+
+---
+
+## System Module
+
+### `std.sys` - System Operations
+
+```gul
+@imp std.sys
+
+# Environment
+let path = sys.env("PATH")
+sys.set_env("MY_VAR", "value")
+
+# Process
+let exit_code = sys.execute("ls -la")
+let output = sys.capture_output("pwd")
+
+# Platform info
+let os = sys.os_name()           # "linux", "windows", "macos"
+let arch = sys.arch()            # "x86_64", "arm64"
+```
+
+---
+
+## Async Runtime
+
+### `std.async` - Asynchronous Operations
+
+```gul
+@imp std.async
+
+# Spawn task
+async task1():
+    await time.sleep(@int(1))
+    return @str("Done")
+
+async task2():
+    await time.sleep(@int(2))
+    return @str("Complete")
+
+# Run concurrently
+async main():
+    let results = await async.gather(@list[task1(), task2()])
+    print(results)
+
+mn:
+    await main()
+```
+
+---
+
+## Complete Example
+
+```gul
+@imp std{io, http, json, db, fs, time}
+
+struct User:
+    id: @int
+    name: @str
+    email: @str
+
+    fn @dict to_dict(self):
+        return @dict{
+            id: self.id,
+            name: self.name,
+            email: self.email
+        }
+
+async fetch_users():
+    # HTTP request
+    let response = await http.get("https://api.example.com/users")
+    let data = response.json()
+    return data
+
+async save_to_db(users):
+    # Database
+    let conn = db.connect("postgresql://localhost/app")
+
+    for user in users:
+        conn.execute(
+            "INSERT INTO users (name, email) VALUES (?, ?)",
+            @list[user["name"], user["email"]]
+        )
+
+async save_to_file(users):
+    # File system
+    let json_data = json.stringify_pretty(users)
+    fs.write_file("users.json", json_data)
+
+async main():
+    print("Fetching users...")
+    let users = await fetch_users()
+
+    print("Saving to database...")
+    await save_to_db(users)
+
+    print("Saving to file...")
+    await save_to_file(users)
+
+    print("Done!")
+
+mn:
+    await main()
+```
+
+---
+
+## Module Summary
+
+| Module            | Functions | Purpose              |
+| ----------------- | --------- | -------------------- |
+| `std.io`          | 8+        | Console I/O          |
+| `std.http`        | 12+       | HTTP client/server   |
+| `std.math`        | 20+       | Mathematics          |
+| `std.db`          | 10+       | Database operations  |
+| `std.fs`          | 15+       | File system          |
+| `std.json`        | 4+        | JSON parsing         |
+| `std.time`        | 10+       | Time/date            |
+| `std.crypto`      | 8+        | Cryptography         |
+| `std.collections` | 12+       | Advanced collections |
+| `std.str`         | 10+       | String operations    |
+| `std.sys`         | 8+        | System operations    |
+| `std.async`       | 5+        | Async runtime        |
+| `std.ui`          | 8+        | UI components        |
+
+**Total**: 13 modules, 110+ functions
 
 ---
 
 ## See Also
 
-- [Syntax Reference](../reference/syntax.md) - v3.0 syntax guide
-- [Package Catalog](../reference/package-catalog.md) - 58 available packages
-- [Quick Reference](../QUICK_REFERENCE.md) - Cheat sheet
+- [HTTP API](http.md) - Detailed HTTP reference
+- [Database API](database.md) - Database guide
+- [Math & Science](math-science.md) - Scientific computing
+- [Quick Reference](../QUICK_REFERENCE.md) - Syntax cheat sheet
 
 ---
 
-**Last Updated**: 2025-12-18  
-**Version**: 0.13.0
+**Last Updated**: 2025-12-28  
+**Version**: 0.13.0  
+**Syntax**: v3.2

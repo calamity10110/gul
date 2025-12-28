@@ -1,8 +1,8 @@
-# Quick Start Tutorial - GUL v3.0
+# Quick Start Tutorial - GUL v3.2
 
-Get up and running with GUL v3.0 in just 5 minutes!
+Get up and running with GUL v3.2 in just 5 minutes!
 
-**All examples use v3.0 syntax exclusively.**
+**All examples use v3.2 syntax exclusively.**
 
 ## ⚡ Installation
 
@@ -28,7 +28,7 @@ Create a file called `hello.mn`:
 
 mn:
     print("Hello, GUL!")
-    print("Welcome to v3.0!")
+    print("Welcome to v3.2!")
 ```
 
 Run it:
@@ -43,10 +43,10 @@ Output:
 
 ```text
 Hello, GUL!
-Welcome to v3.0!
+Welcome to v3.2!
 ```
 
-## 🔢 Variables (v3.0 Syntax)
+## 🔢 Variables (v3.2 Syntax)
 
 ```gul
 mn:
@@ -118,7 +118,7 @@ mn:
 ```gul
 mn:
     # Lists
-    let numbers = [1, 2, 3, 4, 5]
+    let numbers = @list[1, 2, 3, 4, 5]
     var items = [1, 2, 3]
     items.push(4)
     print(numbers[0])  # 1
@@ -132,7 +132,7 @@ mn:
     print(person.name)  # Bob
 ```
 
-## 🌐 Imports (v3.0)
+## 🌐 Imports (v3.2)
 
 ```gul
 @imp std.http
@@ -212,17 +212,17 @@ gul runtime js "console.log('hello')"
 ## 🚀 Next Steps
 
 1. **[Introduction Guide](../guides/introduction.md)** - Complete overview
-2. **[Syntax Reference](../reference/syntax.md)** - v3.0 syntax guide
+2. **[Syntax Reference](../reference/syntax.md)** - v3.2 syntax guide
 3. **[Standard Library](../api/standard-library.md)** - Built-in modules
 4. **[Package Catalog](../reference/package-catalog.md)** - Available packages
 
 ## 🎓 Key Concepts
 
-- **mn:** - Main entry point (v3.0)
-- **let/var** - Immutable/mutable variables (v3.0)
+- **mn:** - Main entry point (v3.2)
+- **let/var** - Immutable/mutable variables (v3.2)
 - **fn** - Function declaration
 - **async** - Async functions
-- **@imp** - Module imports (v3.0)
+- **@imp** - Module imports (v3.2)
 
 ## 📚 Resources
 
@@ -233,10 +233,10 @@ gul runtime js "console.log('hello')"
 
 ---
 
-**Congratulations!** 🎉 You've completed the GUL v3.0 Quick Start!
+**Congratulations!** 🎉 You've completed the GUL v3.2 Quick Start!
 
 ---
 
-**Last Updated**: 2025-12-18  
+**Last Updated**: 2025-12-28  
 **Version**: 0.13.0  
 **License**: MIT

@@ -1,6 +1,6 @@
-# Getting Started with GUL v3.0
+# Getting Started with GUL v3.2
 
-Welcome to GUL (GUL Universal Language)! This guide uses **v3.0 syntax exclusively**.
+Welcome to GUL (GUL Universal Language)! This guide uses **v3.2 syntax exclusively**.
 
 **Version**: 0.13.0 | **Status**: Production Ready
 
@@ -18,7 +18,7 @@ GUL is a modern, multi-paradigm programming language that combines:
 
 ## Key Features
 
-✅ **v3.0 Syntax** - Modern `let`/`var` keywords  
+✅ **v3.2 Syntax** - Modern `let`/`var` keywords  
 ✅ **58 Packages** - Cross-language ecosystem  
 ✅ **13 Stdlib Modules** - Including networking  
 ✅ **3 Runtimes** - Python, JavaScript, Rust  
@@ -57,7 +57,7 @@ Create a file called `hello.mn`:
 
 mn:
     print("Hello, GUL!")
-    print("Welcome to v3.0!")
+    print("Welcome to v3.2!")
 ```
 
 Run it:
@@ -70,19 +70,19 @@ Output:
 
 ```text
 Hello, GUL!
-Welcome to v3.0!
+Welcome to v3.2!
 ```
 
-## Basic Syntax (v3.0)
+## Basic Syntax (v3.2)
 
 ### Variables
 
 ```gul
-# Immutable (v3.0)
+# Immutable (v3.2)
 let name = "Alice"
 let age = 25
 
-# Mutable (v3.0)
+# Mutable (v3.2)
 var count = 0
 count = count + 1
 ```
@@ -128,8 +128,8 @@ while count < 10:
 
 ```gul
 # Lists
-let numbers = [1, 2, 3, 4, 5]
-let names = ["Alice", "Bob", "Charlie"]
+let numbers = @list[1, 2, 3, 4, 5]
+let names = @list["Alice", "Bob", "Charlie"]
 
 # Dictionaries
 let user = {
@@ -139,7 +139,7 @@ let user = {
 }
 ```
 
-## Imports (v3.0)
+## Imports (v3.2)
 
 ```gul
 @imp std.http
@@ -247,7 +247,7 @@ gul runtime load-lib <path>
 
 ## Next Steps
 
-1. **[Syntax Reference](../reference/syntax.md)** - Complete v3.0 syntax guide
+1. **[Syntax Reference](../reference/syntax.md)** - Complete v3.2 syntax guide
 2. **[Quick Start Tutorial](../tutorials/quickstart.md)** - Learn by doing
 3. **[Standard Library](../api/standard-library.md)** - Built-in modules
 4. **[Package Catalog](../reference/package-catalog.md)** - 58 available packages
@@ -260,7 +260,7 @@ gul runtime load-lib <path>
 
 ---
 
-**Happy coding with GUL v3.0!** 🚀
+**Happy coding with GUL v3.2!** 🚀
 
-**Last Updated**: 2025-12-18  
+**Last Updated**: 2025-12-28  
 **Version**: 0.13.0

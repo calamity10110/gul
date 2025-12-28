@@ -217,7 +217,7 @@ secret db_password = vault.read("secret/data/database/password")
 # Write secret to Vault
 vault.write("secret/data/api/key", {
     "key": "sk-1234567890",
-    "created": "2025-12-10"
+    "created": "2025-12-28"
 })
 
 # Dynamic database credentials
@@ -387,7 +387,7 @@ secrets.configure_audit({
 
 # Access secrets (automatically logged)
 secret api_key = secrets.get("API_KEY")
-# Logs: {"timestamp": "2025-12-10T13:45:00Z", "secret": "API_KEY", "action": "read", "user": "app", "result": "success"}
+# Logs: {"timestamp": "2025-12-28T13:45:00Z", "secret": "API_KEY", "action": "read", "user": "app", "result": "success"}
 ```
 
 ### Query Audit Logs
@@ -582,6 +582,6 @@ fn process_payment(request):
 
 ---
 
-**Last Updated**: 2025-12-10  
+**Last Updated**: 2025-12-28  
 **Version**: 1.0.0  
 **License**: MIT

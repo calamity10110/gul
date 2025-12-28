@@ -1,6 +1,6 @@
-# GUL v3.0 Syntax Reference
+# GUL v3.2 Syntax Reference
 
-**ENFORCED**: This document uses **v3.0 syntax only**. While v2.0 syntax still works for backward compatibility, all new code should use v3.0.
+**ENFORCED**: This document uses **v3.2 syntax only**. While v2.0 syntax still works for backward compatibility, all new code should use v3.2.
 
 ## 1. Variables
 
@@ -239,7 +239,7 @@ async fetch_api() -> dict:
 mn:
     print("Starting...")
 
-    let data = [1, 2, 3, 4, 5]
+    let data = @list[1, 2, 3, 4, 5]
     let stats = process_data(data)
     print("Stats:", stats)
 
@@ -247,7 +247,7 @@ mn:
     print("Average:", avg)
 ```
 
-## v3.0 Keywords
+## v3.2 Keywords
 
 **Variables**: `let`, `var`
 
@@ -269,5 +269,5 @@ Use `.mn` for all GUL files.
 
 ---
 
-**Version**: v3.0 (Enforced)  
-**Last Updated**: 2025-12-18
+**Version**: v3.2 (Enforced)  
+**Last Updated**: 2025-12-28

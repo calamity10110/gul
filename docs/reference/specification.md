@@ -1,7 +1,7 @@
 # GUL Language Specification v2.0
 
 Version: 0.13.0  
-Date: 2025-12-10  
+Date: 2025-12-28  
 Status: Production Ready
 
 ---
@@ -563,7 +563,7 @@ Primitive types (`int`, `bool`, `float`) are `copy` by default (implicit copy on
 Assignment transfers ownership for non-copy types:
 
 ```gul
-let list1 = [1, 2, 3]
+let list1 = @list[1, 2, 3]
 let list2 = list1  # list1 is now invalid (moved)
 # print(list1)  # ERROR: value moved
 ```
@@ -841,7 +841,7 @@ struct Point:
 ### 9.4 List & Tuple Definitions
 
 ```gul
-let DATA = [1, 2, 3]
+let DATA = @list[1, 2, 3]
 ```
 
 ### 9.5 Class Definitions
@@ -883,7 +883,7 @@ Definitions in `module.def` are accessed via `module.Name`.
 
 ```gul
 let numbers: [int] = [1, 2, 3, 4, 5]
-let mixed = [1, "a"]  # Typed as [any]
+let mixed = @list[1, "a"]  # Typed as [any]
 ```
 
 ### 10.2 Basic Tuples
@@ -906,7 +906,7 @@ fold(fn, init, list)  # Reduce
 ### 10.4 2D Lists
 
 ```gul
-let matrix = [[1, 2], [3, 4]]
+let matrix = @list[[1, 2], [3, 4]]
 ```
 
 Matrix operations supported via `std.math`.
@@ -916,7 +916,7 @@ Matrix operations supported via `std.math`.
 Volumetric data:
 
 ```gul
-let volume = [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
+let volume = @list[[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
 ```
 
 ### 10.6 4D Lists (x-y-z-time)
@@ -924,7 +924,7 @@ let volume = [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
 Specialized for physics simulations:
 
 ```gul
-let spacetime = [[[[1, 2], [3, 4]], [[5, 6], [7, 8]]]]
+let spacetime = @list[[[[1, 2], [3, 4]], [[5, 6], [7, 8]]]]
 # Access via data[t][z][y][x]
 ```
 
@@ -932,7 +932,7 @@ let spacetime = [[[[1, 2], [3, 4]], [[5, 6], [7, 8]]]]
 
 ```gul
 let own list = [...]  # Mutable (growable)
-let list = [...]      # Immutable view by default
+let list = @list[...]      # Immutable view by default
 ```
 
 ### 10.8 Predictive Timelines
