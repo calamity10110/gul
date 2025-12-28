@@ -1,23 +1,32 @@
-# GUL Simple Test - v3.0
-# Basic syntax demonstration
+# GUL Simple Test - v3.2
+# Basic syntax demonstration with @ prefix types
+
+@imp std.io
 
 struct Point:
-    x: int
-    y: int
+    x: @int
+    y: @int
+    
+    fn @str to_string(self):
+        return "(" + str(self.x) + ", " + str(self.y) + ")"
 
-let msg = "Hello from GUL Interpreter!"
-data = [1, 2, 3]
-data2 = (1, 2, 3)  # Also creates a list
-data3 = {1, 2, 3}  # Also creates a list
-
-# v3.0: Dict with any brackets
-config = [host: "localhost", port: 8080]
-# v3.0: main block - just mn:
 mn:
-    print(msg)
-    print(10 + 20)
-
-# v3.0: Bracket equivalence for collections
-
-
-print("Done!")
+    # Variables with @ prefix
+    let message = @str("Hello from GUL v3.2!")
+    let numbers = @list[1, 2, 3]
+    let tuple_data = @tuple(1, 2, 3)
+    let set_data = @set{1, 2, 3}
+    
+    # Dict with @ prefix
+    let config = @dict{host: "localhost", port: 8080}
+    
+    # Struct usage
+    let point = Point{x: 10, y: 20}
+    
+    # Output
+    print(message)
+    print("Sum:", 10 + 20)
+    print("Numbers:", numbers)
+    print("Point:", point.to_string())
+    
+    print("Done!")

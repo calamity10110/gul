@@ -1,11 +1,26 @@
-# GUL v3.1 Basic Project Template
+# GUL v3.2 Basic Project Template
+# Demonstrates @ prefix type system
 
-@imp std.ui
+@imp std.io
 
-let tree = ^÷^[tree]
-let slider = ^÷^[slider{min=0, max=100, value=50}]
+fn main():
+    let name = @str("GUL Project")
+    let version = @str("3.2.0")
+    let items = @list[1, 2, 3, 4, 5]
+    
+    print("Project:", name)
+    print("Version:", version)
+    print("Items:", items)
+    
+    # Basic configuration
+    let config = @dict{
+        name: "MyApp",
+        version: "1.0",
+        debug: true
+    }
+    
+    print("Config:", config)
+    print("Basic project initialized!")
 
 mn:
-    ui.print(tree)
-    ui.print(slider)
-    print("Basic project initialized!")
+    main()

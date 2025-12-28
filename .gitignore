@@ -1,34 +1,40 @@
-# Build artifacts
-/target
-/build
-*.o
-*.so
-*.dll
-*.exe
-*.wasm
+# Rust build artifacts
+/target/
+**/target/
+**/*.rs.bk
+*.pdb
 
-# Secret files (NEVER commit these)
-*.scrt
-secret.def
-.env
+# Packages directory (contains build artifacts)
+/packages/
 
-# IDE and editor files
+# Cargo lock file (uncomment if building a library)
+# Cargo.lock
+
+# IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# Test output
+coverage/
+*.profraw
 
 # Logs
 *.log
-/logs
+
+# Large binaries
+**/*-[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]s
 
 # Cache
 /.cache
 /tmp
 
-# Package manager
 /node_modules
 /.npm
 

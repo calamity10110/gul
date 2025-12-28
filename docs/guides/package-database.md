@@ -10,29 +10,29 @@ A universal package registry similar to PyPI, Cargo Crates, and NPM, designed fo
 
 ```bash
 # Login to registry
-ulc login
+gul login
 
 # Publish package
-ulc publish
+gul publish
 
 # Publish specific version
-ulc publish --version 1.2.0
+gul publish --version 1.2.0
 ```
 
 ### Package Installation
 
 ```bash
 # Install package
-ulc install package-name
+gul install package-name
 
 # Install specific version
-ulc install package-name@1.2.0
+gul install package-name@1.2.0
 
 # Install from git
-ulc install git+https://github.com/user/repo
+gul install git+https://github.com/user/repo
 
 # Install local package
-ulc install ./local-package
+gul install ./local-package
 ```
 
 ### Dependency Management
@@ -81,7 +81,7 @@ Documentation is automatically generated from:
 
 Example documentation page:
 
-```
+````
 ┌─────────────────────────────────────────────────────┐
 │ http-client v0.5.0                                  │
 ├─────────────────────────────────────────────────────┤
@@ -90,7 +90,7 @@ Example documentation page:
 │                                                     │
 │ ## Installation                                     │
 │ ```                                                 │
-│ ulc install http-client                            │
+│ gul install http-client                            │
 │ ```                                                 │
 │                                                     │
 │ ## Usage                                            │
@@ -116,7 +116,7 @@ Example documentation page:
 │ - `Response` object with status, headers, body     │
 │                                                     │
 └─────────────────────────────────────────────────────┘
-```
+````
 
 ## Semantic Search
 
@@ -124,13 +124,13 @@ Example documentation page:
 
 ```bash
 # Search by description
-ulc search "HTTP client for making API requests"
+gul search "HTTP client for making API requests"
 
 # Search by functionality
-ulc search "parse JSON data"
+gul search "parse JSON data"
 
 # Search by domain
-ulc search "machine learning image classification"
+gul search "machine learning image classification"
 ```
 
 ### AI-Powered Recommendations
@@ -153,7 +153,7 @@ Error: Undefined function 'http.get'
 
 Suggestions:
   1. Add import: @imp std.http
-  2. Install package: ulc install http-client
+  2. Install package: gul install http-client
   3. Did you mean: http.post?
 ```
 
@@ -161,10 +161,10 @@ Suggestions:
 
 ```bash
 # Automatically add missing imports
-ulc fix --auto-import
+gul fix --auto-import
 
 # Install missing packages
-ulc fix --install-deps
+gul fix --install-deps
 ```
 
 ## Dependency Resolution
@@ -213,6 +213,7 @@ Resolving dependencies...
 ### Build Matrix
 
 Supports:
+
 - Linux (x86_64, ARM64)
 - macOS (x86_64, ARM64)
 - Windows (x86_64)
@@ -277,7 +278,7 @@ query {
 ### Private Packages
 
 ```toml
-# ulc.toml
+# gul.toml
 [registry]
 default = "https://registry.universal-lang.org"
 
@@ -300,12 +301,13 @@ mirror = "https://mirror.example.com"
 
 ```bash
 # Create new package from template
-ulc new my-package --template web-app
-ulc new my-lib --template library
-ulc new my-embedded --template embedded
+gul new my-package --template web-app
+gul new my-lib --template library
+gul new my-embedded --template embedded
 ```
 
 Available templates:
+
 - `library` - Basic library package
 - `web-app` - Web application
 - `cli-tool` - Command-line tool
