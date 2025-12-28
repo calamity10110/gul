@@ -49,68 +49,84 @@ impl McpDashboard {
             },
         }
     }
-    
+
     /// Get status widget
     pub fn status_widget(&self) -> Paragraph<'static> {
         let block = Block::default()
             .title("📊 MCP Server Status")
             .borders(Borders::ALL)
             .border_type(BorderType::Rounded);
-        
+
         let status_text = vec![
-            format!("Server: {}", if self.status.running { "✅ Running" } else { "❌ Stopped" }),
+            format!(
+                "Server: {}",
+                if self.status.running {
+                    "✅ Running"
+                } else {
+                    "❌ Stopped"
+                }
+            ),
             format!("Tools Available: {}", self.status.tools_available),
             format!("Workflows Active: {}", self.status.workflows_active),
             format!("Schedules Active: {}", self.status.schedules_active),
         ];
-        
+
         Paragraph::new(status_text.join("\n"))
             .block(block)
             .wrap(Wrap { trim: true })
     }
-    
+
     /// Get tools list widget
     pub fn tools_widget(&self) -> List<'static> {
-        let items: Vec<ListItem> = self.tools
+        let items: Vec<ListItem> = self
+            .tools
             .iter()
             .map(|t| ListItem::new(format!("🛠️  {}", t)))
             .collect();
-        
+
         List::new(items)
-            .block(Block::default()
-                .title("MCP Tools")
-                .borders(Borders::ALL)
-                .border_type(BorderType::Rounded))
+            .block(
+                Block::default()
+                    .title("MCP Tools")
+                    .borders(Borders::ALL)
+                    .border_type(BorderType::Rounded),
+            )
             .highlight_style(Style::default().fg(Color::Yellow))
     }
-    
+
     /// Get workflows widget
     pub fn workflows_widget(&self) -> List<'static> {
-        let items: Vec<ListItem> = self.workflows
+        let items: Vec<ListItem> = self
+            .workflows
             .iter()
             .map(|w| ListItem::new(format!("📋 {}", w)))
             .collect();
-        
+
         List::new(items)
-            .block(Block::default()
-                .title("Workflows")
-                .borders(Borders::ALL)
-                .border_type(BorderType::Rounded))
+            .block(
+                Block::default()
+                    .title("Workflows")
+                    .borders(Borders::ALL)
+                    .border_type(BorderType::Rounded),
+            )
             .highlight_style(Style::default().fg(Color::Green))
     }
-    
+
     /// Get schedules widget
     pub fn schedules_widget(&self) -> List<'static> {
-        let items: Vec<ListItem> = self.schedules
+        let items: Vec<ListItem> = self
+            .schedules
             .iter()
             .map(|s| ListItem::new(format!("📅 {}", s)))
             .collect();
-        
+
         List::new(items)
-            .block(Block::default()
-                .title("Scheduled Tasks")
-                .borders(Borders::ALL)
-                .border_type(BorderType::Rounded))
+            .block(
+                Block::default()
+                    .title("Scheduled Tasks")
+                    .borders(Borders::ALL)
+                    .border_type(BorderType::Rounded),
+            )
             .highlight_style(Style::default().fg(Color::Cyan))
     }
 }
@@ -124,7 +140,7 @@ impl Default for McpDashboard {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_dashboard_creation() {
         let dashboard = McpDashboard::new();
@@ -132,7 +148,7 @@ mod tests {
         assert_eq!(dashboard.workflows.len(), 2);
         assert_eq!(dashboard.schedules.len(), 4);
     }
-    
+
     #[test]
     fn test_server_status() {
         let dashboard = McpDashboard::new();

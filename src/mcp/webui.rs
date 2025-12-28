@@ -117,10 +117,11 @@ impl McpWebUI {
             ],
         }
     }
-    
+
     /// Generate HTML dashboard
     pub fn generate_html(&self) -> String {
-        format!(r#"
+        format!(
+            r#"
 <!DOCTYPE html>
 <html>
 <head>
@@ -225,21 +226,33 @@ impl McpWebUI {
             self.tools.len(),
             self.workflows.len(),
             self.schedules.len(),
-            self.tools.iter()
-                .map(|t| format!(r#"<div class="tool-item"><span>{}</span><span class="badge">✓</span></div>"#, t.name))
+            self.tools
+                .iter()
+                .map(|t| format!(
+                    r#"<div class="tool-item"><span>{}</span><span class="badge">✓</span></div>"#,
+                    t.name
+                ))
                 .collect::<Vec<_>>()
                 .join("\n"),
-            self.workflows.iter()
-                .map(|w| format!(r#"<div class="workflow-item"><span>{}</span><span>{} steps</span></div>"#, w.name, w.steps))
+            self.workflows
+                .iter()
+                .map(|w| format!(
+                    r#"<div class="workflow-item"><span>{}</span><span>{} steps</span></div>"#,
+                    w.name, w.steps
+                ))
                 .collect::<Vec<_>>()
                 .join("\n"),
-            self.schedules.iter()
-                .map(|s| format!(r#"<div class="schedule-item"><span>{}</span><span>{}</span></div>"#, s.name, s.interval))
+            self.schedules
+                .iter()
+                .map(|s| format!(
+                    r#"<div class="schedule-item"><span>{}</span><span>{}</span></div>"#,
+                    s.name, s.interval
+                ))
                 .collect::<Vec<_>>()
                 .join("\n")
         )
     }
-    
+
     /// Get JSON status
     pub fn to_json(&self) -> serde_json::Value {
         serde_json::json!({
@@ -260,14 +273,14 @@ impl Default for McpWebUI {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_webui_creation() {
         let webui = McpWebUI::new();
         assert!(webui.server_running);
         assert_eq!(webui.tools.len(), 7);
     }
-    
+
     #[test]
     fn test_generate_html() {
         let webui = McpWebUI::new();

@@ -18,80 +18,80 @@ pub enum McpCommands {
         /// Port to listen on
         #[arg(short, long, default_value = "3000")]
         port: u16,
-        
+
         /// Host to bind to
         #[arg(long, default_value = "127.0.0.1")]
         host: String,
     },
-    
+
     /// Generate code from description
     Generate {
         /// Code description
         description: String,
-        
+
         /// Code type
         #[arg(short, long, default_value = "function")]
         code_type: String,
     },
-    
+
     /// Create a new package
     Create {
         /// Package name
         name: String,
-        
+
         /// Package type
         #[arg(short, long, default_value = "library")]
         pkg_type: String,
     },
-    
+
     /// Run GUL code
     Run {
         /// File to run
         file: String,
-        
+
         /// Arguments to pass
         #[arg(trailing_var_arg = true)]
         args: Vec<String>,
     },
-    
+
     /// Install dependencies
     Install {
         /// Package names
         packages: Vec<String>,
     },
-    
+
     /// Test code
     Test {
         /// Test pattern
         #[arg(short, long)]
         pattern: Option<String>,
-        
+
         /// Generate coverage
         #[arg(short, long)]
         coverage: bool,
     },
-    
+
     /// Manage workflows
     Workflow {
         #[command(subcommand)]
         action: WorkflowAction,
     },
-    
+
     /// Manage schedules
     Schedule {
         #[command(subcommand)]
         action: ScheduleAction,
     },
-    
+
     /// Auto-maintenance commands
     Auto {
         #[command(subcommand)]
         action: AutoAction,
     },
-    
+
     /// List available tools
     Tools,
-    
+
     /// Show server status
     Status,
 }
@@ -100,18 +100,18 @@ pub enum McpCommands {
 pub enum WorkflowAction {
     /// List workflows
     List,
-    
+
     /// Execute workflow
     Run {
         /// Workflow name
         name: String,
     },
-    
+
     /// Add workflow
     Add {
         /// Workflow name
         name: String,
-        
+
         /// Workflow file
         file: String,
     },
@@ -121,13 +121,13 @@ pub enum WorkflowAction {
 pub enum ScheduleAction {
     /// List schedules
     List,
-    
+
     /// Enable schedule
     Enable {
         /// Schedule name
         name: String,
     },
-    
+
     /// Disable schedule
     Disable {
         /// Schedule name
@@ -139,60 +139,66 @@ pub enum ScheduleAction {
 pub enum AutoAction {
     /// Auto lint
     Lint,
-    
+
     /// Auto format
     Fmt,
-    
+
     /// Auto check
     Check,
-    
+
     /// Auto audit
     Audit,
-    
+
     /// Run all
     All,
 }
 
 pub fn execute_cli() -> Result<(), Box<dyn std::error::Error>> {
     let cli = McpCli::parse();
-    
+
     match cli.command {
         McpCommands::Serve { port, host } => {
             println!("🚀 Starting GUL MCP Server on {}:{}", host, port);
             println!("✅ Server ready!");
             Ok(())
         }
-        
-        McpCommands::Generate { description, code_type } => {
+
+        McpCommands::Generate {
+            description,
+            code_type,
+        } => {
             println!("🤖 Generating {} from: {}", code_type, description);
             println!("✅ Code generated!");
             Ok(())
         }
-        
+
         McpCommands::Create { name, pkg_type } => {
             println!("📦 Creating {} package: {}", pkg_type, name);
             println!("✅ Package created!");
             Ok(())
         }
-        
+
         McpCommands::Run { file, args } => {
             println!("▶️  Running: {} {:?}", file, args);
             println!("✅ Execution complete!");
             Ok(())
         }
-        
+
         McpCommands::Install { packages } => {
             println!("📥 Installing: {:?}", packages);
             println!("✅ Installed!");
             Ok(())
         }
-        
+
         McpCommands::Test { pattern, coverage } => {
-            println!("🧪 Running tests{}", if coverage { " with coverage" } else { "" });
+            println!(
+                "🧪 Running tests{}",
+                if coverage { " with coverage" } else { "" }
+            );
             println!("✅ All tests passed!");
             Ok(())
         }
-        
+
         McpCommands::Workflow { action } => {
             match action {
                 WorkflowAction::List => {
@@ -211,7 +217,7 @@ pub fn execute_cli() -> Result<(), Box<dyn std::error::Error>> {
             }
             Ok(())
         }
-        
+
         McpCommands::Schedule { action } => {
             match action {
                 ScheduleAction::List => {
@@ -230,7 +236,7 @@ pub fn execute_cli() -> Result<(), Box<dyn std::error::Error>> {
             }
             Ok(())
         }
-        
+
         McpCommands::Auto { action } => {
             match action {
                 AutoAction::Lint => {
@@ -256,7 +262,7 @@ pub fn execute_cli() -> Result<(), Box<dyn std::error::Error>> {
             }
             Ok(())
         }
-        
+
         McpCommands::Tools => {
             println!("🛠️  Available MCP Tools:");
             println!("  - gul_generate_code");
@@ -268,7 +274,7 @@ pub fn execute_cli() -> Result<(), Box<dyn std::error::Error>> {
             println!("  - gul_project_scaffold");
             Ok(())
         }
-        
+
         McpCommands::Status => {
             println!("📊 GUL MCP Server Status:");
             println!("  ✅ Server: Running");

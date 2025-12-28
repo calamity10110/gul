@@ -44,29 +44,31 @@ impl WorkflowExecutor {
             workflows: Vec::new(),
         }
     }
-    
+
     /// Add a workflow
     pub fn add_workflow(&mut self, workflow: Workflow) {
         self.workflows.push(workflow);
     }
-    
+
     /// Execute workflow by name
     pub fn execute(&self, name: &str) -> Result<Vec<Value>, String> {
-        let workflow = self.workflows.iter()
+        let workflow = self
+            .workflows
+            .iter()
             .find(|w| w.name == name)
             .ok_or_else(|| format!("Workflow not found: {}", name))?;
-        
+
         let mut results = Vec::new();
-        
+
         for step in &workflow.steps {
             // Execute step
             let result = self.execute_step(step)?;
             results.push(result);
         }
-        
+
         Ok(results)
     }
-    
+
     fn execute_step(&self, step: &WorkflowStep) -> Result<Value, String> {
         // Placeholder for actual execution
         Ok(serde_json::json!({
@@ -74,7 +76,7 @@ impl WorkflowExecutor {
             "status": "success"
         }))
     }
-    
+
     /// List all workflows
     pub fn list_workflows(&self) -> Vec<&Workflow> {
         self.workflows.iter().collect()
@@ -84,7 +86,7 @@ impl WorkflowExecutor {
 impl Default for WorkflowExecutor {
     fn default() -> Self {
         let mut executor = Self::new();
-        
+
         // Add default workflows
         executor.add_workflow(Workflow {
             name: "ci_workflow".to_string(),
@@ -121,7 +123,7 @@ impl Default for WorkflowExecutor {
             ],
             triggers: vec![WorkflowTrigger::OnPush],
         });
-        
+
         executor.add_workflow(Workflow {
             name: "ai_optimize_workflow".to_string(),
             description: "AI-powered code optimization".to_string(),
@@ -152,7 +154,7 @@ impl Default for WorkflowExecutor {
             ],
             triggers: vec![WorkflowTrigger::Manual],
         });
-        
+
         executor
     }
 }
@@ -160,13 +162,13 @@ impl Default for WorkflowExecutor {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_workflow_executor() {
         let executor = WorkflowExecutor::default();
         assert_eq!(executor.list_workflows().len(), 2);
     }
-    
+
     #[test]
     fn test_add_workflow() {
         let mut executor = WorkflowExecutor::new();

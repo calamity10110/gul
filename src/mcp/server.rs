@@ -38,12 +38,12 @@ impl GulMcpServer {
             tools: HashMap::new(),
             resources: HashMap::new(),
         };
-        
+
         server.register_tools();
         server.register_resources();
         server
     }
-    
+
     /// Register all MCP tools
     fn register_tools(&mut self) {
         // Tool 1: Generate Code
@@ -72,7 +72,7 @@ impl GulMcpServer {
                 }),
             },
         );
-        
+
         // Tool 2: Create Package
         self.tools.insert(
             "gul_create_package".to_string(),
@@ -96,7 +96,7 @@ impl GulMcpServer {
                 }),
             },
         );
-        
+
         // Tool 3: Run Code
         self.tools.insert(
             "gul_run_code".to_string(),
@@ -116,7 +116,7 @@ impl GulMcpServer {
                 }),
             },
         );
-        
+
         // Tool 4: Install Dependencies
         self.tools.insert(
             "gul_install_dependencies".to_string(),
@@ -136,7 +136,7 @@ impl GulMcpServer {
                 }),
             },
         );
-        
+
         // Tool 5: Project Scaffold
         self.tools.insert(
             "gul_project_scaffold".to_string(),
@@ -157,7 +157,7 @@ impl GulMcpServer {
             },
         );
     }
-    
+
     /// Register all MCP resources
     fn register_resources(&mut self) {
         self.resources.insert(
@@ -169,7 +169,7 @@ impl GulMcpServer {
                 mime_type: "application/gul".to_string(),
             },
         );
-        
+
         self.resources.insert(
             "packages".to_string(),
             McpResource {
@@ -179,7 +179,7 @@ impl GulMcpServer {
                 mime_type: "application/json".to_string(),
             },
         );
-        
+
         self.resources.insert(
             "docs".to_string(),
             McpResource {
@@ -190,17 +190,17 @@ impl GulMcpServer {
             },
         );
     }
-    
+
     /// List available tools
     pub fn list_tools(&self) -> Vec<&McpTool> {
         self.tools.values().collect()
     }
-    
+
     /// List available resources
     pub fn list_resources(&self) -> Vec<&McpResource> {
         self.resources.values().collect()
     }
-    
+
     /// Handle tool call
     pub fn call_tool(&self, name: &str, args: Value) -> Result<Value, String> {
         match name {
@@ -212,15 +212,13 @@ impl GulMcpServer {
             _ => Err(format!("Unknown tool: {}", name)),
         }
     }
-    
+
     /// Generate GUL code from description
     fn generate_code(&self, args: Value) -> Result<Value, String> {
-        let description = args["description"]
-            .as_str()
-            .ok_or("Missing description")?;
-        
+        let description = args["description"].as_str().ok_or("Missing description")?;
+
         let code_type = args["type"].as_str().unwrap_or("function");
-        
+
         // Use AI to generate code
         let generated_code = format!(
             "# Generated GUL v3.2 Code\n\
@@ -230,19 +228,19 @@ impl GulMcpServer {
                  return @str(\"Generated code\")\n",
             code_type, description
         );
-        
+
         Ok(json!({
             "code": generated_code,
             "explanation": format!("Generated {} from description", code_type),
             "confidence": 0.85
         }))
     }
-    
+
     /// Create a new package
     fn create_package(&self, args: Value) -> Result<Value, String> {
         let name = args["name"].as_str().ok_or("Missing name")?;
         let pkg_type = args["type"].as_str().ok_or("Missing type")?;
-        
+
         Ok(json!({
             "status": "success",
             "package_name": name,
@@ -250,11 +248,11 @@ impl GulMcpServer {
             "files_created": ["src/main.mn", "gul.toml", "README.md"]
         }))
     }
-    
+
     /// Run GUL code
     fn run_code(&self, args: Value) -> Result<Value, String> {
         let code = args["code"].as_str().or_else(|| args["file"].as_str());
-        
+
         if let Some(_code) = code {
             Ok(json!({
                 "status": "success",
@@ -265,25 +263,25 @@ impl GulMcpServer {
             Err("No code or file provided".to_string())
         }
     }
-    
+
     /// Install dependencies
     fn install_dependencies(&self, args: Value) -> Result<Value, String> {
-        let packages = args["packages"]
-            .as_array()
-            .ok_or("Missing packages")?;
-        
+        let packages = args["packages"].as_array().ok_or("Missing packages")?;
+
         Ok(json!({
             "status": "success",
             "installed": packages,
             "count": packages.len()
         }))
     }
-    
+
     /// Scaffold a complete project
     fn scaffold_project(&self, args: Value) -> Result<Value, String> {
         let description = args["description"].as_str().ok_or("Missing description")?;
-        let project_name = args["project_name"].as_str().ok_or("Missing project_name")?;
-        
+        let project_name = args["project_name"]
+            .as_str()
+            .ok_or("Missing project_name")?;
+
         Ok(json!({
             "status": "success",
             "project_name": project_name,
@@ -303,14 +301,14 @@ impl Default for GulMcpServer {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_server_creation() {
         let server = GulMcpServer::new();
         assert_eq!(server.list_tools().len(), 5);
         assert_eq!(server.list_resources().len(), 3);
     }
-    
+
     #[test]
     fn test_generate_code() {
         let server = GulMcpServer::new();
@@ -318,11 +316,11 @@ mod tests {
             "description": "A function that adds two numbers",
             "type": "function"
         });
-        
+
         let result = server.call_tool("gul_generate_code", args);
         assert!(result.is_ok());
     }
-    
+
     #[test]
     fn test_create_package() {
         let server = GulMcpServer::new();
@@ -330,7 +328,7 @@ mod tests {
             "name": "my-package",
             "type": "library"
         });
-        
+
         let result = server.call_tool("gul_create_package", args);
         assert!(result.is_ok());
     }
