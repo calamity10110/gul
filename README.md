@@ -49,7 +49,7 @@ gul package list
 # Search for packages
 gul package search web
 
-# Get package info
+# Get package info <actix-web>
 gul package info actix-web
 
 # Install a package
