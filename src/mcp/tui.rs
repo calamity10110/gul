@@ -57,8 +57,7 @@ impl McpDashboard {
             .borders(Borders::ALL)
             .border_type(BorderType::Rounded);
 
-        let status_text = vec![
-            format!(
+        let status_text = [format!(
                 "Server: {}",
                 if self.status.running {
                     "✅ Running"
@@ -68,8 +67,7 @@ impl McpDashboard {
             ),
             format!("Tools Available: {}", self.status.tools_available),
             format!("Workflows Active: {}", self.status.workflows_active),
-            format!("Schedules Active: {}", self.status.schedules_active),
-        ];
+            format!("Schedules Active: {}", self.status.schedules_active)];
 
         Paragraph::new(status_text.join("\n"))
             .block(block)
