@@ -27,7 +27,7 @@ Locking 0 packages to latest compatible versions
 ### Security Audit
 
 ```bash
-$ cargo audit
+ cargo audit
 ```
 
 **Findings**:
