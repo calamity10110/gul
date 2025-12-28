@@ -11,6 +11,7 @@ pub mod embedded;
 pub mod interop;
 pub mod interpreter;
 pub mod lexer;
+pub mod mcp;
 pub mod memory;
 pub mod ownership;
 pub mod parser;

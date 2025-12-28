@@ -1,5 +1,7 @@
+# begin of file
 # GUL Simple Test - v3.2
 # Basic syntax demonstration with @ prefix types
+# begin of code
 
 @imp std.io
 
@@ -30,3 +32,4 @@ mn:
     print("Point:", point.to_string())
     
     print("Done!")
+# end of file

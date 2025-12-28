@@ -18,7 +18,7 @@ GUL is a modern, multi-paradigm programming language that combines:
 
 ## ✨ Key Features
 
-- **v3.0 Syntax**: Modern `let`/`var` keywords
+- **v3.2 Syntax**: Modern `let`/`var` keywords
 - **58 Packages**: Cross-language package ecosystem
 - **13 Stdlib Modules**: Including networking (WebSocket, TCP, UDP)
 - **3 Runtimes**: Python, JavaScript, and Rust interop
