@@ -29,6 +29,8 @@ Complete documentation for the GUL programming language with MCP integration.
 - [Web Development](guides/web-development.md) - Build web applications
 - [Web Server](guides/web-server.md) - Create HTTP servers
 - [Data Analysis](guides/data-analysis.md) - Data science with GUL
+- [Data Engineering](guides/data-engineering.md) - SaaS data pipelines 🆕
+- [Microservices](guides/microservices-guide.md) - Polyglot services 🆕
 - [Scientific Computing](guides/scientific-computing.md) - Math and science
 - [IoT/Embedded](guides/iot-embedded.md) - Hardware programming
 
@@ -65,7 +67,22 @@ Complete documentation for the GUL programming language with MCP integration.
 
 ### Packages
 
-- [Package Catalog](reference/package-catalog.md) - All 58 packages
+- [Package Catalog](reference/package-catalog.md) - **180 packages** across 22 categories 🆕
+  - Authentication & Authorization (8)
+  - Developer Tools (12)
+  - DevOps & Infrastructure (14)
+  - API & Integration (10)
+  - Caching & Performance (8)
+  - Database Extensions (12)
+  - Security & Compliance (10)
+  - Testing & QA (10)
+  - Multi-Tenancy & SaaS (8)
+  - Mobile & Desktop (8)
+  - Data Engineering (12)
+  - Microservices (10)
+  - 3D Modeling (8)
+  - Science & Engineering (14)
+  - Plus 48 more packages
 
 ---
 
@@ -99,6 +116,7 @@ Complete documentation for the GUL programming language with MCP integration.
 - [Project Status](PROJECT_STATUS.md) - Current state
 - [Development History](devhistory.md) - Evolution from v1.0 to v3.2
 - [v3.2 Update](V32_UPDATE_COMPLETE.md) - Latest changes
+- [Database Integration Tests](../examples/database-integration-tests.md) - Public DB tests 🆕
 
 ---
 
@@ -177,11 +195,13 @@ docs/
 - [HTTP API](api/http.md)
 - [Web Server Tutorial](guides/web-server.md)
 
-### Data Science
+### Data Science & Engineering
 
 - [Data Analysis](guides/data-analysis.md)
+- [Data Engineering](guides/data-engineering.md) - SaaS pipelines 🆕
 - [Scientific Computing](guides/scientific-computing.md)
 - [Math & Science API](api/math-science.md)
+- [Database Tests](../examples/database-integration-tests.md) 🆕
 
 ### Hardware
 
