@@ -5,6 +5,9 @@ on:
     branches: [main, master, develop]
   pull_request:
     branches: [main, master]
+  schedule:
+    # Run dependency check weekly
+    - cron: "0 0 * * 0"
 
 env:
   CARGO_TERM_COLOR: always
@@ -41,6 +44,35 @@ jobs:
       - name: Run clippy
         run: cargo clippy --all-targets --all-features -- -D warnings -A clippy::too_many_arguments
 
+  benchmark:
+    name: Performance Benchmarks
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Run benchmarks
+        run: cargo bench --no-run
+
+  dependencies:
+    name: Dependency Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install cargo-audit
+        run: cargo install cargo-audit
+
+      - name: Run dependency monitoring
+        run: python3 scripts/check_dependencies.py
+        continue-on-error: true
+
   msrv:
     name: Minimum Supported Rust Version
     runs-on: ubuntu-latest
@@ -66,13 +98,11 @@ jobs:
       - name: Build
         run: cargo build --release --all-features
 
-      - name: Upload artifacts
+      - name: Upload Unix artifacts
         uses: actions/upload-artifact@v4
         with:
           name: gul-${{ matrix.os }}
-          path: |
-            target/release/gul
-            target/release/gul.exe
+          path: target/release/gul
         if: matrix.os != 'windows-latest'
 
       - name: Upload Windows artifacts

@@ -59,6 +59,10 @@ tempfile = "3.8"
 name = "gul"
 path = "src/main.rs"
 
+[[bench]]
+name = "performance"
+harness = false
+
 [features]
 default = ["dioxus/web"]
 tui = []
