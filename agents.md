@@ -162,7 +162,7 @@ fn keep(data: kept @list):        # Keep copy
 
 ## Project Structure
 
-```
+```text
 gul/
 ├── src/
 │   ├── lib.rs              # Library root
