@@ -1,0 +1,229 @@
+# Rust Interop Package for GUL v3.1
+# High-performance native code integration
+
+# ============================================
+# High-Performance Collections
+# ============================================
+
+@rust {
+    use std::collections::{HashMap, HashSet, BTreeMap, VecDeque};
+    
+    // Fast HashMap operations
+    fn hashmap_new() -> HashMap<String, String> {
+        HashMap::new()
+    }
+    
+    fn hashmap_insert(map: &mut HashMap<String, String>, key: String, value: String) {
+        map.insert(key, value);
+    }
+    
+    fn hashmap_get(map: &HashMap<String, String>, key: &str) -> Option<String> {
+        map.get(key).cloned()
+    }
+    
+    // HashSet for unique items
+    fn hashset_new() -> HashSet<String> {
+        HashSet::new()
+    }
+    
+    fn hashset_contains(set: &HashSet<String>, item: &str) -> bool {
+        set.contains(item)
+    }
+    
+    // Sorted map
+    fn btreemap_new() -> BTreeMap<String, String> {
+        BTreeMap::new()
+    }
+}
+
+# ============================================
+# Async Runtime (Tokio)
+# ============================================
+
+@rust {
+    use tokio::runtime::Runtime;
+    use tokio::time::{sleep, Duration};
+    use tokio::sync::{mpsc, Mutex, RwLock};
+    use std::sync::Arc;
+    
+    // Create async runtime
+    fn create_runtime() -> Runtime {
+        Runtime::new().unwrap()
+    }
+    
+    // Sleep
+    async fn async_sleep(ms: u64) {
+        sleep(Duration::from_millis(ms)).await;
+    }
+    
+    // Channel operations
+    fn create_channel(buffer: usize) -> (mpsc::Sender<String>, mpsc::Receiver<String>) {
+        mpsc::channel(buffer)
+    }
+}
+
+# ============================================
+# Parallel Processing (Rayon)
+# ============================================
+
+@rust {
+    use rayon::prelude::*;
+    
+    // Parallel map
+    fn parallel_map_square(items: Vec<i64>) -> Vec<i64> {
+        items.par_iter().map(|x| x * x).collect()
+    }
+    
+    fn parallel_filter_positive(items: Vec<i64>) -> Vec<i64> {
+        items.par_iter().filter(|x| **x > 0).cloned().collect()
+    }
+    
+    fn parallel_sum(items: Vec<i64>) -> i64 {
+        items.par_iter().sum()
+    }
+    
+    fn parallel_find(items: Vec<i64>, target: i64) -> Option<i64> {
+        items.par_iter().find_any(|x| **x == target).cloned()
+    }
+    
+    // Parallel sort
+    fn parallel_sort(mut items: Vec<i64>) -> Vec<i64> {
+        items.par_sort();
+        items
+    }
+}
+
+# GUL wrappers (single-line)
+fn parallel_square(items): rust.parallel_map_square(items)
+fn parallel_filter(items): rust.parallel_filter_positive(items)
+fn parallel_sum(items): rust.parallel_sum(items)
+fn parallel_sort(items): rust.parallel_sort(items)
+
+# ============================================
+# Serialization (Serde)
+# ============================================
+
+@rust {
+    use serde::{Serialize, Deserialize};
+    use serde_json;
+    
+    fn to_json(value: &impl Serialize) -> String {
+        serde_json::to_string(value).unwrap_or_default()
+    }
+    
+    fn to_json_pretty(value: &impl Serialize) -> String {
+        serde_json::to_string_pretty(value).unwrap_or_default()
+    }
+    
+    fn from_json<T: for<'de> Deserialize<'de>>(s: &str) -> Option<T> {
+        serde_json::from_str(s).ok()
+    }
+}
+
+# ============================================
+# Cryptography
+# ============================================
+
+@rust {
+    use sha2::{Sha256, Sha512, Digest};
+    use base64::{Engine as _, engine::general_purpose};
+    
+    fn sha256(input: &str) -> String {
+        let mut hasher = Sha256::new();
+        hasher.update(input.as_bytes());
+        format!("{:x}", hasher.finalize())
+    }
+    
+    fn sha512(input: &str) -> String {
+        let mut hasher = Sha512::new();
+        hasher.update(input.as_bytes());
+        format!("{:x}", hasher.finalize())
+    }
+    
+    fn base64_encode(input: &str) -> String {
+        general_purpose::STANDARD.encode(input)
+    }
+    
+    fn base64_decode(input: &str) -> Option<String> {
+        general_purpose::STANDARD.decode(input).ok()
+            .and_then(|bytes| String::from_utf8(bytes).ok())
+    }
+}
+
+# GUL crypto wrappers
+fn hash_sha256(s): rust.sha256(s)
+fn hash_sha512(s): rust.sha512(s)
+fn base64_encode(s): rust.base64_encode(s)
+fn base64_decode(s): rust.base64_decode(s)
+
+# ============================================
+# Regular Expressions
+# ============================================
+
+@rust {
+    use regex::Regex;
+    
+    fn regex_match(pattern: &str, text: &str) -> bool {
+        Regex::new(pattern).map(|r| r.is_match(text)).unwrap_or(false)
+    }
+    
+    fn regex_find(pattern: &str, text: &str) -> Option<String> {
+        Regex::new(pattern).ok()
+            .and_then(|r| r.find(text))
+            .map(|m| m.as_str().to_string())
+    }
+    
+    fn regex_find_all(pattern: &str, text: &str) -> Vec<String> {
+        Regex::new(pattern)
+            .map(|r| r.find_iter(text).map(|m| m.as_str().to_string()).collect())
+            .unwrap_or_default()
+    }
+    
+    fn regex_replace(pattern: &str, text: &str, replacement: &str) -> String {
+        Regex::new(pattern)
+            .map(|r| r.replace_all(text, replacement).to_string())
+            .unwrap_or_else(|_| text.to_string())
+    }
+}
+
+# GUL regex wrappers
+fn regex_match(pattern, text): rust.regex_match(pattern, text)
+fn regex_find(pattern, text): rust.regex_find(pattern, text)
+fn regex_find_all(pattern, text): rust.regex_find_all(pattern, text)
+fn regex_replace(pattern, text, repl): rust.regex_replace(pattern, text, repl)
+
+# ============================================
+# Date/Time
+# ============================================
+
+@rust {
+    use chrono::{Utc, Local, NaiveDateTime, DateTime};
+    
+    fn now_utc() -> String {
+        Utc::now().to_rfc3339()
+    }
+    
+    fn now_local() -> String {
+        Local::now().to_rfc3339()
+    }
+    
+    fn timestamp() -> i64 {
+        Utc::now().timestamp()
+    }
+    
+    fn timestamp_millis() -> i64 {
+        Utc::now().timestamp_millis()
+    }
+    
+    fn parse_datetime(s: &str, format: &str) -> Option<String> {
+        NaiveDateTime::parse_from_str(s, format)
+            .map(|dt| dt.and_utc().to_rfc3339())
+            .ok()
+    }
+}
+
+# GUL time wrappers
+fn now(): rust.now_utc()
+fn now_local(): rust.now_local()
+fn timestamp(): rust.timestamp()
+fn timestamp_ms(): rust.timestamp_millis()

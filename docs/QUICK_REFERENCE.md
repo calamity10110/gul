@@ -25,23 +25,20 @@ var @float(price) = 19.99    # Type annotation (decorator style)
 ## Functions
 
 ```gul
-# Single-line (expression body)
+# Single-line (expression body - implicit return)
 fn add(a, b): a + b
+async fetch(url): http.get(url)
 
-# Multi-line (block body)
+# Multi-line (block body - explicit return/await)
 fn add(a, b):
     return a + b
+
+async fetch(url):
+    await http.get(url)
 
 # With explicit types
 fn add(@int(a, b)):
     return @int(a + b)
-
-# Async functions
-async fetch(url):
-    return await http.get(url)
-
-# Async single-line
-async fetch(url): await http.get(url)
 ```
 
 ---

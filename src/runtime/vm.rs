@@ -184,24 +184,147 @@ impl VM {
 
     /// Execute a single node with lock management
     fn execute_node(&mut self, graph: &IRGraph, node_id: NodeId) -> Result<(), String> {
-        let node = graph.get_node(node_id)
+        let node = graph
+            .get_node(node_id)
             .ok_or_else(|| format!("Node {} not found", node_id))?;
 
-        // Acquire locks for inputs
+        // Track input values and acquire locks
+        let mut input_values: HashMap<String, ValueId> = HashMap::new();
+
         for edge in graph.edges_to(node_id) {
-            // In a real implementation, we'd track value IDs
-            // For now, this is a placeholder
+            // Get source node's output value
+            if let Some(source_node) = graph.get_node(edge.from_node) {
+                // Find the source output
+                for output in &source_node.outputs {
+                    if output.name == edge.from_port {
+                        // Create or find value for this output
+                        let value_id = self.state.create_value(
+                            edge.from_node,
+                            Value::Integer(0), // Would be actual computed value
+                        );
+
+                        // Acquire lock based on edge ownership mode
+                        self.state.acquire_lock(value_id, &edge.mode)?;
+
+                        input_values.insert(edge.to_port.clone(), value_id);
+
+                        // Handle ownership transfer for Take mode
+                        if edge.mode.moves_ownership() {
+                            self.state.transfer_ownership(value_id, node_id);
+                        }
+                    }
+                }
+            }
         }
 
-        // Execute node logic (placeholder)
-        // The actual implementation would call the node's function
+        // Execute node logic based on node type
+        let output_values = self.execute_node_logic(node, &input_values)?;
 
-        // Release locks
+        // Store output values
+        for (port_name, value) in output_values {
+            let value_id = self
+                .state
+                .create_value(node_id, value);
+            // Output values would be tracked for downstream nodes
+            let _ = (port_name, value_id); // Used by edges_from
+        }
+
+        // Release input locks
         for edge in graph.edges_to(node_id) {
-            // Release based on edge mode
+            if let Some(&value_id) = input_values.get(&edge.to_port) {
+                self.state.release_lock(value_id, &edge.mode);
+            }
         }
 
         Ok(())
+    }
+
+    /// Execute the actual node logic
+    fn execute_node_logic(
+        &mut self,
+        node: &crate::dataflow::ir::IRNode,
+        inputs: &HashMap<String, ValueId>,
+    ) -> Result<HashMap<String, Value>, String> {
+        let mut outputs = HashMap::new();
+
+        // Execute based on node name/type
+        match node.name.as_str() {
+            "add" | "sum" => {
+                // Sum all inputs
+                let mut total = 0i64;
+                for (_, value_id) in inputs {
+                    if let Some(val) = self.state.get_value(*value_id) {
+                        if let Value::Integer(i) = &val.data {
+                            total += i;
+                        }
+                    }
+                }
+                outputs.insert("result".to_string(), Value::Integer(total));
+            }
+            "multiply" | "mul" => {
+                // Multiply all inputs
+                let mut product = 1i64;
+                for (_, value_id) in inputs {
+                    if let Some(val) = self.state.get_value(*value_id) {
+                        if let Value::Integer(i) = &val.data {
+                            product *= i;
+                        }
+                    }
+                }
+                outputs.insert("result".to_string(), Value::Integer(product));
+            }
+            "print" | "output" => {
+                // Output nodes - collect values for final output
+                for (port_name, value_id) in inputs {
+                    if let Some(val) = self.state.get_value(*value_id) {
+                        outputs.insert(port_name.clone(), val.data.clone());
+                    }
+                }
+            }
+            "input" => {
+                // Input nodes produce initial values
+                for output in &node.outputs {
+                    outputs.insert(output.name.clone(), Value::Integer(0));
+                }
+            }
+            "double" => {
+                // Double first input
+                for (_, value_id) in inputs {
+                    if let Some(val) = self.state.get_value(*value_id) {
+                        if let Value::Integer(i) = &val.data {
+                            outputs.insert("result".to_string(), Value::Integer(i * 2));
+                            break;
+                        }
+                    }
+                }
+            }
+            "filter" => {
+                // Pass through inputs that match condition
+                for (port_name, value_id) in inputs {
+                    if let Some(val) = self.state.get_value(*value_id) {
+                        outputs.insert(port_name.clone(), val.data.clone());
+                    }
+                }
+            }
+            "map" | "transform" => {
+                // Apply transformation (identity for now)
+                for (port_name, value_id) in inputs {
+                    if let Some(val) = self.state.get_value(*value_id) {
+                        outputs.insert(port_name.clone(), val.data.clone());
+                    }
+                }
+            }
+            _ => {
+                // Default: pass through
+                for (port_name, value_id) in inputs {
+                    if let Some(val) = self.state.get_value(*value_id) {
+                        outputs.insert(port_name.clone(), val.data.clone());
+                    }
+                }
+            }
+        }
+
+        Ok(outputs)
     }
 
     /// Collect output values

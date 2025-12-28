@@ -51,18 +51,41 @@ fn create_json_module() -> Value {
     module.insert(
         "stringify".to_string(),
         Value::NativeFunction(|args| {
-            // Simplified stringify
-            if let Some(val) = args.first() {
+            fn stringify_value(val: &Value) -> String {
                 match val {
-                    Value::String(s) => Value::String(format!("\"{}\"", s)),
-                    Value::Integer(i) => Value::String(i.to_string()),
-                    Value::Float(f) => Value::String(f.to_string()),
-                    Value::Bool(b) => Value::String(b.to_string()),
-                    // TODO: Recursive for complex types
-                    _ => Value::String("{}".to_string()),
+                    Value::String(s) => format!("\"{}\"", s.replace('\\', "\\\\").replace('"', "\\\"")),
+                    Value::Integer(i) => i.to_string(),
+                    Value::Float(f) => f.to_string(),
+                    Value::Bool(b) => b.to_string(),
+                    Value::Null => "null".to_string(),
+                    Value::List(items) => {
+                        let parts: Vec<String> = items.iter().map(stringify_value).collect();
+                        format!("[{}]", parts.join(", "))
+                    }
+                    Value::Dict(map) => {
+                        let parts: Vec<String> = map
+                            .iter()
+                            .map(|(k, v)| format!("\"{}\": {}", k, stringify_value(v)))
+                            .collect();
+                        format!("{{{}}}", parts.join(", "))
+                    }
+                    Value::Object(name, fields) => {
+                        let parts: Vec<String> = fields
+                            .iter()
+                            .map(|(k, v)| format!("\"{}\": {}", k, stringify_value(v)))
+                            .collect();
+                        format!("{{\"_type\": \"{}\", {}}}", name, parts.join(", "))
+                    }
+                    Value::Function(params, _) => format!("\"<function({})>\"", params.join(", ")),
+                    Value::NativeFunction(_) => "\"<native_function>\"".to_string(),
+                    Value::Any(inner) => stringify_value(inner),
                 }
+            }
+
+            if let Some(val) = args.first() {
+                Value::String(stringify_value(val))
             } else {
-                Value::String("".to_string())
+                Value::String("null".to_string())
             }
         }),
     );

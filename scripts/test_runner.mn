@@ -1,9 +1,9 @@
 # GUL Test Runner
 # Main test orchestration in native GUL format
 
-import std.testing
-import std.filesystem as fs
-import std.process
+@imp std.testing
+@imp std.filesystem as fs
+@imp std.process
 
 # Test categories
 let TEST_CATEGORIES = [

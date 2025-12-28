@@ -90,7 +90,7 @@ async run_inference():
 
     export async function fetchAPI(url) {
         const response = await fetch(url);
-        return await response.json();
+        await response.json();
     }
 ```
 
@@ -167,7 +167,7 @@ mn:
                 const response = await fetch(url, {
                     headers: { 'Authorization': `Bearer ${config.apiKey}` }
                 });
-                return await response.json();
+                await response.json();
             }
         };
     }

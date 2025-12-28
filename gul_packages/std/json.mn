@@ -1,41 +1,128 @@
-# JSON Module for GUL v2.1
-# Standard library JSON parser
+# JSON Module for GUL v3.1
+# Standard library JSON parser and serializer
 
-enum Value:
+# ============================================
+# Types
+# ============================================
+
+enum JsonValue:
     Null
-    Bool(bool)
-    Number(float)
-    String(string)
-    Array(vec<Value>)
-    Object(map<string, Value>)
+    Bool(@bool)
+    Number(@float)
+    String(@str)
+    Array(@list)
+    Object(@dict)
 
-fn parse(input: string) -> Value:
-    # TODO: Implement actual parser
-    # For now, return a mock object
+# ============================================
+# Core Functions (Single-line - implicit return)
+# ============================================
+
+fn is_null(value): value == JsonValue.Null
+fn is_bool(value): value is JsonValue.Bool
+fn is_number(value): value is JsonValue.Number
+fn is_string(value): value is JsonValue.String
+fn is_array(value): value is JsonValue.Array
+fn is_object(value): value is JsonValue.Object
+
+# ============================================
+# Parsing (Multi-line - explicit return)
+# ============================================
+
+fn parse(input):
+    if input == nil or input == "":
+        return nil
     if input == "null":
-        return Value.Null
-        
-    # v2.1: Any bracket type for structs
-    return Value.Object{
-        "status": Value.String("ok")
+        return nil
+    if input == "true":
+        return true
+    if input == "false":
+        return false
+    
+    # Use native JSON parser
+    @rust {
+        fn parse_json(s: &str) -> serde_json::Value {
+            serde_json::from_str(s).unwrap_or(serde_json::Value::Null)
+        }
     }
+    return rust.parse_json(input)
 
-fn stringify(value: Value) -> string:
-    match value:
-        Value.Null => "null"
-        Value.Bool(b) => b.to_string()
-        Value.Number(n) => n.to_string()
-        Value.String(s) => "\"" + s + "\""
-        Value.Array(arr) => "[" + "..." + "]"
-        Value.Object(obj) => "{" + "..." + "}"
+fn parse_file(path):
+    content = std.io.read_file(path)
+    return parse(content)
 
-# Helper to load from file
-fn load(path: string) -> Value:
-    # content = fs.read_to_string(path)
-    # return parse(content)
-    return Value.Null
+# ============================================
+# Serialization
+# ============================================
 
-# Helper to save to file
-fn save(path: string, value: Value):
-    content = stringify(value)
-    # fs.write_to_string(path, content)
+# Single-line for simple types
+fn stringify_null(): "null"
+fn stringify_bool(b): if b then "true" else "false"
+fn stringify_number(n): str(n)
+fn stringify_string(s): "\"" + escape_string(s) + "\""
+
+# Multi-line for complex types
+fn stringify(value):
+    if value == nil:
+        return "null"
+    if value is @bool:
+        return stringify_bool(value)
+    if value is @int or value is @float:
+        return stringify_number(value)
+    if value is @str:
+        return stringify_string(value)
+    if value is @list:
+        return stringify_array(value)
+    if value is @dict:
+        return stringify_object(value)
+    return "null"
+
+fn stringify_array(arr):
+    var parts = []
+    for item in arr:
+        parts.append(stringify(item))
+    return "[" + ", ".join(parts) + "]"
+
+fn stringify_object(obj):
+    var parts = []
+    for key, value in obj:
+        parts.append(stringify_string(key) + ": " + stringify(value))
+    return "{" + ", ".join(parts) + "}"
+
+fn stringify_pretty(value, indent):
+    return _stringify_with_indent(value, 0, indent)
+
+fn _stringify_with_indent(value, level, indent_str):
+    prefix = indent_str * level
+    if value is @dict:
+        if len(value) == 0:
+            return "{}"
+        var parts = []
+        for key, val in value:
+            parts.append(prefix + indent_str + stringify_string(key) + ": " + 
+                        _stringify_with_indent(val, level + 1, indent_str))
+        return "{\n" + ",\n".join(parts) + "\n" + prefix + "}"
+    if value is @list:
+        if len(value) == 0:
+            return "[]"
+        var parts = []
+        for item in value:
+            parts.append(prefix + indent_str + _stringify_with_indent(item, level + 1, indent_str))
+        return "[\n" + ",\n".join(parts) + "\n" + prefix + "]"
+    return stringify(value)
+
+# ============================================
+# Helpers
+# ============================================
+
+fn escape_string(s):
+    var result = s
+    result = result.replace("\\", "\\\\")
+    result = result.replace("\"", "\\\"")
+    result = result.replace("\n", "\\n")
+    result = result.replace("\t", "\\t")
+    result = result.replace("\r", "\\r")
+    return result
+
+fn save(path, value):
+    content = stringify_pretty(value, "  ")
+    std.io.write_file(path, content)

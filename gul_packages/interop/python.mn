@@ -1,0 +1,219 @@
+# Python Interop Package for GUL v3.1
+# Cross-language integration with Python ecosystem
+
+# ============================================
+# NumPy Integration
+# ============================================
+
+@python {
+    import numpy as np
+    
+    # Array creation
+    def zeros(shape):
+        return np.zeros(shape).tolist()
+    
+    def ones(shape):
+        return np.ones(shape).tolist()
+    
+    def arange(start, stop, step=1):
+        return np.arange(start, stop, step).tolist()
+    
+    def linspace(start, stop, num):
+        return np.linspace(start, stop, num).tolist()
+    
+    def random_array(shape):
+        return np.random.random(shape).tolist()
+    
+    # Array operations
+    def array_add(a, b):
+        return (np.array(a) + np.array(b)).tolist()
+    
+    def array_multiply(a, b):
+        return (np.array(a) * np.array(b)).tolist()
+    
+    def dot(a, b):
+        return np.dot(a, b).tolist() if isinstance(np.dot(a, b), np.ndarray) else float(np.dot(a, b))
+    
+    def matmul(a, b):
+        return np.matmul(a, b).tolist()
+    
+    # Statistics
+    def np_mean(arr):
+        return float(np.mean(arr))
+    
+    def np_std(arr):
+        return float(np.std(arr))
+    
+    def np_var(arr):
+        return float(np.var(arr))
+    
+    def np_min(arr):
+        return float(np.min(arr))
+    
+    def np_max(arr):
+        return float(np.max(arr))
+    
+    def np_sum(arr):
+        return float(np.sum(arr))
+    
+    # Linear algebra
+    def solve(A, b):
+        return np.linalg.solve(A, b).tolist()
+    
+    def inverse(A):
+        return np.linalg.inv(A).tolist()
+    
+    def determinant(A):
+        return float(np.linalg.det(A))
+    
+    def eigenvalues(A):
+        vals, _ = np.linalg.eig(A)
+        return vals.tolist()
+}
+
+# GUL wrapper functions (single-line)
+fn numpy_zeros(shape): python.zeros(shape)
+fn numpy_ones(shape): python.ones(shape)
+fn numpy_random(shape): python.random_array(shape)
+fn numpy_mean(arr): python.np_mean(arr)
+fn numpy_std(arr): python.np_std(arr)
+
+# ============================================
+# Pandas Integration
+# ============================================
+
+@python {
+    import pandas as pd
+    import json
+    
+    # DataFrame creation
+    def create_dataframe(data):
+        return pd.DataFrame(data).to_json(orient='records')
+    
+    def read_csv(path):
+        return pd.read_csv(path).to_json(orient='records')
+    
+    def read_excel(path, sheet=0):
+        return pd.read_excel(path, sheet_name=sheet).to_json(orient='records')
+    
+    # DataFrame operations
+    def df_filter(df_json, column, value):
+        df = pd.read_json(df_json)
+        return df[df[column] == value].to_json(orient='records')
+    
+    def df_sort(df_json, column, ascending=True):
+        df = pd.read_json(df_json)
+        return df.sort_values(column, ascending=ascending).to_json(orient='records')
+    
+    def df_groupby(df_json, column):
+        df = pd.read_json(df_json)
+        return df.groupby(column).size().to_json()
+    
+    def df_describe(df_json):
+        df = pd.read_json(df_json)
+        return df.describe().to_json()
+    
+    # Save
+    def to_csv(df_json, path):
+        df = pd.read_json(df_json)
+        df.to_csv(path, index=False)
+    
+    def to_excel(df_json, path):
+        df = pd.read_json(df_json)
+        df.to_excel(path, index=False)
+}
+
+# GUL wrappers
+fn pandas_read_csv(path): std.json.parse(python.read_csv(path))
+fn pandas_create(data): std.json.parse(python.create_dataframe(data))
+
+# ============================================
+# SciPy Integration
+# ============================================
+
+@python {
+    from scipy import stats
+    from scipy import optimize
+    from scipy import interpolate
+    
+    def ttest(sample1, sample2):
+        stat, pvalue = stats.ttest_ind(sample1, sample2)
+        return {"statistic": float(stat), "pvalue": float(pvalue)}
+    
+    def pearson_correlation(x, y):
+        corr, pvalue = stats.pearsonr(x, y)
+        return {"correlation": float(corr), "pvalue": float(pvalue)}
+    
+    def linear_regression(x, y):
+        slope, intercept, r, p, se = stats.linregress(x, y)
+        return {
+            "slope": float(slope),
+            "intercept": float(intercept),
+            "r_squared": float(r**2),
+            "pvalue": float(p),
+            "std_err": float(se)
+        }
+    
+    def minimize(func_str, x0):
+        from numpy import *
+        func = eval(f"lambda x: {func_str}")
+        result = optimize.minimize(func, x0)
+        return {"x": result.x.tolist(), "fun": float(result.fun), "success": result.success}
+}
+
+# ============================================
+# Machine Learning (scikit-learn)
+# ============================================
+
+@python {
+    from sklearn.linear_model import LinearRegression, LogisticRegression
+    from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+    from sklearn.cluster import KMeans
+    from sklearn.preprocessing import StandardScaler
+    from sklearn.model_selection import train_test_split
+    import numpy as np
+    import json
+    
+    _models = {}
+    
+    def create_linear_model():
+        model_id = f"linear_{len(_models)}"
+        _models[model_id] = LinearRegression()
+        return model_id
+    
+    def create_random_forest(n_estimators=100):
+        model_id = f"rf_{len(_models)}"
+        _models[model_id] = RandomForestClassifier(n_estimators=n_estimators)
+        return model_id
+    
+    def create_kmeans(n_clusters=3):
+        model_id = f"kmeans_{len(_models)}"
+        _models[model_id] = KMeans(n_clusters=n_clusters)
+        return model_id
+    
+    def fit_model(model_id, X, y=None):
+        model = _models[model_id]
+        X = np.array(X)
+        if y is not None:
+            y = np.array(y)
+            model.fit(X, y)
+        else:
+            model.fit(X)
+        return True
+    
+    def predict(model_id, X):
+        model = _models[model_id]
+        return model.predict(np.array(X)).tolist()
+    
+    def score(model_id, X, y):
+        model = _models[model_id]
+        return float(model.score(np.array(X), np.array(y)))
+}
+
+# GUL ML wrappers
+fn ml_linear_regression(): python.create_linear_model()
+fn ml_random_forest(n): python.create_random_forest(n)
+fn ml_kmeans(k): python.create_kmeans(k)
+fn ml_fit(model, X, y): python.fit_model(model, X, y)
+fn ml_predict(model, X): python.predict(model, X)
+fn ml_score(model, X, y): python.score(model, X, y)

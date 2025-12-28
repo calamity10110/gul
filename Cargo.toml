@@ -63,3 +63,9 @@ path = "src/main.rs"
 default = ["dioxus/web"]
 tui = []
 web-tui = []
+# Interop feature flags (optional - for advanced integrations)
+python-interop = []
+js-interop = []
+sql-interop = []
+postgres = []
+sqlite = []

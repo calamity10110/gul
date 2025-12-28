@@ -1,5 +1,6 @@
 // Multi-Language Integration Module
 
+pub mod go_runtime;
 pub mod javascript;
 pub mod js_runtime;
 pub mod python;

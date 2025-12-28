@@ -286,19 +286,69 @@ impl Parser {
         ) {
             self.advance(); // Skip opener
 
-            // Very basic grouped import skipping for now, just to pass parser
-            // In real v2, we would parse list of modules
+            // Parse grouped imports: collect module names
+            let mut modules = Vec::new();
             while !matches!(
                 self.current_token(),
                 Token::RightBracket | Token::RightBrace | Token::RightParen | Token::Eof
             ) {
-                self.advance();
+                // Skip commas and newlines
+                if matches!(self.current_token(), Token::Comma | Token::Newline) {
+                    self.advance();
+                    continue;
+                }
+
+                // Collect module path
+                if let Token::Identifier(part) = self.current_token() {
+                    let mut module_path = part.clone();
+                    self.advance();
+
+                    // Handle dotted paths like std.io
+                    while self.current_token() == &Token::Dot {
+                        self.advance();
+                        if let Token::Identifier(next_part) = self.current_token() {
+                            module_path.push('.');
+                            module_path.push_str(next_part);
+                            self.advance();
+                        }
+                    }
+
+                    // Handle grouped sub-imports like python{numpy, pandas}
+                    if matches!(
+                        self.current_token(),
+                        Token::LeftBrace | Token::LeftParen
+                    ) {
+                        self.advance();
+                        let mut sub_modules = Vec::new();
+                        while !matches!(
+                            self.current_token(),
+                            Token::RightBrace | Token::RightParen | Token::Eof
+                        ) {
+                            if let Token::Identifier(sub) = self.current_token() {
+                                sub_modules.push(sub.clone());
+                            }
+                            self.advance();
+                        }
+                        if self.current_token() != &Token::Eof {
+                            self.advance(); // Skip closer
+                        }
+                        // Add each sub-module as separate import
+                        for sub in sub_modules {
+                            modules.push(format!("{}:{}", module_path, sub));
+                        }
+                    } else {
+                        modules.push(module_path);
+                    }
+                } else {
+                    self.advance(); // Skip unknown tokens
+                }
             }
             if self.current_token() != &Token::Eof {
                 self.advance(); // Skip closer
             }
             self.skip_newlines();
-            return Ok(Statement::Import("grouped_placeholder".to_string()));
+            // Return joined module paths
+            return Ok(Statement::Import(modules.join(",")));
         }
 
         if let Token::Identifier(first_part) = self.current_token() {
@@ -1504,24 +1554,89 @@ impl Parser {
 
         if self.current_token() == &Token::Colon {
             // Style 2: Block style with colon
+            // @imp:
+            //     std.io,
+            //     std.http
             self.advance(); // Skip ':'
             self.skip_newlines();
-            // For now, treat as grouped placeholder
-            // Would need to parse indented list
-            return Ok(Statement::Import("@imp_block_placeholder".to_string()));
+
+            let mut modules = Vec::new();
+            // Parse indented list until dedent
+            if self.current_token() == &Token::Indent {
+                self.advance();
+                while self.current_token() != &Token::Dedent && self.current_token() != &Token::Eof
+                {
+                    if matches!(self.current_token(), Token::Comma | Token::Newline) {
+                        self.advance();
+                        continue;
+                    }
+                    if let Token::Identifier(part) = self.current_token() {
+                        let mut module_path = part.clone();
+                        self.advance();
+                        while self.current_token() == &Token::Dot {
+                            self.advance();
+                            if let Token::Identifier(next) = self.current_token() {
+                                module_path.push('.');
+                                module_path.push_str(next);
+                                self.advance();
+                            }
+                        }
+                        modules.push(module_path);
+                    } else {
+                        self.advance();
+                    }
+                }
+                if self.current_token() == &Token::Dedent {
+                    self.advance();
+                }
+            }
+            return Ok(Statement::Import(modules.join(",")));
         }
 
         if self.current_token() == &Token::LeftParen {
-            // Style 3: Parenthesized
+            // Style 3: Parenthesized - @imp(std.io, python{numpy})
             self.advance();
+            let mut modules = Vec::new();
             while !matches!(self.current_token(), Token::RightParen | Token::Eof) {
-                self.advance();
+                if matches!(self.current_token(), Token::Comma | Token::Newline) {
+                    self.advance();
+                    continue;
+                }
+                if let Token::Identifier(part) = self.current_token() {
+                    let mut module_path = part.clone();
+                    self.advance();
+                    while self.current_token() == &Token::Dot {
+                        self.advance();
+                        if let Token::Identifier(next) = self.current_token() {
+                            module_path.push('.');
+                            module_path.push_str(next);
+                            self.advance();
+                        }
+                    }
+                    // Handle grouped imports like python{numpy}
+                    if self.current_token() == &Token::LeftBrace {
+                        self.advance();
+                        while !matches!(self.current_token(), Token::RightBrace | Token::Eof) {
+                            if let Token::Identifier(sub) = self.current_token() {
+                                modules.push(format!("{}:{}", module_path, sub));
+                            }
+                            self.advance();
+                        }
+                        if self.current_token() == &Token::RightBrace {
+                            self.advance();
+                        }
+                    } else {
+                        modules.push(module_path);
+                    }
+                } else {
+                    self.advance();
+                }
             }
             if self.current_token() == &Token::RightParen {
                 self.advance();
             }
             self.skip_newlines();
-            return Ok(Statement::Import("@imp_paren_placeholder".to_string()));
+            return Ok(Statement::Import(modules.join(",")));
         }
 
         // Style 1: Single line - same as regular import

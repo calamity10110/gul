@@ -64,7 +64,7 @@ Blocks are separate files that contain specific types of code. GUL automatically
 │  def MAX_RETRIES = 3                │
 │                                     │
 │  async fetch_data(url):               │
-│      return await http.get(url)     │
+│      await http.get(url)     │
 │                                     │
 │  fn process(data):                  │
 │      return transform(data)         │
@@ -138,7 +138,7 @@ def MAX_USERS = 100
 
 # Async functions
 async fetch_users():
-    return await http.get("/users")
+    await http.get("/users")
 
 # Sync functions
 fn calculate_total(items):
@@ -181,7 +181,7 @@ Contains all async functions:
 # async.async - Auto-generated from main.mn
 
 async fetch_users():
-    return await http.get("/users")
+    await http.get("/users")
 ```
 
 #### 5. `functions.fnc` - Sync Functions (Auto-generated)
@@ -305,7 +305,7 @@ Comprehensive `@` prefix annotations for types, functions, and more:
 
 ```glob
 @async fetch_data(url):
-    return await http.get(url)
+    await http.get(url)
 
 @fn calculate(x, y):
     return x + y

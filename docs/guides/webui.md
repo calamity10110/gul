@@ -490,7 +490,7 @@ self.addEventListener("fetch", (event) => {
 # Cache API responses
 @cache(ttl=3600)  # Cache for 1 hour
 @asy get_data():
-    return await fetch_from_api()
+    await fetch_from_api()
 
 # Cache static assets
 app.static("/assets", cache_control="public, max-age=31536000")

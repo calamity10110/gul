@@ -151,7 +151,7 @@ fn view(data: ref @Image):
 
 ```
 async fn fetch():
-    return await http.get(url)
+    await http.get(url)
 ```
 
 - `async` affects scheduling only

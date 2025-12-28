@@ -53,6 +53,12 @@ impl SqlBridge {
     }
 }
 
+/// Execute SQL query (helper function for interpreter)
+pub fn execute_sql(query: &str) -> Result<String, String> {
+    let bridge = SqlBridge::new();
+    bridge.execute_query(query)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

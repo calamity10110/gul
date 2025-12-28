@@ -1029,7 +1029,7 @@ struct ApiClient:
     base_url: str
 
     async fn fetch(self, endpoint: str):
-        return await http.get(self.base_url + endpoint)
+        await http.get(self.base_url + endpoint)
 ```
 
 ### 11.10 Ownership of Fields

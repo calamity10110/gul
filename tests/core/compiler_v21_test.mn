@@ -149,7 +149,7 @@ fn test_async_function_syntax():
     
     async fetch_data2(url: str):
         # async without 'fn' keyword
-        return await http.get(url)
+        await http.get(url)
 
 # ==========================================
 # Test 5: Type and Struct Definitions

@@ -1,0 +1,253 @@
+# JavaScript Interop Package for GUL v3.1
+# Cross-language integration with JavaScript/Node.js ecosystem
+
+# ============================================
+# Core JavaScript Functions
+# ============================================
+
+@js {
+    // JSON operations
+    function parseJSON(str) {
+        try {
+            return JSON.parse(str);
+        } catch (e) {
+            return null;
+        }
+    }
+    
+    function stringifyJSON(obj, pretty = false) {
+        return pretty ? JSON.stringify(obj, null, 2) : JSON.stringify(obj);
+    }
+    
+    // Array operations
+    function arrayMap(arr, fn) {
+        return arr.map(eval(fn));
+    }
+    
+    function arrayFilter(arr, fn) {
+        return arr.filter(eval(fn));
+    }
+    
+    function arrayReduce(arr, fn, initial) {
+        return arr.reduce(eval(fn), initial);
+    }
+    
+    // Object operations
+    function objectKeys(obj) {
+        return Object.keys(obj);
+    }
+    
+    function objectValues(obj) {
+        return Object.values(obj);
+    }
+    
+    function objectEntries(obj) {
+        return Object.entries(obj);
+    }
+    
+    function objectMerge(...objects) {
+        return Object.assign({}, ...objects);
+    }
+    
+    // String operations
+    function stringTemplate(template, data) {
+        return template.replace(/\${(\w+)}/g, (_, key) => data[key] || '');
+    }
+}
+
+# GUL wrappers
+fn js_parse_json(s): js.parseJSON(s)
+fn js_stringify(obj): js.stringifyJSON(obj, false)
+fn js_stringify_pretty(obj): js.stringifyJSON(obj, true)
+fn js_keys(obj): js.objectKeys(obj)
+fn js_values(obj): js.objectValues(obj)
+fn js_merge(*objs): js.objectMerge(objs)
+
+# ============================================
+# Promise/Async Handling
+# ============================================
+
+@js {
+    // Promise utilities
+    async function promiseAll(promises) {
+        return Promise.all(promises);
+    }
+    
+    async function promiseRace(promises) {
+        return Promise.race(promises);
+    }
+    
+    async function promiseAllSettled(promises) {
+        return Promise.allSettled(promises);
+    }
+    
+    function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    
+    // Retry logic
+    async function retryAsync(fn, maxRetries, delayMs) {
+        for (let i = 0; i < maxRetries; i++) {
+            try {
+                return await fn();
+            } catch (e) {
+                if (i === maxRetries - 1) throw e;
+                await delay(delayMs);
+            }
+        }
+    }
+}
+
+# Async wrappers
+async js_delay(ms): js.delay(ms)
+async js_all(promises): js.promiseAll(promises)
+async js_race(promises): js.promiseRace(promises)
+
+# ============================================
+# DOM Operations (Browser)
+# ============================================
+
+@js {
+    // Query elements
+    function querySelector(selector) {
+        return document.querySelector(selector);
+    }
+    
+    function querySelectorAll(selector) {
+        return Array.from(document.querySelectorAll(selector));
+    }
+    
+    function getElementById(id) {
+        return document.getElementById(id);
+    }
+    
+    // Element manipulation
+    function createElement(tag) {
+        return document.createElement(tag);
+    }
+    
+    function setInnerHTML(element, html) {
+        element.innerHTML = html;
+    }
+    
+    function setTextContent(element, text) {
+        element.textContent = text;
+    }
+    
+    function addClass(element, className) {
+        element.classList.add(className);
+    }
+    
+    function removeClass(element, className) {
+        element.classList.remove(className);
+    }
+    
+    function toggleClass(element, className) {
+        element.classList.toggle(className);
+    }
+    
+    // Events
+    function addEventListener(element, event, handler) {
+        element.addEventListener(event, eval(handler));
+    }
+    
+    function removeEventListener(element, event, handler) {
+        element.removeEventListener(event, eval(handler));
+    }
+}
+
+# ============================================
+# Fetch API
+# ============================================
+
+@js {
+    async function fetchGet(url, headers = {}) {
+        const response = await fetch(url, { headers });
+        return {
+            status: response.status,
+            ok: response.ok,
+            headers: Object.fromEntries(response.headers),
+            body: await response.text()
+        };
+    }
+    
+    async function fetchPost(url, data, headers = {}) {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', ...headers },
+            body: JSON.stringify(data)
+        });
+        return {
+            status: response.status,
+            ok: response.ok,
+            body: await response.text()
+        };
+    }
+    
+    async function fetchPut(url, data, headers = {}) {
+        const response = await fetch(url, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', ...headers },
+            body: JSON.stringify(data)
+        });
+        return {
+            status: response.status,
+            ok: response.ok,
+            body: await response.text()
+        };
+    }
+    
+    async function fetchDelete(url, headers = {}) {
+        const response = await fetch(url, {
+            method: 'DELETE',
+            headers
+        });
+        return {
+            status: response.status,
+            ok: response.ok
+        };
+    }
+}
+
+# Async HTTP wrappers
+async js_get(url): js.fetchGet(url, {})
+async js_post(url, data): js.fetchPost(url, data, {})
+async js_put(url, data): js.fetchPut(url, data, {})
+async js_delete(url): js.fetchDelete(url, {})
+
+# ============================================
+# LocalStorage / SessionStorage
+# ============================================
+
+@js {
+    function localStorageGet(key) {
+        return localStorage.getItem(key);
+    }
+    
+    function localStorageSet(key, value) {
+        localStorage.setItem(key, value);
+    }
+    
+    function localStorageRemove(key) {
+        localStorage.removeItem(key);
+    }
+    
+    function localStorageClear() {
+        localStorage.clear();
+    }
+    
+    function sessionStorageGet(key) {
+        return sessionStorage.getItem(key);
+    }
+    
+    function sessionStorageSet(key, value) {
+        sessionStorage.setItem(key, value);
+    }
+}
+
+# Storage wrappers
+fn local_get(key): js.localStorageGet(key)
+fn local_set(key, value): js.localStorageSet(key, value)
+fn local_remove(key): js.localStorageRemove(key)
+fn session_get(key): js.sessionStorageGet(key)
+fn session_set(key, value): js.sessionStorageSet(key, value)

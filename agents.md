@@ -11,37 +11,41 @@
 - **Format**: `cargo fmt`
 - **Security audit**: `cargo audit`
 
-## GUL Language Syntax (v2.0)
+## GUL Language Syntax (v3.1)
 
 ### Keywords
 
-- **Variables**: `const` (immutable), `mut` (mutable)
+- **Variables**: `let` (immutable), `var` (mutable)
 - **Functions**: `fn` (sync), `async` (async)
-- **Imports**: `import` (with optional grouping `{...}`)
-- **Multi-language**: `extern language {...}`
+- **Imports**: `@imp` (with optional grouping `{...}`)
+- **Multi-language**: `@python {...}`, `@rust {...}`, `@sql {...}`
 - **Entry point**: `mn:`
-- **Ownership**: `own`, `ref`, `copy` (unchanged)
+- **Ownership**: `borrow`, `ref`, `move`, `kept`
 
 ### File Types
 
-- **.mn**: General purpose files
+- **.mn**: Main files (entry point and orchestration, General purpose files)
 - **.def**: Definition files (types, constants, imports)
 - **.fnc**: Function files (pure logic)
-- **.mn**: Main files (entry point and orchestration)
+- **.py**, .rs, .go, .js, .ts, .rb, .php, .java, .kt, .swift, .rs: External language files
+- **.scrt**: secret files (credentials, API keys, etc.)
 
 ### Examples
 
 ```gul
-import std.io
-import python{numpy, pandas}
+@imp std.io
+@imp python{numpy, pandas}
 
 let PI = @float(3.14159)
 var @int(counter) = 0
 
-fn greet(name: str) -> str:
-    return "Hello, " + name
+fn greet(@str(name)):
+    return @str("Hello, " + name)
 
-extern python {
+fn add(@int(a, b)):
+    return @int(a + b)
+
+@python {
     fn analyze(data: list) -> dict {
         import numpy as np
         return {"mean": np.mean(data)}
@@ -49,7 +53,9 @@ extern python {
 }
 
 mn:
-    print("Hello, GUL v2.0!")
+    print(greet("GUL v3.1!"))
+    result = add(1, 2)
+    print("Result:", result)
     result = analyze([1, 2, 3, 4, 5])
     print("Analysis:", result)
 ```

@@ -170,14 +170,17 @@ impl PackageDatabase {
         let mut cache = self.cache.write().await;
         cache.insert(key, package.clone());
 
-        // Insert into database based on backend
+        // For now, we only use cache. Database backends are for future implementation
+        // when the appropriate crates are added as dependencies.
         match &self.backend {
-            DatabaseBackend::PostgreSQL(_) => {
-                // TODO: Actual PostgreSQL insert
+            DatabaseBackend::PostgreSQL(_config) => {
+                // PostgreSQL support requires adding sqlx with postgres feature
+                // For now, data is stored in cache only
                 Ok(())
             }
-            DatabaseBackend::SQLite(_) => {
-                // TODO: Actual SQLite insert
+            DatabaseBackend::SQLite(_path) => {
+                // SQLite support available via rusqlite for sync operations
+                // Async operations would require sqlx
                 Ok(())
             }
             DatabaseBackend::InMemory => Ok(()),
@@ -195,15 +198,16 @@ impl PackageDatabase {
             }
         }
 
-        // Fetch from database
+        // Cache miss - for now we only support in-memory storage
+        // Future: query actual database backends
         match &self.backend {
-            DatabaseBackend::PostgreSQL(_) => {
-                // TODO: Actual PostgreSQL query
-                Err("Not found".to_string())
+            DatabaseBackend::PostgreSQL(_config) => {
+                // PostgreSQL support requires sqlx
+                Err("Not found in cache".to_string())
             }
-            DatabaseBackend::SQLite(_) => {
-                // TODO: Actual SQLite query
-                Err("Not found".to_string())
+            DatabaseBackend::SQLite(_path) => {
+                // SQLite support available via rusqlite for sync operations
+                Err("Not found in cache".to_string())
             }
             DatabaseBackend::InMemory => Err("Not found".to_string()),
         }

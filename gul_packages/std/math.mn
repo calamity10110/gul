@@ -1,0 +1,213 @@
+# Math Module for GUL v3.1
+# Mathematical functions and constants
+
+# ============================================
+# Constants
+# ============================================
+
+let PI = @float(3.14159265358979323846)
+let E = @float(2.71828182845904523536)
+let TAU = @float(6.28318530717958647692)
+let PHI = @float(1.61803398874989484820)  # Golden ratio
+let SQRT2 = @float(1.41421356237309504880)
+let INF = @float(1.0 / 0.0)
+let NAN = @float(0.0 / 0.0)
+
+# ============================================
+# Basic Functions (Single-line - implicit return)
+# ============================================
+
+fn abs(x): if x < 0 then -x else x
+fn sign(x): if x > 0 then 1 elif x < 0 then -1 else 0
+fn min(a, b): if a < b then a else b
+fn max(a, b): if a > b then a else b
+fn clamp(x, lo, hi): min(max(x, lo), hi)
+
+# ============================================
+# Powers and Roots
+# ============================================
+
+fn sqrt(x): x ^ 0.5
+fn cbrt(x): x ^ (1.0 / 3.0)
+fn pow(base, exp): base ^ exp
+fn square(x): x * x
+fn cube(x): x * x * x
+
+# ============================================
+# Trigonometry (Single-line)
+# ============================================
+
+fn sin(x): _native_sin(x)
+fn cos(x): _native_cos(x)
+fn tan(x): _native_tan(x)
+fn asin(x): _native_asin(x)
+fn acos(x): _native_acos(x)
+fn atan(x): _native_atan(x)
+fn atan2(y, x): _native_atan2(y, x)
+
+# Hyperbolic
+fn sinh(x): (exp(x) - exp(-x)) / 2
+fn cosh(x): (exp(x) + exp(-x)) / 2
+fn tanh(x): sinh(x) / cosh(x)
+
+# Degrees/Radians
+fn radians(deg): deg * PI / 180
+fn degrees(rad): rad * 180 / PI
+
+# ============================================
+# Exponential and Logarithmic
+# ============================================
+
+fn exp(x): E ^ x
+fn log(x): _native_ln(x)
+fn log10(x): log(x) / log(10)
+fn log2(x): log(x) / log(2)
+fn log_base(x, base): log(x) / log(base)
+
+# ============================================
+# Rounding (Multi-line for complex logic)
+# ============================================
+
+fn floor(x):
+    let i = int(x)
+    if x < 0 and x != i:
+        return i - 1
+    return i
+
+fn ceil(x):
+    let i = int(x)
+    if x > 0 and x != i:
+        return i + 1
+    return i
+
+fn round(x):
+    if x >= 0:
+        return floor(x + 0.5)
+    return ceil(x - 0.5)
+
+fn trunc(x): int(x)
+
+fn frac(x): x - trunc(x)
+
+# ============================================
+# Statistical Functions
+# ============================================
+
+fn sum(values):
+    var total = 0
+    for v in values:
+        total = total + v
+    return total
+
+fn mean(values): sum(values) / len(values)
+
+fn variance(values):
+    let m = mean(values)
+    var sum_sq = 0
+    for v in values:
+        sum_sq = sum_sq + (v - m)^2
+    return sum_sq / len(values)
+
+fn std_dev(values): sqrt(variance(values))
+
+fn median(values):
+    let sorted = values.sorted()
+    let n = len(sorted)
+    if n % 2 == 1:
+        return sorted[n // 2]
+    return (sorted[n // 2 - 1] + sorted[n // 2]) / 2
+
+fn mode(values):
+    var counts = {}
+    for v in values:
+        counts[v] = counts.get(v, 0) + 1
+    var max_count = 0
+    var result = values[0]
+    for v, count in counts:
+        if count > max_count:
+            max_count = count
+            result = v
+    return result
+
+# ============================================
+# Number Theory
+# ============================================
+
+fn gcd(a, b):
+    var x = abs(a)
+    var y = abs(b)
+    while y != 0:
+        let temp = y
+        y = x % y
+        x = temp
+    return x
+
+fn lcm(a, b): abs(a * b) / gcd(a, b)
+
+fn factorial(n):
+    if n <= 1:
+        return 1
+    return n * factorial(n - 1)
+
+fn fibonacci(n):
+    if n <= 0:
+        return 0
+    if n == 1:
+        return 1
+    var a = 0
+    var b = 1
+    for i in range(2, n + 1):
+        let temp = a + b
+        a = b
+        b = temp
+    return b
+
+fn is_prime(n):
+    if n < 2:
+        return false
+    if n == 2:
+        return true
+    if n % 2 == 0:
+        return false
+    for i in range(3, int(sqrt(n)) + 1, 2):
+        if n % i == 0:
+            return false
+    return true
+
+# ============================================
+# Vector/Matrix Operations
+# ============================================
+
+fn dot_product(a, b):
+    var result = 0
+    for i in range(len(a)):
+        result = result + a[i] * b[i]
+    return result
+
+fn cross_product(a, b):
+    return [
+        a[1] * b[2] - a[2] * b[1],
+        a[2] * b[0] - a[0] * b[2],
+        a[0] * b[1] - a[1] * b[0]
+    ]
+
+fn magnitude(v): sqrt(sum([x^2 for x in v]))
+
+fn normalize(v):
+    let mag = magnitude(v)
+    return [x / mag for x in v]
+
+# ============================================
+# Native Implementation
+# ============================================
+
+@rust {
+    fn _native_sin(x: f64) -> f64 { x.sin() }
+    fn _native_cos(x: f64) -> f64 { x.cos() }
+    fn _native_tan(x: f64) -> f64 { x.tan() }
+    fn _native_asin(x: f64) -> f64 { x.asin() }
+    fn _native_acos(x: f64) -> f64 { x.acos() }
+    fn _native_atan(x: f64) -> f64 { x.atan() }
+    fn _native_atan2(y: f64, x: f64) -> f64 { y.atan2(x) }
+    fn _native_ln(x: f64) -> f64 { x.ln() }
+}

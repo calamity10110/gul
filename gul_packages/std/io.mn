@@ -1,0 +1,142 @@
+# I/O Module for GUL v3.1
+# File system and input/output operations
+
+# ============================================
+# File Operations (Single-line - implicit return)
+# ============================================
+
+fn exists(path): _fs_exists(path)
+fn is_file(path): _fs_is_file(path)
+fn is_dir(path): _fs_is_dir(path)
+fn file_size(path): _fs_size(path)
+
+# ============================================
+# File Reading (Multi-line - explicit return)
+# ============================================
+
+fn read_file(path):
+    if not exists(path):
+        throw "File not found: " + path
+    return _fs_read(path)
+
+fn read_lines(path):
+    content = read_file(path)
+    return content.split("\n")
+
+fn read_bytes(path):
+    if not exists(path):
+        throw "File not found: " + path
+    return _fs_read_bytes(path)
+
+# ============================================
+# File Writing
+# ============================================
+
+fn write_file(path, content):
+    _fs_write(path, content)
+
+fn write_lines(path, lines):
+    content = "\n".join(lines)
+    write_file(path, content)
+
+fn append_file(path, content):
+    _fs_append(path, content)
+
+fn write_bytes(path, data):
+    _fs_write_bytes(path, data)
+
+# ============================================
+# Directory Operations
+# ============================================
+
+fn list_dir(path):
+    if not is_dir(path):
+        throw "Not a directory: " + path
+    return _fs_list_dir(path)
+
+fn create_dir(path):
+    _fs_create_dir(path)
+
+fn create_dir_all(path):
+    _fs_create_dir_all(path)
+
+fn remove_file(path):
+    _fs_remove_file(path)
+
+fn remove_dir(path):
+    _fs_remove_dir(path)
+
+fn remove_dir_all(path):
+    _fs_remove_dir_all(path)
+
+fn copy_file(src, dst):
+    _fs_copy(src, dst)
+
+fn move_file(src, dst):
+    _fs_rename(src, dst)
+
+# ============================================
+# Path Operations (Single-line)
+# ============================================
+
+fn join_path(base, path): base + "/" + path
+fn basename(path): path.split("/")[-1]
+fn dirname(path): "/".join(path.split("/")[:-1])
+fn extension(path): path.split(".")[-1] if "." in path else ""
+fn stem(path): basename(path).rsplit(".", 1)[0]
+
+# ============================================
+# Console I/O
+# ============================================
+
+fn print(*args):
+    _console_print(args)
+
+fn println(*args):
+    _console_println(args)
+
+fn input(prompt):
+    if prompt != nil:
+        print(prompt)
+    return _console_read_line()
+
+fn error(*args):
+    _console_error(args)
+
+# ============================================
+# Async File Operations
+# ============================================
+
+async read_file_async(path): _fs_read_async(path)
+async write_file_async(path, content): _fs_write_async(path, content)
+
+async read_large_file(path, chunk_size):
+    var chunks = []
+    var offset = 0
+    let size = file_size(path)
+    while offset < size:
+        chunk = await _fs_read_chunk(path, offset, chunk_size)
+        chunks.append(chunk)
+        offset = offset + chunk_size
+    return "".join(chunks)
+
+# ============================================
+# Native Implementation
+# ============================================
+
+@rust {
+    use std::fs;
+    use std::path::Path;
+    
+    fn _fs_exists(path: &str) -> bool { Path::new(path).exists() }
+    fn _fs_is_file(path: &str) -> bool { Path::new(path).is_file() }
+    fn _fs_is_dir(path: &str) -> bool { Path::new(path).is_dir() }
+    fn _fs_size(path: &str) -> u64 { fs::metadata(path).map(|m| m.len()).unwrap_or(0) }
+    fn _fs_read(path: &str) -> String { fs::read_to_string(path).unwrap_or_default() }
+    fn _fs_write(path: &str, content: &str) { fs::write(path, content).unwrap(); }
+    fn _fs_list_dir(path: &str) -> Vec<String> {
+        fs::read_dir(path)
+            .map(|entries| entries.filter_map(|e| e.ok().map(|e| e.file_name().to_string_lossy().into_owned())).collect())
+            .unwrap_or_default()
+    }
+}
