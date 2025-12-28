@@ -1,7 +1,6 @@
 // GUL MCP CLI - Command-line interface for MCP server
 
 use clap::{Parser, Subcommand};
-use serde_json::json;
 
 #[derive(Parser)]
 #[command(name = "gul-mcp")]
@@ -189,8 +188,10 @@ pub fn execute_cli() -> Result<(), Box<dyn std::error::Error>> {
             println!("✅ Installed!");
             Ok(())
         }
-
-        McpCommands::Test { pattern, coverage } => {
+        McpCommands::Test {
+            pattern: _,
+            coverage,
+        } => {
             println!(
                 "🧪 Running tests{}",
                 if coverage { " with coverage" } else { "" }
