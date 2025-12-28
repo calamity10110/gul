@@ -40,7 +40,7 @@ Full implementation of Model Context Protocol server with:
 
 ### Automatically Create Packages/Applications
 
-```
+```text
 You: "Create a sentiment analysis API"
 
 AI (using MCP):
@@ -56,7 +56,7 @@ Result: Working application in seconds!
 
 ### Generate and Run Code
 
-```
+```text
 You: "Write a function to process CSV data"
 
 AI (using MCP):
@@ -70,7 +70,7 @@ Result: Tested, working code!
 
 ### Download and Install Dependencies
 
-```
+```text
 You: "I need TensorFlow for ML"
 
 AI (using MCP):
@@ -148,7 +148,7 @@ AI automatically:
 
 ### Workflow 1: Build a Web API
 
-```
+```text
 1. You: "Create a REST API for user management"
 
 2. AI: [gul_project_scaffold]
@@ -186,7 +186,7 @@ AI automatically:
 
 ### Workflow 2: Data Science Project
 
-```
+```text
 1. You: "Analyze this CSV file with ML"
 
 2. AI: [gul_project_scaffold]
@@ -224,7 +224,7 @@ AI automatically:
 
 ## 🔧 How It Works
 
-```
+```text
 ┌─────────────────┐
 │ You: "Create X" │
 └────────┬────────┘
@@ -283,7 +283,7 @@ AI automatically:
 
 ### Then Just Ask
 
-```
+```text
 You: "Create a machine learning project"
 Claude: [Creates complete ML project with TensorFlow]
 
