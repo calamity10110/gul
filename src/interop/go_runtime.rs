@@ -45,8 +45,7 @@ func main() {{
         };
 
         // Write Go file
-        fs::write(&file_path, &full_code)
-            .map_err(|e| format!("Failed to write Go file: {}", e))?;
+        fs::write(&file_path, &full_code).map_err(|e| format!("Failed to write Go file: {}", e))?;
 
         // Run with go run
         let output = Command::new("go")
@@ -202,9 +201,13 @@ func main() {{
     }
 
     /// Execute Go template
-    pub fn execute_template(&self, template: &str, data: HashMap<String, String>) -> Result<String, String> {
-        let data_json = serde_json::to_string(&data)
-            .map_err(|e| format!("Failed to serialize data: {}", e))?;
+    pub fn execute_template(
+        &self,
+        template: &str,
+        data: HashMap<String, String>,
+    ) -> Result<String, String> {
+        let data_json =
+            serde_json::to_string(&data).map_err(|e| format!("Failed to serialize data: {}", e))?;
 
         let code = format!(
             r#"package main

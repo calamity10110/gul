@@ -485,7 +485,7 @@ impl Interpreter {
                         // fold(fn, initial, list) - reduce list to single value
                         if args.len() != 3 {
                             return Err(
-                                "fold expects 3 arguments (function, initial, list)".to_string(),
+                                "fold expects 3 arguments (function, initial, list)".to_string()
                             );
                         }
                         let func = self.evaluate(&args[0])?;

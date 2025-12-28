@@ -1,7 +1,6 @@
 // JavaScript Runtime Integration using Node.js
 // Provides JS execution with JSON, async, and utility functions
 
-
 use std::process::Command;
 
 /// JavaScript runtime manager
@@ -89,10 +88,7 @@ impl JavaScriptRuntime {
 
     /// Array operations
     pub fn array_map(&self, array: &str, mapper: &str) -> Result<String, String> {
-        let code = format!(
-            "console.log(JSON.stringify(({}).map({})))",
-            array, mapper
-        );
+        let code = format!("console.log(JSON.stringify(({}).map({})))", array, mapper);
         self.execute(&code)
     }
 
@@ -104,7 +100,12 @@ impl JavaScriptRuntime {
         self.execute(&code)
     }
 
-    pub fn array_reduce(&self, array: &str, reducer: &str, initial: &str) -> Result<String, String> {
+    pub fn array_reduce(
+        &self,
+        array: &str,
+        reducer: &str,
+        initial: &str,
+    ) -> Result<String, String> {
         let code = format!(
             "console.log(JSON.stringify(({}).reduce({}, {})))",
             array, reducer, initial
@@ -169,7 +170,8 @@ impl JavaScriptRuntime {
     pub fn write_file(&self, path: &str, content: &str) -> Result<String, String> {
         let code = format!(
             "const fs = require('fs'); fs.writeFileSync('{}', '{}'); console.log('Written')",
-            path, content.replace('\'', "\\'").replace('\n', "\\n")
+            path,
+            content.replace('\'', "\\'").replace('\n', "\\n")
         );
         self.execute(&code)
     }

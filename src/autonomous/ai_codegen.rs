@@ -125,7 +125,8 @@ impl AiCodeGenerator {
             // Generic code template
             Ok(format!(
                 "// Generated code for: {}\n// Language: {}\n\n{}",
-                request.prompt, request.language,
+                request.prompt,
+                request.language,
                 self.generate_template(&request.language)
             ))
         }
@@ -147,9 +148,14 @@ impl AiCodeGenerator {
             "go" => {
                 use crate::interop::go_runtime::GoRuntime;
                 let runtime = GoRuntime::new()?;
-                runtime.execute("fmt.Println(\"Code executed successfully\")\n// Add your implementation here")
+                runtime.execute(
+                    "fmt.Println(\"Code executed successfully\")\n// Add your implementation here",
+                )
             }
-            _ => Ok(format!("// Code execution for {} not yet supported", language))
+            _ => Ok(format!(
+                "// Code execution for {} not yet supported",
+                language
+            )),
         }
     }
 
@@ -214,7 +220,7 @@ mn:
 "#,
                 prompt
             )),
-            _ => Ok(format!("// ML code for {} not implemented", language))
+            _ => Ok(format!("// ML code for {} not implemented", language)),
         }
     }
 
@@ -302,7 +308,7 @@ mn:
 "#,
                 prompt
             )),
-            _ => Ok(format!("// Async code for {} not implemented", language))
+            _ => Ok(format!("// Async code for {} not implemented", language)),
         }
     }
 
@@ -370,7 +376,7 @@ if __name__ == '__main__':
 "#,
                 prompt
             )),
-            _ => Ok(format!("// API code for {} not implemented", language))
+            _ => Ok(format!("// API code for {} not implemented", language)),
         }
     }
 
@@ -386,7 +392,8 @@ fn main_function():
 
 mn:
     main_function()
-"#.to_string(),
+"#
+            .to_string(),
             "python" => r#"
 # Python Template
 def main():
@@ -394,7 +401,8 @@ def main():
 
 if __name__ == "__main__":
     main()
-"#.to_string(),
+"#
+            .to_string(),
             "go" => r#"
 package main
 
@@ -403,7 +411,8 @@ import "fmt"
 func main() {
     fmt.Println("Hello from Go!")
 }
-"#.to_string(),
+"#
+            .to_string(),
             "javascript" | "js" => r#"
 // JavaScript Template
 function main() {
@@ -411,13 +420,15 @@ function main() {
 }
 
 main();
-"#.to_string(),
+"#
+            .to_string(),
             "rust" => r#"
 fn main() {
     println!("Hello from Rust!");
 }
-"#.to_string(),
-            _ => format!("// Template for {}\n// Add implementation here", language)
+"#
+            .to_string(),
+            _ => format!("// Template for {}\n// Add implementation here", language),
         }
     }
 

@@ -53,7 +53,9 @@ fn create_json_module() -> Value {
         Value::NativeFunction(|args| {
             fn stringify_value(val: &Value) -> String {
                 match val {
-                    Value::String(s) => format!("\"{}\"", s.replace('\\', "\\\\").replace('"', "\\\"")),
+                    Value::String(s) => {
+                        format!("\"{}\"", s.replace('\\', "\\\\").replace('"', "\\\""))
+                    }
                     Value::Integer(i) => i.to_string(),
                     Value::Float(f) => f.to_string(),
                     Value::Bool(b) => b.to_string(),

@@ -266,7 +266,6 @@ asyncio.run(main())
 
     /// Execute Python with timeout
     pub fn execute_with_timeout(&self, code: &str, _timeout_secs: u64) -> Result<String, String> {
-
         let child = Command::new(&self.python_path)
             .arg("-c")
             .arg(code)

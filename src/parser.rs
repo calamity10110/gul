@@ -314,10 +314,7 @@ impl Parser {
                     }
 
                     // Handle grouped sub-imports like python{numpy, pandas}
-                    if matches!(
-                        self.current_token(),
-                        Token::LeftBrace | Token::LeftParen
-                    ) {
+                    if matches!(self.current_token(), Token::LeftBrace | Token::LeftParen) {
                         self.advance();
                         let mut sub_modules = Vec::new();
                         while !matches!(
