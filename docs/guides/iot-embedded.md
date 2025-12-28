@@ -4,7 +4,7 @@
 
 ---
 
-# IoT & Embedded Development Tutorial
+## IoT & Embedded Development Tutorial
 
 Build IoT applications and embedded systems with GUL.
 
@@ -178,4 +178,4 @@ main:
 
 **Last Updated**: 2025-12-28  
 **Version: 0.13.0  
-**License**: MIT
+**License\*\*: MIT
