@@ -1,28 +1,74 @@
-# GUL SQL Query - v3.0
+# GUL v3.2 SQL Query Example
+# Database operations with @ prefix types
 
-@imp db
+@imp std.sql
 
 @sql {
-    create table if not exists users (
-        id integer primary key,
-        name text not null,
-        email text unique not null,
-        age integer
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        email TEXT UNIQUE NOT NULL,
+        age INTEGER,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    
+    CREATE TABLE IF NOT EXISTS posts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        title TEXT NOT NULL,
+        content TEXT,
+        FOREIGN KEY (user_id) REFERENCES users(id)
     );
 }
 
-@sql {
-    insert into users (name, email, age) values
-        ('Alice', 'alice@example.com', 30),
-        ('Bob', 'bob@example.com', 25),
-        ('Charlie', 'charlie@example.com', 35);
-}
+fn @list get_all_users():
+    return sql.query("SELECT * FROM users")
+
+fn @dict get_user_by_id(user_id):
+    let results = sql.query(
+        "SELECT * FROM users WHERE id = ?",
+        @list[user_id]
+    )
+    if results.length() > 0:
+        return results[0]
+    return @dict{}
+
+fn @int create_user(name, email, age):
+    sql.execute(
+        "INSERT INTO users (name, email, age) VALUES (?, ?, ?)",
+        @list[name, email, age]
+    )
+    return sql.last_insert_id()
+
+fn @list get_user_posts(user_id):
+    return sql.query(
+        "SELECT * FROM posts WHERE user_id = ?",
+        @list[user_id]
+    )
 
 mn:
-    db.execute(create_table)
-    db.execute(insert_users)
-
-    results = db.query("select * from users where age > 25")
-
-    for row in results:
-        print(row.name, row.email, row.age)
+    print("=== GUL v3.2 SQL Example ===")
+    
+    # Create users
+    let user1_id = create_user("Alice", "alice@example.com", 30)
+    let user2_id = create_user("Bob", "bob@example.com", 25)
+    
+    print("Created users:", user1_id, user2_id)
+    
+    # Query users
+    let all_users = get_all_users()
+    print("All users:", all_users)
+    
+    # Get specific user
+    let user = get_user_by_id(user1_id)
+    print("User details:", user)
+    
+    # Create posts
+    sql.execute(
+        "INSERT INTO posts (user_id, title, content) VALUES (?, ?, ?)",
+        @list[user1_id, "Hello GUL", "First post with v3.2 syntax!"]
+    )
+    
+    # Get user posts
+    let posts = get_user_posts(user1_id)
+    print("User posts:", posts)

@@ -1,33 +1,54 @@
-# Foreign C Block - v3.0
-# GUL v3.0 supports foreign code blocks with @c syntax
+# GUL v3.2 C Inline Example
+# Inline C code with @ prefix types
 
+@imp std.ffi
+
+# C code block for performance-critical operations
 @c {
+    #include <stdio.h>
     #include <math.h>
-    #include <string.h>
-
-    double calculate_distance(double x1, double y1, double x2, double y2) {
-        double dx = x2 - x1;
-        double dy = y2 - y1;
-        return sqrt(dx*dx + dy*dy);
+    
+    double fast_sqrt(double x) {
+        return sqrt(x);
     }
     
-    // Simple string reversal in C
-    void reverse_string(char* str) {
-        int len = strlen(str);
-        for (int i = 0; i < len/2; i++) {
-            char temp = str[i];
-            str[i] = str[len-1-i];
-            str[len-1-i] = temp;
+    int fast_factorial(int n) {
+        if (n <= 1) return 1;
+        int result = 1;
+        for (int i = 2; i <= n; i++) {
+            result *= i;
         }
+        return result;
+    }
+    
+    void print_array(int* arr, int len) {
+        printf("[");
+        for (int i = 0; i < len; i++) {
+            printf("%d", arr[i]);
+            if (i < len - 1) printf(", ");
+        }
+        printf("]\n");
     }
 }
 
+fn @float calculate_distance(x1, y1, x2, y2):
+    let dx = @float(x2 - x1)
+    let dy = @float(y2 - y1)
+    return c.fast_sqrt(dx*dx + dy*dy)
+
+fn @int compute_factorial(n):
+    return c.fast_factorial(n)
+
 mn:
-    # Call foreign function
-    let distance = c.calculate_distance(0.0, 0.0, 3.0, 4.0)
-    print("Distance:", distance)
+    print("=== GUL v3.2 C Inline Example ===")
     
-    # Ownership transfer to foreign code (ref)
-    let text = "Hello, World!"
-    c.reverse_string(ref text)
-    print("Reversed:", text)
+    # Test C functions
+    let dist = calculate_distance(0.0, 0.0, 3.0, 4.0)
+    print("Distance:", dist)
+    
+    let fact = compute_factorial(10)
+    print("Factorial(10):", fact)
+    
+    # Test C array printing
+    let numbers = @list[1, 2, 3, 4, 5]
+    c.print_array(numbers, numbers.length())

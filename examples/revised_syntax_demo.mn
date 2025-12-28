@@ -1,93 +1,58 @@
-# GUL v3.0 Syntax Examples
-# Demonstrating modern v3.0 syntax
+# GUL v3.2 Revised Syntax Demo
+# Comprehensive demonstration of v3.2 features
 
-# ============================================
-# 1. MUTABILITY - 'let' and 'var' keywords
-# ============================================
-
-# Immutable constants (let)
-let PI = 3.14159
-let MAX_USERS = 100
-
-# Mutable variables (var)
-var count = 0
-var total = 100
-
-# Type annotations
-let name: str = "Alice"
-var counter: int = 0
-
-# ============================================
-# 2. IMPORTS - '@imp' syntax (3 styles)
-# ============================================
-
-# Style 1: Single line
 @imp std.io
-@imp std.http
+@imp std.math
+@imp std.json
 
-# Style 2: Grouped
-@imp python{numpy, pandas}
-@imp rust{tokio, serde}
+# 1. Type annotations with @ prefix
+let name = @str("GUL")
+let version = @str("3.2.0")
+let count = @int(42)
+let pi = @float(3.14159)
+let active = @bool(true)
 
-# Style 3: Block (indented)
-@imp:
-    std.math,
-    std.collections,
-    python{matplotlib}
-
-# ============================================
-# 3. FUNCTIONS - 'fn' and 'async' keywords
-# ============================================
-
-# Sync function
-fn greet(name: str) -> str:
-    return "Hello, " + name
-
-# Async function (no fn keyword)
-async fetch_data(url: str) -> dict:
-    response = await http.get(url)
-    return response.json()
-
-# ============================================
-# 4. MULTI-LANGUAGE - '@lang' blocks
-# ============================================
-
-@python {
-    def analyze_data(data):
-        import numpy as np
-        arr = np.array(data)
-        return {
-            "mean": float(np.mean(arr)),
-            "std": float(np.std(arr)),
-            "count": len(data)
-        }
+# 2. Collections
+let numbers = @list[1, 2, 3, 4, 5]
+let coords = @tuple(10.5, 20.3)
+let tags = @set{"rust", "python", "javascript"}
+let config = @dict{
+    host: "localhost",
+    port: 8080,
+    debug: true
 }
 
-@rust {
-    fn fast_compute(n: i32) -> i32 {
-        n * n
-    }
-}
+# 3. Functions with return types
+fn @int add(a, b): a + b
+fn @float multiply(x, y): x * y
+fn @str format(template, value):
+    return template + ": " + str(value)
 
-# ============================================
-# 5. MAIN ENTRY - 'mn:' block
-# ============================================
+# 4. Structs
+struct Point:
+    x: @float
+    y: @float
+    
+    fn @float magnitude(self):
+        return math.sqrt(self.x^2 + self.y^2)
+
+struct Config:
+    name: @str
+    value: @int
+    enabled: @bool
+
+# 5. List comprehensions
+let squares = @list[x^2 for x in range(10)]
+let evens = @list[x for x in numbers if x % 2 == 0]
 
 mn:
-    print("Hello from GUL v3.0!")
-
-    # Use modern syntax
-    var counter = 0
-    let max_count = 10
-
-    while counter < max_count:
-        print("Count:", counter)
-        counter = counter + 1
-
-    # Test multi-language integration
-    data = [1, 2, 3, 4, 5]
-    stats = analyze_data(data)
-    print("Data stats:", stats)
-
-    result = fast_compute(5)
-    print("5 squared =", result)
+    print("=== GUL v3.2 Syntax Demo ===")
+    print("Name:", name, "Version:", version)
+    print("Collections:", numbers, config)
+    print("Functions:", add(10, 20), format("Result", 100))
+    
+    let p = Point{x: 3.0, y: 4.0}
+    print("Point magnitude:", p.magnitude())
+    
+    print("Comprehensions:", squares, evens)
+    print("✓ All features working!")

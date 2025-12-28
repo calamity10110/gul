@@ -1,15 +1,35 @@
-# Embedded LED Blink - v3.0
+# GUL v3.2 Embedded Blink Example
+# LED blinking for embedded systems
 
 @imp embedded.gpio
 @imp embedded.time
 
-async blink(pin: int, delay_ms: int):
-    loop:
-        gpio.high(pin)
-        await time.sleep(delay_ms)
-        gpio.low(pin)
-        await time.sleep(delay_ms)
+# Pin configuration
+let LED_PIN = @int(13)
+let BLINK_DELAY = @int(1000)  # milliseconds
+
+fn setup():
+    gpio.set_mode(LED_PIN, gpio.OUTPUT)
+    print("LED initialized on pin", LED_PIN)
+
+fn @bool toggle_led(state):
+    gpio.write(LED_PIN, state)
+    return not state
+
+fn blink_pattern(times):
+    var state = @bool(false)
+    var count = @int(0)
+    
+    while count < times:
+        state = toggle_led(state)
+        time.delay_ms(BLINK_DELAY)
+        count = count + 1
 
 mn:
-    gpio.set_mode(5, OUTPUT)
-    await blink(5, 500)
+    print("=== GUL v3.2 Embedded Blink ===")
+    setup()
+    
+    # Blink forever
+    loop:
+        blink_pattern(10)
+        print("Blink cycle complete")

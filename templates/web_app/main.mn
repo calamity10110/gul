@@ -1,18 +1,61 @@
-# GUL v3.1 Web App Template
+# GUL v3.2 Web App Template
+# Full-stack web application with @ prefix
 
 @imp std.http
-@imp std.ui
+@imp std.json
+@imp std.html
 
-async fetch_users():
-    res = await http.get("https://api.example.com/users")
-    return res.json()
+struct WebApp:
+    name: @str
+    port: @int
+    routes: @dict
+    
+    fn add_route(mut self, path, handler):
+        self.routes[path] = handler
+    
+    fn start(self):
+        http.listen(self.port, self.routes)
 
-let user_list = ^÷^[table{
-    headers=["ID", "Name", "Email"],
-    rows=[]
-}]
+fn @str index_handler(request):
+    return html.render("""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>GUL v3.2 Web App</title>
+        </head>
+        <body>
+            <h1>Welcome to GUL v3.2!</h1>
+            <p>@ prefix type system</p>
+        </body>
+        </html>
+    """)
+
+fn @dict api_handler(request):
+    return @dict{
+        status: "ok",
+        message: "GUL v3.2 API",
+        data: @list[1, 2, 3]
+    }
+
+fn @str users_handler(request):
+    let users = @list[
+        @dict{id: 1, name: "Alice"},
+        @dict{id: 2, name: "Bob"}
+    ]
+    return json.stringify(users)
 
 mn:
-    users = await fetch_users()
-    ui.print(user_list)
-    print("Web app running!")
+    print("=== GUL v3.2 Web App ===")
+    
+    var app = WebApp{
+        name: "MyApp",
+        port: 8080,
+        routes: @dict{}
+    }
+    
+    app.add_route("/", index_handler)
+    app.add_route("/api", api_handler)
+    app.add_route("/api/users", users_handler)
+    
+    print("Starting server on port", app.port)
+    app.start()

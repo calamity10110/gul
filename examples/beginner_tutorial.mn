@@ -1,75 +1,50 @@
-# GUL Beginner Tutorial - v3.0
-# This example demonstrates the core features of GUL with v3.0 syntax.
+# GUL Beginner Tutorial - v3.2
+# Core features demonstration with @ prefix type system
 
-# 1. Flexible Imports (v3.0 @imp syntax)
-@imp std{io, math}
+@imp std.io
+@imp std.math
 @imp python{random}
 
-# 2. Constants (let - immutable)
-let MAX_GUESSES = 5
-let MIN_NUMBER = 1
-let MAX_NUMBER = 100
+# Constants with @ prefix
+let MAX_GUESSES = @int(5)
+let MIN_NUMBER = @int(1)
+let MAX_NUMBER = @int(100)
 
-# 3. Global State (var - mutable with @global)
-@global var game_state = {
-    high_score: 0,
-    games_played: 0
-}
-
-# 4. Functions
-
-# Pure logic function
-fn generate_secret_number() -> int:
-    # Foreign Block (Python)
+# Function with @ return type
+fn @int generate_secret_number():
+    # Python foreign block
     @python {
+        import random
         def get_random(min_val, max_val):
-            import random
             return random.randint(min_val, max_val)
     }
+    return python.get_random(MIN_NUMBER, MAX_NUMBER)
 
-    return get_random(MIN_NUMBER, MAX_NUMBER)
-
-# Async function (no fn keyword in v3.0)
-async play_game():
-    print(f"Welcome to Guess the Number! ({MIN_NUMBER}-{MAX_NUMBER})")
+# Main game function
+fn play_game():
+    print("Welcome to Guess the Number!")
+    print("Guess between", MIN_NUMBER, "and", MAX_NUMBER)
     
-    secret = generate_secret_number()
-    var guesses_left = MAX_GUESSES
-    var won = false
-
-    loop:
-        if guesses_left <= 0:
-            break
-
-        print(f"Guesses left: {guesses_left}")
-
-        # UI Input (Async)
-        input_str = await io.input("Enter your guess: ")
-
-        # Type conversion
-        guess = int(input_str)
-
+    let secret = generate_secret_number()
+    var guesses_left = @int(MAX_GUESSES)
+    var won = @bool(false)
+    
+    while guesses_left > 0 and not won:
+        print("Guesses left:", guesses_left)
+        var guess = @int(50)  # Placeholder for user input
+        
         if guess == secret:
-            print("Congratulations! You won!")
             won = true
-            break
+            print("Congratulations! You won!")
         elif guess < secret:
             print("Too low!")
         else:
             print("Too high!")
-
+        
         guesses_left = guesses_left - 1
-
+    
     if not won:
-        print(f"Game Over! The number was {secret}")
+        print("Game over! The number was:", secret)
 
-    # Update global state
-    game_state.games_played = game_state.games_played + 1
-    if won:
-        game_state.high_score = game_state.high_score + 1
-
-# Main Entry Point (v3.0: mn:)
 mn:
-    await play_game()
-    print("Thanks for playing!")
-    print(f"Total games played: {game_state.games_played}")
+    play_game()

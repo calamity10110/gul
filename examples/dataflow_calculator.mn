@@ -1,48 +1,52 @@
-# GUL Data-Flow Calculator Example
-# Demonstrates node-based programming with contracts
+# GUL v3.2 Dataflow Calculator
+# Demonstrates node-based computation with @ prefix
 
-# calculator.def - Node declarations
+@imp std.math
 
-node add {
-    re_in: @int[ a: A, b: B ],
-    re_out: @int[ result: Sum ],
-}
+# Node definitions
+node add_node:
+    (a: ref @int, b: ref @int),
+    (result: @int)
 
-node multiply {
-    re_in: @int[ x: X, y: Y ],
-    re_out: @int[ result: Product ],
-}
+node multiply_node:
+    (a: ref @int, b: ref @int),
+    (result: @int)
 
-node subtract {
-    re_in: @int[ a: A, b: B ],
-    re_out: @int[ result: Difference ],
-}
+node square_node:
+    (x: ref @float),
+    (result: @float)
 
-# calculator.fnc - Node implementations
+# Calculator functions with @ types
+fn @int calculate_sum(numbers):
+    var total = @int(0)
+    for num in numbers:
+        total = total + num
+    return total
 
-fn add(@int[a, b]) -> @int:
-    return result : a + b
+fn @float calculate_average(numbers):
+    let sum = calculate_sum(numbers)
+    let count = @float(numbers.length())
+    return sum / count
 
-fn multiply(@int[x, y]) -> @int:
-    return result : x * y
-
-fn subtract(@int[a, b]) -> @int:
-    return result : a - b
-
-# main.mn - Data-flow composition
-# Calculate: (5 + 3) * 2 = 16
-
+# Dataflow pipeline
 mn: [
-    # External inputs
-    input(@int(5)) : add: a
-    input(@int(3)) : add: b
-    
-    # Connect add output to multiply input
-    add: result : multiply: x
-    
-    # Another external input
-    input(@int(2)) : multiply: y
-    
-    # Output to print
-    print: multiply: result  # Output: 16
+    # Input -> Process -> Output
+    input(@list[10, 20, 30, 40, 50])
+        -> calculate_sum
+        -> print("Sum:", _)
 ]
+
+# Alternative functional approach
+mn:
+    let numbers = @list[5, 10, 15, 20, 25]
+    
+    let sum = calculate_sum(numbers)
+    let avg = calculate_average(numbers)
+    
+    print("Numbers:", numbers)
+    print("Sum:", sum)
+    print("Average:", avg)
+    
+    # Squares using comprehension
+    let squares = @list[x^2 for x in numbers]
+    print("Squares:", squares)

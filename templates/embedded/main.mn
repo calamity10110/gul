@@ -1,21 +1,53 @@
-# GUL v3.1 Embedded Template
+# GUL v3.2 Embedded Template
+# Embedded systems programming with @ prefix
 
 @imp embedded.gpio
-@imp embedded.wifi
+@imp embedded.spi
 @imp embedded.time
 
-async blink_led(pin, interval_ms):
-    loop:
-        gpio.high(pin)
-        await time.sleep(interval_ms)
-        gpio.low(pin)
-        await time.sleep(interval_ms)
+# Hardware configuration
+let LED_PIN = @int(13)
+let BUTTON_PIN = @int(2)
+let SPI_CS = @int(10)
 
-async connect_wifi():
-    await wifi.connect("YOUR_SSID", "YOUR_PASSWORD")
-    print("Connected! IP:", wifi.ip())
+struct Hardware:
+    led: @int
+    button: @int
+    
+    fn setup(self):
+        gpio.set_mode(self.led, gpio.OUTPUT)
+        gpio.set_mode(self.button, gpio.INPUT_PULLUP)
+    
+    fn @bool read_button(self):
+        return gpio.read(self.button)
+    
+    fn led_on(self):
+        gpio.write(self.led, true)
+    
+    fn led_off(self):
+        gpio.write(self.led, false)
+
+fn main_loop(hw):
+    var state = @bool(false)
+    
+    loop:
+        let button = hw.read_button()
+        
+        if button:
+            state = not state
+            if state:
+                hw.led_on()
+            else:
+                hw.led_off()
+            time.delay_ms(200)  # Debounce
+        
+        time.delay_ms(10)
 
 mn:
-    gpio.set_mode(2, OUTPUT)
-    await connect_wifi()
-    await blink_led(2, 1000)
+    print("=== GUL v3.2 Embedded System ===")
+    
+    let hw = Hardware{led: LED_PIN, button: BUTTON_PIN}
+    hw.setup()
+    
+    print("System initialized")
+    main_loop(hw)

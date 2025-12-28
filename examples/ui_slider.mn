@@ -1,18 +1,54 @@
-# GUL UI Slider - v3.0
+# GUL v3.2 UI Slider Example
+# Interactive slider component with @ prefix
 
 @imp std.ui
 
-# v3.0: UI component literal syntax
-let slider = ^&^[slider{min: 0, max: 100, value: 50}]
+struct Slider:
+    label: @str
+    min: @int
+    max: @int
+    value: @int
+    step: @int
+    
+    fn @str render(self):
+        let percent = @float((self.value - self.min) / (self.max - self.min) * 100)
+        return self.label + ": " + str(self.value) + " (" + str(percent) + "%)"
+    
+    fn update(mut self, new_value):
+        if new_value >= self.min and new_value <= self.max:
+            self.value = new_value
+
+fn create_volume_slider():
+    return Slider{
+        label: "Volume",
+        min: 0,
+        max: 100,
+        value: 50,
+        step: 5
+    }
+
+fn create_brightness_slider():
+    return Slider{
+        label: "Brightness",
+        min: 0,
+        max: 255,
+        value: 128,
+        step: 1
+    }
 
 mn:
-    # UI component rendering
-    ui.print(slider)
+    print("=== GUL v3.2 UI Slider Demo ===")
     
-    # Alternative: function call style (equivalent)
-    ui.print(button[text: "Click me", color: "blue"])
+    var volume = create_volume_slider()
+    var brightness = create_brightness_slider()
     
-    # Alternative: component literal style
-    ^&^[label{text: "Hello World"}]
+    print(volume.render())
+    print(brightness.render())
     
-    print("Slider value:", slider.value)
+    # Simulate adjustments
+    volume.update(75)
+    brightness.update(200)
+    
+    print("\nAfter adjustment:")
+    print(volume.render())
+    print(brightness.render())

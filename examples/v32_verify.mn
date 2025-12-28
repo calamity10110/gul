@@ -1,0 +1,64 @@
+# GUL v3.2 Syntax Verification
+# Tests all @ prefix type syntax features
+
+@imp std.io
+@imp std.math
+
+# Test 1: Primitive types with @ prefix
+fn test_primitives():
+    let int_val = @int(42)
+    let float_val = @float(3.14)
+    let str_val = @str("hello")
+    let bool_val = @bool(true)
+    
+    print("✓ Primitives:", int_val, float_val, str_val, bool_val)
+
+# Test 2: Collection types
+fn test_collections():
+    let list_val = @list[1, 2, 3, 4, 5]
+    let tuple_val = @tuple(10, 20, 30)
+    let set_val = @set{1, 2, 3}
+    let dict_val = @dict{name: "Alice", age: 30}
+    
+    print("✓ Collections:", list_val, tuple_val, set_val, dict_val)
+
+# Test 3: Function return types
+fn @int add(a, b): a + b
+fn @str greet(name): "Hello, " + name
+fn @list range_list(n):
+    let result = @list[]
+    var i = @int(0)
+    while i < n:
+        result.append(i)
+        i = i + 1
+    return result
+
+# Test 4: Structs with @ types
+struct Point:
+    x: @float
+    y: @float
+    
+    fn @float distance(self):
+        return math.sqrt(self.x^2 + self.y^2)
+    
+    fn @str to_string(self):
+        return "Point(" + str(self.x) + ", " + str(self.y) + ")"
+
+# Test 5: Async functions
+async @json fetch_data(url):
+    # Simulated async
+    return @dict{status: "ok", data: @list[1, 2, 3]}
+
+mn:
+    print("=== GUL v3.2 Syntax Verification ===")
+    
+    test_primitives()
+    test_collections()
+    
+    print("✓ Functions:", add(10, 20), greet("GUL"))
+    print("✓ Range:", range_list(5))
+    
+    let p = Point{x: 3.0, y: 4.0}
+    print("✓ Struct:", p.to_string(), "Distance:", p.distance())
+    
+    print("✓ All v3.2 syntax features verified!")

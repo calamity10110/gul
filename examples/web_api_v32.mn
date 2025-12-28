@@ -1,0 +1,57 @@
+# GUL v3.2 Web API Example
+# Demonstrates HTTP API with @ prefix types
+
+@imp std.http
+@imp std.json
+
+struct User:
+    id: @int
+    name: @str
+    email: @str
+    
+    fn @dict to_dict(self):
+        return @dict{
+            id: self.id,
+            name: self.name,
+            email: self.email
+        }
+
+# Async API functions
+async @json fetch_users(url):
+    response = http.get(url)
+    return response.json()
+
+async @dict create_user(url, user_data):
+    response = http.post(url, user_data)
+    return response.json()
+
+async @bool delete_user(url, user_id):
+    response = http.delete(url + "/" + str(user_id))
+    return response.status == 200
+
+# Main API demonstration
+async main():
+    let api_url = @str("https://api.example.com/users")
+    
+    # Fetch all users
+    print("Fetching users...")
+    let users = await fetch_users(api_url)
+    print("Users:", users)
+    
+    # Create new user
+    let new_user = @dict{
+        name: "Alice",
+        email: "alice@example.com"
+    }
+    
+    print("Creating user...")
+    let created = await create_user(api_url, new_user)
+    print("Created:", created)
+    
+    # Delete user
+    let user_id = @int(123)
+    let deleted = await delete_user(api_url, user_id)
+    print("Deleted:", deleted)
+
+mn:
+    await main()

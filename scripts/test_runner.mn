@@ -1,222 +1,69 @@
-# GUL Test Runner
-# Main test orchestration in native GUL format
+# GUL v3.2 Test Runner
+# Automated testing with @ prefix types
 
-@imp std.testing
-@imp std.filesystem as fs
-@imp std.process
-
-# Test categories
-let TEST_CATEGORIES = [
-    "interop",
-    "packages",
-    "core",
-    "stdlib"
-]
-
-struct TestResult:
-    name: str
-    passed: bool
-    duration: float
-    error: str?
+@imp std.test
+@imp std.io
 
 struct TestSuite:
-    name: str
-    tests: vec[TestResult]
+    name: @str
+    tests: @list
+    passed: @int
+    failed: @int
     
-    fn total_tests(self): int:
-        return len(self.tests)
+    fn add_test(mut self, test_name, test_fn):
+        self.tests.append(@dict{name: test_name, fn: test_fn})
     
-    fn passed_tests(self): int:
-        return len([t for t in self.tests if t.passed])
-    
-    fn failed_tests(self): int:
-        return self.total_tests() - self.passed_tests()
-    
-    fn success_rate(self): float:
-        if self.total_tests() == 0:
-            return 100.0
-        return (self.passed_tests() / self.total_tests()) * 100.0
+    fn @dict run(mut self):
+        print("Running test suite:", self.name)
+        
+        for test in self.tests:
+            try:
+                test["fn"]()
+                self.passed = self.passed + 1
+                print("  ✓", test["name"])
+            catch e:
+                self.failed = self.failed + 1
+                print("  ✗", test["name"], "-", e)
+        
+        return @dict{
+            total: self.tests.length(),
+            passed: self.passed,
+            failed: self.failed
+        }
 
-fn run_test_file(file_path: str): TestSuite:
-    """Run a single GUL test file"""
+fn test_primitives():
+    assert(@int(42) == 42, "int test")
+    assert(@str("hello") == "hello", "str test")
+    assert(@bool(true) == true, "bool test")
+
+fn test_collections():
+    let list = @list[1, 2, 3]
+    assert(list.length() == 3, "list length")
     
-    print(f"Running {file_path}...")
+    let dict = @dict{key: "value"}
+    assert(dict["key"] == "value", "dict access")
+
+fn test_functions():
+    fn @int add(a, b): a + b
+    assert(add(2, 3) == 5, "function test")
+
+mn:
+    print("=== GUL v3.2 Test Runner ===")
     
-    start_time = time.now()
-    
-    # Execute test file using GUL compiler
-    result = process.run(["gul", "test", file_path])
-    
-    duration = time.now() - start_time
-    
-    suite = TestSuite {
-        name: fs.basename(file_path),
-        tests: parse_test_output(result.stdout)
+    var suite = TestSuite{
+        name: "Core Tests",
+        tests: @list[],
+        passed: 0,
+        failed: 0
     }
     
-    return suite
-
-fn parse_test_output(output: str): vec[TestResult]:
-    """Parse test output from GUL test runner"""
+    suite.add_test("Primitives", test_primitives)
+    suite.add_test("Collections", test_collections)
+    suite.add_test("Functions", test_functions)
     
-    results = vec[]
+    let results = suite.run()
     
-    # Parse test results from output
-    # Format: "✓ test_name (0.123s)" or "✗ test_name: error message"
-    for line in output.split("\n"):
-        if line.starts_with("✓ "):
-            parts = line[2:].split(" ")
-            results.push(TestResult {
-                name: parts[0],
-                passed: True,
-                duration: parse_duration(parts[1]) if len(parts) > 1 else 0.0,
-                error: None
-            })
-        elif line.starts_with("✗ "):
-            parts = line[2:].split(": ")
-            results.push(TestResult {
-                name: parts[0],
-                passed: False,
-                duration: 0.0,
-                error: Some(parts[1]) if len(parts) > 1 else Some("Unknown error")
-            })
-    
-    return results
-
-fn parse_duration(dur_str: str): float:
-    """Parse duration string like (0.123s)"""
-    cleaned = dur_str.replace("(", "").replace(")", "").replace("s", "")
-    return float(cleaned)
-
-fn discover_tests(category: str): vec[str]:
-    """Discover all test files in a category"""
-    
-    test_dir = f"tests/{category}"
-    
-    if not fs.exists(test_dir):
-        print(f"Warning: Test directory not found: {test_dir}")
-        return vec[]
-    
-    # Find all .mn files (v2.1 file type)
-    test_files = []
-    for file in fs.list_files(test_dir):
-        if file.ends_with(".mn"):
-            test_files.push(fs.join(test_dir, file))
-    
-    return test_files
-
-fn run_category_tests(category: str): vec[TestSuite]:
-    """Run all tests in a category"""
-    
-    print(f"\n{'='*60}")
-    print(f"Running {category} tests")
-    print(f"{'='*60}\n")
-    
-    test_files = discover_tests(category)
-    suites = vec[]
-    
-    for test_file in test_files:
-        suite = run_test_file(test_file)
-        suites.push(suite)
-        
-        # Print results
-        if suite.passed_tests() == suite.total_tests():
-            print(f"  ✓ {suite.name}: All {suite.total_tests()} tests passed")
-        else:
-            print(f"  ✗ {suite.name}: {suite.failed_tests()}/{suite.total_tests()} tests failed")
-    
-    return suites
-
-fn generate_report(all_suites: vec[TestSuite]):
-    """Generate comprehensive test report"""
-    
-    print(f"\n{'='*60}")
-    print("TEST SUMMARY")
-    print(f"{'='*60}\n")
-    
-    total_tests = 0
-    total_passed = 0
-    total_failed = 0
-    
-    for suite in all_suites:
-        total_tests += suite.total_tests()
-        total_passed += suite.passed_tests()
-        total_failed += suite.failed_tests()
-        
-        if suite.failed_tests() > 0:
-            print(f"\n{suite.name}:")
-            for test in suite.tests:
-                if not test.passed:
-                    print(f"  ✗ {test.name}")
-                    if test.error is not None:
-                        print(f"    Error: {test.error}")
-    
-    print(f"\n{'='*60}")
-    print(f"Total Tests: {total_tests}")
-    print(f"Passed: {total_passed} ({(total_passed/total_tests*100):.1f}%)")
-    print(f"Failed: {total_failed} ({(total_failed/total_tests*100):.1f}%)")
-    print(f"{'='*60}\n")
-    
-    # Write JSON report
-    report = {
-        "timestamp": datetime.now().to_string(),
-        "total_tests": total_tests,
-        "passed": total_passed,
-        "failed": total_failed,
-        "success_rate": (total_passed / total_tests * 100) if total_tests > 0 else 0,
-        "suites": [
-            {
-                "name": suite.name,
-                "total": suite.total_tests(),
-                "passed": suite.passed_tests(),
-                "failed": suite.failed_tests()
-            }
-            for suite in all_suites
-        ]
-    }
-    
-    fs.write_text("target/test_report.json", json.stringify(report, indent=2))
-    print("📊 Test report saved to target/test_report.json")
-
-fn run_parallel_tests(test_files: vec[str]): vec[TestSuite]:
-    """Run tests in parallel for faster execution"""
-    
-    import std.async
-    
-    # Create async tasks for each test file
-    tasks = []
-    for test_file in test_files:
-        task = async.spawn(|| run_test_file(test_file))
-        tasks.push(task)
-    
-    # Wait for all to complete
-    suites = []
-    for task in tasks:
-        suite = task.await()
-        suites.push(suite)
-    
-    return suites
-
-main:
-    print("🧪 GUL Test Runner - Native Format")
-    print(f"Starting test execution at {datetime.now()}\n")
-    
-    all_suites = vec[]
-    
-    # Run tests for each category
-    for category in TEST_CATEGORIES:
-        suites = run_category_tests(category)
-        all_suites.extend(suites)
-    
-    # Generate report
-    generate_report(all_suites)
-    
-    # Exit with appropriate code
-    total_failed = sum([suite.failed_tests() for suite in all_suites])
-    
-    if total_failed == 0:
-        print("✅ All tests passed!")
-        exit(0)
-    else:
-        print(f"❌ {total_failed} test(s) failed")
-        exit(1)
+    print("\nResults:")
+    print("  Total:", results["total"])
+    print("  Passed:", results["passed"])
+    print("  Failed:", results["failed"])

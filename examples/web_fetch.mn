@@ -1,16 +1,38 @@
-# GUL Web Fetch - v3.0
+# GUL v3.2 Web Fetch Example
+# HTTP requests with @ prefix types
 
-@imp std{http}
+@imp std.http
+@imp std.json
 
-async fetch_data(url):
-    res = await http.get(url)
-    return res.json()
+async @dict fetch_json(url):
+    let response = http.get(url)
+    return response.json()
 
-# v3.0: main block with mn:
-mn:
-    data = await fetch_data("https://api.example.com/users")
-    print("Fetched data:", data)
+async @str fetch_text(url):
+    let response = http.get(url)
+    return response.text()
+
+async @dict post_data(url, data):
+    let response = http.post(url, data)
+    return response.json()
+
+async main():
+    # GET request
+    let api_url = @str("https://jsonplaceholder.typicode.com/users")
+    print("Fetching users...")
     
-    # v3.0: Bracket equivalence for function calls
-    print["Using square brackets"]
-    print{"Using curly braces"}
+    let users = await fetch_json(api_url)
+    print("Users:", users)
+    
+    # POST request
+    let new_post = @dict{
+        title: "GUL v3.2",
+        body: "Testing HTTP with @ prefix",
+        userId: 1
+    }
+    
+    let created = await post_data("https://jsonplaceholder.typicode.com/posts", new_post)
+    print("Created:", created)
+
+mn:
+    await main()
