@@ -123,13 +123,6 @@ db.transaction(fn():
 )
 ```
 
-## 📚 See Also
-
-- [Web Development Guide](../guides/web-development.md)
-- [HTTP Module](http.md)
-
----
-
 **Last Updated**: 2025-12-28  
 **Version**: 1.0.0  
 **License**: MIT
