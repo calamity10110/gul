@@ -355,7 +355,7 @@ kubectl scale deployment gul-app --replicas=5 -n gul-production
 
 ### Chart Structure
 
-```
+```text
 gul-chart/
 ├── Chart.yaml
 ├── values.yaml
