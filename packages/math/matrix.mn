@@ -1,0 +1,18 @@
+# GUL Matrix
+# 2x2 Matrix Math
+# Status: ✅ Implemented (Pure GUL)
+
+struct Mat2:
+    a: @float
+    b: @float
+    c: @float
+    d: @float
+
+    fn det(self) -> @float:
+        return self.a * self.d - self.b * self.c
+
+    fn add(self, other: Mat2) -> Mat2:
+        return Mat2{
+            a: self.a + other.a, b: self.b + other.b,
+            c: self.c + other.c, d: self.d + other.d
+        }

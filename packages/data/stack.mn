@@ -1,0 +1,15 @@
+# GUL Stack
+# LIFO Stack
+# Status: ✅ Implemented (Pure GUL)
+
+struct Stack:
+    items: @list
+
+    fn push(self, val: @any):
+        self.items.append(val)
+
+    fn pop(self) -> @any:
+        return self.items.pop()
+
+    fn peek(self) -> @any:
+        return self.items[len(self.items)-1]

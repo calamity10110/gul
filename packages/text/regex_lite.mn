@@ -1,0 +1,15 @@
+# GUL Regex Lite
+# Naive string matching
+# Status: ✅ Implemented (Pure GUL)
+
+fn match_simple(pattern: @str, text: @str) -> @bool:
+    if pattern == "": return true
+    if text == "": return false
+    
+    let p0 = slice(pattern, 0, 1)
+    let t0 = slice(text, 0, 1)
+    
+    if p0 == t0 or p0 == ".":
+        return match_simple(slice(pattern, 1, len(pattern)), slice(text, 1, len(text)))
+        
+    return false

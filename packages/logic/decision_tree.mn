@@ -1,0 +1,25 @@
+# GUL Decision Tree
+# Simple decision tree logic
+# Status: ✅ Implemented (Pure GUL)
+
+struct Node:
+    question: @str
+    yes: Node
+    no: Node
+    result: @str
+    is_leaf: @bool
+
+    fn leaf(res: @str) -> Node:
+        return Node{result: res, is_leaf: true, question: "", yes: null, no: null}
+
+    fn decision(q: @str, y: Node, n: Node) -> Node:
+        return Node{question: q, yes: y, no: n, is_leaf: false, result: ""}
+
+    fn traverse(self, context: @dict) -> @str:
+        if self.is_leaf:
+            return self.result
+        
+        if context[self.question]:
+             return self.yes.traverse(context)
+        else:
+             return self.no.traverse(context)

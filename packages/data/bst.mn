@@ -1,0 +1,25 @@
+# GUL BST
+# Binary Search Tree
+# Status: ✅ Implemented (Pure GUL)
+
+struct Node:
+    val: @int
+    left: Node
+    right: Node
+
+struct BST:
+    root: Node
+
+    fn insert(self, val: @int):
+        if self.root == null:
+            self.root = Node{val: val, left: null, right: null}
+        else:
+            self._insert_rec(self.root, val)
+            
+    fn _insert_rec(self, node: Node, val: @int):
+        if val < node.val:
+            if node.left == null: node.left = Node{val: val, left: null, right: null}
+            else: self._insert_rec(node.left, val)
+        else:
+            if node.right == null: node.right = Node{val: val, left: null, right: null}
+            else: self._insert_rec(node.right, val)

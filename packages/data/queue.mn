@@ -1,0 +1,13 @@
+# GUL Queue
+# FIFO Queue
+# Status: ✅ Implemented (Pure GUL)
+
+struct Queue:
+    items: @list
+
+    fn enqueue(self, val: @any):
+        self.items.append(val)
+
+    fn dequeue(self) -> @any:
+        # Note: Inefficient O(N) in naive list impl
+        return self.items.remove(0)

@@ -1,0 +1,20 @@
+# GUL Linked List
+# Singly linked list (Node based)
+# Status: ✅ Implemented (Pure GUL)
+
+struct Node:
+    val: @any
+    next: Node
+
+struct LinkedList:
+    head: Node
+
+    fn push(self, val: @any):
+        let n = Node{val: val, next: self.head}
+        self.head = n
+        
+    fn pop(self) -> @any:
+        if self.head == null: return null
+        let v = self.head.val
+        self.head = self.head.next
+        return v

@@ -1,0 +1,13 @@
+# GUL Graph
+# Adjacency List Graph
+# Status: ✅ Implemented (Pure GUL)
+
+struct Graph:
+    adj: @dict
+
+    fn add_edge(self, u: @str, v: @str):
+        if !(u in self.adj): self.adj[u] = @list[]
+        self.adj[u].append(v)
+        
+    fn neighbors(self, u: @str) -> @list:
+        return self.adj[u]

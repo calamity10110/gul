@@ -1,0 +1,21 @@
+# GUL Finite State Machine
+# FSM Implementation
+# Status: ✅ Implemented (Pure GUL)
+
+struct State:
+    name: @str
+    transitions: @dict # event -> next_state_name
+
+struct FSM:
+    current: @str
+    states: @dict
+
+    fn add(self, state: State):
+        self.states[state.name] = state
+
+    fn transition(self, event: @str):
+        let s = self.states[self.current]
+        if event in s.transitions:
+            self.current = s.transitions[event]
+        else:
+            print("Invalid transition: " + event)

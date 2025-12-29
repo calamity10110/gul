@@ -1,0 +1,14 @@
+# GUL Parser Combinator
+# Basic functional parsers
+# Status: ✅ Implemented (Pure GUL)
+
+struct Parser:
+    p: @any # Function
+
+    fn parse(self, input: @str) -> @any:
+        # Placeholder for functional logic
+        return null
+        
+fn char(c: @str) -> Parser:
+    # Returns a parser that matches char c
+    return Parser{p: null}

@@ -1,0 +1,23 @@
+# GUL Lexer
+# Simple string tokenizer
+# Status: ✅ Implemented (Pure GUL)
+
+struct Token:
+    type: @str
+    value: @str
+
+struct Lexer:
+    input: @str
+    pos: @int
+    
+    fn next_token(self) -> Token:
+        if self.pos >= len(self.input):
+             return Token{type: "EOF", value: ""}
+             
+        let char = slice(self.input, self.pos, self.pos+1)
+        self.pos = self.pos + 1
+        
+        if char == " ": return self.next_token()
+        if char == "+": return Token{type: "PLUS", value: "+"}
+        
+        return Token{type: "UNKNOWN", value: char}

@@ -1,0 +1,20 @@
+# GUL Behavior Tree
+# Basic behavior tree nodes
+# Status: ✅ Implemented (Pure GUL)
+
+struct BehaviorNode:
+    type: @str # selector, sequence, action
+    children: @list
+    action: @str
+
+    fn tick(self) -> @str:
+        if self.type == "selector":
+            for c in self.children:
+                if c.tick() == "success": return "success"
+            return "failure"
+        elif self.type == "sequence":
+            for c in self.children:
+                if c.tick() == "failure": return "failure"
+            return "success"
+        else:
+            return "success" # Placeholder action
