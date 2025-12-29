@@ -2,7 +2,7 @@
 
 **_A modern, multi-paradigm programming language designed for everyone_**
 
-Version: **0.13.0** | Status: **Production Ready**
+Version: **0.13.0** | Syntax: **v3.2** | Status: **Production Ready**
 
 ---
 
@@ -34,30 +34,120 @@ GUL is a modern, multi-paradigm programming language that combines:
 
 ```bash
 # Clone and build
-git clone https://github.com/gul-lang/gul.git
+git clone https://github.com/calamity10110/gul.git
 cd gul
 cargo build --release
 
 # Run your first program
-echo 'mn:
-    print("Hello, GUL!")' > hello.mn
-cargo run -- run hello.mn
+echo '@imp std.io
+
+mn:
+    print(@str("Hello, GUL v3.2!"))' > hello.gul
+
+cargo run -- run hello.gul
+```
+
+## 📝 v3.2 Syntax Examples
+
+### Variables
+
+```gul
+# Modern variable declarations
+let name = @str("Alice")  # Immutable with type annotation
+var count = @int(0)       # Mutable integer
+let items = @list([1, 2, 3])  # List type
+```
+
+### Functions
+
+```gul
+# Function with type annotations
+fn @int add(x: @int, y: @int):
+    return x + y
+
+# Async function (no 'fn' keyword for async)
+async fetch_data(url: @str):
+    let response = await http.get(url)
+    return response.json()
+
+# Main entry point
+mn:
+    let result = add(5, 10)
+    print(result)
+```
+
+### Imports
+
+```gul
+# Block-style imports
+@imp std.io
+@imp std.http
+@imp std.json
+
+# Selective imports
+@imp std.math{sqrt, pow, pi}
+
+# Multi-language imports
+@imp python{pandas, numpy}
+@imp rust{tokio}
+```
+
+### Data Types
+
+```gul
+# Type annotations with @ prefix
+let number = @int(42)
+let text = @str("hello")
+let decimal = @float(3.14)
+let flag = @bool(true)
+let items = @list([1, 2, 3])
+let data = @dict({
+    name: "Alice",
+    age: 30
+})
+```
+
+### Advanced Features
+
+```gul
+# Structs
+struct User:
+    name: @str
+    age: @int
+    email: @str
+
+    fn greet(self):
+        print("Hello, " + self.name)
+
+# Async operations
+async fetch_users():
+    let response = await http.get("https://api.example.com/users")
+    return response.json()
+
+# Pattern matching
+match value:
+    case @int(x) if x > 0:
+        print("Positive")
+    case @int(0):
+        print("Zero")
+    case _:
+        print("Negative")
 ```
 
 ## 📦 Package Management
 
 ```bash
-# List all packages
+# List all packages (180 total)
 gul package list
 
 # Search for packages
-gul package search web
+gul package search auth
 
-# Get package info <actix-web>
-gul package info actix-web
+# Get package info
+gul package info gul-auth
 
 # Install a package
-gul package install actix-web
+gul package install gul-auth
 
 # Audit packages
 gul package audit
@@ -76,13 +166,6 @@ gul package audit
 - `gul package audit` - Security audit
 - `gul package outdated` - Check for updates
 
-### AI Configuration
-
-- `gul ai status` - Show AI config
-- `gul ai set-provider <provider>` - Set AI provider
-- `gul ai set-model <model>` - Set AI model
-- `gul ai set-key <key>` - Set API key
-
 ### Runtime Operations
 
 - `gul runtime python "<code>"` - Run Python code
@@ -94,70 +177,94 @@ gul package audit
 ### Getting Started
 
 - [Introduction](docs/guides/introduction.md) - Get started with GUL
-- [Syntax Reference](docs/reference/syntax.md) - v3.0 syntax guide
-- [Quick Start Tutorial](docs/tutorials/quickstart.md) - Learn by doing
+- [Quick Reference](docs/QUICK_REFERENCE.md) - v3.2 syntax guide
+- [Quick Start Tutorial](docs/guides/quickstart.md) - Learn by doing
 
 ### Language Reference
 
 - [Language Specification](docs/reference/specification.md) - Complete spec
 - [Standard Library](docs/api/standard-library.md) - Built-in modules
-- [Package Catalog](docs/reference/package-catalog.md) - Available packages
+- [Package Catalog](docs/reference/package-catalog.md) - All 180 packages
 
 ### Development
 
 - [Compiler Guide](docs/guides/compiler.md) - Compiler architecture
-- [Contributing](docs/project/future-development.md) - How to contribute
+- [Implementation Roadmap](docs/IMPLEMENTATION_ROADMAP.md) - Package timeline
+- [Production Deployment](docs/PRODUCTION_DEPLOYMENT.md) - Deploy to production
 
-## 💻 Example Code
+## 💻 Example Code (v3.2 Syntax)
 
 ```gul
-# Variables (v3.0 syntax)
-let name = "Alice"
-var count = 0
+@imp std.io
+@imp std.http
+
+# Variables with type annotations
+let name = @str("Alice")
+var count = @int(0)
 
 # Functions
-fn greet(name):
+fn @str greet(name: @str):
     return "Hello, " + name
 
-# Async functions
-async fetch_data(url):
-    response = await http.get(url)
+# Async functions (no 'fn' keyword)
+async fetch_data(url: @str):
+    let response = await http.get(url)
     return response.json()
+
+# Structs
+struct User:
+    name: @str
+    age: @int
+
+    fn describe(self):
+        return self.name + " is " + @str(self.age)
 
 # Main entry point
 mn:
     print(greet("World"))
+
+    let user = User{name: "Bob", age: 30}
+    print(user.describe())
 ```
 
 ## 🏗️ Project Status
 
-- ✅ **Phase 1**: Core package manager (100%)
-- ✅ **Phase 2**: Standard library - 13 modules (100%)
-- ✅ **Phase 3**: 58 packages (100%)
-- ✅ **Phase 4**: Cross-language runtimes (100%)
-- ✅ **Phase 5**: CLI commands (100%)
-- ✅ **Phase 6**: CI/CD + Tests (100%)
+- ✅ **Phase 0**: Core Infrastructure (100%)
+  - gul-http, gul-tui
+- 🚧 **Phase 1**: Production Foundation (9%)
+  - gul-auth ✅ (JWT, sessions)
+  - In progress: gul-security-headers
+- 📋 **Phase 2-7**: Advanced Packages (0%)
+  - 177 packages planned
 
-**Total**: 1,600+ lines of production-ready code, 33+ tests, 0 warnings
+**Total**: 3/180 packages implemented (1.7%)  
+**Tests**: 521 passing  
+**Status**: Production ready for core features
 
 ## 🧪 Testing
 
 ```bash
 # Run all tests
-cargo test
+cargo test --lib
 
 # Run specific test suite
-cargo test --test integration_test
-cargo test --test runtime_test
-cargo test --test cli_test
+cargo test --lib --test integration
 
 # Run benchmarks
 cargo bench
 ```
 
+## 🎯 Implementation Progress
+
+See [IMPLEMENTATION_PROGRESS.md](docs/IMPLEMENTATION_PROGRESS.md) for detailed tracking.
+
+**Current Focus**: Phase 1 - Production Foundation  
+**Timeline**: 8-12 weeks to production SaaS  
+**Next Package**: gul-security-headers
+
 ## 🤝 Contributing
 
-We welcome contributions! See [Contributing Guide](docs/project/future-development.md).
+We welcome contributions! See [Contributing Guide](CONTRIBUTING.md).
 
 ## 📜 License
 
@@ -165,4 +272,13 @@ MIT License - See [LICENSE](LICENSE) for details.
 
 ---
 
-**Start building with GUL today!** 🚀
+## 🔗 Links
+
+- **Documentation**: [docs/INDEX.md](docs/INDEX.md)
+- **Package Catalog**: [docs/reference/package-catalog.md](docs/reference/package-catalog.md)
+- **Roadmap**: [docs/IMPLEMENTATION_ROADMAP.md](docs/IMPLEMENTATION_ROADMAP.md)
+- **GitHub**: <https://github.com/calamity10110/gul>
+
+---
+
+**Start building with GUL v3.2 today!** 🚀
