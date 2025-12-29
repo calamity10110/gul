@@ -208,7 +208,7 @@ fn @str greet(name: @str):
 
 # Async functions (no 'fn' keyword)
 async fetch_data(url: @str):
-    let response = await http.get(url)
+    var response = await http.get(url)
     return response.json()
 
 # Structs
