@@ -1,0 +1,8 @@
+[package]
+name = "gul-archive"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+zip = "0.6"
+tar = "0.4"

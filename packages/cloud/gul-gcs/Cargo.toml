@@ -1,0 +1,9 @@
+[package]
+name = "gul-gcs"
+version = "0.1.0"
+edition = "2021"
+description = "GCS Client for GUL"
+
+[dependencies]
+reqwest = "0.11"
+tokio = "1.0"

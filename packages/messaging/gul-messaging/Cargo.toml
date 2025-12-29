@@ -1,0 +1,8 @@
+[package]
+name = "gul-messaging"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+lapin = "2.1"    # RabbitMQ
+rdkafka = "0.29" # Kafka

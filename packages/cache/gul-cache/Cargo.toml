@@ -1,0 +1,7 @@
+[package]
+name = "gul-cache"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+fred = "6.0" # Redis client

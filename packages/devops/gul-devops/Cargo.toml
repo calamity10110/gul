@@ -1,0 +1,9 @@
+[package]
+name = "gul-devops"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bollard = "0.13"       # Docker
+kube = "0.82"          # K8s
+opentelemetry = "0.18"

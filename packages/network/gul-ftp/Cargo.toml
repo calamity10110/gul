@@ -1,0 +1,7 @@
+[package]
+name = "gul-ftp"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+suppaftp = "4.5"

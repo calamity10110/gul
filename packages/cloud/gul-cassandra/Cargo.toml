@@ -1,0 +1,8 @@
+[package]
+name = "gul-cassandra"
+version = "0.1.0"
+edition = "2021"
+description = "Cassandra Client for GUL"
+
+[dependencies]
+tokio = "1.0"
