@@ -124,6 +124,14 @@ enum Commands {
     /// Run MCP server
     #[cfg(feature = "mcp")]
     Mcp,
+
+    /// Launch TUI IDE
+    #[cfg(feature = "tui")]
+    Tui,
+
+    /// Launch Web IDE
+    #[cfg(feature = "web-tui")]
+    Webui,
 }
 
 #[derive(Subcommand)]
@@ -575,6 +583,24 @@ fn main() {
         Commands::Mcp => {
             if let Err(e) = gul_lang::mcp::cli::execute_cli() {
                 eprintln!("MCP Error: {}", e);
+            }
+        }
+
+        #[cfg(feature = "tui")]
+        Commands::Tui => {
+            println!("Launching TUI IDE (Ratatui)...");
+            let mut app = gul_lang::tui::GulTuiApp::new();
+            if let Err(e) = app.run() {
+                eprintln!("TUI IDE error: {}", e);
+            }
+        }
+
+        #[cfg(feature = "web-tui")]
+        Commands::Webui => {
+            println!("Launching Web IDE...");
+            let mut ide = tools::web_ide::GulWebIde::new();
+            if let Err(e) = ide.run_project() {
+                eprintln!("Web IDE error: {}", e);
             }
         }
     }
