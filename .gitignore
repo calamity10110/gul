@@ -4,8 +4,15 @@
 **/*.rs.bk
 *.pdb
 
-# Packages directory (contains build artifacts)
-/packages/
+# Package build artifacts (but allow source code in packages/)
+/packages/*/target/
+/packages/**/target/
+/packages/**/*.so
+/packages/**/*.dylib
+/packages/**/*.dll
+/packages/**/__pycache__/
+/packages/**/*.pyc
+/packages/**/node_modules/
 
 # Cargo lock file (uncomment if building a library)
 # Cargo.lock
