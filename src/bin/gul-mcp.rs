@@ -1,28 +1,24 @@
 // GUL MCP Server Binary
-// AI-powered Model Context Protocol server
+// Runs the GUL MCP server
 
-use gul_lang::mcp::server::MCPServer;
-use gul_lang::mcp::cli::parse_args;
+use gul_lang::mcp::server::GulMcpServer;
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let args = parse_args();
+fn main() {
+    println!("GUL MCP Server v0.13.0");
+    println!("======================\n");
     
-    let server = MCPServer::new("gul-mcp", "0.13.0");
+    let server = GulMcpServer::new();
     
-    match args.command.as_str() {
-        "start" => {
-            let port = args.port.unwrap_or(3000);
-            println!("🚀 Starting GUL MCP Server on port {}", port);
-            server.start(port).await?;
-        }
-        "status" => {
-            println!("✓ GUL MCP Server is configured and ready");
-        }
-        _ => {
-            println!("Unknown command. Use 'start' or 'status'");
-        }
+    println!("Registered {} tools:", server.list_tools().len());
+    for tool in server.list_tools() {
+        println!("  - {}: {}", tool.name, tool.description);
     }
     
-    Ok(())
+    println!("\nRegistered {} resources:", server.list_resources().len());
+    for resource in server.list_resources() {
+        println!("  - {}: {}", resource.name, resource.description);
+    }
+    
+    println!("\nServer ready. Use the MCP protocol to interact.");
+    println!("Example tools: gul_generate_code, gul_create_package, gul_run_code");
 }
