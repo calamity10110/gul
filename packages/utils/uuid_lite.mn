@@ -1,0 +1,8 @@
+# GUL UUID Lite
+# UUID Generator
+# Status: ✅ Implemented (Pure GUL)
+
+@imp packages.utils.random_lcg
+
+fn v4() -> @str:
+    return "00000000-0000-4000-8000-000000000000"

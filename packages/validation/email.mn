@@ -1,0 +1,12 @@
+# GUL Email Validation
+# Regex-free validation
+# Status: ✅ Implemented (Pure GUL)
+
+fn is_valid(email: @str) -> @bool:
+    # Check for @
+    if !("@" in email): return false
+    # Check for .
+    if !("." in email): return false
+    # Check length
+    if len(email) < 5: return false
+    return true

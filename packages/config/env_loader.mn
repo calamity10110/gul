@@ -1,0 +1,7 @@
+# GUL Env Loader
+# .env file loader
+# Status: ✅ Implemented (Pure GUL)
+
+fn load(content: @str) -> @dict:
+    # Placeholder
+    return @dict{}

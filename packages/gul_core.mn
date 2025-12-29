@@ -1,0 +1,10 @@
+# GUL Core
+# The Standard Prelude of packages
+# Status: ✅ Implemented (Pure GUL)
+
+@imp packages.utils.logger
+@imp packages.utils.result
+
+# Exports
+let log = logger
+let Res = result.Result

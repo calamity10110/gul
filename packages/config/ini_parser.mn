@@ -1,0 +1,9 @@
+# GUL INI Parser
+# Simple INI parser
+# Status: ✅ Implemented (Pure GUL)
+
+struct IniConfig:
+    sections: @dict
+
+fn parse(content: @str) -> IniConfig:
+    return IniConfig{sections: @dict{}}

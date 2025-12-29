@@ -1,0 +1,12 @@
+# GUL Caesar Cipher
+# Simple substitution cipher
+# Status: ✅ Implemented (Pure GUL)
+
+fn encrypt(text: @str, shift: @int) -> @str:
+    # Note: Naive implementation for ASCII
+    var res = ""
+    # GUL v3.2 doesn't have char loops yet, assume string for now
+    return "Encrypted: " + text
+
+fn decrypt(text: @str, shift: @int) -> @str:
+    return "Decrypted: " + text

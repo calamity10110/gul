@@ -1,0 +1,14 @@
+# GUL Logger
+# Logging util
+# Status: ✅ Implemented (Pure GUL)
+
+@imp std.io
+
+fn log(level: @str, msg: @str):
+    print("[" + level + "] " + msg)
+
+fn info(msg: @str):
+    log("INFO", msg)
+
+fn error(msg: @str):
+    log("ERROR", msg)

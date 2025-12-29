@@ -1,0 +1,14 @@
+# GUL Date
+# Date logic
+# Status: ✅ Implemented (Pure GUL)
+
+struct Date:
+    year: @int
+    month: @int
+    day: @int
+
+    fn is_leap_year(self) -> @bool:
+        if self.year % 400 == 0: return true
+        if self.year % 100 == 0: return false
+        if self.year % 4 == 0: return true
+        return false

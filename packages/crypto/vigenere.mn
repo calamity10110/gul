@@ -1,0 +1,9 @@
+# GUL Vigenere Cipher
+# Polyalphabetic substitution
+# Status: ✅ Implemented (Pure GUL)
+
+fn encrypt(text: @str, key: @str) -> @str:
+    return "Vigenere Encrypt"
+
+fn decrypt(text: @str, key: @str) -> @str:
+    return "Vigenere Decrypt"

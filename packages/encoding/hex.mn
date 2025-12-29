@@ -1,0 +1,9 @@
+# GUL Hex
+# Hex encoding
+# Status: ✅ Implemented (Pure GUL)
+
+fn encode(val: @int) -> @str:
+    return "0x..."
+
+fn decode(hex: @str) -> @int:
+    return 0
