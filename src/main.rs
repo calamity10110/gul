@@ -120,6 +120,10 @@ enum Commands {
 
     /// Run benchmarks
     Bench,
+
+    /// Run MCP server
+    #[cfg(feature = "mcp")]
+    Mcp,
 }
 
 #[derive(Subcommand)]
@@ -565,6 +569,13 @@ fn main() {
                 "Benchmark: {}, Duration: {:?}, Memory: {} bytes",
                 result.name, result.duration, result.memory_usage
             );
+        }
+
+        #[cfg(feature = "mcp")]
+        Commands::Mcp => {
+            if let Err(e) = gul_lang::mcp::cli::execute_cli() {
+                eprintln!("MCP Error: {}", e);
+            }
         }
     }
 }
