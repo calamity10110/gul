@@ -47,7 +47,7 @@ fn bench_parser_simple(c: &mut Criterion) {
         b.iter(|| {
             let source = black_box("let x = 42\nlet y = x + 10\nprint(y)");
             let mut lexer = Lexer::new(source);
-            let tokens = lexer.tokenize().unwrap();
+            let tokens = lexer.tokenize();
             let mut parser = Parser::new(tokens);
             parser.parse()
         })
@@ -74,7 +74,7 @@ fn bench_parser_complex(c: &mut Criterion) {
                 "#,
             );
             let mut lexer = Lexer::new(source);
-            let tokens = lexer.tokenize().unwrap();
+            let tokens = lexer.tokenize();
             let mut parser = Parser::new(tokens);
             parser.parse()
         })
@@ -96,7 +96,7 @@ fn bench_full_pipeline(c: &mut Criterion) {
                 "#,
             );
             let mut lexer = Lexer::new(source);
-            let tokens = lexer.tokenize().unwrap();
+            let tokens = lexer.tokenize();
             let mut parser = Parser::new(tokens);
             parser.parse()
         })
