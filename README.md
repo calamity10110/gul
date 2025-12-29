@@ -166,6 +166,14 @@ gul package audit
 - `gul package audit` - Security audit
 - `gul package outdated` - Check for updates
 
+### IDE & Tools
+
+- `gul tui` - Launch Terminal UI IDE
+- `gul webui` - Launch Web IDE
+- `gul mcp` - Run MCP server commands
+- `gul mcp serve` - Start MCP server
+- `gul mcp tui` - MCP Dashboard
+
 ### Runtime Operations
 
 - `gul runtime python "<code>"` - Run Python code
