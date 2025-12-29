@@ -146,7 +146,7 @@ Complete documentation for the GUL programming language with MCP integration.
 
 ## 📂 Directory Structure
 
-```
+```text
 docs/
 ├── README.md                  # This file
 ├── QUICK_REFERENCE.md         # Syntax cheat sheet
@@ -267,9 +267,9 @@ gul-mcp workflow run ci_workflow
 
 ## 📱 Contact & Community
 
-- **GitHub**: https://github.com/calamity10110/gul
-- **Issues**: https://github.com/calamity10110/gul/issues
-- **Discussions**: https://github.com/calamity10110/gul/discussions
+- **GitHub**: <https://github.com/calamity10110/gul>
+- **Issues**: <https://github.com/calamity10110/gul/issues>
+- **Discussions**: <https://github.com/calamity10110/gul/discussions>
 
 ---
 

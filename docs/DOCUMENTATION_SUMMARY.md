@@ -271,9 +271,9 @@ Quick reference to all GUL documentation.
 
 ## 🔗 External Resources
 
-- **GitHub**: https://github.com/calamity10110/gul
-- **Issues**: https://github.com/calamity10110/gul/issues
-- **Discussions**: https://github.com/calamity10110/gul/discussions
+- **GitHub**: <https://github.com/calamity10110/gul>
+- **Issues**: <https://github.com/calamity10110/gul/issues>
+- **Discussions**: <https://github.com/calamity10110/gul/discussions>
 
 ---
 
