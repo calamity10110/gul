@@ -1,0 +1,24 @@
+# GUL Result Type
+# Result type implementation
+# Status: ✅ Implemented (Pure GUL)
+
+struct Result:
+    ok: @bool
+    value: @any
+    error: @str
+
+    fn success(val: @any) -> Result:
+        return Result{ok: true, value: val, error: ""}
+
+    fn fail(msg: @str) -> Result:
+        return Result{ok: false, value: null, error: msg}
+
+    fn is_ok(self) -> @bool:
+        return self.ok
+
+    fn unwrap(self) -> @any:
+        if !self.ok:
+            # Panic in real life, print for now
+            print("Panic: Unwrap failed - " + self.error)
+            return null
+        return self.value

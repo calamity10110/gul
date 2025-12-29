@@ -1,0 +1,17 @@
+# GUL String Utils
+# String manipulation helper
+# Status: ✅ Implemented (Pure GUL)
+
+fn is_empty(s: @str) -> @bool:
+    return len(s) == 0
+
+fn pad_left(s: @str, width: @int, char: @str) -> @str:
+    var res = s
+    while len(res) < width:
+        res = char + res
+    return res
+
+fn truncate(s: @str, length: @int) -> @str:
+    if len(s) <= length:
+        return s
+    return slice(s, 0, length) + "..."

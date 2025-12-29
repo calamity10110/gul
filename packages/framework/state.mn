@@ -1,0 +1,18 @@
+# GUL State Manager
+# Simple key-value state store
+# Status: ✅ Implemented (Pure GUL)
+
+struct State:
+    store: @dict
+
+    fn get(self, key: @str) -> @any:
+        return self.store[key]
+
+    fn set(self, key: @str, value: @any):
+        self.store[key] = value
+
+    fn has(self, key: @str) -> @bool:
+        return key in self.store
+
+    fn clear(self):
+        self.store = @dict{}

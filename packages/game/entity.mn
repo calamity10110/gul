@@ -1,0 +1,19 @@
+# GUL Game Entity
+# Basic game entity structure
+# Status: ✅ Implemented (Pure GUL)
+
+struct Vector2:
+    x: @float
+    y: @float
+
+struct Entity:
+    id: @int
+    pos: Vector2
+    active: @bool
+
+    fn move(self, dx: @float, dy: @float):
+        self.pos.x = self.pos.x + dx
+        self.pos.y = self.pos.y + dy
+
+    fn destroy(self):
+        self.active = false

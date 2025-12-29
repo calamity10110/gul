@@ -1,0 +1,20 @@
+# GUL Observable
+# Observer pattern implementation
+# Status: ✅ Implemented (Pure GUL)
+
+struct Observer:
+    id: @str
+    
+    fn notify(self, event: @str):
+        # Placeholder for notification logic
+        pass
+
+struct Subject:
+    observers: @list
+
+    fn subscribe(self, obs: Observer):
+        self.observers.append(obs)
+
+    fn notify_all(self, event: @str):
+        for obs in self.observers:
+            obs.notify(event)

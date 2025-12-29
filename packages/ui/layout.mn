@@ -1,0 +1,18 @@
+# GUL UI Layout
+# Basic layout calculation
+# Status: ✅ Implemented (Pure GUL)
+
+struct Rect:
+    x: @float
+    y: @float
+    w: @float
+    h: @float
+
+struct Layout:
+    bounds: Rect
+    padding: @float
+
+    fn center(self, child_w: @float, child_h: @float) -> Rect:
+        let cx = self.bounds.x + (self.bounds.w - child_w) / 2.0
+        let cy = self.bounds.y + (self.bounds.h - child_h) / 2.0
+        return Rect{x: cx, y: cy, w: child_w, h: child_h}

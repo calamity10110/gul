@@ -1,0 +1,26 @@
+# GUL UI Theme
+# Design token definitions
+# Status: ✅ Implemented (Pure GUL)
+
+struct Colors:
+    primary: @str
+    secondary: @str
+    bg: @str
+    text: @str
+
+struct Theme:
+    name: @str
+    colors: Colors
+    spacing: @int
+
+    fn dark() -> Theme:
+        return Theme{
+            name: "dark",
+            colors: Colors{
+                primary: "#007AFF",
+                secondary: "#5856D6",
+                bg: "#000000",
+                text: "#FFFFFF"
+            },
+            spacing: 8
+        }

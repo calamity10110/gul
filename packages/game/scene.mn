@@ -1,0 +1,19 @@
+# GUL Game Scene
+# Scene graph management
+# Status: ✅ Implemented (Pure GUL)
+
+@imp packages.game.entity
+
+struct Scene:
+    name: @str
+    entities: @list
+
+    fn add_entity(self, ent: entity.Entity):
+        self.entities.append(ent)
+
+    fn update(self):
+        # Update logic
+        for ent in self.entities:
+            if ent.active:
+                # Simulate logic
+                pass

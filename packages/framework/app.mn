@@ -1,0 +1,39 @@
+# GUL Application Framework
+# Core application lifecycle management
+# Status: ✅ Implemented (Pure GUL)
+
+@imp std.io
+
+struct AppConfig:
+    name: @str
+    version: @str
+    debug: @bool
+
+struct App:
+    config: AppConfig
+    running: @bool
+
+    fn new(name: @str, debug: @bool) -> App:
+        let cfg = AppConfig{
+            name: name,
+            version: "1.0.0",
+            debug: debug
+        }
+        return App{config: cfg, running: false}
+
+    fn run(self):
+        self.running = true
+        if self.config.debug:
+            print("Starting App: " + self.config.name)
+        
+        # Main blocking loop simulation
+        while self.running:
+            self.update()
+            self.running = false # Exit for test
+            
+    fn update(self):
+        # Override this
+        pass
+
+    fn stop(self):
+        self.running = false

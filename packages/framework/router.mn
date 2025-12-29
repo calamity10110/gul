@@ -1,0 +1,19 @@
+# GUL Router
+# Simple pattern matching router
+# Status: ✅ Implemented (Pure GUL)
+
+struct Route:
+    path: @str
+    handler: @str  # Function name reference
+
+struct Router:
+    routes: @list
+
+    fn add(self, path: @str, handler: @str):
+        self.routes.append(Route{path: path, handler: handler})
+
+    fn resolve(self, path: @str) -> @str:
+        for route in self.routes:
+            if route.path == path:
+                return route.handler
+        return "404_handler"
