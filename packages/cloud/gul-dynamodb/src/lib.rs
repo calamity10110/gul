@@ -1,23 +1,23 @@
-use std::collections::HashMap;
+use serde_json::Value;
 
-pub struct DynamoDB {
+pub struct DynamoClient {
     region: String,
 }
 
-impl DynamoDB {
+impl DynamoClient {
     pub fn new(region: &str) -> Self {
         Self {
             region: region.to_string(),
         }
     }
 
-    pub async fn get_item(&self, table: &str, key: HashMap<String, String>) -> Result<Option<String>, String> {
-        // Mock Implementation
-        Ok(None)
+    pub fn put_item(&self, table: &str, item: &Value) -> Result<(), String> {
+        println!("MOCK: Put item into table '{}': {:?}", table, item);
+        Ok(())
     }
 
-    pub async fn put_item(&self, table: &str, item: HashMap<String, String>) -> Result<(), String> {
-        // Mock Implementation
-        Ok(())
+    pub fn get_item(&self, table: &str, key: &str) -> Result<Value, String> {
+        println!("MOCK: Get item from table '{}' with key '{}'", table, key);
+        Ok(serde_json::json!({ "id": key, "value": "mock_data" }))
     }
 }

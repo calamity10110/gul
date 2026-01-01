@@ -1,8 +1,10 @@
-// Example usage of gul-postgres
+use gul_postgres::Connection;
 
-fn main() {
-    println!("gul-postgres - Basic Example");
-    
-    // TODO: Add actual usage example
-    println!("Package is ready to use!");
+#[tokio::main]
+async fn main() {
+    let mut conn = Connection::new("mydb", "myuser");
+
+    // Default is MOCK mode, so this won't actually fail network
+    conn.connect().await.unwrap();
+    println!("Connected (Mock): {}", true);
 }

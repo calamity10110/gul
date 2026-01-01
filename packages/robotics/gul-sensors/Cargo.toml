@@ -2,12 +2,12 @@
 name = "gul-sensors"
 version = "0.1.0"
 edition = "2021"
-authors = ["GUL Team <team@gul-lang.org>"]
-description = "Sensor libraries"
-license = "MIT"
-repository = "https://github.com/gul-lang/packages"
-keywords = ["sensors", "hardware"]
+
+[features]
+default = ["stub"]
+stub = []
+real = []          # Placeholder for sensor crates (mpu6050, etc)
 
 [dependencies]
-
-[dev-dependencies]
+log = "0.4"
+serde = { version = "1.0", features = ["derive"] }

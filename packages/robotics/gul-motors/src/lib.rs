@@ -1,15 +1,25 @@
-// gul-motors - Motor control
+use gul_gpio::PinDriver;
 
-pub struct Motors {
-    // Implementation
+pub struct Motor {
+    pin_a: PinDriver,
+    pin_b: PinDriver,
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+impl Motor {
+    pub fn new(pin_a_num: i32, pin_b_num: i32) -> Self {
+        Self {
+            pin_a: PinDriver::new_output(pin_a_num),
+            pin_b: PinDriver::new_output(pin_b_num),
+        }
+    }
 
-    #[test]
-    fn test_basic() {
-        assert_eq!(2 + 2, 4);
+    pub fn forward(&mut self) {
+        self.pin_a.high();
+        self.pin_b.low();
+    }
+
+    pub fn stop(&mut self) {
+        self.pin_a.low();
+        self.pin_b.low();
     }
 }

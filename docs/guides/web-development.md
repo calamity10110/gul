@@ -4,7 +4,7 @@
 
 ---
 
-# Web Development with GUL
+## Web Development with GUL
 
 This guide covers building modern web applications with GUL, including HTTP servers, routing, middleware, templates, and full-stack development patterns.
 

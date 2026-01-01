@@ -1,0 +1,7 @@
+@imp std.io
+
+# Generated from: Create web API
+
+mn:
+    print("Generated code placeholder")
+    # TODO: Implement actual generation logic

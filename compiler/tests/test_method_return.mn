@@ -1,0 +1,22 @@
+# Test struct field access from method return
+struct Token:
+    type: @str
+    value: @str
+
+struct Parser:
+    position: @int
+    
+    fn current(self) -> Token:
+        return Token{type: "Fn", value: "fn"}
+
+fn test_method_return_access(p: Parser):
+    let tok = p.current()
+    print("Inside function after method call:")
+    print(tok.type)
+    print(tok.value)
+
+let parser = Parser{position: 0}
+test_method_return_access(parser)
+
+mn:
+    print("Done!")

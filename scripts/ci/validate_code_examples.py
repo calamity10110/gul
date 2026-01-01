@@ -64,7 +64,7 @@ class DocExampleValidator:
         
         return code_blocks
     
-    def_validate_gul_code(self, md_file: Path, code: str, line_num: int):
+    def _validate_gul_code(self, md_file: Path, code: str, line_num: int):
         """Validate GUL code example"""
         # Create temporary file
         with tempfile.NamedTemporaryFile(mode='w', suffix='.gul', delete=False) as f:

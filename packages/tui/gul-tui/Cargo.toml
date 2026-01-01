@@ -2,13 +2,7 @@
 name = "gul-tui"
 version = "0.1.0"
 edition = "2021"
-authors = ["GUL Team <team@gul-lang.org>"]
-description = "Terminal User Interface framework for GUL"
-license = "MIT"
-repository = "https://github.com/gul-lang/packages"
-keywords = ["tui", "terminal", "ui", "gul"]
-categories = ["command-line-interface"]
 
 [dependencies]
-
-[dev-dependencies]
+ratatui = "0.26"
+crossterm = "0.27"

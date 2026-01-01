@@ -1,0 +1,408 @@
+# GUL v3.2 Compiler - Semantic Analyzer
+# Type checking, scope management, and semantic validation
+
+@imp std.collections
+@imp compiler.ast.nodes
+@imp compiler.lexer.token
+
+# Symbol table for scope management
+struct Symbol:
+    name: @str
+    type: @str
+    is_mutable: @bool
+    is_function: @bool
+    line: @int
+    column: @int
+
+struct Scope:
+    symbols: @dict  # name -> Symbol
+    parent: Scope  # Can be None
+    
+fn create_scope() -> Scope:
+    return Scope{symbols: @dict{}, parent: None}
+
+fn create_child_scope(parent: Scope) -> Scope:
+    return Scope{symbols: @dict{}, parent: parent}
+impl Scope:
+    fn define(ref self, name: @str, symbol: Symbol):
+        """Define a symbol in this scope"""
+        self.symbols[name] = symbol
+    
+    fn resolve(self, name: @str) -> Symbol:
+        """Resolve a symbol, checking parent scopes"""
+        if name in self.symbols:
+            return self.symbols[name]
+        
+        if self.parent:
+            return self.parent.resolve(name)
+        
+        return None  # Not found
+    
+    fn exists_in_current(self, name: @str) -> @bool:
+        """Check if symbol exists in current scope only"""
+        return name in self.symbols
+
+# Semantic analyzer
+struct SemanticAnalyzer:
+    current_scope: Scope
+    errors: @list[@str]
+    warnings: @list[@str]
+    
+fn create_analyzer() -> SemanticAnalyzer:
+    return SemanticAnalyzer{current_scope: create_scope(), errors: @list[], warnings: @list[]}
+
+impl SemanticAnalyzer:
+    fn analyze_program(ref self, program: Program):
+        """Analyze entire program"""
+        # Analyze imports first
+        for import_stmt in program.imports:
+            self.analyze_import(import_stmt)
+        
+        # Analyze statements
+        for stmt in program.statements:
+            self.analyze_statement(stmt)
+        
+        # Analyze main entry point
+        for stmt in program.main_entry:
+            self.analyze_statement(stmt)
+    
+    fn enter_scope(ref self):
+        """Enter a new scope"""
+        self.current_scope = create_child_scope(self.current_scope)
+    
+    fn exit_scope(ref self):
+        """Exit current scope"""
+        if self.current_scope.parent:
+            self.current_scope = self.current_scope.parent
+    
+    fn error(ref self, message: @str, line: @int, column: @int):
+        """Record a semantic error"""
+        let error_msg = "Semantic error at " + str(line) + ":" + str(column) + ": " + message
+        self.errors.add(error_msg)
+        print(error_msg)
+    
+    fn warn(ref self, message: @str, line: @int, column: @int):
+        """Record a warning"""
+        let warn_msg = "Warning at " + str(line) + ":" + str(column) + ": " + message
+        self.warnings.add(warn_msg)
+    
+    # ========================================
+    # STATEMENT ANALYSIS
+    # ========================================
+    
+    fn analyze_statement(ref self, stmt: Statement):
+        """Analyze a statement"""
+        let st = stmt.stmt_type
+        if st == StmtType.LetDecl: self.analyze_let_stmt(@cast(LetStmt, stmt))
+        elif st == StmtType.VarDecl: self.analyze_var_stmt(@cast(VarStmt, stmt))
+        elif st == StmtType.FunctionDecl: self.analyze_function_decl(@cast(FunctionDecl, stmt))
+        elif st == StmtType.IfStmt: self.analyze_if_stmt(@cast(IfStmt, stmt))
+        elif st == StmtType.WhileStmt: self.analyze_while_stmt(@cast(WhileStmt, stmt))
+        elif st == StmtType.ForStmt: self.analyze_for_stmt(@cast(ForStmt, stmt))
+        elif st == StmtType.ReturnStmt: self.analyze_return_stmt(@cast(ReturnStmt, stmt))
+        elif st == StmtType.AssignmentStmt: self.analyze_assignment(@cast(AssignmentStmt, stmt))
+        elif st == StmtType.ExpressionStmt: self.analyze_expression_stmt(@cast(ExpressionStmt, stmt))
+        elif st == StmtType.ImportStmt: self.analyze_import(@cast(ImportStmt, stmt))
+        else: pass # Handle other statement types
+    
+    fn analyze_let_stmt(ref self, stmt: LetStmt):
+        """Analyze let declaration"""
+        # Check if already defined in current scope
+        if self.current_scope.exists_in_current(stmt.name):
+            self.error(f"Variable '{stmt.name}' already defined", stmt.base.node.line, stmt.base.node.column)
+        
+        # Analyze the value expression
+        let value_type = self.analyze_expression(stmt.value)
+        
+        # Check type annotation if provided
+        if stmt.type_annotation and value_type:
+            if not self.types_compatible(stmt.type_annotation, value_type):
+                self.error(f"Type mismatch: expected {stmt.type_annotation}, got {value_type}", 
+                          stmt.base.node.line, stmt.base.node.column)
+        
+        # Define the symbol
+        self.current_scope.define(stmt.name, Symbol{
+            name: stmt.name,
+            type: stmt.type_annotation or value_type,
+            is_mutable: @bool(false),
+            is_function: @bool(false),
+            line: stmt.base.node.line,
+            column: stmt.base.node.column
+        })
+    
+    fn analyze_var_stmt(ref self, stmt: VarStmt):
+        """Analyze var declaration (similar to let but mutable)"""
+        if self.current_scope.exists_in_current(stmt.name):
+            self.error(f"Variable '{stmt.name}' already defined", stmt.base.node.line, stmt.base.node.column)
+        
+        let value_type = self.analyze_expression(stmt.value)
+        
+        if stmt.type_annotation and value_type:
+            if not self.types_compatible(stmt.type_annotation, value_type):
+                self.error(f"Type mismatch: expected {stmt.type_annotation}, got {value_type}", 
+                          stmt.base.node.line, stmt.base.node.column)
+        
+        self.current_scope.define(stmt.name, Symbol{
+            name: stmt.name,
+            type: stmt.type_annotation or value_type,
+            is_mutable: @bool(true),
+            is_function: @bool(false),
+            line: stmt.base.node.line,
+            column: stmt.base.node.column
+        })
+    
+    fn analyze_function_decl(ref self, stmt: FunctionDecl):
+        """Analyze function declaration"""
+        if self.current_scope.exists_in_current(stmt.name):
+            self.error(f"Function '{stmt.name}' already defined", stmt.base.node.line, stmt.base.node.column)
+        
+        # Define function in current scope
+        self.current_scope.define(stmt.name, Symbol{
+            name: stmt.name,
+            type: stmt.return_type or "void",
+            is_mutable: @bool(false),
+            is_function: @bool(true),
+            line: stmt.base.node.line,
+            column: stmt.base.node.column
+        })
+        
+        # Enter function scope
+        self.enter_scope()
+        
+        # Define parameters in function scope
+        for param in stmt.parameters:
+            self.current_scope.define(param.name, Symbol{
+                name: param.name,
+                type: param.type_annotation or "any",
+                is_mutable: param.ownership_mode == "ref",
+                is_function: @bool(false),
+                line: stmt.base.node.line,
+                column: stmt.base.node.column
+            })
+        
+        # Analyze function body
+        for body_stmt in stmt.body:
+            self.analyze_statement(body_stmt)
+        
+        # Exit function scope
+        self.exit_scope()
+    
+    fn analyze_if_stmt(ref self, stmt: IfStmt):
+        """Analyze if statement"""
+        # Analyze condition
+        let cond_type = self.analyze_expression(stmt.condition)
+        if cond_type and cond_type != "bool":
+            self.warn(f"Condition should be bool, got {cond_type}", stmt.base.node.line, stmt.base.node.column)
+        
+        # Analyze then branch
+        self.enter_scope()
+        for s in stmt.then_body:
+            self.analyze_statement(s)
+        self.exit_scope()
+        
+        # Analyze elif branches
+        for elif_clause in stmt.elif_clauses:
+            let elif_cond_type = self.analyze_expression(elif_clause.condition)
+            self.enter_scope()
+            for s in elif_clause.body:
+                self.analyze_statement(s)
+            self.exit_scope()
+        
+        # Analyze else branch
+        if stmt.else_body:
+            self.enter_scope()
+            for s in stmt.else_body:
+                self.analyze_statement(s)
+            self.exit_scope()
+    
+    fn analyze_while_stmt(ref self, stmt: WhileStmt):
+        """Analyze while loop"""
+        let cond_type = self.analyze_expression(stmt.condition)
+        
+        self.enter_scope()
+        for s in stmt.body:
+            self.analyze_statement(s)
+        self.exit_scope()
+    
+    fn analyze_for_stmt(ref self, stmt: ForStmt):
+        """Analyze for loop"""
+        let iterable_type = self.analyze_expression(stmt.iterable)
+        
+        self.enter_scope()
+        
+        # Define loop variable
+        self.current_scope.define(stmt.variable, Symbol{
+            name: stmt.variable,
+            type: "any",  # TODO: infer from iterable type
+            is_mutable: @bool(false),
+            is_function: @bool(false),
+            line: stmt.base.node.line,
+            column: stmt.base.node.column
+        })
+        
+        for s in stmt.body:
+            self.analyze_statement(s)
+        
+        self.exit_scope()
+    
+    fn analyze_return_stmt(ref self, stmt: ReturnStmt):
+        """Analyze return statement"""
+        if stmt.value:
+            self.analyze_expression(stmt.value)
+    
+    fn analyze_assignment(ref self, stmt: AssignmentStmt):
+        """Analyze assignment"""
+        # Analyze target (must be a variable)
+        if stmt.target.expr_type == ExprType.Identifier:
+            let ident = @cast(IdentifierExpr, stmt.target)
+            let symbol = self.current_scope.resolve(ident.name)
+            
+            if not symbol:
+                self.error(f"Undefined variable '{ident.name}'", stmt.base.node.line, stmt.base.node.column)
+            elif not symbol.is_mutable:
+                self.error(f"Cannot assign to immutable variable '{ident.name}'", 
+                          stmt.base.node.line, stmt.base.node.column)
+        
+        # Analyze value
+        self.analyze_expression(stmt.value)
+    
+    fn analyze_expression_stmt(ref self, stmt: ExpressionStmt):
+        """Analyze expression statement"""
+        self.analyze_expression(stmt.expression)
+    
+    fn analyze_import(ref self, stmt: ImportStmt):
+        """Analyze import statement"""
+        # For now, just note that it exists
+        # TODO: Validate module exists
+        pass
+    
+    # ========================================
+    # EXPRESSION ANALYSIS
+    # ========================================
+    
+    fn analyze_expression(ref self, expr: Expression) -> @str:
+        """Analyze expression and return its type"""
+        let et = expr.expr_type
+        if et == ExprType.IntegerLiteral: return "int"
+        elif et == ExprType.FloatLiteral: return "float"
+        elif et == ExprType.StringLiteral: return "str"
+        elif et == ExprType.BooleanLiteral: return "bool"
+        elif et == ExprType.Identifier: return self.analyze_identifier(@cast(IdentifierExpr, expr))
+        elif et == ExprType.BinaryOp: return self.analyze_binary_op(@cast(BinaryOpExpr, expr))
+        elif et == ExprType.UnaryOp: return self.analyze_unary_op(@cast(UnaryOpExpr, expr))
+        elif et == ExprType.Call: return self.analyze_call(@cast(CallExpr, expr))
+        elif et == ExprType.Index: return self.analyze_index(@cast(IndexExpr, expr))
+        elif et == ExprType.Attribute: return self.analyze_attribute(@cast(AttributeExpr, expr))
+        elif et == ExprType.ListLiteral: return self.analyze_list_literal(@cast(ListLiteralExpr, expr))
+        elif et == ExprType.TupleLiteral: return self.analyze_tuple_literal(@cast(TupleLiteralExpr, expr))
+        elif et == ExprType.SetLiteral: return self.analyze_set_literal(@cast(SetLiteralExpr, expr))
+        elif et == ExprType.DictLiteral: return self.analyze_dict_literal(@cast(DictLiteralExpr, expr))
+        elif et == ExprType.TypeConstructor: return self.analyze_type_constructor(@cast(TypeConstructorExpr, expr))
+        else: return "any"
+    
+    fn analyze_identifier(ref self, expr: IdentifierExpr) -> @str:
+        """Analyze identifier and return type"""
+        let symbol = self.current_scope.resolve(expr.name)
+        
+        if not symbol:
+            self.error(f"Undefined variable '{expr.name}'", expr.base.node.line, expr.base.node.column)
+            return "any"
+        
+        return symbol.type
+    
+    fn analyze_binary_op(ref self, expr: BinaryOpExpr) -> @str:
+        """Analyze binary operation"""
+        let left_type = self.analyze_expression(expr.left)
+        let right_type = self.analyze_expression(expr.right)
+        
+        # Type checking for operators
+        if expr.operator == TokenType.Plus or 
+           expr.operator == TokenType.Minus or
+           expr.operator == TokenType.Star or
+           expr.operator == TokenType.Slash:
+            # Arithmetic operators
+            if left_type == "int" and right_type == "int":
+                return "int"
+            elif left_type == "float" or right_type == "float":
+                return "float"
+            else:
+                return "any"
+        
+        elif expr.operator == TokenType.EqualEqual or
+             expr.operator == TokenType.NotEqual or
+             expr.operator == TokenType.Less or
+             expr.operator == TokenType.Greater or
+             expr.operator == TokenType.LessEq or
+             expr.operator == TokenType.GreaterEq:
+            # Comparison operators
+            return "bool"
+        
+        elif expr.operator == TokenType.And or expr.operator == TokenType.Or:
+            # Logical operators
+            return "bool"
+        
+        else:
+            return "any"
+    
+    fn analyze_unary_op(ref self, expr: UnaryOpExpr) -> @str:
+        """Analyze unary operation"""
+        let operand_type = self.analyze_expression(expr.operand)
+        
+        if expr.operator == TokenType.Minus:
+            return operand_type  # Negation preserves type
+        elif expr.operator == TokenType.Not:
+            return "bool"
+        else:
+            return "any"
+    
+    fn analyze_call(ref self, expr: CallExpr) -> @str:
+        """Analyze function call"""
+        # Analyze callee
+        let callee_type = self.analyze_expression(expr.callee)
+        
+        # Analyze arguments
+        for arg in expr.arguments:
+            self.analyze_expression(arg)
+        
+        # TODO: Check function signature matches
+        return "any"  # Unknown return type for now
+    
+    fn analyze_index(ref self, expr: IndexExpr) -> @str:
+        """Analyze index operation"""
+        let object_type = self.analyze_expression(expr.object)
+        let index_type = self.analyze_expression(expr.index)
+        
+        # TODO: Better type inference
+        return "any"
+    
+    fn analyze_attribute(ref self, expr: AttributeExpr) -> @str:
+        """Analyze attribute access"""
+        let object_type = self.analyze_expression(expr.object)
+        
+        # TODO: Check if attribute exists on type
+        return "any"
+    
+    fn analyze_type_constructor(ref self, expr: TypeConstructorExpr) -> @str:
+        """Analyze type constructor"""
+        self.analyze_expression(expr.argument)
+        return expr.type_name
+    
+    # ========================================
+    # HELPER METHODS
+    # ========================================
+    
+    fn types_compatible(self, expected: @str, actual: @str) -> @bool:
+        """Check if two types are compatible"""
+        if expected == actual:
+            return @bool(true)
+        if expected == "any" or actual == "any":
+            return @bool(true)
+        # TODO: Add more sophisticated type checking
+        return @bool(false)
+
+# Public API
+fn analyze_semantics(program: Program) -> @list[@str]:
+    """Perform semantic analysis on program, return errors"""
+    var sem_analyzer = create_analyzer()
+    sem_analyzer.analyze_program(program)
+    return sem_analyzer.errors

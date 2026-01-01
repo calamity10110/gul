@@ -1,0 +1,174 @@
+# GUL v3.2 Compiler - Recursive Descent Parser
+@imp compiler.lexer.token
+@imp compiler.ast.nodes
+
+# Enumeration for operator precedence
+enum Precedence:
+    None_
+    Assignment
+    Or
+    And
+    Comparison
+    Term
+    Factor
+    Power
+    Range
+    Prefix
+    Call
+    Index
+    Unpack
+
+fn get_precedence(token_type: TokenType) -> Precedence:
+    """Get the precedence level for a given token type"""
+    if token_type == TokenType.Equal:
+        return Precedence.Assignment
+    elif token_type == TokenType.Or or token_type == TokenType.Not:
+        return Precedence.Or
+    elif token_type == TokenType.And:
+        return Precedence.And
+    elif token_type == TokenType.EqualEqual or token_type == TokenType.NotEqual:
+        return Precedence.Comparison
+    elif token_type == TokenType.Less or token_type == TokenType.LessEq or token_type == TokenType.Greater or token_type == TokenType.GreaterEq:
+        return Precedence.Comparison
+    elif token_type == TokenType.Plus or token_type == TokenType.Minus:
+        return Precedence.Term
+    elif token_type == TokenType.Star or token_type == TokenType.Slash or token_type == TokenType.Percent:
+        return Precedence.Factor
+    elif token_type == TokenType.DoubleStar:
+        return Precedence.Power
+    elif token_type == TokenType.LeftParen or token_type == TokenType.LeftBracket or token_type == TokenType.Dot:
+        return Precedence.Call
+    return Precedence.None_
+
+struct Parser:
+    tokens: @list[Token]
+    current_pos: @int
+    errors: @list[@str]
+    
+    fn create(tokens: @list[Token]) -> Parser:
+        return Parser{tokens: tokens, current_pos: @int(0), errors: @list[]}
+    
+    fn is_at_end(ref self) -> @bool:
+        let size = len(self.tokens)
+        return self.current_pos >= size - 1
+    
+    fn current(ref self) -> Token:
+        return self.tokens[self.current_pos]
+    
+    fn advance(ref self) -> Token:
+        let token = self.tokens[self.current_pos]
+        let size = len(self.tokens)
+        if self.current_pos < size - 1:
+            self.current_pos = self.current_pos + 1
+        return token
+    
+    fn match_token(ref self, type: TokenType) -> @bool:
+        let tok = self.tokens[self.current_pos]
+        if tok.type == type:
+            let size = len(self.tokens)
+            if self.current_pos < size - 1:
+                self.current_pos = self.current_pos + 1
+            return true
+        return false
+    
+    fn expect(ref self, type: TokenType, message: @str) -> Token:
+        let tok = self.tokens[self.current_pos]
+        if tok.type == type:
+            let size = len(self.tokens)
+            if self.current_pos < size - 1:
+                self.current_pos = self.current_pos + 1
+            return tok
+        print("Parse error: " + message)
+        return tok # fallthrough
+        
+    fn parse_expression(ref self, min_precedence: Precedence) -> Expression:
+        var left = self.parse_prefix()
+        while @bool(true):
+            if self.current_pos >= len(self.tokens) - 1: break
+            let tok = self.tokens[self.current_pos]
+            let prec = get_precedence(tok.type)
+            if prec <= min_precedence: break
+            left = self.parse_infix(left, prec)
+        return left
+
+    fn parse_prefix(ref self) -> Expression:
+        let token = self.advance()
+        let t_type = token.type
+        if t_type == TokenType.Identifier:
+            return IdentifierExpr{base: Expression{node: ASTNode{line: 1, column: 1}, expr_type: ExprType.Identifier}, name: token.value}
+        elif t_type == TokenType.Integer:
+            return LiteralExpr{base: Expression{node: ASTNode{line: 1, column: 1}, expr_type: ExprType.IntegerLiteral}, value: token.value, value_type: TokenType.Integer}
+        elif t_type == TokenType.LeftParen:
+            let expr = self.parse_expression(Precedence.None_)
+            self.expect(TokenType.RightParen, "Expected ')'")
+            return expr
+        elif t_type == TokenType.Minus:
+            let op = self.parse_expression(Precedence.Prefix)
+            return UnaryOpExpr{base: Expression{node: ASTNode{line: 1, column: 1}, expr_type: ExprType.UnaryOp}, operator: TokenType.Minus, operand: op}
+        return LiteralExpr{base: Expression{node: ASTNode{line: 1, column: 1}, expr_type: ExprType.NoneLiteral}, value: "None", value_type: TokenType.NoneLiteral}
+
+    fn parse_infix(ref self, left: Expression, precedence: Precedence) -> Expression:
+        let token = self.advance()
+        if token.type == TokenType.Plus or token.type == TokenType.Minus or token.type == TokenType.Star or token.type == TokenType.Slash:
+            let right = self.parse_expression(precedence)
+            return BinaryOpExpr{base: Expression{node: ASTNode{line: 1, column: 1}, expr_type: ExprType.BinaryOp}, left: left, operator: token.type, right: right}
+        elif token.type == TokenType.LeftParen:
+            let args = @list[]
+            if not (self.tokens[self.current_pos].type == TokenType.RightParen):
+                args.add(self.parse_expression(Precedence.None_))
+                while self.match_token(TokenType.Comma):
+                    args.add(self.parse_expression(Precedence.None_))
+            self.expect(TokenType.RightParen, "Expected ')'")
+            return CallExpr{base: Expression{node: ASTNode{line: 1, column: 1}, expr_type: ExprType.Call}, callee: left, arguments: args}
+        return left
+
+    fn parse_statement(ref self) -> Statement:
+        let tok = self.tokens[self.current_pos]
+        if tok.type == TokenType.Let:
+            self.advance()
+            let name = self.expect(TokenType.Identifier, "Expected identifier").value
+            self.expect(TokenType.Equal, "Expected '='")
+            let val = self.parse_expression(Precedence.None_)
+            return LetStmt{base: Statement{node: ASTNode{line: 1, column: 1}, stmt_type: StmtType.LetStmt}, name: name, value: val, is_var: @bool(false)}
+        elif tok.type == TokenType.Return:
+            self.advance()
+            let val = self.parse_expression(Precedence.None_)
+            return ReturnStmt{base: Statement{node: ASTNode{line: 1, column: 1}, stmt_type: StmtType.ReturnStmt}, value: val}
+        elif tok.type == TokenType.Fn:
+            self.advance()
+            let name = self.expect(TokenType.Identifier, "Expected function name").value
+            self.expect(TokenType.LeftParen, "Expected '('")
+            let params = @list[] # simplified
+            while not (self.tokens[self.current_pos].type == TokenType.RightParen):
+                self.advance() # consume param
+                if self.tokens[self.current_pos].type == TokenType.Comma: self.advance()
+            self.advance() # )
+            self.expect(TokenType.Colon, "Expected ':'")
+            self.expect(TokenType.Newline, "Expected Newline")
+            self.expect(TokenType.Indent, "Expected Indent")
+            let body = @list[]
+            while not (self.tokens[self.current_pos].type == TokenType.Dedent):
+                body.add(self.parse_statement())
+                if self.tokens[self.current_pos].type == TokenType.Newline: self.advance()
+            self.advance() # Dedent
+            return FunctionDecl{base: Statement{node: ASTNode{line: 1, column: 1}, stmt_type: StmtType.FunctionDecl}, name: name, params: @list[], body: body, return_type: "Any"}
+        
+        # Expression statement
+        let expr = self.parse_expression(Precedence.None_)
+        return ExpressionStmt{base: Statement{node: ASTNode{line: 1, column: 1}, stmt_type: StmtType.ExpressionStmt}, expression: expr}
+
+    fn parse_program(ref self) -> Program:
+        let statements = @list[]
+        print("    Parser: parse_program start")
+        while self.current_pos < len(self.tokens) - 1:
+            print("    Parser POS: " + str(self.current_pos))
+            let tok = self.tokens[self.current_pos]
+            if tok.type == TokenType.Newline:
+                self.advance()
+            else:
+                statements.add(self.parse_statement())
+        return Program{statements: statements, imports: @list[], main_entry: @list[]}
+
+fn parse(tokens: @list[Token]) -> Program:
+    var parser = Parser.create(tokens)
+    return parser.parse_program()

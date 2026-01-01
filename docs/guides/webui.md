@@ -4,16 +4,16 @@
 
 ---
 
-# GUL Web IDE & Web Development Guide
+## GUL Web IDE & Web Development Guide
 
 Complete guide to using the GUL Web IDE and developing web applications.
 
 ## 📋 Table of Contents
 
-1. [Using the Web IDE](#using-the-web-ide)
-2. [Developing Web Applications](#developing-web-applications)
-3. [Hosting & Deployment](#hosting--deployment)
-4. [Web IDE Features](#web-ide-features)
+1. [Using the Web IDE](<using-the-web-ide>)
+2. [Developing Web Applications](<developing-web-applications>)
+3. [Hosting & Deployment](<hosting--deployment>)
+4. [Web IDE Features](<web-ide-features>)
 
 ---
 

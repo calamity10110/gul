@@ -1,0 +1,9 @@
+[package]
+name = "gul-can"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+embedded-can = "0.4"
+[target.'cfg(target_os = "espidf")'.dependencies]
+esp-idf-hal = "0.45.2"

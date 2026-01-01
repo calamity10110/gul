@@ -145,8 +145,14 @@ let active: bool = true
 ### Collections
 
 ```gul
-let numbers: list = [1, 2, 3, 4, 5]
-let user: dict = {name: "Alice", age: 25}
+let numbers: list = [1, 2, 3, 4, 5] # Immutable
+var items: list = [1, 2, 3] # Mutable
+
+let labels: set = {"a", "b"} # Immutable
+var tags: set = {"rust", "python"} # Mutable
+
+let user: dict = {name: "Alice", age: 25} # Immutable
+var cfg: dict = {host: "localhost", port: 8080} # Mutable
 ```
 
 ### Gradual Typing
@@ -245,11 +251,11 @@ async fetch_api() -> dict:
 mn:
     print("Starting...")
 
-    let data = @list[1, 2, 3, 4, 5]
-    let stats = process_data(data)
+    var data = @list[1, 2, 3, 4, 5]
+    var stats = process_data(data)
     print("Stats:", stats)
 
-    let avg = analyze(data)
+    var avg = analyze(data)
     print("Average:", avg)
 ```
 

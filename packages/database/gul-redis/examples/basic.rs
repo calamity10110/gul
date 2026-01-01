@@ -1,8 +1,7 @@
-// Example usage of gul-redis
+use gul_redis::RedisManager;
 
 fn main() {
-    println!("gul-redis - Basic Example");
-    
-    // TODO: Add actual usage example
-    println!("Package is ready to use!");
+    // Requires running Redis
+    // let manager = RedisManager::new("redis://127.0.0.1/").unwrap();
+    println!("RedisManager would connect here.");
 }

@@ -5,6 +5,15 @@
       "type": "local",
       "command": ["npx", "-y", "@modelcontextprotocol/server-everything"],
     },
+    "gul": {
+      "command": ["gul", "mcp", "serve"],
+      "env": {
+        "GUL_AI_PROVIDER": "anthropic",
+        "GUL_AI_MODEL": "claude-3-opus-20240229",
+        "GUL_AI_API_KEY": "${ANTHROPIC_API_KEY}"
+      }
+    }
+  },
     "code-mode": {
       "type": "local",
       "command": ["npx", "-y", "@utcp/code-mode-mcp"],

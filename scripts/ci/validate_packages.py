@@ -184,8 +184,10 @@ class PackageValidator:
         print(f"{'='*60}\n")
 
 def main():
-    root_dir = os.getcwd()
-    validator = PackageValidator(root_dir)
+    # Find project root (go up from scripts/ci/)
+    script_dir = Path(__file__).parent
+    root_dir = script_dir.parent.parent
+    validator = PackageValidator(str(root_dir))
     
     success = validator.validate_all()
     

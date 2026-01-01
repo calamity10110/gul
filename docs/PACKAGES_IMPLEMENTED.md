@@ -1,583 +1,844 @@
-# GUL Package Catalog - Implemented Packages
+# GUL Package Catalog
 
-**Version**: 0.13.0  
-**Syntax**: v3.2  
-**Last Updated**: 2025-12-28
+**Date**: 2025-12-29
+**Total Packages**: 151
+**Status**: 100% Implemented (Rust & Pure GUL)
 
----
+## -packages-
 
-## 📊 Implementation Status
+### Algo
 
-**Total Packages Planned**: 180  
-**Implemented**: 94  
-**Progress**: 52.2%
+**search** 🔷
 
----
+- Type: Pure GUL
+- Location: `packages/algo/search.mn`
 
-## ✅ IMPLEMENTED PACKAGES (94)
+**sort** 🔷
 
-### Api (5 packages)
+- Type: Pure GUL
+- Location: `packages/algo/sort.mn`
 
-**gul-api-gateway** ✅
-- **Status**: ✅ Implemented
-- **Description**: HTTP API gateway with routing, middleware, and load balancing
-- **Location**: `packages/api/gul_api_gateway.py`
+### Api
 
-**gul-graphql-server** ✅
-- **Status**: ✅ Implemented
-- **Description**: GraphQL API server implementation
-- **Location**: `packages/api/gul_graphql.py`
+**gul-api-gateway** 🦀
 
-**gul-rate-limiter** ✅
-- **Status**: ✅ Implemented
-- **Description**: Advanced rate limiting with multiple algorithms
-- **Location**: `packages/api/gul_rate_limiter.py`
+- Type: Rust Crate
+- Location: `packages/api/gul-api-gateway`
 
-**gul-rest-framework** ✅
-- **Status**: ✅ Implemented
-- **Description**: RESTful API framework with routing and serialization
-- **Location**: `packages/api/gul_rest.py`
+**gul-graphql** 🦀
 
-**gul-websocket-server** ✅
-- **Status**: ✅ Implemented
-- **Description**: WebSocket server with rooms and broadcasting
-- **Location**: `packages/api/gul_websocket.py`
+- Type: Rust Crate
+- Location: `packages/api/gul-graphql`
 
----
+### Async
 
-### Async (1 packages)
+**gul-task-queue** 🦀
 
-**gul-task-queue** ✅
-- **Status**: ✅ Implemented
-- **Description**: Async task processing with Celery-style API
-- **Location**: `packages/async/gul_task_queue.py`
+- Type: Rust Crate
+- Location: `packages/async/gul-task-queue`
 
----
+### Cache
 
-### Auth (5 packages)
+**gul-cache** 🦀
 
-**gul-2fa-(two-factor-authentication)** ✅
-- **Status**: ✅ Implemented
-- **Description**: TOTP-based two-factor authentication
-- **Location**: `packages/auth/gul_2fa.py`
+- Type: Rust Crate
+- Location: `packages/cache/gul-cache`
 
-**gul-authentication-framework** ✅
-- **Status**: ✅ Implemented
-- **Description**: Provides JWT-based authentication and session management
-- **Location**: `packages/auth/gul_auth.py`
+### Cli
 
-**gul-jwt-(json-web-tokens)** ✅
-- **Status**: ✅ Implemented
-- **Description**: Standalone JWT implementation
-- **Location**: `packages/auth/gul_jwt.py`
+**gul-cli-tools** 🦀
 
-**gul-oauth2-client** ✅
-- **Status**: ✅ Implemented
-- **Description**: OAuth2 authentication client
-- **Location**: `packages/auth/gul_oauth2.py`
+- Type: Rust Crate
+- Location: `packages/cli/gul-cli-tools`
 
-**gul-rbac-(role-based-access-control)** ✅
-- **Status**: ✅ Implemented
-- **Description**: Advanced authorization with permissions
-- **Location**: `packages/auth/gul_rbac.py`
+### Cloud
 
----
+**gul-azure-blob** 🦀
 
-### Cache (4 packages)
+- Type: Rust Crate
+- Location: `packages/cloud/gul-azure-blob`
 
-**gul-cache-manager** ✅
-- **Status**: ✅ Implemented
-- **Description**: Multi-backend cache abstraction layer
-- **Location**: `packages/cache/gul_cache_manager.py`
+**gul-cassandra** 🦀
 
-**gul-event-bus** ✅
-- **Status**: ✅ Implemented
-- **Description**: Event-driven architecture with pub/sub pattern
-- **Location**: `packages/cache/gul_event_bus.py`
+- Type: Rust Crate
+- Location: `packages/cloud/gul-cassandra`
 
-**gul-message-queue** ✅
-- **Status**: ✅ Implemented
-- **Description**: Message queue implementation with Redis backend support
-- **Location**: `packages/cache/gul_message_queue.py`
-
-**gul-redis-advanced** ✅
-- **Status**: ✅ Implemented
-- **Description**: Advanced Redis operations and patterns
-- **Location**: `packages/cache/gul_redis_advanced.py`
-
----
+**gul-dynamodb** 🦀
 
-### Cli (1 packages)
-
-**gul-cli-framework** ✅
-- **Status**: ✅ Implemented
-- **Description**: Command-line interface framework with argument parsing
-- **Location**: `packages/cli/gul_cli.py`
-
----
-
-### Communication (2 packages)
-
-**gul-email-service** ✅
-- **Status**: ✅ Implemented
-- **Description**: Email sending with templates
-- **Location**: `packages/communication/gul_email.py`
-
-**gul-notification-service** ✅
-- **Status**: ✅ Implemented
-- **Description**: Multi-channel notifications (email, SMS, push)
-- **Location**: `packages/communication/gul_notifications.py`
-
----
-
-### Config (2 packages)
-
-**gul-configuration-manager** ✅
-- **Status**: ✅ Implemented
-- **Description**: Application configuration with env vars and files
-- **Location**: `packages/config/gul_config.py`
-
-**gul-environment-manager** ✅
-- **Status**: ✅ Implemented
-- **Description**: Environment and deployment configuration
-- **Location**: `packages/config/gul_environment.py`
-
----
-
-### Data (17 packages)
-
-**gul-archive** ✅
-- **Status**: ✅ Implemented
-- **Description**: Archive manipulation (Zip/Tar)
-- **Location**: `packages/data/gul_archive.py`
-
-**gul-caching** ✅
-- **Status**: ✅ Implemented
-- **Description**: In-memory and Redis caching
-- **Location**: `packages/data/gul_caching.py`
-
-**gul-compression** ✅
-- **Status**: ✅ Implemented
-- **Description**: Data compression utilities
-- **Location**: `packages/data/gul_compression.py`
-
-**gul-csv-parser** ✅
-- **Status**: ✅ Implemented
-- **Description**: CSV file parsing and generation
-- **Location**: `packages/data/gul_csv.py`
-
-**gul-data-pipeline** ✅
-- **Status**: ✅ Implemented
-- **Description**: ETL data processing pipeline
-- **Location**: `packages/data/gul_pipeline.py`
-
-**gul-docx** ✅
-- **Status**: ✅ Implemented
-- **Description**: Word (DOCX) generator
-- **Location**: `packages/data/gul_docx.py`
-
-**gul-excel** ✅
-- **Status**: ✅ Implemented
-- **Description**: Excel (XLSX) generator
-- **Location**: `packages/data/gul_excel.py`
-
-**gul-image** ✅
-- **Status**: ✅ Implemented
-- **Description**: Basic Image processing (BMP/PPM support without heavy deps)
-- **Location**: `packages/data/gul_image.py`
-
-**gul-json-schema-validator** ✅
-- **Status**: ✅ Implemented
-- **Description**: JSON schema validation
-- **Location**: `packages/data/gul_json_schema.py`
-
-**gul-pagination** ✅
-- **Status**: ✅ Implemented
-- **Description**: Data pagination utilities
-- **Location**: `packages/data/gul_pagination.py`
-
-**gul-pdf** ✅
-- **Status**: ✅ Implemented
-- **Description**: PDF Generation (Simulated/Basic)
-- **Location**: `packages/data/gul_pdf.py`
-
-**gul-qr-code** ✅
-- **Status**: ✅ Implemented
-- **Description**: QR Code generator (Basic)
-- **Location**: `packages/data/gul_qrcode.py`
-
-**gul-serialization** ✅
-- **Status**: ✅ Implemented
-- **Description**: Object serialization to multiple formats
-- **Location**: `packages/data/gul_serialization.py`
-
-**gul-toml** ✅
-- **Status**: ✅ Implemented
-- **Description**: TOML parser and generator
-- **Location**: `packages/data/gul_toml.py`
-
-**gul-validation** ✅
-- **Status**: ✅ Implemented
-- **Description**: Data validation library
-- **Location**: `packages/data/gul_validation.py`
-
-**gul-xml-parser** ✅
-- **Status**: ✅ Implemented
-- **Description**: XML parsing and generation
-- **Location**: `packages/data/gul_xml.py`
+- Type: Rust Crate
+- Location: `packages/cloud/gul-dynamodb`
 
-**gul-yaml-parser** ✅
-- **Status**: ✅ Implemented
-- **Description**: YAML parsing and serialization
-- **Location**: `packages/data/gul_yaml.py`
+**gul-gcs** 🦀
 
----
+- Type: Rust Crate
+- Location: `packages/cloud/gul-gcs`
 
-### Database (6 packages)
+**gul-s3** 🦀
 
-**gul-migrations** ✅
-- **Status**: ✅ Implemented
-- **Description**: Database schema migrations with version control
-- **Location**: `packages/database/gul_migrations.py`
-
-**gul-mongodb-driver** ✅
-- **Status**: ✅ Implemented
-- **Description**: MongoDB database driver with async support
-- **Location**: `packages/database/gul_mongodb.py`
-
-**gul-orm-(object-relational-mapping)** ✅
-- **Status**: ✅ Implemented
-- **Description**: Type-safe ORM with migrations and relationships
-- **Location**: `packages/database/gul_orm.py`
-
-**gul-postgresql-driver** ✅
-- **Status**: ✅ Implemented
-- **Description**: PostgreSQL database driver with connection pooling
-- **Location**: `packages/database/gul_postgres.py`
-
-**gul-query-builder** ✅
-- **Status**: ✅ Implemented
-- **Description**: Type-safe SQL query builder
-- **Location**: `packages/database/gul_query_builder.py`
-
-**gul-search-engine** ✅
-- **Status**: ✅ Implemented
-- **Description**: Full-text search with indexing
-- **Location**: `packages/database/gul_search.py`
-
----
-
-### Devops (4 packages)
-
-**gul-docker-integration** ✅
-- **Status**: ✅ Implemented
-- **Description**: Helpers for Docker containerization
-- **Location**: `packages/devops/gul_docker.py`
-
-**gul-kubernetes-integration** ✅
-- **Status**: ✅ Implemented
-- **Description**: Kubernetes manifest generation and deployment helpers
-- **Location**: `packages/devops/gul_kubernetes.py`
+- Type: Rust Crate
+- Location: `packages/cloud/gul-s3`
 
-**gul-opentelemetry-integration** ✅
-- **Status**: ✅ Implemented
-- **Description**: Distributed tracing and observability
-- **Location**: `packages/devops/gul_opentelemetry.py`
+### Communication
 
-**gul-prometheus-integration** ✅
-- **Status**: ✅ Implemented
-- **Description**: Metrics collection and exposition for Prometheus
-- **Location**: `packages/devops/gul_prometheus.py`
+**gul-communication** 🦀
 
----
+- Type: Rust Crate
+- Location: `packages/communication/gul-communication`
 
-### Devtools (2 packages)
-
-**gul-language-server-protocol-(lsp)** ✅
-- **Status**: ✅ Implemented
-- **Description**: Simplified but functional LSP implementation
-- **Location**: `packages/devtools/gul_lsp.py`
-
-**gul-vscode-extension-configuration** ✅
-- **Status**: ✅ Implemented
-- **Description**: VS Code extension package.json and configuration
-- **Location**: `packages/devtools/gul_vscode.py`
-
----
-
-### Logging (1 packages)
+### Config
 
-**gul-logging** ✅
-- **Status**: ✅ Implemented
-- **Description**: Structured logging with multiple outputs
-- **Location**: `packages/logging/gul_logging.py`
-
----
+**env_loader** 🔷
 
-### Ml (1 packages)
+- Type: Pure GUL
+- Location: `packages/config/env_loader.mn`
 
-**gul-ml-model-serving** ✅
-- **Status**: ✅ Implemented
-- **Description**: Machine learning model deployment and serving
-- **Location**: `packages/ml/gul_model_serving.py`
+**gul-config** 🦀
 
----
+- Type: Rust Crate
+- Location: `packages/config/gul-config`
 
-### Network (8 packages)
+**ini_parser** 🔷
 
-**gul-dns** ✅
-- **Status**: ✅ Implemented
-- **Description**: DNS resolver wrapper
-- **Location**: `packages/network/gul_dns.py`
+- Type: Pure GUL
+- Location: `packages/config/ini_parser.mn`
 
-**gul-ftp** ✅
-- **Status**: ✅ Implemented
-- **Description**: FTP Client wrapper
-- **Location**: `packages/network/gul_ftp.py`
+### Crypto
 
-**gul-imap** ✅
-- **Status**: ✅ Implemented
-- **Description**: IMAP Email retrieval
-- **Location**: `packages/network/gul_imap.py`
-
-**gul-ip** ✅
-- **Status**: ✅ Implemented
-- **Description**: IP Address manipulation and utilities
-- **Location**: `packages/network/gul_ip.py`
-
-**gul-smtp** ✅
-- **Status**: ✅ Implemented
-- **Description**: SMTP Email client
-- **Location**: `packages/network/gul_smtp.py`
-
-**gul-ssh** ✅
-- **Status**: ✅ Implemented
-- **Description**: SSH Client wrapper (simulated for environments without paramiko)
-- **Location**: `packages/network/gul_ssh.py`
+**caesar** 🔷
 
-**gul-telnet** ✅
-- **Status**: ✅ Implemented
-- **Description**: Telnet Client wrapper
-- **Location**: `packages/network/gul_telnet.py`
-
-**gul-whois** ✅
-- **Status**: ✅ Implemented
-- **Description**: Whois client wrapper
-- **Location**: `packages/network/gul_whois.py`
+- Type: Pure GUL
+- Location: `packages/crypto/caesar.mn`
 
----
+**hashing** 🔷
 
-### Patterns (1 packages)
+- Type: Pure GUL
+- Location: `packages/crypto/hashing.mn`
 
-**gul-retry-logic** ✅
-- **Status**: ✅ Implemented
-- **Description**: Retry with exponential backoff
-- **Location**: `packages/patterns/gul_retry.py`
+**vigenere** 🔷
 
----
+- Type: Pure GUL
+- Location: `packages/crypto/vigenere.mn`
 
-### Saas (5 packages)
+### Data
 
-**gul-admin-dashboard** ✅
-- **Status**: ✅ Implemented
-- **Description**: Admin dashboard with CRUD operations
-- **Location**: `packages/saas/gul_admin_dashboard.py`
+**bst** 🔷
 
-**gul-analytics** ✅
-- **Status**: ✅ Implemented
-- **Description**: Event tracking and analytics
-- **Location**: `packages/saas/gul_analytics.py`
+- Type: Pure GUL
+- Location: `packages/data/bst.mn`
 
-**gul-billing-&-subscriptions** ✅
-- **Status**: ✅ Implemented
-- **Description**: Subscription management and billing
-- **Location**: `packages/saas/gul_billing.py`
+**graph** 🔷
 
-**gul-multi-tenancy** ✅
-- **Status**: ✅ Implemented
-- **Description**: Multi-tenant architecture with tenant isolation
-- **Location**: `packages/saas/gul_multitenancy.py`
+- Type: Pure GUL
+- Location: `packages/data/graph.mn`
 
-**gul-user-management** ✅
-- **Status**: ✅ Implemented
-- **Description**: Complete user management system
-- **Location**: `packages/saas/gul_user_management.py`
+**gul-archive** 🦀
 
----
+- Type: Rust Crate
+- Location: `packages/data/gul-archive`
 
-### Scheduler (1 packages)
+**gul-image** 🦀
 
-**gul-scheduler** ✅
-- **Status**: ✅ Implemented
-- **Description**: Task scheduling with cron-like syntax
-- **Location**: `packages/scheduler/gul_scheduler.py`
+- Type: Rust Crate
+- Location: `packages/data/gul-image`
 
----
+**gul-json-schema** 🦀
 
-### Security (7 packages)
+- Type: Rust Crate
+- Location: `packages/data/gul-json-schema`
 
-**gul-crypto** ✅
-- **Status**: ✅ Implemented
-- **Description**: High-level cryptography wrapper
-- **Location**: `packages/security/gul_crypto.py`
+**gul-office** 🦀
 
-**gul-hashing** ✅
-- **Status**: ✅ Implemented
-- **Description**: Cryptographic hashing utilities
-- **Location**: `packages/security/gul_hashing.py`
+- Type: Rust Crate
+- Location: `packages/data/gul-office`
 
-**gul-input-validation** ✅
-- **Status**: ✅ Implemented
-- **Description**: Comprehensive input validation and sanitization
-- **Location**: `packages/security/gul_input_validation.py`
+**gul-qrcode** 🦀
 
-**gul-jwt** ✅
-- **Status**: ✅ Implemented
-- **Description**: JSON Web Token implementation
-- **Location**: `packages/security/gul_jwt.py`
+- Type: Rust Crate
+- Location: `packages/data/gul-qrcode`
 
-**gul-rate-limit** ✅
-- **Status**: ✅ Implemented
-- **Description**: Rate limiting for APIs and services
-- **Location**: `packages/security/gul_rate_limit.py`
+**linked_list** 🔷
 
-**gul-secrets-manager** ✅
-- **Status**: ✅ Implemented
-- **Description**: Secure secrets management
-- **Location**: `packages/security/gul_secrets.py`
+- Type: Pure GUL
+- Location: `packages/data/linked_list.mn`
 
-**gul-security-headers-middleware** ✅
-- **Status**: ✅ Implemented
-- **Description**: Provides security headers for HTTP responses
-- **Location**: `packages/security/gul_security_headers.py`
+**queue** 🔷
 
----
+- Type: Pure GUL
+- Location: `packages/data/queue.mn`
 
-### Storage (1 packages)
+**stack** 🔷
 
-**gul-file-storage** ✅
-- **Status**: ✅ Implemented
-- **Description**: File upload and storage management
-- **Location**: `packages/storage/gul_file_storage.py`
+- Type: Pure GUL
+- Location: `packages/data/stack.mn`
 
----
+### Data-Science
 
-### Testing (1 packages)
+**gul-ml** 🦀
 
-**gul-test-framework** ✅
-- **Status**: ✅ Implemented
-- **Description**: Unit testing framework with assertions and test runners
-- **Location**: `packages/testing/gul_test.py`
+- Type: Rust Crate
+- Location: `packages/data-science/gul-ml`
 
----
+**gul-numpy** 🦀
 
-### Tests (2 packages)
+- Type: Rust Crate
+- Location: `packages/data-science/gul-numpy`
 
-**Security Headers** 🚧
-- **Status**: Unknown
-- **Description**: No description
-- **Location**: `packages/security/tests/test_security_headers.py`
+**gul-pandas** 🦀
 
-**gul-authentication-framework** 🚧
-- **Status**: Unknown
-- **Description**: No description
-- **Location**: `packages/auth/tests/test_gul_auth.py`
+- Type: Rust Crate
+- Location: `packages/data-science/gul-pandas`
 
----
+**gul-plot** 🦀
 
-### Text (1 packages)
+- Type: Rust Crate
+- Location: `packages/data-science/gul-plot`
 
-**gul-markdown** ✅
-- **Status**: ✅ Implemented
-- **Description**: Markdown processing and rendering
-- **Location**: `packages/text/gul_markdown.py`
+**gul-stats** 🦀
 
----
+- Type: Rust Crate
+- Location: `packages/data-science/gul-stats`
 
-### Utils (5 packages)
+### Database
 
-**gul-datetime** ✅
-- **Status**: ✅ Implemented
-- **Description**: Date and time utilities
-- **Location**: `packages/utils/gul_datetime.py`
+**gul-mongodb** 🦀
 
-**gul-glob** ✅
-- **Status**: ✅ Implemented
-- **Description**: File globbing and matching
-- **Location**: `packages/utils/gul_glob.py`
+- Type: Rust Crate
+- Location: `packages/database/gul-mongodb`
 
-**gul-i18n** ✅
-- **Status**: ✅ Implemented
-- **Description**: Internationalization and localization
-- **Location**: `packages/utils/gul_i18n.py`
+**gul-mysql** 🦀
 
-**gul-semver** ✅
-- **Status**: ✅ Implemented
-- **Description**: Semantic Versioning utilities
-- **Location**: `packages/utils/gul_semver.py`
+- Type: Rust Crate
+- Location: `packages/database/gul-mysql`
 
-**gul-uuid** ✅
-- **Status**: ✅ Implemented
-- **Description**: UUID generation (v4, v7)
-- **Location**: `packages/utils/gul_uuid.py`
+**gul-orm** 🦀
 
----
+- Type: Rust Crate
+- Location: `packages/database/gul-orm`
 
-### Web (11 packages)
+**gul-postgres** 🦀
 
-**gul-cookies** ✅
-- **Status**: ✅ Implemented
-- **Description**: HTTP cookie management
-- **Location**: `packages/web/gul_cookies.py`
+- Type: Rust Crate
+- Location: `packages/database/gul-postgres`
 
-**gul-cors** ✅
-- **Status**: ✅ Implemented
-- **Description**: CORS (Cross-Origin Resource Sharing) utilities
-- **Location**: `packages/web/gul_cors.py`
+**gul-redis** 🦀
 
-**gul-csrf** ✅
-- **Status**: ✅ Implemented
-- **Description**: CSRF (Cross-Site Request Forgery) protection
-- **Location**: `packages/web/gul_csrf.py`
+- Type: Rust Crate
+- Location: `packages/database/gul-redis`
 
-**gul-graphql** ✅
-- **Status**: ✅ Implemented
-- **Description**: GraphQL server utilities
-- **Location**: `packages/web/gul_graphql.py`
+**gul-sqlite** 🦀
 
-**gul-html-builder** ✅
-- **Status**: ✅ Implemented
-- **Description**: HTML generation library
-- **Location**: `packages/web/gul_html.py`
+- Type: Rust Crate
+- Location: `packages/database/gul-sqlite`
 
-**gul-openapi** ✅
-- **Status**: ✅ Implemented
-- **Description**: OpenAPI (Swagger) documentation generator
-- **Location**: `packages/web/gul_openapi.py`
+### Devops
 
-**gul-router** ✅
-- **Status**: ✅ Implemented
-- **Description**: URL routing for web applications
-- **Location**: `packages/web/gul_router.py`
+**gul-devops** 🦀
 
-**gul-sse-(server-sent-events)** ✅
-- **Status**: ✅ Implemented
-- **Description**: SSE implementation
-- **Location**: `packages/web/gul_sse.py`
+- Type: Rust Crate
+- Location: `packages/devops/gul-devops`
 
-**gul-template-engine** ✅
-- **Status**: ✅ Implemented
-- **Description**: Template rendering engine
-- **Location**: `packages/web/gul_templates.py`
+### Devtools
 
-**gul-url-parser** ✅
-- **Status**: ✅ Implemented
-- **Description**: URL parsing and building
-- **Location**: `packages/web/gul_url.py`
+**gul-devtools** 🦀
 
-**gul-websocket** ✅
-- **Status**: ✅ Implemented
-- **Description**: WebSocket client and server messages
-- **Location**: `packages/web/gul_websocket.py`
+- Type: Rust Crate
+- Location: `packages/devtools/gul-devtools`
 
----
+### Encoding
+
+**base64_lite** 🔷
+
+- Type: Pure GUL
+- Location: `packages/encoding/base64_lite.mn`
+
+**hex** 🔷
+
+- Type: Pure GUL
+- Location: `packages/encoding/hex.mn`
+
+### Framework
+
+**app** 🔷
+
+- Type: Pure GUL
+- Location: `packages/framework/app.mn`
+
+**observable** 🔷
+
+- Type: Pure GUL
+- Location: `packages/framework/observable.mn`
+
+**router** 🔷
+
+- Type: Pure GUL
+- Location: `packages/framework/router.mn`
+
+**state** 🔷
+
+- Type: Pure GUL
+- Location: `packages/framework/state.mn`
+
+### Game
+
+**entity** 🔷
+
+- Type: Pure GUL
+- Location: `packages/game/entity.mn`
+
+**scene** 🔷
+
+- Type: Pure GUL
+- Location: `packages/game/scene.mn`
+
+### Infrastructure
+
+**gul-registry** 🦀
+
+- Type: Rust Crate
+- Location: `packages/infrastructure/gul-registry`
+
+### Logging
+
+**gul-logging** 🦀
+
+- Type: Rust Crate
+- Location: `packages/logging/gul-logging`
+
+### Logic
+
+**behavior_tree** 🔷
+
+- Type: Pure GUL
+- Location: `packages/logic/behavior_tree.mn`
+
+**decision_tree** 🔷
+
+- Type: Pure GUL
+- Location: `packages/logic/decision_tree.mn`
+
+**fsm** 🔷
+
+- Type: Pure GUL
+- Location: `packages/logic/fsm.mn`
+
+### Math
+
+**complex** 🔷
+
+- Type: Pure GUL
+- Location: `packages/math/complex.mn`
+
+**matrix** 🔷
+
+- Type: Pure GUL
+- Location: `packages/math/matrix.mn`
+
+### Messaging
+
+**gul-messaging** 🦀
+
+- Type: Rust Crate
+- Location: `packages/messaging/gul-messaging`
+
+### Ml
+
+**gul-model-serving** 🦀
+
+- Type: Rust Crate
+- Location: `packages/ml/gul-model-serving`
+
+### Mobile
+
+**gul-mobile** 🦀
+
+- Type: Rust Crate
+- Location: `packages/mobile/gul-mobile`
+
+### Network
+
+**gul-dns** 🦀
+
+- Type: Rust Crate
+- Location: `packages/network/gul-dns`
+
+**gul-ftp** 🦀
+
+- Type: Rust Crate
+- Location: `packages/network/gul-ftp`
+
+**gul-ip** 🦀
+
+- Type: Rust Crate
+- Location: `packages/network/gul-ip`
+
+**gul-smtp** 🦀
+
+- Type: Rust Crate
+- Location: `packages/network/gul-smtp`
+
+**gul-ssh** 🦀
+
+- Type: Rust Crate
+- Location: `packages/network/gul-ssh`
+
+**gul-telnet** 🦀
+
+- Type: Rust Crate
+- Location: `packages/network/gul-telnet`
+
+**gul-whois** 🦀
+
+- Type: Rust Crate
+- Location: `packages/network/gul-whois`
+
+### Packages
+
+**auth** 🦀
+
+- Type: Rust Crate
+- Location: `packages/auth`
+
+**gul_core** 🔷
+
+- Type: Pure GUL
+- Location: `packages/gul_core.mn`
+
+**security** 🦀
+
+- Type: Rust Crate
+- Location: `packages/security`
+
+### Patterns
+
+**gul-retry** 🦀
+
+- Type: Rust Crate
+- Location: `packages/patterns/gul-retry`
+
+### Robotics
+
+**gul-gpio** 🦀
+
+- Type: Rust Crate
+- Location: `packages/robotics/gul-gpio`
+
+**gul-i2c** 🦀
+
+- Type: Rust Crate
+- Location: `packages/robotics/gul-i2c`
+
+**gul-motors** 🦀
+
+- Type: Rust Crate
+- Location: `packages/robotics/gul-motors`
+
+**gul-ros** 🦀
+
+- Type: Rust Crate
+- Location: `packages/robotics/gul-ros`
+
+**gul-sensors** 🦀
+
+- Type: Rust Crate
+- Location: `packages/robotics/gul-sensors`
+
+**gul-serial** 🦀
+
+- Type: Rust Crate
+- Location: `packages/robotics/gul-serial`
+
+**gul-spi** 🦀
+
+- Type: Rust Crate
+- Location: `packages/robotics/gul-spi`
+
+### Saas
+
+**gul-saas** 🦀
+
+- Type: Rust Crate
+- Location: `packages/saas/gul-saas`
+
+### Scheduler
+
+**gul-scheduler** 🦀
+
+- Type: Rust Crate
+- Location: `packages/scheduler/gul-scheduler`
+
+### Scientific
+
+**gul-bio** 🦀
+
+- Type: Rust Crate
+- Location: `packages/scientific/gul-bio`
+
+**gul-chem** 🦀
+
+- Type: Rust Crate
+- Location: `packages/scientific/gul-chem`
+
+**gul-finance** 🦀
+
+- Type: Rust Crate
+- Location: `packages/scientific/gul-finance`
+
+**gul-geo** 🦀
+
+- Type: Rust Crate
+- Location: `packages/scientific/gul-geo`
+
+**gul-physics** 🦀
+
+- Type: Rust Crate
+- Location: `packages/scientific/gul-physics`
+
+**gul-scipy** 🦀
+
+- Type: Rust Crate
+- Location: `packages/scientific/gul-scipy`
+
+**gul-units** 🦀
+
+- Type: Rust Crate
+- Location: `packages/scientific/gul-units`
+
+### Storage
+
+**gul-storage** 🦀
+
+- Type: Rust Crate
+- Location: `packages/storage/gul-storage`
+
+### Testing
+
+**gul-bench** 🦀
+
+- Type: Rust Crate
+- Location: `packages/testing/gul-bench`
+
+**gul-debug** 🦀
+
+- Type: Rust Crate
+- Location: `packages/testing/gul-debug`
+
+**gul-log** 🦀
+
+- Type: Rust Crate
+- Location: `packages/testing/gul-log`
+
+**gul-mock** 🦀
+
+- Type: Rust Crate
+- Location: `packages/testing/gul-mock`
+
+**gul-test** 🦀
+
+- Type: Rust Crate
+- Location: `packages/testing/gul-test`
+
+### Text
+
+**combinator** 🔷
+
+- Type: Pure GUL
+- Location: `packages/text/combinator.mn`
+
+**gul-markdown** 🦀
+
+- Type: Rust Crate
+- Location: `packages/text/gul-markdown`
+
+**lexer** 🔷
+
+- Type: Pure GUL
+- Location: `packages/text/lexer.mn`
+
+**regex_lite** 🔷
+
+- Type: Pure GUL
+- Location: `packages/text/regex_lite.mn`
+
+### Tools
+
+**gul-db** 🦀
+
+- Type: Rust Crate
+- Location: `packages/tools/gul-db`
+
+**gul-debugger** 🦀
+
+- Type: Rust Crate
+- Location: `packages/tools/gul-debugger`
+
+**gul-editor** 🦀
+
+- Type: Rust Crate
+- Location: `packages/tools/gul-editor`
+
+**gul-explorer** 🦀
+
+- Type: Rust Crate
+- Location: `packages/tools/gul-explorer`
+
+**gul-git** 🦀
+
+- Type: Rust Crate
+- Location: `packages/tools/gul-git`
+
+**gul-logs** 🦀
+
+- Type: Rust Crate
+- Location: `packages/tools/gul-logs`
+
+**gul-monitor** 🦀
+
+- Type: Rust Crate
+- Location: `packages/tools/gul-monitor`
+
+**gul-package** 🦀
+
+- Type: Rust Crate
+- Location: `packages/tools/gul-package`
+
+**gul-profiler** 🦀
+
+- Type: Rust Crate
+- Location: `packages/tools/gul-profiler`
+
+**gul-repl** 🦀
+
+- Type: Rust Crate
+- Location: `packages/tools/gul-repl`
+
+### Tui
+
+**gul-chart** 🦀
+
+- Type: Rust Crate
+- Location: `packages/tui/gul-chart`
+
+**gul-colors** 🦀
+
+- Type: Rust Crate
+- Location: `packages/tui/gul-colors`
+
+**gul-progress** 🦀
+
+- Type: Rust Crate
+- Location: `packages/tui/gul-progress`
+
+**gul-prompt** 🦀
+
+- Type: Rust Crate
+- Location: `packages/tui/gul-prompt`
+
+**gul-ssh** 🦀
+
+- Type: Rust Crate
+- Location: `packages/tui/gul-ssh`
+
+**gul-table** 🦀
+
+- Type: Rust Crate
+- Location: `packages/tui/gul-table`
+
+**gul-terminal** 🦀
+
+- Type: Rust Crate
+- Location: `packages/tui/gul-terminal`
+
+**gul-tui** 🦀
+
+- Type: Rust Crate
+- Location: `packages/tui/gul-tui`
+
+### Ui
+
+**layout** 🔷
+
+- Type: Pure GUL
+- Location: `packages/ui/layout.mn`
+
+**theme** 🔷
+
+- Type: Pure GUL
+- Location: `packages/ui/theme.mn`
+
+### Utils
+
+**color** 🔷
+
+- Type: Pure GUL
+- Location: `packages/utils/color.mn`
+
+**date** 🔷
+
+- Type: Pure GUL
+- Location: `packages/utils/date.mn`
+
+**gul-compress** 🦀
+
+- Type: Rust Crate
+- Location: `packages/utils/gul-compress`
+
+**gul-crypto** 🦀
+
+- Type: Rust Crate
+- Location: `packages/utils/gul-crypto`
+
+**gul-csv** 🦀
+
+- Type: Rust Crate
+- Location: `packages/utils/gul-csv`
+
+**gul-datetime** 🦀
+
+- Type: Rust Crate
+- Location: `packages/utils/gul-datetime`
+
+**gul-hash** 🦀
+
+- Type: Rust Crate
+- Location: `packages/utils/gul-hash`
+
+**gul-json** 🦀
+
+- Type: Rust Crate
+- Location: `packages/utils/gul-json`
+
+**gul-regex** 🦀
+
+- Type: Rust Crate
+- Location: `packages/utils/gul-regex`
+
+**gul-toml** 🦀
+
+- Type: Rust Crate
+- Location: `packages/utils/gul-toml`
+
+**gul-xml** 🦀
+
+- Type: Rust Crate
+- Location: `packages/utils/gul-xml`
+
+**gul-yaml** 🦀
+
+- Type: Rust Crate
+- Location: `packages/utils/gul-yaml`
+
+**logger** 🔷
+
+- Type: Pure GUL
+- Location: `packages/utils/logger.mn`
+
+**random_lcg** 🔷
+
+- Type: Pure GUL
+- Location: `packages/utils/random_lcg.mn`
+
+**result** 🔷
+
+- Type: Pure GUL
+- Location: `packages/utils/result.mn`
+
+**string_utils** 🔷
+
+- Type: Pure GUL
+- Location: `packages/utils/string_utils.mn`
+
+**uuid_lite** 🔷
+
+- Type: Pure GUL
+- Location: `packages/utils/uuid_lite.mn`
+
+### Validation
+
+**card** 🔷
+
+- Type: Pure GUL
+- Location: `packages/validation/card.mn`
+
+**email** 🔷
+
+- Type: Pure GUL
+- Location: `packages/validation/email.mn`
+
+### Visualization
+
+**gul-visualization** 🦀
+
+- Type: Rust Crate
+- Location: `packages/visualization/gul-visualization`
+
+### Web
+
+**gul-cookies** 🦀
+
+- Type: Rust Crate
+- Location: `packages/web/gul-cookies`
+
+**gul-cors** 🦀
+
+- Type: Rust Crate
+- Location: `packages/web/gul-cors`
+
+**gul-csrf** 🦀
+
+- Type: Rust Crate
+- Location: `packages/web/gul-csrf`
+
+**gul-css** 🦀
+
+- Type: Rust Crate
+- Location: `packages/web/gul-css`
+
+**gul-html** 🦀
+
+- Type: Rust Crate
+- Location: `packages/web/gul-html`
+
+**gul-http** 🦀
+
+- Type: Rust Crate
+- Location: `packages/web/gul-http`
+
+**gul-openapi** 🦀
+
+- Type: Rust Crate
+- Location: `packages/web/gul-openapi`
+
+**gul-router** 🦀
+
+- Type: Rust Crate
+- Location: `packages/web/gul-router`
+
+**gul-sse** 🦀
+
+- Type: Rust Crate
+- Location: `packages/web/gul-sse`
+
+**gul-templates** 🦀
+
+- Type: Rust Crate
+- Location: `packages/web/gul-templates`
+
+**gul-ui** 🦀
+
+- Type: Rust Crate
+- Location: `packages/web/gul-ui`
+
+**gul-url** 🦀
+
+- Type: Rust Crate
+- Location: `packages/web/gul-url`
+
+**gul-web** 🦀
+
+- Type: Rust Crate
+- Location: `packages/web/gul-web`
+
+**gul-websocket** 🦀
+
+- Type: Rust Crate
+- Location: `packages/web/gul-websocket`

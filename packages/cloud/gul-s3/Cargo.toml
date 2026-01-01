@@ -2,14 +2,10 @@
 name = "gul-s3"
 version = "0.1.0"
 edition = "2021"
-description = "S3 Client for GUL"
 
 [dependencies]
-reqwest = { version = "0.11", features = ["json"] }
-tokio = { version = "1.0", features = ["full"] }
+reqwest = { version = "0.11", features = ["blocking", "json"] }
 chrono = "0.4"
+base64 = "0.21"
 hmac = "0.12"
 sha2 = "0.10"
-hex = "0.4"
-base64 = "0.21"
-anyhow = "1.0"

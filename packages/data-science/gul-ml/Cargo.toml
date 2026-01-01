@@ -10,5 +10,6 @@ keywords = ["ml", "machine-learning", "ai", "neural-network", "gul"]
 categories = ["science"]
 
 [dependencies]
+serde = { version = "1.0", features = ["derive"] }
 
 [dev-dependencies]

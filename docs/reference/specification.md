@@ -4,10 +4,10 @@
 
 ---
 
-# GUL Language Specification v2.0
+# GUL Language Specification v3.2
 
-Version: 0.13.0  
-Date: 2025-12-28  
+Version: 0.13.0
+Date: 2025-12-29
 Status: Production Ready
 
 ---
@@ -125,7 +125,9 @@ Built-in support for embedding:
 - Python (via PyO3)
 - JavaScript (via QuickJS/V8)
 - C (via libloading)
+- C (via libloading)
 - SQL (embedded queries)
+- AI (via gul-ml and gul-model-serving)
 
 ### 1.10 Toolchain Overview
 
@@ -140,7 +142,7 @@ Built-in support for embedding:
 
 ## 2. Language Structure
 
-### 2.1 File Types (v2.1)
+### 2.1 File Types (v3.2)
 
 GUL uses a 5-file architecture. Users write in `.mn` files; compiler separates on publish:
 
@@ -284,7 +286,7 @@ The lexer produces the following token types:
 - Case-sensitive
 - Unicode characters allowed
 
-### 3.4 Keywords (v2.0)
+### 3.4 Keywords (v3.2)
 
 **Primary Keywords:**
 
@@ -1810,7 +1812,10 @@ SQL strings are strictly parameterized.
 
 ### 22.8 Concurrency
 
-`std.sync`, `std.thread` - Mutex, Channel, Thread
+### 22.8 Concurrency
+
+`std.sync`, `std.thread` - Mutex, Channel, Thread.
+`std.async` - `spawn`, `join`, `join_all`, `sleep`.
 
 ### 22.9 Compression
 
@@ -2060,6 +2065,7 @@ DEDENT ::= <decrease in indentation>
 - [Project Structure Guide](structure.md)
 - [Compiler Architecture](../guides/compiler.md)
 - [Standard Library Reference](../api/standard-library.md)
+- [Data Science & AI Guide](../guides/data-science.md)
 - [Complete Knowledgebase](knowledgebase.md)
 
 ---

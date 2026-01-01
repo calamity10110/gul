@@ -1,0 +1,15 @@
+# Test importing a module
+print("Testing import system...")
+
+@imp compiler.tests.test_module
+
+print("Calling imported function...")
+let result = helper_function(21)
+print("Result:", result)
+
+let greeting = greet("World")
+print(greeting)
+
+print("Module constant:", MODULE_CONSTANT)
+
+print("Import test complete!")

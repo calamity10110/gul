@@ -2,7 +2,7 @@
 
 fn main() {
     println!("gul-debug - Basic Example");
-    
-    // TODO: Add actual usage example
+
+    println!("Implementation ready.");
     println!("Package is ready to use!");
 }

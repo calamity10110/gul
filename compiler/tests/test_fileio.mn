@@ -1,0 +1,17 @@
+# Test file I/O
+print("Testing file I/O...")
+
+# Write a test file
+let content = "Hello from GUL compiler test!"
+let success = write_file("test_output.txt", content)
+print("Write successful:", success)
+
+# Read it back
+let read_content = read_file("test_output.txt")
+print("Read content:", read_content)
+
+# Check file exists
+let exists = file_exists("test_output.txt")
+print("File exists:", exists)
+
+print("File I/O test complete!")

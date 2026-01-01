@@ -1,0 +1,15 @@
+# Test struct field access via function parameter
+struct TestStruct:
+    name: @str
+    value: @int
+
+fn test_param_access(ts: TestStruct):
+    print("Inside function:")
+    print(ts.name)
+    print(ts.value)
+
+let test = TestStruct{name: "hello", value: 42}
+test_param_access(test)
+
+mn:
+    print("Done!")

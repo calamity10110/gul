@@ -1,0 +1,65 @@
+# GUL v3.2 Web API - Generated Code
+# Description: Create web API for users
+# Syntax: v3.2 with full type annotations and ownership modes
+
+@imp std.http
+@imp std.json
+@imp std.db
+
+# Type definition with @ prefix constructors
+struct User:
+    id: @int
+    username: @str
+    email: @str
+    created_at: @str
+
+# Async function with full type annotations
+async @dict get_users() -> @dict:
+    """Fetch all users from database"""
+    let users = await db.query("SELECT * FROM users ORDER BY created_at DESC")
+    return @dict{
+        status: @int(200),
+        data: users
+    }
+
+async @dict create_user(req) -> @dict:
+    """Create new user with validation"""
+    # Extract data from request
+    let username = @str(req.body["username"])
+    let email = @str(req.body["email"])
+    
+    # Validate input (borrow for read-only access)
+    if not validate_email(borrow email):
+        return @dict{
+            status: @int(400),
+            error: @str("Invalid email format")
+        }
+    
+    # Insert into database
+    let user_id = await db.execute(
+        "INSERT INTO users (username, email) VALUES (?, ?)",
+        username, email
+    )
+    
+    return @dict{
+        status: @int(201),
+        id: user_id,
+        message: @str("User created successfully")
+    }
+
+fn @bool validate_email(email: borrow @str) -> @bool:
+    """Validate email format (uses borrow for efficiency)"""
+    return email.contains("@") && email.contains(".")
+
+# Main entry point
+mn:
+    print(@str("🚀 Starting GUL v3.2 Web API Server..."))
+    
+    # Configure routes
+    http.get("/api/users", get_users)
+    http.post("/api/users", create_user)
+    
+    # Start server with type-annotated port
+    let port = @int(8080)
+    print(@str(f"✅ Server running on http://localhost:{port}"))
+    http.listen(port)

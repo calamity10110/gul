@@ -1,0 +1,27 @@
+@imp std.io
+
+fn tokenize_min(source: @str) -> @int:
+    var l_pos = @int(0)
+    var l_len = len(source)
+    var count = @int(0)
+    
+    while l_pos < l_len:
+        let ch = source[l_pos]
+        if ch == " " or ch == "\t" or ch == "\n" or ch == "\r":
+            l_pos = l_pos + 1
+            continue
+        if ch == "#":
+            while l_pos < l_len and source[l_pos] != "\n":
+                l_pos = l_pos + 1
+            continue
+        l_pos = l_pos + 1
+        count = count + 1
+    return count
+
+fn main():
+    let source = "# test\nlet x = 1\n"
+    print("START")
+    let count = tokenize_min(source)
+    print("DONE: " + str(count))
+
+main()

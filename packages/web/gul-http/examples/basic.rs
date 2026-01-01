@@ -1,8 +1,14 @@
-// Example usage of gul-http
+use gul_http;
+use log::info;
 
 fn main() {
-    println!("gul-http - Basic Example");
-    
-    // TODO: Add actual usage example
-    println!("Package is ready to use!");
+    gul_logging::init();
+    info!("gul-http - Basic Example");
+
+    // Mock HTTP Request
+    let url = "https://api.gul-lang.org/v1/status";
+    info!("GET {}", url);
+
+    // In real app: let resp = client.get(url).send().await?;
+    info!("Response: 200 OK {{ 'status': 'healthy' }}");
 }

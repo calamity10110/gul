@@ -1,0 +1,5 @@
+# std.fs stub module  
+# Minimal implementation for compiler bootstrapping
+
+# These are already provided as built-ins in the interpreter
+# This module just exports them under std.fs namespace

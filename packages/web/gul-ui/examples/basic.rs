@@ -1,8 +1,6 @@
-// Example usage of gul-ui
+use gul_ui::Component;
 
 fn main() {
-    println!("gul-ui - Basic Example");
-    
-    // TODO: Add actual usage example
-    println!("Package is ready to use!");
+    let card = Component::card("Welcome", "Hello GUL Users");
+    println!("{}", card.render_html());
 }

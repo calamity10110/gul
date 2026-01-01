@@ -1,0 +1,19 @@
+# Minimal test file that imports parser and tests method execution
+@imp compiler.lexer.lexer
+@imp compiler.parser.parser
+
+fn test_it():
+    let source = "let x = 5"
+    let tokens = tokenize(source)
+    var p = Parser.create(tokens)
+    print("DEBUG: p created")
+    print("DEBUG: p type check")
+    print(p)
+    print("Before calling test_method_works")
+    p.test_method_works()
+    print("After calling test_method_works")
+
+test_it()
+
+mn:
+    print("Done")

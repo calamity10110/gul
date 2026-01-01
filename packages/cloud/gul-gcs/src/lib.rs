@@ -4,7 +4,9 @@ pub struct GCSClient {
 
 impl GCSClient {
     pub fn new(bucket: &str) -> Self {
-        Self { bucket: bucket.to_string() }
+        Self {
+            bucket: bucket.to_string(),
+        }
     }
 
     pub async fn upload(&self, object: &str, data: &[u8]) -> Result<(), String> {

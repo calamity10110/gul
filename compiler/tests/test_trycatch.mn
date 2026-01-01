@@ -1,0 +1,12 @@
+#  Test try/catch
+print("Testing try/catch...")
+
+try:
+    print("In try block")
+    let result = read_file("nonexistent_file.txt")
+    print("Should not reach here")
+catch e:
+    print("In catch block - error handled!")
+
+print("After try/catch block")
+print("Test complete!")

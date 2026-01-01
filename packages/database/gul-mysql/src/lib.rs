@@ -1,15 +1,12 @@
-// gul-mysql - MySQL driver
+use sqlx::mysql::{MySqlPool, MySqlPoolOptions};
 
-pub struct Mysql {
-    // Implementation
+pub struct MySqlManager {
+    pool: MySqlPool,
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_basic() {
-        assert_eq!(2 + 2, 4);
+impl MySqlManager {
+    pub async fn new(url: &str) -> Result<Self, sqlx::Error> {
+        let pool = MySqlPoolOptions::new().connect(url).await?;
+        Ok(Self { pool })
     }
 }

@@ -1,0 +1,9 @@
+# Test single-line dict vs multi-line
+let single_line_dict = @dict{"fn": "keyword1", "let": "keyword2"}
+
+print("Single-line dict:")
+print(single_line_dict)
+print("fn in single_line_dict: " + str("fn" in single_line_dict))
+
+mn:
+    print("Done!")

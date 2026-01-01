@@ -4,7 +4,7 @@
 
 ---
 
-# Building a Web Server Tutorial
+## Building a Web Server Tutorial
 
 Learn to build a complete REST API web server with GUL, including routing, database integration, and authentication.
 

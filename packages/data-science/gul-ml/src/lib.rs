@@ -3,8 +3,10 @@
 
 use std::collections::HashMap;
 
+use serde::{Deserialize, Serialize};
+
 /// Neural Network Layer
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Layer {
     Dense {
         input_size: usize,
@@ -26,7 +28,7 @@ pub enum Layer {
 }
 
 /// Activation Functions
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub enum Activation {
     ReLU,
     Sigmoid,
@@ -36,7 +38,7 @@ pub enum Activation {
 }
 
 /// Model Architecture
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Model {
     layers: Vec<Layer>,
     name: String,

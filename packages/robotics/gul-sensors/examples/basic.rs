@@ -1,8 +1,6 @@
-// Example usage of gul-sensors
+use gul_sensors::{MockImu, Sensor};
 
 fn main() {
-    println!("gul-sensors - Basic Example");
-    
-    // TODO: Add actual usage example
-    println!("Package is ready to use!");
+    let mut imu = MockImu;
+    println!("IMU: {:?}", imu.read().unwrap());
 }

@@ -1,11 +1,8 @@
 pub mod svg {
     use svg::node::element::Circle;
-    
+
     pub fn create_circle(cx: i32, cy: i32, r: i32) -> Circle {
-        Circle::new()
-            .set("cx", cx)
-            .set("cy", cy)
-            .set("r", r)
+        Circle::new().set("cx", cx).set("cy", cy).set("r", r)
     }
 }
 

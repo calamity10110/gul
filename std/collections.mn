@@ -1,0 +1,5 @@
+# std.collections stub module
+# Minimal implementation for compiler bootstrapping
+
+# These collection types are already built-in to the interpreter
+# This module provides them under std.collections namespace

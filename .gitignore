@@ -32,11 +32,12 @@ Thumbs.db
 coverage/
 *.profraw
 
-# Logs
-*.log
-
-# Large binaries
+# Large binaries and logs
 **/*-[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]s
+debug_log.txt
+debug_output*.txt
+debug_parser*.txt
+test_output.txt
 
 # Cache
 /.cache
@@ -47,3 +48,4 @@ coverage/
 
 # OS-specific
 Thumbs.db
+.embuild/

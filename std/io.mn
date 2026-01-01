@@ -1,0 +1,5 @@
+# std.io stub module
+# Minimal implementation for compiler bootstrapping
+
+# print and println are built-in for the interpreter
+# so we don't need to redefine them here

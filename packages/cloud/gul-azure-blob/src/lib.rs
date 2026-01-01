@@ -1,18 +1,17 @@
-pub struct AzureBlobClient {
+pub struct BlobClient {
     account: String,
-    container: String,
+    key: String,
 }
 
-impl AzureBlobClient {
-    pub fn new(account: &str, container: &str) -> Self {
+impl BlobClient {
+    pub fn new(account: &str, key: &str) -> Self {
         Self {
             account: account.to_string(),
-            container: container.to_string(),
+            key: key.to_string(),
         }
     }
 
-    pub async fn put_blob(&self, blob: &str, data: &[u8]) -> Result<(), String> {
-        // Mock
-        Ok(())
+    pub fn upload(&self, container: &str, blob_name: &str, _data: &[u8]) {
+        println!("MOCK: Azure Upload to {}/{}", container, blob_name);
     }
 }

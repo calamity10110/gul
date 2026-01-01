@@ -5,3 +5,4 @@ edition = "2021"
 
 [dependencies]
 ndarray = "0.15"
+# ndarray-linalg = "0.16" # Commented out to avoid complex system dep requirements (lapack) for now

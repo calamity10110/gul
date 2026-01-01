@@ -1,15 +1,12 @@
-// gul-sqlite - SQLite driver
+use sqlx::sqlite::{SqlitePool, SqlitePoolOptions};
 
-pub struct Sqlite {
-    // Implementation
+pub struct SqliteManager {
+    pool: SqlitePool,
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_basic() {
-        assert_eq!(2 + 2, 4);
+impl SqliteManager {
+    pub async fn new(url: &str) -> Result<Self, sqlx::Error> {
+        let pool = SqlitePoolOptions::new().connect(url).await?;
+        Ok(Self { pool })
     }
 }

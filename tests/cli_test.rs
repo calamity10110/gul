@@ -4,7 +4,7 @@ use std::process::Command;
 #[test]
 fn test_cli_package_list() {
     let output = Command::new("cargo")
-        .args(["run", "--", "package", "list"])
+        .args(["run", "--bin", "gul", "--", "package", "list"])
         .output()
         .expect("Failed to execute command");
 
@@ -16,7 +16,7 @@ fn test_cli_package_list() {
 #[test]
 fn test_cli_package_info() {
     let output = Command::new("cargo")
-        .args(["run", "--", "package", "info", "actix-web"])
+        .args(["run", "--bin", "gul", "--", "package", "info", "actix-web"])
         .output()
         .expect("Failed to execute command");
 
@@ -28,7 +28,7 @@ fn test_cli_package_info() {
 #[test]
 fn test_cli_package_search() {
     let output = Command::new("cargo")
-        .args(["run", "--", "package", "search", "web"])
+        .args(["run", "--bin", "gul", "--", "package", "search", "web"])
         .output()
         .expect("Failed to execute command");
 
@@ -40,7 +40,7 @@ fn test_cli_package_search() {
 #[test]
 fn test_cli_ai_status() {
     let output = Command::new("cargo")
-        .args(["run", "--", "ai", "status"])
+        .args(["run", "--bin", "gul", "--", "ai", "status"])
         .output()
         .expect("Failed to execute command");
 
@@ -52,7 +52,7 @@ fn test_cli_ai_status() {
 #[test]
 fn test_cli_package_audit() {
     let output = Command::new("cargo")
-        .args(["run", "--", "package", "audit"])
+        .args(["run", "--bin", "gul", "--", "package", "audit"])
         .output()
         .expect("Failed to execute command");
 
@@ -64,7 +64,7 @@ fn test_cli_package_audit() {
 #[test]
 fn test_cli_package_outdated() {
     let output = Command::new("cargo")
-        .args(["run", "--", "package", "outdated"])
+        .args(["run", "--bin", "gul", "--", "package", "outdated"])
         .output()
         .expect("Failed to execute command");
 

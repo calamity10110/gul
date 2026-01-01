@@ -2,12 +2,7 @@
 name = "gul-mysql"
 version = "0.1.0"
 edition = "2021"
-authors = ["GUL Team <team@gul-lang.org>"]
-description = "MySQL driver"
-license = "MIT"
-repository = "https://github.com/gul-lang/packages"
-keywords = ["mysql", "database", "sql"]
 
 [dependencies]
-
-[dev-dependencies]
+sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "mysql"] }
+tokio = { version = "1.0", features = ["full"] }

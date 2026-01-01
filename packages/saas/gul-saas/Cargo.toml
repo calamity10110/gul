@@ -4,4 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-serde = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1.0", features = ["full"] }
+chrono = "0.4"
+
+[dependencies.aws-config]
+version = "0.55"
+
+[dependencies.aws-sdk-dynamodb]
+version = "0.28"

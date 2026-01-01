@@ -1,0 +1,8 @@
+# Test CLI argument handling
+let args = sys.argv
+print("Arguments received:")
+for arg in args:
+    print("  -", arg)
+
+print("")
+print("Total arguments:", len(args))

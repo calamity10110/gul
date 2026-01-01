@@ -1,0 +1,15 @@
+[package]
+name = "gul-wireless"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+default = ["stub"]
+stub = []
+real = []          # ["dep:esp-idf-svc"]
+
+[dependencies]
+# esp-idf-svc = { version = "0.47", optional = true } # Commented out to prevent build attempts on Linux
+# This crate is tricky on non-ESP targets. We usually cfg it out entirely or use conditional deps.
+# For GUL on Linux, we mock everything.
+log = "0.4"

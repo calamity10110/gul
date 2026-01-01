@@ -1,0 +1,12 @@
+[package]
+name = "gul-audio"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+default = ["stub"]
+stub = []
+real = ["dep:rodio"]
+
+[dependencies]
+rodio = { version = "0.19", optional = true } # Audio backend

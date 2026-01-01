@@ -2,15 +2,16 @@
 name = "gul-postgres"
 version = "0.1.0"
 edition = "2021"
-authors = ["GUL Team <team@gul-lang.org>"]
-description = "PostgreSQL database driver for GUL"
-license = "MIT"
-repository = "https://github.com/gul-lang/packages"
-keywords = ["postgres", "postgresql", "database", "sql", "gul"]
-categories = ["database"]
+
+[features]
+default = ["real"]
+real = ["dep:sqlx"]
+mock = []
 
 [dependencies]
-tokio = { version = "1.35", features = ["full"] }
-
-[dev-dependencies]
-tokio-test = "0.4"
+tokio = { version = "1.0", features = ["full"] }
+sqlx = { version = "0.7", features = [
+    "runtime-tokio-rustls",
+    "postgres",
+], optional = true }
+log = "0.4"
