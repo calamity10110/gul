@@ -12,6 +12,7 @@ pub fn load_std_module(name: &str) -> Option<Value> {
         "std.udp" => Some(create_udp_module()),
         "std.bytes" => Some(create_bytes_module()),
         "std.async" => Some(create_async_module()),
+        "std.test" => Some(create_test_module()),
         "embedded.batt" => Some(create_batt_module()),
         "embedded.storage" => Some(create_embedded_storage_module()),
         "embedded.micropython" => Some(create_micropython_module()),
@@ -481,4 +482,50 @@ fn create_embedded_storage_module() -> Value {
         Value::NativeFunction(|_| Value::Object("NvsStorage".to_string(), HashMap::new())),
     );
     Value::Object("embedded.storage".to_string(), module)
+}
+
+fn create_test_module() -> Value {
+    let mut module = HashMap::new();
+
+    // std.test.suite(name)
+    module.insert(
+        "suite".to_string(),
+        Value::NativeFunction(|args| {
+            if let Some(Value::String(name)) = args.first() {
+                println!("Running test suite: {}", name);
+            }
+            Value::Null
+        }),
+    );
+
+    // std.test.assert(cond, msg) - complementary to builtin assert
+    module.insert(
+        "assert".to_string(),
+        Value::NativeFunction(|args| {
+            // Re-use logic or just let the builtin handle it if users call it as assert()
+            // Here we can provide more formatted output if we want.
+            if args.is_empty() {
+                return Value::Null;
+            }
+            let condition = match &args[0] {
+                Value::Bool(b) => *b,
+                _ => true,
+            };
+            if !condition {
+                let msg = if args.len() > 1 {
+                    match &args[1] {
+                        Value::String(s) => s.clone(),
+                        _ => format!("{:?}", args[1]),
+                    }
+                } else {
+                    "Assertion failed".to_string()
+                };
+                eprintln!("TEST FAILURE: {}", msg);
+                panic!("test_assert_fail");
+            }
+            Value::Null
+        }),
+    );
+
+    Value::Object("std.test".to_string(), module)
 }

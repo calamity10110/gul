@@ -192,6 +192,7 @@ impl Parser {
         match self.current_token() {
             // v3.0 annotations
             Token::Identifier(name) if name == "imp" => self.parse_at_import(),
+            Token::Imp | Token::Import => self.parse_at_import(),
             Token::Identifier(name) if name == "ui" => self.parse_at_ui(),
             Token::Identifier(name) if name == "python" => self.parse_at_lang_block("python"),
             Token::Identifier(name) if name == "rust" => self.parse_at_lang_block("rust"),

@@ -1,0 +1,13 @@
+@imp std.test
+
+mn:
+    # Test built-in assert
+    assert(1 + 1 == 2, "Basic math should work")
+    
+    # Test std.test.suite
+    test.suite("Standard Library Check")
+    
+    # Test std.test.assert
+    test.assert(true, "Boolean check")
+    
+    print("All tests in builtin_test.mn PASSED!")

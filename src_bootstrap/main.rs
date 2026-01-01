@@ -121,6 +121,12 @@ enum Commands {
     /// Run benchmarks
     Bench,
 
+    /// Run tests
+    Test {
+        /// Source file to test (optional)
+        file: Option<PathBuf>,
+    },
+
     /// Run MCP server
     #[cfg(feature = "mcp")]
     Mcp,
@@ -616,5 +622,92 @@ fn main() {
                 eprintln!("Error running REPL: {}", e);
             }
         }
+
+        Commands::Test { file } => {
+            if let Some(path) = file {
+                match run_single_test(&path) {
+                    Ok(_) => println!("{} {}", "✓".green(), path.display()),
+                    Err(e) => {
+                        eprintln!("{} {}: {}", "✗".red(), path.display(), e);
+                        std::process::exit(1);
+                    }
+                }
+            } else {
+                let mut passed = 0;
+                let mut failed = 0;
+                let mut test_files = Vec::new();
+
+                // Find tests in tests/ and compiler/tests/
+                for dir in &["tests", "compiler/tests"] {
+                    if let Ok(entries) = std::fs::read_dir(dir) {
+                        for entry in entries.flatten() {
+                            let path = entry.path();
+                            if path.extension().map_or(false, |ext| ext == "mn") {
+                                test_files.push(path);
+                            }
+                        }
+                    }
+                }
+
+                if test_files.is_empty() {
+                    println!("{}", "No tests found.".yellow());
+                    return;
+                }
+
+                println!("Running {} tests...\n", test_files.len());
+
+                for path in test_files {
+                    print!("Testing {} ... ", path.display());
+                    std::io::Write::flush(&mut std::io::stdout()).ok();
+                    match run_single_test(&path) {
+                        Ok(_) => {
+                            println!("{}", "passed".green());
+                            passed += 1;
+                        }
+                        Err(e) => {
+                            println!("{}", "failed".red());
+                            eprintln!("  {}", e);
+                            failed += 1;
+                        }
+                    }
+                }
+
+                println!(
+                    "\nTest summary: {} passed, {} failed",
+                    passed.to_string().green(),
+                    if failed > 0 {
+                        failed.to_string().red()
+                    } else {
+                        failed.to_string().green()
+                    }
+                );
+
+                if failed > 0 {
+                    std::process::exit(1);
+                }
+            }
+        }
+    }
+}
+
+fn run_single_test(path: &std::path::Path) -> Result<(), String> {
+    let source = std::fs::read_to_string(path)
+        .map_err(|e| format!("Failed to read file: {}", e))?;
+
+    let mut lexer = gul_lang::lexer::Lexer::new(&source);
+    let tokens = lexer.tokenize();
+    let mut parser = gul_lang::parser::Parser::new(tokens);
+    let program = parser.parse().map_err(|e| format!("Parse error: {}", e))?;
+
+    let mut interpreter = gul_lang::interpreter::Interpreter::new();
+    
+    // We use catch_unwind because assert() panics on failure
+    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(move || {
+        interpreter.run(&program)
+    }));
+
+    match result {
+        Ok(run_result) => run_result,
+        Err(_) => Err("Assertion failed".to_string()),
     }
 }
