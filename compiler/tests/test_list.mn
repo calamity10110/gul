@@ -1,4 +1,0 @@
-let s = "abc"
-let l = @list[s]
-print(len(l))
-print(l[0])

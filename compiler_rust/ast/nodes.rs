@@ -1,389 +1,395 @@
-// Auto-generated from GUL source
-#![allow(unused_variables, dead_code, unused_mut)]
+// GUL v3.2 Compiler - AST Node Definitions (Refactored)
+use std::collections::{HashMap, HashSet};
+use crate::lexer::token::*;
 
-use std::collections::{HashMap, HashSet, VecDeque};
+#[derive(Debug, Clone, PartialEq)]
+pub struct ASTNode {
+    pub line: usize,
+    pub column: usize,
 
-// GUL v3.2 Compiler - AST Node Definitions
-// Abstract Syntax Tree node types for representing parsed GUL code
+}
+impl ASTNode {
+    pub fn location(&self)  ->  String {
+        return format!("{}:{}", self.line, self.column);
 
-use std::collections;
-use compiler::lexer::token;
-
-// ================================================================================
-// BASE NODE TYPES
-// ================================================================================
-
-// Base node for all AST nodes
-struct ASTNode {
-    line: @int
-    column: @int
-    
-fn String location(&self) -> String {
-        return @str(format!("{self.line}:{self.column}"))
-
-// ================================================================================
-// EXPRESSION NODES
-// ================================================================================
-
-enum ExprType {
-    // Literals
-    IntegerLiteral
-    FloatLiteral
-    StringLiteral
-    BooleanLiteral
-    NoneLiteral
-    
-    // Collections
-    ListLiteral
-    TupleLiteral
-    SetLiteral
-    DictLiteral
-    
-    // Variables and names
-    Identifier
-    
-    // Binary operations
-    BinaryOp
-    
-    // Unary operations
-    UnaryOp
-    
-    // Function call
-    Call
-    
-    // Index/subscript
-    Index
-    
-    // Attribute access
-    Attribute
-    
-    // Lambda/arrow function
-    Lambda
-    
-    // Match expression
-    MatchExpr
-    
-    // Type constructor
-    TypeConstructor
-    
-    // Parenthesized expression
-    Grouped
-
-// Expression base struct
-struct Expression {
-    node: ASTNode
-    expr_type: ExprType
-
-// Literal value expression
-struct LiteralExpr {
-    base: Expression
-    value: @str  # String representation of the value
-    value_type: TokenType  # Integer, Float, String, Boolean
-
-// Identifier (variable name)
-struct IdentifierExpr {
-    base: Expression
-    name: @str
-
-// Binary operation (a + b, x == y, etc.)
-struct BinaryOpExpr {
-    base: Expression
-    left: Expression
-    operator: TokenType
-    right: Expression
-
-// Unary operation (not x, -y, etc.)
-struct UnaryOpExpr {
-    base: Expression
-    operator: TokenType
-    operand: Expression
-
-// Function call
-struct CallExpr {
-    base: Expression
-    callee: Expression  # Function being called
-    arguments: @list[Expression]
-    keyword_args: @dict  # name -> Expression
-
-// Index/subscript (list[0], dict[key])
-struct IndexExpr {
-    base: Expression
-    object: Expression
-    index: Expression
-
-// Attribute access (obj.field)
-struct AttributeExpr {
-    base: Expression
-    object: Expression
-    attribute: @str
-
-// List literal
-struct ListExpr {
-    base: Expression
-    elements: @list[Expression]
-
-// Tuple literal
-struct TupleExpr {
-    base: Expression
-    elements: @list[Expression]
-
-// Set literal
-struct SetExpr {
-    base: Expression
-    elements: @list[Expression]
-
-// Dictionary literal
-struct DictExpr {
-    base: Expression
-    pairs: @list[@tuple(Expression, Expression)]  # (key, value) pairs
-
-// Lambda/arrow function
-struct LambdaExpr {
-    base: Expression
-    parameters: @list[@str]
-    body: Expression
-
-// Match expression
-struct MatchExpr {
-    base: Expression
-    value: Expression
-    cases: @list[MatchCase]
-
-struct MatchCase {
-    pattern: Expression
-    guard: Expression  # Optional condition (can be Option::None)
-    body: Expression
-
-// Type constructor (@int(42), @str("hello"))
-struct TypeConstructorExpr {
-    base: Expression
-    type_name: @str  # "int", "float", "str", etc.
-    argument: Expression  # Value being cast/constructed
-
-// ================================================================================
-// STATEMENT NODES
-// ================================================================================
-
-enum StmtType {
-    // Declarations
-    LetDecl
-    VarDecl
-    FunctionDecl
-    StructDecl
-    EnumDecl
-    
-    // Control flow
-    IfStmt
-    WhileStmt
-    ForStmt
-    LoopStmt
-    MatchStmt
-    
-    // Flow control
-    BreakStmt
-    ContinueStmt
-    ReturnStmt
-    
-    // Error handling
-    TryStmt
-    
-    // Other
-    ExpressionStmt
-    AssignmentStmt
-    ImportStmt
-    ForeignCodeBlock
-    PassStmt
-
-// Statement base struct
-struct Statement {
-    node: ASTNode
-    stmt_type: StmtType
-
-// Let declaration (immutable)
-struct LetStmt {
-    base: Statement
-    name: @str
-    type_annotation: @str  # Optional type (can be empty)
-    value: Expression
-
-// Var declaration (mutable)
-struct VarStmt {
-    base: Statement
-    name: @str
-    type_annotation: @str
-    value: Expression
-
-// Assignment statement (x = 5, x += 1)
-struct AssignmentStmt {
-    base: Statement
-    target: Expression  # Can be identifier, index, || attribute
-    operator: TokenType  # Equal, PlusEq, MinusEq, etc.
-    value: Expression
-
-// Function declaration
-struct FunctionDecl {
-    base: Statement
-    name: @str
-    is_async: @bool
-    parameters: @list[Parameter]
-    return_type: @str  # Optional return type
-    body: @list[Statement]
-    decorators: @list[@str]  # Decorator names
-
-struct Parameter {
-    name: @str
-    type_annotation: @str  # Optional type
-    ownership_mode: @str  # "borrow", "reformat!(", ")move", "kept", || empty
-    default_value: Expression  # Optional default value
-
-// Struct declaration
-struct StructDecl {
-    base: Statement
-    name: @str
-    fields: @list[StructField]
-    methods: @list[FunctionDecl]
-
-struct StructField {
-    name: @str
-    type_annotation: @str
-
-// Enum declaration
-struct EnumDecl {
-    base: Statement
-    name: @str
-    variants: @list[@str]
-
-// If statement
-struct IfStmt {
-    base: Statement
-    condition: Expression
-    then_body: @list[Statement]
-    elif_clauses: @list[ElifClause]
-    else_body: @list[Statement]  # Can be empty
-
-struct ElifClause {
-    condition: Expression
-    body: @list[Statement]
-
-// While loop
-struct WhileStmt {
-    base: Statement
-    condition: Expression
-    body: @list[Statement]
-
-// For loop
-struct ForStmt {
-    base: Statement
-    variable: @str
-    iterable: Expression
-    body: @list[Statement]
-
-// Infinite loop
-struct LoopStmt {
-    base: Statement
-    body: @list[Statement]
-
-// Match statement
-struct MatchStmt {
-    base: Statement
-    value: Expression
-    cases: @list[MatchStmtCase]
-
-struct MatchStmtCase {
-    pattern: Expression
-    guard: Expression  # Optional
-    body: @list[Statement]
-
-// Break statement
-struct BreakStmt {
-    base: Statement
-
-// Continue statement
-struct ContinueStmt {
-    base: Statement
-
-// Return statement
-struct ReturnStmt {
-    base: Statement
-    value: Expression  # Optional (can be Option::None)
-
-// Try/catch/finally
-struct TryStmt {
-    base: Statement
-    try_body: @list[Statement]
-    catch_clauses: @list[CatchClause]
-    finally_body: @list[Statement]  # Optional
-
-struct CatchClause {
-    exception_type: @str  # Optional type filter
-    variable_name: @str  # Variable to bind exception to
-    body: @list[Statement]
-
-// Import statement
-struct ImportStmt {
-    base: Statement
-    module_path: @list[@str]  # ["std", "io"]
-    import_type: @str  # "single", "multiple", "block"
-    items: @list[@str]  # Empty for full module import
-
-// Foreign code block (@python{}, @rust{}, etc.)
-struct ForeignCodeBlock {
-    base: Statement
-    language: @str  # "python", "rust", "js", "sql"
-    code: @str  # Raw foreign code
-
-// Expression statement (just an expression as a statement)
-struct ExpressionStmt {
-    base: Statement
-    expression: Expression
-
-// Pass statement (no-op)
-struct PassStmt {
-    base: Statement
-
-// ================================================================================
-// PROGRAM/MODULE NODE
-// ================================================================================
-
-// Top-level program/module
-struct Program {
-    statements: @list[Statement]
-    imports: @list[ImportStmt]
-    main_entry: @list[Statement]  # Code in mn: block
-
-// ================================================================================
-// HELPER FUNCTIONS
-// ================================================================================
-
-fn create_node(line { i64, column: i64) -> ASTNode:
-    return ASTNode{line: line, column: column}
-
-fn create_literal_expr(value { String, value_type: TokenType, line: i64, column: i64) -> LiteralExpr:
-    return LiteralExpr{
-        base: Expression{
-            node: create_node(line, column),
-            expr_type: ExprType.IntegerLiteral  # Adjust based on value_type
-        },
-        value: value,
-        value_type: value_type
+// Enums for Types
     }
+}
+#[derive(Debug, Clone, PartialEq)]
+pub enum ExprType {
+    IntegerLiteral, FloatLiteral, StringLiteral, BooleanLiteral, NoneLiteral,
+    ListLiteral, TupleLiteral, SetLiteral, DictLiteral,
+    Identifier, BinaryOp, UnaryOp, Call, Index, Attribute,
+    Lambda, MatchExpr, TypeConstructor, Grouped,
 
-fn create_identifier_expr(name { String, line: i64, column: i64) -> IdentifierExpr:
-    return IdentifierExpr{
-        base: Expression{
-            node: create_node(line, column),
-            expr_type: ExprType.Identifier
-        },
-        name: name
-    }
+}
+#[derive(Debug, Clone, PartialEq)]
+pub enum StmtType {
+    LetDecl, VarDecl, FunctionDecl, StructDecl, EnumDecl,
+    IfStmt, WhileStmt, ForStmt, LoopStmt, MatchStmt,
+    BreakStmt, ContinueStmt, ReturnStmt,
+    TryStmt, ExpressionStmt, AssignmentStmt, ImportStmt, ForeignCodeBlock, PassStmt,
 
-fn create_binary_op_expr(left { Expression, op: TokenType, right: Expression, line: i64, column: i64) -> BinaryOpExpr:
-    return BinaryOpExpr{
-        base: Expression{
-            node: create_node(line, column),
-            expr_type: ExprType.BinaryOp
-        },
-        left: left,
-        operator: op,
-        right: right
+// Expression Enum
+}
+#[derive(Debug, Clone, PartialEq)]
+pub enum Expression {
+    Literal(LiteralExpr),
+    Identifier(IdentifierExpr),
+    BinaryOp(BinaryOpExpr),
+    UnaryOp(UnaryOpExpr),
+    Call(CallExpr),
+    Index(IndexExpr),
+    Attribute(AttributeExpr),
+    List(ListExpr),
+    Tuple(TupleExpr),
+    Set(SetExpr),
+    Dict(DictExpr),
+    Lambda(LambdaExpr),
+    Match(MatchExpr),
+    TypeConstructor(TypeConstructorExpr),
+    Grouped(GroupedExpr),
+
+// Statement Enum
+}
+#[derive(Debug, Clone, PartialEq)]
+pub enum Statement {
+    LetDecl(LetStmt),
+    VarDecl(VarStmt),
+    FunctionDecl(FunctionDecl),
+    StructDecl(StructDecl),
+    EnumDecl(EnumDecl),
+    IfStmt(IfStmt),
+    WhileStmt(WhileStmt),
+    ForStmt(ForStmt),
+    LoopStmt(LoopStmt),
+    MatchStmt(MatchStmt),
+    BreakStmt(BreakStmt),
+    ContinueStmt(ContinueStmt),
+    ReturnStmt(ReturnStmt),
+    TryStmt(TryStmt),
+    ExpressionStmt(ExpressionStmt),
+    AssignmentStmt(AssignmentStmt),
+    ImportStmt(ImportStmt),
+    ForeignCodeBlock(ForeignCodeBlock),
+    PassStmt(PassStmt),
+
+// Implement basic methods for Statement
+}
+impl Statement {
+    pub fn stmt_type(&mut self)  ->  StmtType {
+        match self {
+            Statement::LetDecl(s) => return StmtType::LetDecl,
+            Statement::VarDecl(s) => return StmtType::VarDecl,
+            Statement::FunctionDecl(s) => return StmtType::FunctionDecl,
+            Statement::StructDecl(s) => return StmtType::StructDecl,
+            Statement::EnumDecl(s) => return StmtType::EnumDecl,
+            Statement::IfStmt(s) => return StmtType::IfStmt,
+            Statement::WhileStmt(s) => return StmtType::WhileStmt,
+            Statement::ForStmt(s) => return StmtType::ForStmt,
+            Statement::LoopStmt(s) => return StmtType::LoopStmt,
+            Statement::MatchStmt(s) => return StmtType::MatchStmt,
+            Statement::BreakStmt(s) => return StmtType::BreakStmt,
+            Statement::ContinueStmt(s) => return StmtType::ContinueStmt,
+            Statement::ReturnStmt(s) => return StmtType::ReturnStmt,
+            Statement::TryStmt(s) => return StmtType::TryStmt,
+            Statement::ExpressionStmt(s) => return StmtType::ExpressionStmt,
+            Statement::AssignmentStmt(s) => return StmtType::AssignmentStmt,
+            Statement::ImportStmt(s) => return StmtType::ImportStmt,
+            Statement::ForeignCodeBlock(s) => return StmtType::ForeignCodeBlock,
+            Statement::PassStmt(s) => return StmtType::PassStmt,
+
+// Expression Structs
+        }
     }
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct LiteralExpr {
+    pub node: ASTNode,
+    pub value: String,
+    pub value_type: TokenType,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct IdentifierExpr {
+    pub node: ASTNode,
+    pub name: String,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct BinaryOpExpr {
+    pub node: ASTNode,
+    pub left: Box<Expression>,
+    pub operator: TokenType,
+    pub right: Box<Expression>,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct UnaryOpExpr {
+    pub node: ASTNode,
+    pub operator: TokenType,
+    pub operand: Box<Expression>,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct CallExpr {
+    pub node: ASTNode,
+    pub callee: Box<Expression>,
+    pub arguments: Vec<Expression>,
+    pub keyword_args: HashMap<String, String>,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct IndexExpr {
+    pub node: ASTNode,
+    pub object: Box<Expression>,
+    pub index: Box<Expression>,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct AttributeExpr {
+    pub node: ASTNode,
+    pub object: Box<Expression>,
+    pub attribute: String,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct ListExpr {
+    pub node: ASTNode,
+    pub elements: Vec<Expression>,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct TupleExpr {
+    pub node: ASTNode,
+    pub elements: Vec<Expression>,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct SetExpr {
+    pub node: ASTNode,
+    pub elements: Vec<Expression>,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct DictExpr {
+    pub node: ASTNode,
+    pub pairs: Vec<(Expression, Expression)>,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct LambdaExpr {
+    pub node: ASTNode,
+    pub parameters: Vec<String>,
+    pub body: Box<Expression>,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct MatchExpr {
+    pub node: ASTNode,
+    pub value: Box<Expression>,
+    pub cases: Vec<MatchCase>,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct MatchCase {
+    pub pattern: Expression,
+    pub guard: Expression,
+    pub body: Expression,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct TypeConstructorExpr {
+    pub node: ASTNode,
+    pub type_name: String,
+    pub argument: Box<Expression>,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct GroupedExpr {
+    pub node: ASTNode,
+    pub expression: Box<Expression>,
+
+// Statements
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct LetStmt {
+    pub node: ASTNode,
+    pub name: String,
+    pub type_annotation: String,
+    pub value: Expression,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct VarStmt {
+    pub node: ASTNode,
+    pub name: String,
+    pub type_annotation: String,
+    pub value: Expression,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct AssignmentStmt {
+    pub node: ASTNode,
+    pub target: Expression,
+    pub operator: TokenType,
+    pub value: Expression,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct FunctionDecl {
+    pub node: ASTNode,
+    pub name: String,
+    pub is_async: bool,
+    pub parameters: Vec<Parameter>,
+    pub return_type: String,
+    pub body: Vec<Statement>,
+    pub decorators: Vec<String>,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct Parameter {
+    pub name: String,
+    pub type_annotation: String,
+    pub ownership_mode: String,
+    pub default_value: Expression,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct StructDecl {
+    pub node: ASTNode,
+    pub name: String,
+    pub fields: Vec<StructField>,
+    pub methods: Vec<FunctionDecl>,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct StructField {
+    pub name: String,
+    pub type_annotation: String,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct EnumDecl {
+    pub node: ASTNode,
+    pub name: String,
+    pub variants: Vec<String>,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct IfStmt {
+    pub node: ASTNode,
+    pub condition: Expression,
+    pub then_body: Vec<Statement>,
+    pub elif_clauses: Vec<ElifClause>,
+    pub else_body: Vec<Statement>,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct ElifClause {
+    pub condition: Expression,
+    pub body: Vec<Statement>,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct WhileStmt {
+    pub node: ASTNode,
+    pub condition: Expression,
+    pub body: Vec<Statement>,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct ForStmt {
+    pub node: ASTNode,
+    pub variable: String,
+    pub iterable: Expression,
+    pub body: Vec<Statement>,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct LoopStmt {
+    pub node: ASTNode,
+    pub body: Vec<Statement>,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct MatchStmt {
+    pub node: ASTNode,
+    pub value: Expression,
+    pub cases: Vec<MatchStmtCase>,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct MatchStmtCase {
+    pub pattern: Expression,
+    pub guard: Expression,
+    pub body: Vec<Statement>,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct BreakStmt {
+    pub node: ASTNode,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct ContinueStmt {
+    pub node: ASTNode,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct ReturnStmt {
+    pub node: ASTNode,
+    pub value: Expression,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct TryStmt {
+    pub node: ASTNode,
+    pub try_body: Vec<Statement>,
+    pub catch_clauses: Vec<CatchClause>,
+    pub finally_body: Vec<Statement>,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct CatchClause {
+    pub exception_type: String,
+    pub variable_name: String,
+    pub body: Vec<Statement>,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct ImportStmt {
+    pub node: ASTNode,
+    pub module_path: Vec<String>,
+    pub import_type: String,
+    pub items: Vec<String>,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct ForeignCodeBlock {
+    pub node: ASTNode,
+    pub language: String,
+    pub code: String,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct ExpressionStmt {
+    pub node: ASTNode,
+    pub expression: Expression,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct PassStmt {
+    pub node: ASTNode,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct Program {
+    pub statements: Vec<Statement>,
+    pub imports: Vec<ImportStmt>,
+    pub main_entry: Vec<Statement>,
+
+}
+pub fn create_node(line: usize, column: usize)  ->  ASTNode {
+    return ASTNode{line: line, column: column};
+}

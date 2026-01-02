@@ -1,0 +1,3 @@
+Found 1 GUL files to transpile
+Transpiling test_enum.mn -> test_enum.rs
+✅ Generated test_enum.rs

@@ -1,0 +1,17 @@
+fn main():
+    let x = 10
+    print(x) # EXPECT: 10
+    
+    let y = 0
+    if x > 5:
+        y = 1
+    else:
+        y = 2
+    
+    print(y) # EXPECT: 1
+        
+    while x > 0:
+        x = x - 1
+        
+    print(x) # EXPECT: 0
+    return x

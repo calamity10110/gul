@@ -1,9 +1,3 @@
-# GUL Language Knowledgebase
-
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-30
-
----
-
 <!-- META_START
 category: language-specification
 type: reference-manual
@@ -12,6 +6,10 @@ audience: [ai-agents, developers, learners]
 version: 0.13.0
 syntax-version: 3.2
 META_END -->
+
+# GUL Language Knowledgebase
+
+**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-30
 
 ## Quick Navigation
 
@@ -161,7 +159,7 @@ count = count + 1
 ```gul
 let name = @str("Alice")      # String
 let age = @int(30)            # Integer (64-bit signed)
-let score = @float(95.5)      # Float (64-bit IEEE)
+let score = @float(95.5)      # Float (64-bit IEEE), also accepts @flt(24)
 let active = @bool(true)      # Boolean
 ```
 
@@ -241,9 +239,9 @@ result = "now a string"  # OK with 'any' type
 
 | Type | Constructor | Example |
 |------|-------------|---------|
-| String | `@str(...)` | `@str("hello")` |
+| String (default) | `@str/@string(...)` | `@str("hello")` or `@string("hello")` or `"hello"` |
 | Integer | `@int(...)` | `@int(42)` |
-| Float | `@float(...)` | `@float(3.14)` |
+| Float | `@flt/@float(...)` | `@flt(3.14)` or `@float(3.14)` |
 | Boolean | `@bool(...)` | `@bool(true)` |
 | List | `@list[...]` | `@list[1, 2, 3]` |
 | Tuple | `@tuple(...)` | `@tuple(1, 2)` |
@@ -932,17 +930,3 @@ match value:
 mn:
     print("Hello!")
 ```
-
----
-
-**Version**: 0.13.0 (Syntax v3.2)  
-**Last Updated**: 2025-12-30  
-**Maintained by**: GUL Core Team  
-
-**Links**:
-
-- [GitHub](https://github.com/gul-lang/gul)
-- [Documentation](../README.md)
-- [Quick Reference](../QUICK_REFERENCE.md)
-- [Syntax Guide](syntax.md)
-- [MCP Guide](../docs/guides/MCP_QUICKSTART.md)

@@ -1,0 +1,7 @@
+Found 1 GUL files to transpile
+Transpiling test_bug.mn -> test_bug.rs
+DEBUG: mn: Depth: 0
+DEBUG: Pops: 0
+DEBUG: let x = @dict{"a": b}) Depth: -1
+DEBUG: Pops: 0
+✅ Generated test_bug.rs

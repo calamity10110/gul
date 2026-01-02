@@ -6,8 +6,16 @@ struct Token:
     type: TokenType
     value: @str
 
+# Character constants for cleaner comparisons
+let CHAR_SPACE = " "
+let CHAR_TAB = "	"
+let CHAR_NEWLINE = "
+"
+let CHAR_CR = ""
+let CHAR_HASH = "#"
+
 fn main():
-    print("🚀 Specialized Flat Compiler Starting")
+    print("Specialized Flat Compiler Starting")
     let source = read_file("compiler/tests/simple_add_stripped.mn")
     var tokens = @list[]
     
@@ -16,6 +24,7 @@ fn main():
     let length = len(source)
     var indents = @list[0]
     var line_start = @bool(true)
+
     while pos < length:
         let ch0 = source[pos]
         if line_start:

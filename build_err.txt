@@ -1,0 +1,3611 @@
+🚀 Building GUL Compiler from GUL Source
+========================================
+
+Step 1: Transpiling GUL → Rust...
+Found 10 GUL files to transpile
+Transpiling main.mn -> main.rs
+✅ Generated main.rs
+Transpiling ast/nodes.mn -> ast/nodes.rs
+✅ Generated ast/nodes.rs
+Transpiling parser/parser.mn -> parser/parser.rs
+✅ Generated parser/parser.rs
+Transpiling ir/ir_builder.mn -> ir/ir_builder.rs
+✅ Generated ir/ir_builder.rs
+Transpiling ir/ir_nodes.mn -> ir/ir_nodes.rs
+✅ Generated ir/ir_nodes.rs
+Transpiling lexer/lexer.mn -> lexer/lexer.rs
+✅ Generated lexer/lexer.rs
+Transpiling lexer/token.mn -> lexer/token.rs
+✅ Generated lexer/token.rs
+Transpiling builtins/codegen_helpers.mn -> builtins/codegen_helpers.rs
+✅ Generated builtins/codegen_helpers.rs
+Transpiling codegen/rust_backend.mn -> codegen/rust_backend.rs
+✅ Generated codegen/rust_backend.rs
+Transpiling semantic/analyzer.mn -> semantic/analyzer.rs
+✅ Generated semantic/analyzer.rs
+
+Step 2: Creating Rust project structure...
+✅ Cargo.toml created
+
+Step 3: Compiling Rust code...
+   Compiling gul-compiler v0.1.0 (/media/vu/512gb/blob/gul/compiler_rust)
+error: expected identifier, found `,`
+  --> ir/ir_builder.rs:24:13
+   |
+15 |         return IRBuilder {
+   |                --------- while parsing this struct
+...
+24 |             ,
+   |             ^ expected identifier
+   |
+help: remove this comma
+   |
+24 -             ,
+   |
+
+error: non-item in item list
+   --> lexer/token.rs:147:6
+    |
+131 | impl Token {
+    |            - item list starts here
+...
+147 |     };
+    |      ^
+    |      |
+    |      non-item starts here
+    |      help: consider removing this semicolon
+...
+168 | }
+    | - item list ends here
+
+error: `match` arm body without braces
+   --> parser/parser.rs:280:17
+    |
+278 |             _ =>
+    |               -- while parsing the `match` arm starting here
+279 |                 // Try parsing as expression statement or assignment
+280 |                 return self.parse_expression_or_assignment();
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ this statement is not surrounded by a body
+    |
+help: replace `;` with `,` to end a `match` arm expression
+    |
+280 -                 return self.parse_expression_or_assignment();
+280 +                 return self.parse_expression_or_assignment(),
+    |
+
+error: expected `{`, found keyword `in`
+  --> semantic/analyzer.rs:40:17
+   |
+40 |         if name in self.symbols {
+   |                 ^^ expected `{`
+   |
+note: the `if` expression is missing a block after this condition
+  --> semantic/analyzer.rs:40:12
+   |
+40 |         if name in self.symbols {
+   |            ^^^^
+
+error: expected one of `!`, `.`, `::`, `;`, `?`, `{`, `}`, or an operator, found keyword `in`
+  --> semantic/analyzer.rs:53:21
+   |
+53 |         return name in self.symbols;
+   |                     ^^ expected one of 8 possible tokens
+
+error: expected expression, found `;`
+   --> semantic/analyzer.rs:390:45
+    |
+390 |         expr.operator == TokenType::Minus ||;
+    |                                             ^ expected expression
+
+error: invalid format string: field access isn't supported
+   --> lexer/token.rs:133:26
+    |
+133 |         return format!("{self.token_type}('{self.value}') at {self.line}:{self.column}");
+    |                          ^^^^^^^^^^^^^^^ not supported in format string
+    |
+help: consider using a positional formatting argument instead
+    |
+133 -         return format!("{self.token_type}('{self.value}') at {self.line}:{self.column}");
+133 +         return format!("{0}('{self.value}') at {self.line}:{self.column}", self.token_type);
+    |
+
+error[E0425]: cannot find value `items` in this scope
+   --> codegen/rust_backend.rs:254:47
+    |
+254 |             let items = ", ".to_string().join(items);
+    |                                               ^^^^^ not found in this scope
+
+error[E0423]: expected value, found struct `CodeGenerator`
+   --> codegen/rust_backend.rs:450:25
+    |
+450 |     let mut generator = CodeGenerator.create();
+    |                         ^^^^^^^^^^^^^
+    |
+help: use the path separator to refer to an item
+    |
+450 -     let mut generator = CodeGenerator.create();
+450 +     let mut generator = CodeGenerator::create();
+    |
+
+error[E0412]: cannot find type `Module` in this scope
+  --> ir/ir_builder.rs:30:41
+   |
+30 |     pub fn build_module(&mut self, ast: Module)  ->  IRModule {
+   |                                         ^^^^^^
+   |
+  ::: ir/ir_nodes.rs:34:1
+   |
+34 | pub struct IRModule {
+   | ------------------- similarly named struct `IRModule` defined here
+   |
+help: there is an enum variant `crate::ir::ir_nodes::IRNodeType::Module`; try using the variant's enum
+   |
+30 -     pub fn build_module(&mut self, ast: Module)  ->  IRModule {
+30 +     pub fn build_module(&mut self, ast: crate::ir::ir_nodes::IRNodeType)  ->  IRModule {
+   |
+help: a struct with a similar name exists
+   |
+30 |     pub fn build_module(&mut self, ast: IRModule)  ->  IRModule {
+   |                                         ++
+
+error[E0425]: cannot find value `token` in this scope
+  --> lexer/lexer.rs:94:16
+   |
+94 |             if token.is_keyword(ident) {
+   |                ^^^^^ not found in this scope
+
+error[E0425]: cannot find value `token` in this scope
+  --> lexer/lexer.rs:95:21
+   |
+95 |                 t = token.get_keyword_type(ident);
+   |                     ^^^^^ not found in this scope
+
+error[E0425]: cannot find value `clause` in this scope
+   --> parser/parser.rs:457:27
+    |
+457 |         elif_clauses.push(clause);
+    |                           ^^^^^^
+    |
+help: the binding `clause` is available in a different scope in the same function
+   --> parser/parser.rs:451:17
+    |
+451 |             let clause = ElifClause{
+    |                 ^^^^^^
+
+error[E0425]: cannot find value `e` in this scope
+   --> main.rs:107:76
+    |
+107 |         println!("{}", "Error reading file: ".to_string() + &format!("{}", e));
+    |                                                                            ^ not found in this scope
+
+error[E0425]: cannot find value `e` in this scope
+   --> main.rs:121:76
+    |
+121 |         println!("{}", "Error writing file: ".to_string() + &format!("{}", e));
+    |                                                                            ^ not found in this scope
+
+warning: unnecessary trailing semicolon
+   --> lexer/token.rs:176:5
+    |
+176 |     ;
+    |     ^ help: remove this semicolon
+    |
+    = note: `#[warn(redundant_semicolons)]` (part of `#[warn(unused)]`) on by default
+
+warning: denote infinite loops with `loop { ... }`
+   --> parser/parser.rs:112:9
+    |
+112 |         while true {
+    |         ^^^^^^^^^^ help: use `loop`
+    |
+    = note: `#[warn(while_true)]` on by default
+
+warning: unnecessary trailing semicolon
+   --> parser/parser.rs:306:9
+    |
+306 |         ;
+    |         ^ help: remove this semicolon
+
+warning: unnecessary trailing semicolon
+   --> parser/parser.rs:331:9
+    |
+331 |         ;
+    |         ^ help: remove this semicolon
+
+warning: unnecessary trailing semicolon
+   --> parser/parser.rs:383:9
+    |
+383 |         ;
+    |         ^ help: remove this semicolon
+
+warning: unnecessary trailing semicolon
+   --> parser/parser.rs:409:9
+    |
+409 |         ;
+    |         ^ help: remove this semicolon
+
+warning: unnecessary trailing semicolon
+   --> parser/parser.rs:475:9
+    |
+475 |         ;
+    |         ^ help: remove this semicolon
+
+warning: unnecessary trailing semicolon
+   --> parser/parser.rs:455:13
+    |
+455 |             ;
+    |             ^ help: remove this semicolon
+
+warning: unnecessary trailing semicolon
+   --> parser/parser.rs:492:9
+    |
+492 |         ;
+    |         ^ help: remove this semicolon
+
+warning: unnecessary trailing semicolon
+   --> parser/parser.rs:512:9
+    |
+512 |         ;
+    |         ^ help: remove this semicolon
+
+warning: unnecessary trailing semicolon
+   --> parser/parser.rs:529:9
+    |
+529 |         ;
+    |         ^ help: remove this semicolon
+
+warning: unnecessary trailing semicolon
+   --> parser/parser.rs:566:9
+    |
+566 |         ;
+    |         ^ help: remove this semicolon
+
+warning: unnecessary trailing semicolon
+   --> parser/parser.rs:593:9
+    |
+593 |         ;
+    |         ^ help: remove this semicolon
+
+warning: unnecessary trailing semicolon
+   --> parser/parser.rs:585:13
+    |
+585 |             ;
+    |             ^ help: remove this semicolon
+
+warning: unnecessary parentheses around assigned value
+   --> semantic/analyzer.rs:318:25
+    |
+318 |             let ident = (stmt.target as IdentifierExpr);
+    |                         ^                             ^
+    |
+    = note: `#[warn(unused_parens)]` (part of `#[warn(unused)]`) on by default
+help: remove these parentheses
+    |
+318 -             let ident = (stmt.target as IdentifierExpr);
+318 +             let ident = stmt.target as IdentifierExpr;
+    |
+
+error[E0072]: recursive type `analyzer::Scope` has infinite size
+  --> semantic/analyzer.rs:20:1
+   |
+20 | pub struct Scope {
+   | ^^^^^^^^^^^^^^^^
+21 |     pub symbols: HashMap<String, String>, // name -> Symbol
+22 |     pub parent: Scope, // Can be None
+   |                 ----- recursive without indirection
+   |
+help: insert some indirection (e.g., a `Box`, `Rc`, or `&`) to break the cycle
+   |
+22 |     pub parent: Box<Scope>, // Can be None
+   |                 ++++     +
+
+error: reached the recursion limit finding the struct tail for `analyzer::Scope`
+  |
+  = help: consider increasing the recursion limit by adding a `#![recursion_limit = "256"]`
+
+error[E0592]: duplicate definitions with name `parse_statement`
+   --> parser/parser.rs:163:5
+    |
+163 |     pub fn parse_statement(&mut self)  ->  Statement {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ duplicate definitions for `parse_statement`
+...
+239 |     pub fn parse_statement(&mut self)  ->  Statement {
+    |     ------------------------------------------------ other definition for `parse_statement`
+
+error[E0277]: the type `str` cannot be indexed by `usize`
+  --> builtins/codegen_helpers.rs:17:20
+   |
+17 |         let ch = s[i];
+   |                    ^ string indices are ranges of `usize`
+   |
+   = help: the trait `SliceIndex<str>` is not implemented for `usize`
+   = help: the following other types implement trait `SliceIndex<T>`:
+             `usize` implements `SliceIndex<ByteStr>`
+             `usize` implements `SliceIndex<[T]>`
+   = note: required for `String` to implement `Index<usize>`
+
+error[E0277]: the type `str` cannot be indexed by `usize`
+  --> builtins/codegen_helpers.rs:20:30
+   |
+20 |                 let next = s[i + 1];
+   |                              ^^^^^ string indices are ranges of `usize`
+   |
+   = help: the trait `SliceIndex<str>` is not implemented for `usize`
+   = help: the following other types implement trait `SliceIndex<T>`:
+             `usize` implements `SliceIndex<ByteStr>`
+             `usize` implements `SliceIndex<[T]>`
+   = note: required for `String` to implement `Index<usize>`
+
+error[E0369]: cannot add `&str` to `&str`
+  --> builtins/codegen_helpers.rs:23:37
+   |
+23 |                     result = result + "\\n";
+   |                              ------ ^ ----- &str
+   |                              |      |
+   |                              |      `+` cannot be used to concatenate two `&str` strings
+   |                              &str
+   |
+   = note: string concatenation requires an owned `String` on the left
+help: create an owned `String` from a string reference
+   |
+23 |                     result = result.to_owned() + "\\n";
+   |                                    +++++++++++
+
+error[E0369]: cannot add `&str` to `&str`
+  --> builtins/codegen_helpers.rs:27:37
+   |
+27 |                     result = result + "\\t";
+   |                              ------ ^ ----- &str
+   |                              |      |
+   |                              |      `+` cannot be used to concatenate two `&str` strings
+   |                              &str
+   |
+   = note: string concatenation requires an owned `String` on the left
+help: create an owned `String` from a string reference
+   |
+27 |                     result = result.to_owned() + "\\t";
+   |                                    +++++++++++
+
+error[E0369]: cannot add `&str` to `&str`
+  --> builtins/codegen_helpers.rs:31:37
+   |
+31 |                     result = result + "\\r";
+   |                              ------ ^ ----- &str
+   |                              |      |
+   |                              |      `+` cannot be used to concatenate two `&str` strings
+   |                              &str
+   |
+   = note: string concatenation requires an owned `String` on the left
+help: create an owned `String` from a string reference
+   |
+31 |                     result = result.to_owned() + "\\r";
+   |                                    +++++++++++
+
+error[E0369]: cannot add `&str` to `&str`
+  --> builtins/codegen_helpers.rs:35:37
+   |
+35 |                     result = result + "\\\\";
+   |                              ------ ^ ------ &str
+   |                              |      |
+   |                              |      `+` cannot be used to concatenate two `&str` strings
+   |                              &str
+   |
+   = note: string concatenation requires an owned `String` on the left
+help: create an owned `String` from a string reference
+   |
+35 |                     result = result.to_owned() + "\\\\";
+   |                                    +++++++++++
+
+error[E0369]: cannot add `&str` to `&str`
+  --> builtins/codegen_helpers.rs:39:37
+   |
+39 |                     result = result + "\\\"";
+   |                              ------ ^ ------ &str
+   |                              |      |
+   |                              |      `+` cannot be used to concatenate two `&str` strings
+   |                              &str
+   |
+   = note: string concatenation requires an owned `String` on the left
+help: create an owned `String` from a string reference
+   |
+39 |                     result = result.to_owned() + "\\\"";
+   |                                    +++++++++++
+
+error[E0369]: cannot add `_` to `&str`
+  --> builtins/codegen_helpers.rs:43:37
+   |
+43 |                     result = result + ch;
+   |                              ------ ^ -- _
+   |                              |
+   |                              &str
+
+error[E0369]: cannot add `_` to `&str`
+  --> builtins/codegen_helpers.rs:48:33
+   |
+48 |                 result = result + ch;
+   |                          ------ ^ -- _
+   |                          |
+   |                          &str
+
+error[E0369]: cannot add `_` to `&str`
+  --> builtins/codegen_helpers.rs:53:29
+   |
+53 |             result = result + ch;
+   |                      ------ ^ -- _
+   |                      |
+   |                      &str
+
+error[E0308]: mismatched types
+  --> builtins/codegen_helpers.rs:58:12
+   |
+10 | pub fn escape_string(s: String)  ->  String {
+   |                                      ------ expected `String` because of return type
+...
+58 |     return result;
+   |            ^^^^^^ expected `String`, found `&str`
+   |
+help: try using a conversion method
+   |
+58 |     return result.to_string();
+   |                  ++++++++++++
+
+error[E0599]: no method named `startswith` found for struct `String` in the current scope
+   --> builtins/codegen_helpers.rs:100:17
+    |
+100 |     if type_str.startswith("Vec[".to_string().to_string()) {
+    |                 ^^^^^^^^^^
+    |
+help: there is a method `starts_with` with a similar name
+    |
+100 |     if type_str.starts_with("Vec[".to_string().to_string()) {
+    |                       +
+
+error[E0599]: no method named `substring` found for struct `String` in the current scope
+    --> builtins/codegen_helpers.rs:101:30
+     |
+ 101 |         let inner = type_str.substring(6, (type_str).len() - 1);
+     |                              ^^^^^^^^^
+     |
+help: there is a method `to_string` with a similar name, but with different arguments
+    --> /home/vu/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/alloc/src/string.rs:2855:5
+     |
+2855 |     fn to_string(&self) -> String;
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0308]: mismatched types
+   --> builtins/codegen_helpers.rs:102:37
+    |
+102 |         return "Vec<".to_string() + gul_type_to_rust(inner) + ">";
+    |                                     ^^^^^^^^^^^^^^^^^^^^^^^ expected `&str`, found `String`
+    |
+help: consider borrowing here
+    |
+102 |         return "Vec<".to_string() + &gul_type_to_rust(inner) + ">";
+    |                                     +
+
+error[E0599]: no method named `startswith` found for struct `String` in the current scope
+   --> builtins/codegen_helpers.rs:104:22
+    |
+104 |     else if type_str.startswith("HashMap[".to_string().to_string()) {
+    |                      ^^^^^^^^^^
+    |
+help: there is a method `starts_with` with a similar name
+    |
+104 |     else if type_str.starts_with("HashMap[".to_string().to_string()) {
+    |                            +
+
+error[E0599]: no method named `substring` found for struct `String` in the current scope
+    --> builtins/codegen_helpers.rs:105:30
+     |
+ 105 |         let inner = type_str.substring(6, (type_str).len() - 1);
+     |                              ^^^^^^^^^
+     |
+help: there is a method `to_string` with a similar name, but with different arguments
+    --> /home/vu/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/alloc/src/string.rs:2855:5
+     |
+2855 |     fn to_string(&self) -> String;
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0308]: mismatched types
+   --> builtins/codegen_helpers.rs:136:42
+    |
+136 |     let mut result = "fn ".to_string() + name + "(";
+    |                                          ^^^^ expected `&str`, found `String`
+    |
+help: consider borrowing here
+    |
+136 |     let mut result = "fn ".to_string() + &name + "(";
+    |                                          +
+
+error[E0308]: mismatched types
+   --> builtins/codegen_helpers.rs:139:27
+    |
+139 |         result = result + self_param_to_rust(receiver);
+    |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `&str`, found `String`
+    |
+help: consider borrowing here
+    |
+139 |         result = result + &self_param_to_rust(receiver);
+    |                           +
+
+error[E0308]: mismatched types
+   --> builtins/codegen_helpers.rs:150:27
+    |
+150 |         result = result + p;
+    |                           ^ expected `&str`, found `String`
+    |
+help: consider borrowing here
+    |
+150 |         result = result + &p;
+    |                           +
+
+error[E0308]: mismatched types
+   --> builtins/codegen_helpers.rs:157:27
+    |
+157 |         result = result + " -> ".to_string() + &gul_type_to_rust(return_type);
+    |                           ^^^^^^^^^^^^^^^^^^ expected `&str`, found `String`
+    |
+help: try removing the method call
+    |
+157 -         result = result + " -> ".to_string() + &gul_type_to_rust(return_type);
+157 +         result = result + " -> " + &gul_type_to_rust(return_type);
+    |
+
+error[E0369]: cannot add `&str` to `&str`
+   --> builtins/codegen_helpers.rs:172:25
+    |
+172 |         indent = indent + "    ";
+    |                  ------ ^ ------ &str
+    |                  |      |
+    |                  |      `+` cannot be used to concatenate two `&str` strings
+    |                  &str
+    |
+    = note: string concatenation requires an owned `String` on the left
+help: create an owned `String` from a string reference
+    |
+172 |         indent = indent.to_owned() + "    ";
+    |                        +++++++++++
+
+error[E0277]: the trait bound `String: Pattern` is not satisfied
+    --> builtins/codegen_helpers.rs:177:28
+     |
+ 177 |     let lines = code.split("\n".to_string().to_string());
+     |                      ----- ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ the trait `Pattern` is not implemented for `String`
+     |                      |
+     |                      required by a bound introduced by this call
+     |
+     = note: required for `String` to implement `Pattern`
+note: required by a bound in `core::str::<impl str>::split`
+    --> /home/vu/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/str/mod.rs:1628:21
+     |
+1628 |     pub fn split<P: Pattern>(&self, pat: P) -> Split<'_, P> {
+     |                     ^^^^^^^ required by this bound in `core::str::<impl str>::split`
+help: consider borrowing here
+     |
+ 177 |     let lines = code.split(&"\n".to_string().to_string());
+     |                            +
+
+error[E0277]: expected a `FnMut(char)` closure, found `String`
+   --> builtins/codegen_helpers.rs:178:17
+    |
+178 |     for line in lines {
+    |                 ^^^^^ expected an `FnMut(char)` closure, found `String`
+    |
+    = help: the trait `FnMut(char)` is not implemented for `String`
+    = help: the trait `Pattern` is implemented for `&String`
+    = note: required for `String` to implement `Pattern`
+note: required by a bound in `std::str::Split`
+   --> /home/vu/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/str/iter.rs:789:1
+    |
+789 | / generate_pattern_iterators! {
+790 | |     forward:
+791 | |         /// Created with the method [`split`].
+792 | |         ///
+793 | |         /// [`split`]: str::split
+794 | |         struct Split;
+    | |                ----- required by a bound in this struct
+...   |
+804 | |     delegate double ended;
+805 | | }
+    | |_^ required by this bound in `Split`
+    = note: this error originates in the macro `generate_pattern_iterators` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0369]: cannot add `&str` to `&str`
+   --> builtins/codegen_helpers.rs:180:29
+    |
+180 |             result = result + indent + line + "\n";
+    |                      ------ ^ ------ &str
+    |                      |      |
+    |                      |      `+` cannot be used to concatenate two `&str` strings
+    |                      &str
+    |
+    = note: string concatenation requires an owned `String` on the left
+help: create an owned `String` from a string reference
+    |
+180 |             result = result.to_owned() + indent + line + "\n";
+    |                            +++++++++++
+
+error[E0369]: cannot add `&str` to `&str`
+   --> builtins/codegen_helpers.rs:183:29
+    |
+183 |             result = result + "\n";
+    |                      ------ ^ ---- &str
+    |                      |      |
+    |                      |      `+` cannot be used to concatenate two `&str` strings
+    |                      &str
+    |
+    = note: string concatenation requires an owned `String` on the left
+help: create an owned `String` from a string reference
+    |
+183 |             result = result.to_owned() + "\n";
+    |                            +++++++++++
+
+error[E0308]: mismatched types
+   --> builtins/codegen_helpers.rs:187:12
+    |
+167 | pub fn indent_code(code: String, level: usize)  ->  String {
+    |                                                     ------ expected `String` because of return type
+...
+187 |     return result;
+    |            ^^^^^^ expected `String`, found `&str`
+    |
+help: try using a conversion method
+    |
+187 |     return result.to_string();
+    |                  ++++++++++++
+
+error[E0308]: mismatched types
+   --> builtins/codegen_helpers.rs:192:32
+    |
+192 |     return "{\n".to_string() + code + "}\n";
+    |                                ^^^^ expected `&str`, found `String`
+    |
+help: consider borrowing here
+    |
+192 |     return "{\n".to_string() + &code + "}\n";
+    |                                +
+
+error[E0599]: no method named `join` found for struct `String` in the current scope
+  --> codegen/rust_backend.rs:50:33
+   |
+50 |         return "\n".to_string().join(self.output);
+   |                                 ^^^^ method not found in `String`
+
+error[E0308]: mismatched types
+  --> codegen/rust_backend.rs:61:23
+   |
+61 |         self.emit_raw("");
+   |              -------- ^^ expected `String`, found `&str`
+   |              |
+   |              arguments to this method are incorrect
+   |
+note: method defined here
+  --> codegen/rust_backend.rs:43:12
+   |
+43 |     pub fn emit_raw(&mut self, code: String) {
+   |            ^^^^^^^^            ------------
+help: try using a conversion method
+   |
+61 |         self.emit_raw("".to_string());
+   |                         ++++++++++++
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:65:34
+    |
+ 65 |             self.generate_import(import_stmt);
+    |                  --------------- ^^^^^^^^^^^ expected `&ImportStmt`, found `ImportStmt`
+    |                  |
+    |                  arguments to this method are incorrect
+    |
+note: method defined here
+   --> codegen/rust_backend.rs:249:12
+    |
+249 |     pub fn generate_import(&mut self, stmt: &ImportStmt) {
+    |            ^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+ 65 |             self.generate_import(&import_stmt);
+    |                                  +
+
+error[E0308]: mismatched types
+  --> codegen/rust_backend.rs:69:27
+   |
+69 |             self.emit_raw("");
+   |                  -------- ^^ expected `String`, found `&str`
+   |                  |
+   |                  arguments to this method are incorrect
+   |
+note: method defined here
+  --> codegen/rust_backend.rs:43:12
+   |
+43 |     pub fn emit_raw(&mut self, code: String) {
+   |            ^^^^^^^^            ------------
+help: try using a conversion method
+   |
+69 |             self.emit_raw("".to_string());
+   |                             ++++++++++++
+
+error[E0308]: mismatched types
+  --> codegen/rust_backend.rs:74:37
+   |
+74 |             self.generate_statement(stmt);
+   |                  ------------------ ^^^^ expected `&Statement`, found `Statement`
+   |                  |
+   |                  arguments to this method are incorrect
+   |
+note: method defined here
+  --> codegen/rust_backend.rs:94:12
+   |
+94 |     pub fn generate_statement(&mut self, stmt: &Statement) {
+   |            ^^^^^^^^^^^^^^^^^^            ----------------
+help: consider borrowing here
+   |
+74 |             self.generate_statement(&stmt);
+   |                                     +
+
+error[E0308]: mismatched types
+  --> codegen/rust_backend.rs:79:27
+   |
+79 |             self.emit_raw("");
+   |                  -------- ^^ expected `String`, found `&str`
+   |                  |
+   |                  arguments to this method are incorrect
+   |
+note: method defined here
+  --> codegen/rust_backend.rs:43:12
+   |
+43 |     pub fn emit_raw(&mut self, code: String) {
+   |            ^^^^^^^^            ------------
+help: try using a conversion method
+   |
+79 |             self.emit_raw("".to_string());
+   |                             ++++++++++++
+
+error[E0308]: mismatched types
+  --> codegen/rust_backend.rs:83:41
+   |
+83 |                 self.generate_statement(stmt);
+   |                      ------------------ ^^^^ expected `&Statement`, found `Statement`
+   |                      |
+   |                      arguments to this method are incorrect
+   |
+note: method defined here
+  --> codegen/rust_backend.rs:94:12
+   |
+94 |     pub fn generate_statement(&mut self, stmt: &Statement) {
+   |            ^^^^^^^^^^^^^^^^^^            ----------------
+help: consider borrowing here
+   |
+83 |                 self.generate_statement(&stmt);
+   |                                         +
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:115:12
+    |
+115 |         if stmt.type_annotation { code = format!("{}: {}", code, self.map_type(stmt.type_annotation)) }
+    |            ^^^^^^^^^^^^^^^^^^^^ expected `bool`, found `String`
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:116:71
+    |
+116 |         code = format!("{} = {};", code, self.generate_expression_str(stmt.value));
+    |                                               ----------------------- ^^^^^^^^^^ expected `&Expression`, found `Expression`
+    |                                               |
+    |                                               arguments to this method are incorrect
+    |
+note: method defined here
+   --> codegen/rust_backend.rs:266:12
+    |
+266 |     pub fn generate_expression_str(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+116 |         code = format!("{} = {};", code, self.generate_expression_str(&stmt.value));
+    |                                                                       +
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:123:12
+    |
+123 |         if stmt.type_annotation { code = format!("{}: {}", code, self.map_type(stmt.type_annotation)) }
+    |            ^^^^^^^^^^^^^^^^^^^^ expected `bool`, found `String`
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:124:71
+    |
+124 |         code = format!("{} = {};", code, self.generate_expression_str(stmt.value));
+    |                                               ----------------------- ^^^^^^^^^^ expected `&Expression`, found `Expression`
+    |                                               |
+    |                                               arguments to this method are incorrect
+    |
+note: method defined here
+   --> codegen/rust_backend.rs:266:12
+    |
+266 |     pub fn generate_expression_str(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+124 |         code = format!("{} = {};", code, self.generate_expression_str(&stmt.value));
+    |                                                                       +
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:134:16
+    |
+134 |             if param.type_annotation { param_str = format!("{}: {}", param_str, self.map_type(param.type_annotation)) }
+    |                ^^^^^^^^^^^^^^^^^^^^^ expected `bool`, found `String`
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:137:33
+    |
+137 |         signature = signature + params.join(", ") + ".to_string())";
+    |                                 ^^^^^^^^^^^^^^^^^ expected `&str`, found `String`
+    |
+help: consider borrowing here
+    |
+137 |         signature = signature + &params.join(", ") + ".to_string())";
+    |                                 +
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:138:12
+    |
+138 |         if stmt.return_type { signature = format!("{} -> {}", signature, self.map_type(stmt.return_type)) }
+    |            ^^^^^^^^^^^^^^^^ expected `bool`, found `String`
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:145:23
+    |
+145 |         self.emit_raw("");
+    |              -------- ^^ expected `String`, found `&str`
+    |              |
+    |              arguments to this method are incorrect
+    |
+note: method defined here
+   --> codegen/rust_backend.rs:43:12
+    |
+ 43 |     pub fn emit_raw(&mut self, code: String) {
+    |            ^^^^^^^^            ------------
+help: try using a conversion method
+    |
+145 |         self.emit_raw("".to_string());
+    |                         ++++++++++++
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:150:54
+    |
+150 |         let condition = self.generate_expression_str(stmt.condition);
+    |                              ----------------------- ^^^^^^^^^^^^^^ expected `&Expression`, found `Expression`
+    |                              |
+    |                              arguments to this method are incorrect
+    |
+note: method defined here
+   --> codegen/rust_backend.rs:266:12
+    |
+266 |     pub fn generate_expression_str(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+150 |         let condition = self.generate_expression_str(&stmt.condition);
+    |                                                      +
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:161:58
+    |
+161 |             let elif_cond = self.generate_expression_str(elif_clause.condition);
+    |                                  ----------------------- ^^^^^^^^^^^^^^^^^^^^^ expected `&Expression`, found `Expression`
+    |                                  |
+    |                                  arguments to this method are incorrect
+    |
+note: method defined here
+   --> codegen/rust_backend.rs:266:12
+    |
+266 |     pub fn generate_expression_str(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+161 |             let elif_cond = self.generate_expression_str(&elif_clause.condition);
+    |                                                          +
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:185:54
+    |
+185 |         let condition = self.generate_expression_str(stmt.condition);
+    |                              ----------------------- ^^^^^^^^^^^^^^ expected `&Expression`, found `Expression`
+    |                              |
+    |                              arguments to this method are incorrect
+    |
+note: method defined here
+   --> codegen/rust_backend.rs:266:12
+    |
+266 |     pub fn generate_expression_str(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+185 |         let condition = self.generate_expression_str(&stmt.condition);
+    |                                                      +
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:198:53
+    |
+198 |         let iterable = self.generate_expression_str(stmt.iterable);
+    |                             ----------------------- ^^^^^^^^^^^^^ expected `&Expression`, found `Expression`
+    |                             |
+    |                             arguments to this method are incorrect
+    |
+note: method defined here
+   --> codegen/rust_backend.rs:266:12
+    |
+266 |     pub fn generate_expression_str(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+198 |         let iterable = self.generate_expression_str(&stmt.iterable);
+    |                                                     +
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:211:12
+    |
+211 |         if stmt.value {
+    |            ^^^^^^^^^^ expected `bool`, found `Expression`
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:212:54
+    |
+212 |             let value = self.generate_expression_str(stmt.value);
+    |                              ----------------------- ^^^^^^^^^^ expected `&Expression`, found `Expression`
+    |                              |
+    |                              arguments to this method are incorrect
+    |
+note: method defined here
+   --> codegen/rust_backend.rs:266:12
+    |
+266 |     pub fn generate_expression_str(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+212 |             let value = self.generate_expression_str(&stmt.value);
+    |                                                      +
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:222:51
+    |
+222 |         let target = self.generate_expression_str(stmt.target);
+    |                           ----------------------- ^^^^^^^^^^^ expected `&Expression`, found `Expression`
+    |                           |
+    |                           arguments to this method are incorrect
+    |
+note: method defined here
+   --> codegen/rust_backend.rs:266:12
+    |
+266 |     pub fn generate_expression_str(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+222 |         let target = self.generate_expression_str(&stmt.target);
+    |                                                   +
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:223:50
+    |
+223 |         let value = self.generate_expression_str(stmt.value);
+    |                          ----------------------- ^^^^^^^^^^ expected `&Expression`, found `Expression`
+    |                          |
+    |                          arguments to this method are incorrect
+    |
+note: method defined here
+   --> codegen/rust_backend.rs:266:12
+    |
+266 |     pub fn generate_expression_str(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+223 |         let value = self.generate_expression_str(&stmt.value);
+    |                                                  +
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:245:49
+    |
+245 |         let expr = self.generate_expression_str(stmt.expression);
+    |                         ----------------------- ^^^^^^^^^^^^^^^ expected `&Expression`, found `Expression`
+    |                         |
+    |                         arguments to this method are incorrect
+    |
+note: method defined here
+   --> codegen/rust_backend.rs:266:12
+    |
+266 |     pub fn generate_expression_str(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+245 |         let expr = self.generate_expression_str(&stmt.expression);
+    |                                                 +
+
+error[E0599]: no method named `join` found for struct `String` in the current scope
+   --> codegen/rust_backend.rs:251:39
+    |
+251 |         let module = "::".to_string().join(stmt.module_path);
+    |                                       ^^^^ method not found in `String`
+
+error[E0599]: no method named `join` found for struct `String` in the current scope
+   --> codegen/rust_backend.rs:254:42
+    |
+254 |             let items = ", ".to_string().join(items);
+    |                                          ^^^^ method not found in `String`
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:255:57
+    |
+255 |             self.emit_raw("use ".to_string() + module + "::{".to_string() + &items + "};");
+    |                                                         ^^^^^^^^^^^^^^^^^ expected `&str`, found `String`
+    |
+help: try removing the method call
+    |
+255 -             self.emit_raw("use ".to_string() + module + "::{".to_string() + &items + "};");
+255 +             self.emit_raw("use ".to_string() + module + "::{" + &items + "};");
+    |
+
+error[E0599]: no variant or associated item named `StringLiteral` found for enum `token::TokenType` in the current scope
+   --> codegen/rust_backend.rs:269:49
+    |
+269 |                 if lit.value_type == TokenType::StringLiteral { return self.generate_string_literal(lit) }
+    |                                                 ^^^^^^^^^^^^^ variant or associated item not found in `token::TokenType`
+    |
+   ::: lexer/token.rs:8:1
+    |
+  8 | pub enum TokenType {
+    | ------------------ variant or associated item `StringLiteral` not found for this enum
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:269:101
+    |
+269 |                 if lit.value_type == TokenType::StringLiteral { return self.generate_string_literal(lit) }
+    |                                                                             ----------------------- ^^^ expected `LiteralExpr`, found `&LiteralExpr`
+    |                                                                             |
+    |                                                                             arguments to this method are incorrect
+    |
+note: method defined here
+   --> codegen/rust_backend.rs:294:12
+    |
+294 |     pub fn generate_string_literal(&mut self, expr: LiteralExpr)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^            -----------------
+help: consider using clone here
+    |
+269 |                 if lit.value_type == TokenType::StringLiteral { return self.generate_string_literal(lit.clone()) }
+    |                                                                                                        ++++++++
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:270:53
+    |
+270 |                 else { return self.generate_literal(lit) }
+    |                                    ---------------- ^^^ expected `LiteralExpr`, found `&LiteralExpr`
+    |                                    |
+    |                                    arguments to this method are incorrect
+    |
+note: method defined here
+   --> codegen/rust_backend.rs:289:12
+    |
+289 |     pub fn generate_literal(&mut self, expr: LiteralExpr)  ->  String {
+    |            ^^^^^^^^^^^^^^^^            -----------------
+help: consider using clone here
+    |
+270 |                 else { return self.generate_literal(lit.clone()) }
+    |                                                        ++++++++
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:283:93
+    |
+283 |             Expression::Grouped(g) => return "(".to_string() + self.generate_expression_str(g.expression) + ".to_string().to_string())",
+    |                                                                     ----------------------- ^^^^^^^^^^^^ expected `&Expression`, found `Box<Expression>`
+    |                                                                     |
+    |                                                                     arguments to this method are incorrect
+    |
+    = note: expected reference `&nodes::Expression`
+                  found struct `Box<nodes::Expression>`
+note: method defined here
+   --> codegen/rust_backend.rs:266:12
+    |
+266 |     pub fn generate_expression_str(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+283 |             Expression::Grouped(g) => return "(".to_string() + self.generate_expression_str(&g.expression) + ".to_string().to_string())",
+    |                                                                                             +
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:283:64
+    |
+283 |             Expression::Grouped(g) => return "(".to_string() + self.generate_expression_str(g.expression) + ".to_string().to_string())",
+    |                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `&str`, found `String`
+    |
+help: consider borrowing here
+    |
+283 |             Expression::Grouped(g) => return "(".to_string() + &self.generate_expression_str(g.expression) + ".to_string().to_string())",
+    |                                                                +
+
+warning: unreachable statement
+   --> codegen/rust_backend.rs:286:9
+    |
+267 | /         match expr {
+268 | |             Expression::Literal(lit) =>
+269 | |                 if lit.value_type == TokenType::StringLiteral { return self.generate_string_literal(lit) }
+270 | |                 else { return self.generate_literal(lit) }
+...   |
+284 | |             _ => return "unknown_expr".to_string(),
+285 | |         }
+    | |_________- any code following this `match` expression is unreachable, as all arms diverge
+286 |           return "/* unsupported expression */".to_string();
+    |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ unreachable statement
+    |
+    = note: `#[warn(unreachable_code)]` (part of `#[warn(unused)]`) on by default
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:305:49
+    |
+305 |         let left = self.generate_expression_str(expr.left);
+    |                         ----------------------- ^^^^^^^^^ expected `&Expression`, found `Box<Expression>`
+    |                         |
+    |                         arguments to this method are incorrect
+    |
+    = note: expected reference `&nodes::Expression`
+                  found struct `Box<nodes::Expression>`
+note: method defined here
+   --> codegen/rust_backend.rs:266:12
+    |
+266 |     pub fn generate_expression_str(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+305 |         let left = self.generate_expression_str(&expr.left);
+    |                                                 +
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:306:50
+    |
+306 |         let right = self.generate_expression_str(expr.right);
+    |                          ----------------------- ^^^^^^^^^^ expected `&Expression`, found `Box<Expression>`
+    |                          |
+    |                          arguments to this method are incorrect
+    |
+    = note: expected reference `&nodes::Expression`
+                  found struct `Box<nodes::Expression>`
+note: method defined here
+   --> codegen/rust_backend.rs:266:12
+    |
+266 |     pub fn generate_expression_str(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+306 |         let right = self.generate_expression_str(&expr.right);
+    |                                                  +
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:310:43
+    |
+308 |         let mut op = "";
+    |                      -- expected due to this value
+309 |
+310 |         if op_t == TokenType::Plus { op = "+".to_string() }
+    |                                           ^^^^^^^^^^^^^^^ expected `&str`, found `String`
+    |
+help: try removing the method call
+    |
+310 -         if op_t == TokenType::Plus { op = "+".to_string() }
+310 +         if op_t == TokenType::Plus { op = "+" }
+    |
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:311:49
+    |
+308 |         let mut op = "";
+    |                      -- expected due to this value
+...
+311 |         else if op_t == TokenType::Minus { op = "-".to_string() }
+    |                                                 ^^^^^^^^^^^^^^^ expected `&str`, found `String`
+    |
+help: try removing the method call
+    |
+311 -         else if op_t == TokenType::Minus { op = "-".to_string() }
+311 +         else if op_t == TokenType::Minus { op = "-" }
+    |
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:312:48
+    |
+308 |         let mut op = "";
+    |                      -- expected due to this value
+...
+312 |         else if op_t == TokenType::Star { op = "*".to_string() }
+    |                                                ^^^^^^^^^^^^^^^ expected `&str`, found `String`
+    |
+help: try removing the method call
+    |
+312 -         else if op_t == TokenType::Star { op = "*".to_string() }
+312 +         else if op_t == TokenType::Star { op = "*" }
+    |
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:313:49
+    |
+308 |         let mut op = "";
+    |                      -- expected due to this value
+...
+313 |         else if op_t == TokenType::Slash { op = "/".to_string() }
+    |                                                 ^^^^^^^^^^^^^^^ expected `&str`, found `String`
+    |
+help: try removing the method call
+    |
+313 -         else if op_t == TokenType::Slash { op = "/".to_string() }
+313 +         else if op_t == TokenType::Slash { op = "/" }
+    |
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:314:51
+    |
+308 |         let mut op = "";
+    |                      -- expected due to this value
+...
+314 |         else if op_t == TokenType::Percent { op = "%".to_string() }
+    |                                                   ^^^^^^^^^^^^^^^ expected `&str`, found `String`
+    |
+help: try removing the method call
+    |
+314 -         else if op_t == TokenType::Percent { op = "%".to_string() }
+314 +         else if op_t == TokenType::Percent { op = "%" }
+    |
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:316:54
+    |
+308 |         let mut op = "";
+    |                      -- expected due to this value
+...
+316 |         else if op_t == TokenType::EqualEqual { op = "==".to_string() }
+    |                                                      ^^^^^^^^^^^^^^^^ expected `&str`, found `String`
+    |
+help: try removing the method call
+    |
+316 -         else if op_t == TokenType::EqualEqual { op = "==".to_string() }
+316 +         else if op_t == TokenType::EqualEqual { op = "==" }
+    |
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:317:52
+    |
+308 |         let mut op = "";
+    |                      -- expected due to this value
+...
+317 |         else if op_t == TokenType::NotEqual { op = "!=".to_string() }
+    |                                                    ^^^^^^^^^^^^^^^^ expected `&str`, found `String`
+    |
+help: try removing the method call
+    |
+317 -         else if op_t == TokenType::NotEqual { op = "!=".to_string() }
+317 +         else if op_t == TokenType::NotEqual { op = "!=" }
+    |
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:318:51
+    |
+308 |         let mut op = "";
+    |                      -- expected due to this value
+...
+318 |         else if op_t == TokenType::Greater { op = ">".to_string() }
+    |                                                   ^^^^^^^^^^^^^^^ expected `&str`, found `String`
+    |
+help: try removing the method call
+    |
+318 -         else if op_t == TokenType::Greater { op = ">".to_string() }
+318 +         else if op_t == TokenType::Greater { op = ">" }
+    |
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:319:48
+    |
+308 |         let mut op = "";
+    |                      -- expected due to this value
+...
+319 |         else if op_t == TokenType::Less { op = "<".to_string() }
+    |                                                ^^^^^^^^^^^^^^^ expected `&str`, found `String`
+    |
+help: try removing the method call
+    |
+319 -         else if op_t == TokenType::Less { op = "<".to_string() }
+319 +         else if op_t == TokenType::Less { op = "<" }
+    |
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:320:53
+    |
+308 |         let mut op = "";
+    |                      -- expected due to this value
+...
+320 |         else if op_t == TokenType::GreaterEq { op = ">=".to_string() }
+    |                                                     ^^^^^^^^^^^^^^^^ expected `&str`, found `String`
+    |
+help: try removing the method call
+    |
+320 -         else if op_t == TokenType::GreaterEq { op = ">=".to_string() }
+320 +         else if op_t == TokenType::GreaterEq { op = ">=" }
+    |
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:321:50
+    |
+308 |         let mut op = "";
+    |                      -- expected due to this value
+...
+321 |         else if op_t == TokenType::LessEq { op = "<=".to_string() }
+    |                                                  ^^^^^^^^^^^^^^^^ expected `&str`, found `String`
+    |
+help: try removing the method call
+    |
+321 -         else if op_t == TokenType::LessEq { op = "<=".to_string() }
+321 +         else if op_t == TokenType::LessEq { op = "<=" }
+    |
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:322:47
+    |
+308 |         let mut op = "";
+    |                      -- expected due to this value
+...
+322 |         else if op_t == TokenType::And { op = "&&".to_string() }
+    |                                               ^^^^^^^^^^^^^^^^ expected `&str`, found `String`
+    |
+help: try removing the method call
+    |
+322 -         else if op_t == TokenType::And { op = "&&".to_string() }
+322 +         else if op_t == TokenType::And { op = "&&" }
+    |
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:323:46
+    |
+308 |         let mut op = "";
+    |                      -- expected due to this value
+...
+323 |         else if op_t == TokenType::Or { op = "||".to_string() }
+    |                                              ^^^^^^^^^^^^^^^^ expected `&str`, found `String`
+    |
+help: try removing the method call
+    |
+323 -         else if op_t == TokenType::Or { op = "||".to_string() }
+323 +         else if op_t == TokenType::Or { op = "||" }
+    |
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:326:21
+    |
+308 |         let mut op = "";
+    |                      -- expected due to this value
+...
+326 |         else { op = "?".to_string() }
+    |                     ^^^^^^^^^^^^^^^ expected `&str`, found `String`
+    |
+help: try removing the method call
+    |
+326 -         else { op = "?".to_string() }
+326 +         else { op = "?" }
+    |
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:332:52
+    |
+332 |         let operand = self.generate_expression_str(expr.operand);
+    |                            ----------------------- ^^^^^^^^^^^^ expected `&Expression`, found `Box<Expression>`
+    |                            |
+    |                            arguments to this method are incorrect
+    |
+    = note: expected reference `&nodes::Expression`
+                  found struct `Box<nodes::Expression>`
+note: method defined here
+   --> codegen/rust_backend.rs:266:12
+    |
+266 |     pub fn generate_expression_str(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+332 |         let operand = self.generate_expression_str(&expr.operand);
+    |                                                    +
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:347:51
+    |
+347 |         let callee = self.generate_expression_str(expr.callee);
+    |                           ----------------------- ^^^^^^^^^^^ expected `&Expression`, found `Box<Expression>`
+    |                           |
+    |                           arguments to this method are incorrect
+    |
+    = note: expected reference `&nodes::Expression`
+                  found struct `Box<nodes::Expression>`
+note: method defined here
+   --> codegen/rust_backend.rs:266:12
+    |
+266 |     pub fn generate_expression_str(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+347 |         let callee = self.generate_expression_str(&expr.callee);
+    |                                                   +
+
+error[E0599]: no method named `join` found for struct `String` in the current scope
+   --> codegen/rust_backend.rs:354:41
+    |
+354 |         let args_str = ", ".to_string().join(args);
+    |                                         ^^^^ method not found in `String`
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:360:51
+    |
+360 |         let object = self.generate_expression_str(expr.object);
+    |                           ----------------------- ^^^^^^^^^^^ expected `&Expression`, found `Box<Expression>`
+    |                           |
+    |                           arguments to this method are incorrect
+    |
+    = note: expected reference `&nodes::Expression`
+                  found struct `Box<nodes::Expression>`
+note: method defined here
+   --> codegen/rust_backend.rs:266:12
+    |
+266 |     pub fn generate_expression_str(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+360 |         let object = self.generate_expression_str(&expr.object);
+    |                                                   +
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:361:50
+    |
+361 |         let index = self.generate_expression_str(expr.index);
+    |                          ----------------------- ^^^^^^^^^^ expected `&Expression`, found `Box<Expression>`
+    |                          |
+    |                          arguments to this method are incorrect
+    |
+    = note: expected reference `&nodes::Expression`
+                  found struct `Box<nodes::Expression>`
+note: method defined here
+   --> codegen/rust_backend.rs:266:12
+    |
+266 |     pub fn generate_expression_str(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+361 |         let index = self.generate_expression_str(&expr.index);
+    |                                                  +
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:367:51
+    |
+367 |         let object = self.generate_expression_str(expr.object);
+    |                           ----------------------- ^^^^^^^^^^^ expected `&Expression`, found `Box<Expression>`
+    |                           |
+    |                           arguments to this method are incorrect
+    |
+    = note: expected reference `&nodes::Expression`
+                  found struct `Box<nodes::Expression>`
+note: method defined here
+   --> codegen/rust_backend.rs:266:12
+    |
+266 |     pub fn generate_expression_str(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+367 |         let object = self.generate_expression_str(&expr.object);
+    |                                                   +
+
+error[E0599]: no method named `join` found for struct `String` in the current scope
+   --> codegen/rust_backend.rs:378:42
+    |
+378 |         let elems_str = ", ".to_string().join(elements);
+    |                                          ^^^^ method not found in `String`
+
+error[E0599]: no method named `join` found for struct `String` in the current scope
+   --> codegen/rust_backend.rs:389:42
+    |
+389 |         let elems_str = ", ".to_string().join(elements);
+    |                                          ^^^^ method not found in `String`
+
+error[E0599]: no method named `join` found for struct `String` in the current scope
+   --> codegen/rust_backend.rs:400:42
+    |
+400 |         let elems_str = ", ".to_string().join(elements);
+    |                                          ^^^^ method not found in `String`
+
+error[E0608]: cannot index into a value of type `&(nodes::Expression, nodes::Expression)`
+   --> codegen/rust_backend.rs:408:56
+    |
+408 |             let key = self.generate_expression_str(pair[0]);
+    |                                                        ^^^
+
+error[E0608]: cannot index into a value of type `&(nodes::Expression, nodes::Expression)`
+   --> codegen/rust_backend.rs:409:58
+    |
+409 |             let value = self.generate_expression_str(pair[1]);
+    |                                                          ^^^
+
+error[E0599]: no method named `join` found for struct `String` in the current scope
+   --> codegen/rust_backend.rs:413:42
+    |
+413 |         let pairs_str = ", ".to_string().join(pairs);
+    |                                          ^^^^ method not found in `String`
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:419:48
+    |
+419 |         let arg = self.generate_expression_str(expr.argument);
+    |                        ----------------------- ^^^^^^^^^^^^^ expected `&Expression`, found `Box<Expression>`
+    |                        |
+    |                        arguments to this method are incorrect
+    |
+    = note: expected reference `&nodes::Expression`
+                  found struct `Box<nodes::Expression>`
+note: method defined here
+   --> codegen/rust_backend.rs:266:12
+    |
+266 |     pub fn generate_expression_str(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+419 |         let arg = self.generate_expression_str(&expr.argument);
+    |                                                +
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:422:13
+    |
+421 |         match expr.type_name {
+    |               -------------- this expression has type `String`
+422 |             "int" => return format!("({} as i64)", arg),
+    |             ^^^^^ expected `String`, found `&str`
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:423:13
+    |
+421 |         match expr.type_name {
+    |               -------------- this expression has type `String`
+422 |             "int" => return format!("({} as i64)", arg),
+423 |             "float" => return format!("({} as f64)", arg),
+    |             ^^^^^^^ expected `String`, found `&str`
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:424:13
+    |
+421 |         match expr.type_name {
+    |               -------------- this expression has type `String`
+...
+424 |             "str" => return format!("({}.to_string())", arg),
+    |             ^^^^^ expected `String`, found `&str`
+
+error[E0308]: mismatched types
+   --> codegen/rust_backend.rs:425:13
+    |
+421 |         match expr.type_name {
+    |               -------------- this expression has type `String`
+...
+425 |             "bool" => return format!("({} as bool)", arg),
+    |             ^^^^^^ expected `String`, found `&str`
+
+error[E0308]: mismatched types
+  --> ir/ir_builder.rs:18:23
+   |
+18 |                 name: "",
+   |                       ^^ expected `String`, found `&str`
+   |
+help: try using a conversion method
+   |
+18 |                 name: "".to_string(),
+   |                         ++++++++++++
+
+error[E0308]: mismatched types
+  --> ir/ir_builder.rs:25:29
+   |
+25 |             current_struct: "",
+   |                             ^^ expected `String`, found `&str`
+   |
+help: try using a conversion method
+   |
+25 |             current_struct: "".to_string(),
+   |                               ++++++++++++
+
+error[E0615]: attempted to take value of method `stmt_type` on type `nodes::Statement`
+  --> ir/ir_builder.rs:40:17
+   |
+40 |         if stmt.stmt_type == StmtType::StructDecl {
+   |                 ^^^^^^^^^ method, not a field
+   |
+help: use parentheses to call the method
+   |
+40 |         if stmt.stmt_type() == StmtType::StructDecl {
+   |                          ++
+
+error[E0615]: attempted to take value of method `stmt_type` on type `nodes::Statement`
+  --> ir/ir_builder.rs:43:22
+   |
+43 |         else if stmt.stmt_type == StmtType::FunctionDecl {
+   |                      ^^^^^^^^^ method, not a field
+   |
+help: use parentheses to call the method
+   |
+43 |         else if stmt.stmt_type() == StmtType::FunctionDecl {
+   |                               ++
+
+error[E0615]: attempted to take value of method `stmt_type` on type `nodes::Statement`
+  --> ir/ir_builder.rs:46:22
+   |
+46 |         else if stmt.stmt_type == StmtType::ImportStmt {
+   |                      ^^^^^^^^^ method, not a field
+   |
+help: use parentheses to call the method
+   |
+46 |         else if stmt.stmt_type() == StmtType::ImportStmt {
+   |                               ++
+
+error[E0609]: no field `base` on type `nodes::Statement`
+  --> ir/ir_builder.rs:53:95
+   |
+53 | ...   let mut ir_struct = IRStruct {base: IRNode {node_type: IRNodeType::Struct, line: stmt.base.line, column: stmt.base.column}, name: d...
+   |                                                                                             ^^^^ unknown field
+
+error[E0609]: no field `base` on type `nodes::Statement`
+  --> ir/ir_builder.rs:53:119
+   |
+53 | ...   let mut ir_struct = IRStruct {base: IRNode {node_type: IRNodeType::Struct, line: stmt.base.line, column: stmt.base.column}, name: d...
+   |                                                                                                                     ^^^^ unknown field
+
+error[E0609]: no field `name` on type `nodes::Statement`
+  --> ir/ir_builder.rs:53:144
+   |
+53 | ...ne: stmt.base.line, column: stmt.base.column}, name: decl.name, fields: vec![]};
+   |                                                              ^^^^ unknown field
+
+error[E0609]: no field `name` on type `nodes::Statement`
+  --> ir/ir_builder.rs:54:36
+   |
+54 |         self.current_struct = decl.name;
+   |                                    ^^^^ unknown field
+
+error[E0609]: no field `body` on type `nodes::Statement`
+  --> ir/ir_builder.rs:55:28
+   |
+55 |         for member in decl.body {
+   |                            ^^^^ unknown field
+
+error[E0599]: no variant or associated item named `FieldDecl` found for enum `nodes::StmtType` in the current scope
+  --> ir/ir_builder.rs:56:46
+   |
+56 |             if member.stmt_type == StmtType::FieldDecl {
+   |                                              ^^^^^^^^^ variant or associated item not found in `nodes::StmtType`
+   |
+  ::: ast/nodes.rs:27:1
+   |
+27 | pub enum StmtType {
+   | ----------------- variant or associated item `FieldDecl` not found for this enum
+
+error[E0308]: mismatched types
+  --> ir/ir_builder.rs:57:222
+   |
+57 | ...e_to_rust(member.type_annotation), default_value: ""};
+   |                                                      ^^ expected `String`, found `&str`
+   |
+help: try using a conversion method
+   |
+57 |                 let field = IRField {base: IRNode {node_type: IRNodeType::Field, line: member.base.line, column: member.base.column}, name: member.name, type_name: gul_type_to_rust(member.type_annotation), default_value: "".to_string()};
+   |                                                                                                                                                                                                                                ++++++++++++
+
+error[E0609]: no field `name` on type `nodes::Statement`
+  --> ir/ir_builder.rs:62:58
+   |
+62 |                 if !self.pending_impls.contains_key(decl.name) {
+   |                                                          ^^^^ unknown field
+
+error[E0609]: no field `name` on type `nodes::Statement`
+  --> ir/ir_builder.rs:63:45
+   |
+63 |                     self.pending_impls[decl.name] = vec![];
+   |                                             ^^^^ unknown field
+
+error[E0609]: no field `name` on type `nodes::Statement`
+  --> ir/ir_builder.rs:65:41
+   |
+65 |                 self.pending_impls[decl.name].push(ir_func);
+   |                                         ^^^^ unknown field
+
+error[E0308]: mismatched types
+  --> ir/ir_builder.rs:69:31
+   |
+69 |         self.current_struct = "";
+   |         -------------------   ^^ expected `String`, found `&str`
+   |         |
+   |         expected due to the type of this binding
+   |
+help: try using a conversion method
+   |
+69 |         self.current_struct = "".to_string();
+   |                                 ++++++++++++
+
+error[E0308]: mismatched types
+  --> ir/ir_builder.rs:73:43
+   |
+73 |         let ir_func = self.build_function(stmt);
+   |                            -------------- ^^^^ expected `FunctionDecl`, found `Statement`
+   |                            |
+   |                            arguments to this method are incorrect
+   |
+note: method defined here
+  --> ir/ir_builder.rs:77:12
+   |
+77 |     pub fn build_function(&mut self, decl: FunctionDecl)  ->  IRFunction {
+   |            ^^^^^^^^^^^^^^            ------------------
+
+error[E0609]: no field `base` on type `nodes::FunctionDecl`
+  --> ir/ir_builder.rs:78:97
+   |
+78 | ...   let mut ir_func = IRFunction {base: IRNode {node_type: IRNodeType::Function, line: decl.base.line, column: decl.base.column}, name:...
+   |                                                                                               ^^^^ unknown field
+   |
+   = note: available fields are: `node`, `name`, `is_async`, `parameters`, `return_type` ... and 2 others
+
+error[E0609]: no field `base` on type `nodes::FunctionDecl`
+  --> ir/ir_builder.rs:78:121
+   |
+78 | ... IRNodeType::Function, line: decl.base.line, column: decl.base.column}, name: decl.name, params: vec![], return_type: gul_type_to_rust...
+   |                                                              ^^^^ unknown field
+   |
+   = note: available fields are: `node`, `name`, `is_async`, `parameters`, `return_type` ... and 2 others
+
+error[E0308]: mismatched types
+  --> ir/ir_builder.rs:78:259
+   |
+78 | ..._type), body: vec![], is_method: false, receiver: ""};
+   |                                                      ^^ expected `String`, found `&str`
+   |
+help: try using a conversion method
+   |
+78 |         let mut ir_func = IRFunction {base: IRNode {node_type: IRNodeType::Function, line: decl.base.line, column: decl.base.column}, name: decl.name, params: vec![], return_type: gul_type_to_rust(decl.return_type), body: vec![], is_method: false, receiver: "".to_string()};
+   |                                                                                                                                                                                                                                                                     ++++++++++++
+
+error[E0609]: no field `base` on type `nodes::Parameter`
+  --> ir/ir_builder.rs:85:105
+   |
+85 | ...   let ir_param = IRParameter {base: IRNode {node_type: IRNodeType::Parameter, line: param.base.line, column: param.base.column}, name...
+   |                                                                                               ^^^^ unknown field
+   |
+   = note: available fields are: `name`, `type_annotation`, `ownership_mode`, `default_value`
+
+error[E0609]: no field `base` on type `nodes::Parameter`
+  --> ir/ir_builder.rs:85:130
+   |
+85 | ...NodeType::Parameter, line: param.base.line, column: param.base.column}, name: param.name, type_name: gul_type_to_rust(param.type_annot...
+   |                                                              ^^^^ unknown field
+   |
+   = note: available fields are: `name`, `type_annotation`, `ownership_mode`, `default_value`
+
+error[E0609]: no field `module_path` on type `nodes::Statement`
+  --> ir/ir_builder.rs:93:26
+   |
+93 |         let parts = stmt.module_path;
+   |                          ^^^^^^^^^^^ unknown field
+
+error[E0369]: cannot add `&str` to `&str`
+  --> ir/ir_builder.rs:97:29
+   |
+97 |                 path = path + "::";
+   |                        ---- ^ ---- &str
+   |                        |    |
+   |                        |    `+` cannot be used to concatenate two `&str` strings
+   |                        &str
+   |
+   = note: string concatenation requires an owned `String` on the left
+help: create an owned `String` from a string reference
+   |
+97 |                 path = path.to_owned() + "::";
+   |                            +++++++++++
+
+error[E0369]: cannot add `_` to `&str`
+  --> ir/ir_builder.rs:99:25
+   |
+99 |             path = path + part;
+   |                    ---- ^ ---- _
+   |                    |
+   |                    &str
+
+error[E0308]: mismatched types
+    --> ir/ir_builder.rs:101:42
+     |
+ 101 |         self.current_module.imports.push(path);
+     |                                     ---- ^^^^ expected `String`, found `&str`
+     |                                     |
+     |                                     arguments to this method are incorrect
+     |
+note: method defined here
+    --> /home/vu/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/alloc/src/vec/mod.rs:2563:12
+     |
+2563 |     pub fn push(&mut self, value: T) {
+     |            ^^^^
+help: try using a conversion method
+     |
+ 101 |         self.current_module.imports.push(path.to_string());
+     |                                              ++++++++++++
+
+error[E0308]: mismatched types
+  --> lexer/lexer.rs:41:87
+   |
+41 | ...                   l_tokens.push(Token{token_type: TokenType::Indent, value: "", line: 1, column: 1});
+   |                                                                                 ^^ expected `String`, found `&str`
+   |
+help: try using a conversion method
+   |
+41 |                             l_tokens.push(Token{token_type: TokenType::Indent, value: "".to_string(), line: 1, column: 1});
+   |                                                                                         ++++++++++++
+
+error[E0308]: mismatched types
+  --> lexer/lexer.rs:47:91
+   |
+47 | ...                   l_tokens.push(Token{token_type: TokenType::Dedent, value: "", line: 1, column: 1});
+   |                                                                                 ^^ expected `String`, found `&str`
+   |
+help: try using a conversion method
+   |
+47 |                                 l_tokens.push(Token{token_type: TokenType::Dedent, value: "".to_string(), line: 1, column: 1});
+   |                                                                                             ++++++++++++
+
+error[E0308]: mismatched types
+  --> lexer/lexer.rs:60:72
+   |
+60 |             l_tokens.push(Token{token_type: TokenType::Newline, value: "\n", line: 1, column: 1});
+   |                                                                        ^^^^ expected `String`, found `&str`
+   |
+help: try using a conversion method
+   |
+60 |             l_tokens.push(Token{token_type: TokenType::Newline, value: "\n".to_string(), line: 1, column: 1});
+   |                                                                            ++++++++++++
+
+error[E0308]: mismatched types
+  --> lexer/lexer.rs:77:83
+   |
+77 |                         l_tokens.push(Token{token_type: TokenType::Dedent, value: "", line: 1, column: 1});
+   |                                                                                   ^^ expected `String`, found `&str`
+   |
+help: try using a conversion method
+   |
+77 |                         l_tokens.push(Token{token_type: TokenType::Dedent, value: "".to_string(), line: 1, column: 1});
+   |                                                                                     ++++++++++++
+
+error[E0308]: mismatched types
+  --> lexer/lexer.rs:88:37
+   |
+88 |                     ident = ident + c;
+   |                                     ^ expected `&str`, found `String`
+   |
+help: consider borrowing here
+   |
+88 |                     ident = ident + &c;
+   |                                     +
+
+error[E0308]: mismatched types
+   --> lexer/lexer.rs:104:79
+    |
+104 |                     l_tokens.push(Token{token_type: TokenType::Dedent, value: "", line: 1, column: 1});
+    |                                                                               ^^ expected `String`, found `&str`
+    |
+help: try using a conversion method
+    |
+104 |                     l_tokens.push(Token{token_type: TokenType::Dedent, value: "".to_string(), line: 1, column: 1});
+    |                                                                                 ++++++++++++
+
+error[E0308]: mismatched types
+   --> lexer/lexer.rs:113:33
+    |
+113 |                     num = num + c;
+    |                                 ^ expected `&str`, found `String`
+    |
+help: consider borrowing here
+    |
+113 |                     num = num + &c;
+    |                                 +
+
+error[E0308]: mismatched types
+   --> lexer/lexer.rs:125:79
+    |
+125 |                     l_tokens.push(Token{token_type: TokenType::Dedent, value: "", line: 1, column: 1});
+    |                                                                               ^^ expected `String`, found `&str`
+    |
+help: try using a conversion method
+    |
+125 |                     l_tokens.push(Token{token_type: TokenType::Dedent, value: "".to_string(), line: 1, column: 1});
+    |                                                                                 ++++++++++++
+
+error[E0308]: mismatched types
+   --> lexer/lexer.rs:146:67
+    |
+146 |         l_tokens.push(Token{token_type: TokenType::Dedent, value: "", line: 1, column: 1});
+    |                                                                   ^^ expected `String`, found `&str`
+    |
+help: try using a conversion method
+    |
+146 |         l_tokens.push(Token{token_type: TokenType::Dedent, value: "".to_string(), line: 1, column: 1});
+    |                                                                     ++++++++++++
+
+error[E0308]: mismatched types
+   --> lexer/lexer.rs:148:60
+    |
+148 |     l_tokens.push(Token{token_type: TokenType::Eof, value: "", line: 1, column: 1});
+    |                                                            ^^ expected `String`, found `&str`
+    |
+help: try using a conversion method
+    |
+148 |     l_tokens.push(Token{token_type: TokenType::Eof, value: "".to_string(), line: 1, column: 1});
+    |                                                              ++++++++++++
+
+error[E0277]: the trait bound `token::TokenType: Eq` is not satisfied
+   --> lexer/token.rs:138:24
+    |
+138 |         let keywords = HashSet::from([TokenType::Let, TokenType::Var, TokenType::Fn,
+    |                        ^^^^^^^ the trait `Eq` is not implemented for `token::TokenType`
+    |
+    = help: the trait `From<[T; N]>` is implemented for `HashSet<T>`
+    = note: required for `HashSet<token::TokenType>` to implement `From<[token::TokenType; 21]>`
+help: consider annotating `token::TokenType` with `#[derive(Eq)]`
+    |
+  8 + #[derive(Eq)]
+  9 | pub enum TokenType {
+    |
+
+error[E0277]: the trait bound `token::TokenType: Hash` is not satisfied
+   --> lexer/token.rs:138:24
+    |
+138 |         let keywords = HashSet::from([TokenType::Let, TokenType::Var, TokenType::Fn,
+    |                        ^^^^^^^ the trait `Hash` is not implemented for `token::TokenType`
+    |
+    = help: the trait `From<[T; N]>` is implemented for `HashSet<T>`
+    = note: required for `HashSet<token::TokenType>` to implement `From<[token::TokenType; 21]>`
+help: consider annotating `token::TokenType` with `#[derive(Hash)]`
+    |
+  8 + #[derive(Hash)]
+  9 | pub enum TokenType {
+    |
+
+error[E0599]: the method `contains` exists for struct `HashSet<token::TokenType>`, but its trait bounds were not satisfied
+   --> lexer/token.rs:145:25
+    |
+  8 | pub enum TokenType {
+    | ------------------ doesn't satisfy `token::TokenType: Eq` or `token::TokenType: Hash`
+...
+145 |         return keywords.contains(&self.token_type);
+    |                         ^^^^^^^^ method cannot be called on `HashSet<token::TokenType>` due to unsatisfied trait bounds
+    |
+    = note: the following trait bounds were not satisfied:
+            `token::TokenType: Eq`
+            `token::TokenType: Hash`
+help: consider annotating `token::TokenType` with `#[derive(Eq, Hash, PartialEq)]`
+    |
+  8 + #[derive(Eq, Hash, PartialEq)]
+  9 | pub enum TokenType {
+    |
+
+error[E0308]: mismatched types
+   --> parser/parser.rs:106:54
+    |
+106 |         println!("{}", "Parse error: ".to_string() + message);
+    |                                                      ^^^^^^^ expected `&str`, found `String`
+    |
+help: consider borrowing here
+    |
+106 |         println!("{}", "Parse error: ".to_string() + &message);
+    |                                                      +
+
+error[E0369]: binary operation `<=` cannot be applied to type `Precedence`
+   --> parser/parser.rs:116:21
+    |
+116 |             if prec <= min_precedence { break }
+    |                ---- ^^ -------------- Precedence
+    |                |
+    |                Precedence
+    |
+note: an implementation of `PartialOrd` might be missing for `Precedence`
+   --> parser/parser.rs:7:1
+    |
+  7 | pub enum Precedence {
+    | ^^^^^^^^^^^^^^^^^^^ must implement `PartialOrd`
+help: consider annotating `Precedence` with `#[derive(PartialEq, PartialOrd)]`
+    |
+  7 + #[derive(PartialEq, PartialOrd)]
+  8 | pub enum Precedence {
+    |
+
+error[E0308]: mismatched types
+   --> parser/parser.rs:138:124
+    |
+138 |             return Expression::UnaryOp(UnaryOpExpr{node: ASTNode{line: 1, column: 1}, operator: TokenType::Minus, operand: op});
+    |                                                                                                                            ^^ expected `Box<Expression>`, found `Expression`
+    |
+    = note: expected struct `Box<nodes::Expression>`
+                 found enum `nodes::Expression`
+    = note: for more on the distinction between the stack and the heap, read https://doc.rust-lang.org/book/ch15-01-box.html, https://doc.rust-lang.org/rust-by-example/std/box.html, and https://doc.rust-lang.org/std/boxed/index.html
+help: store this in the heap by calling `Box::new`
+    |
+138 |             return Expression::UnaryOp(UnaryOpExpr{node: ASTNode{line: 1, column: 1}, operator: TokenType::Minus, operand: Box::new(op)});
+    |                                                                                                                            +++++++++  +
+
+error[E0308]: mismatched types
+   --> parser/parser.rs:140:90
+    |
+140 |         return Expression::Literal(LiteralExpr{node: ASTNode{line: 1, column: 1}, value: "None", value_type: TokenType::NoneLiteral});
+    |                                                                                          ^^^^^^ expected `String`, found `&str`
+    |
+help: try using a conversion method
+    |
+140 |         return Expression::Literal(LiteralExpr{node: ASTNode{line: 1, column: 1}, value: "None".to_string(), value_type: TokenType::NoneLiteral});
+    |                                                                                                ++++++++++++
+
+error[E0599]: no variant or associated item named `NoneLiteral` found for enum `token::TokenType` in the current scope
+   --> parser/parser.rs:140:121
+    |
+140 |         return Expression::Literal(LiteralExpr{node: ASTNode{line: 1, column: 1}, value: "None", value_type: TokenType::NoneLiteral});
+    |                                                                                                                         ^^^^^^^^^^^ variant or associated item not found in `token::TokenType`
+    |
+   ::: lexer/token.rs:8:1
+    |
+  8 | pub enum TokenType {
+    | ------------------ variant or associated item `NoneLiteral` not found for this enum
+
+error[E0308]: mismatched types
+   --> parser/parser.rs:147:95
+    |
+147 | ...node: ASTNode{line: 1, column: 1}, left: left, operator: token.token_type, right: right});
+    |                                             ^^^^ expected `Box<Expression>`, found `Expression`
+    |
+    = note: expected struct `Box<nodes::Expression>`
+                 found enum `nodes::Expression`
+    = note: for more on the distinction between the stack and the heap, read https://doc.rust-lang.org/book/ch15-01-box.html, https://doc.rust-lang.org/rust-by-example/std/box.html, and https://doc.rust-lang.org/std/boxed/index.html
+help: store this in the heap by calling `Box::new`
+    |
+147 |             return Expression::BinaryOp(BinaryOpExpr{node: ASTNode{line: 1, column: 1}, left: Box::new(left), operator: token.token_type, right: right});
+    |                                                                                               +++++++++    +
+
+error[E0308]: mismatched types
+   --> parser/parser.rs:147:136
+    |
+147 | ...left, operator: token.token_type, right: right});
+    |                                             ^^^^^ expected `Box<Expression>`, found `Expression`
+    |
+    = note: expected struct `Box<nodes::Expression>`
+                 found enum `nodes::Expression`
+    = note: for more on the distinction between the stack and the heap, read https://doc.rust-lang.org/book/ch15-01-box.html, https://doc.rust-lang.org/rust-by-example/std/box.html, and https://doc.rust-lang.org/std/boxed/index.html
+help: store this in the heap by calling `Box::new`
+    |
+147 |             return Expression::BinaryOp(BinaryOpExpr{node: ASTNode{line: 1, column: 1}, left: left, operator: token.token_type, right: Box::new(right)});
+    |                                                                                                                                        +++++++++     +
+
+error[E0308]: mismatched types
+   --> parser/parser.rs:158:89
+    |
+158 |             return Expression::Call(CallExpr{node: ASTNode{line: 1, column: 1}, callee: left, arguments: args});
+    |                                                                                         ^^^^ expected `Box<Expression>`, found `Expression`
+    |
+    = note: expected struct `Box<nodes::Expression>`
+                 found enum `nodes::Expression`
+    = note: for more on the distinction between the stack and the heap, read https://doc.rust-lang.org/book/ch15-01-box.html, https://doc.rust-lang.org/rust-by-example/std/box.html, and https://doc.rust-lang.org/std/boxed/index.html
+help: store this in the heap by calling `Box::new`
+    |
+158 |             return Expression::Call(CallExpr{node: ASTNode{line: 1, column: 1}, callee: Box::new(left), arguments: args});
+    |                                                                                         +++++++++    +
+
+error[E0063]: missing field `keyword_args` in initializer of `nodes::CallExpr`
+   --> parser/parser.rs:158:37
+    |
+158 |             return Expression::Call(CallExpr{node: ASTNode{line: 1, column: 1}, callee: left, arguments: args});
+    |                                     ^^^^^^^^ missing `keyword_args`
+
+error[E0560]: struct `nodes::LetStmt` has no field named `is_var`
+   --> parser/parser.rs:170:106
+    |
+170 |             return Statement::LetDecl(LetStmt{node: ASTNode{line: 1, column: 1}, name: name, value: val, is_var: false});
+    |                                                                                                          ^^^^^^ `nodes::LetStmt` does not have this field
+    |
+    = note: available fields are: `type_annotation`
+
+error[E0308]: mismatched types
+   --> parser/parser.rs:184:83
+    |
+184 |                 if self.tokens[self.current_pos].token_type == TokenType::Comma { self.advance() }
+    |                 ------------------------------------------------------------------^^^^^^^^^^^^^^--
+    |                 |                                                                 |
+    |                 |                                                                 expected `()`, found `Token`
+    |                 expected this to be `()`
+    |
+help: consider using a semicolon here
+    |
+184 |                 if self.tokens[self.current_pos].token_type == TokenType::Comma { self.advance(); }
+    |                                                                                                 +
+help: consider using a semicolon here
+    |
+184 |                 if self.tokens[self.current_pos].token_type == TokenType::Comma { self.advance() };
+    |                                                                                                   +
+
+error[E0034]: multiple applicable items in scope
+   --> parser/parser.rs:192:32
+    |
+192 |                 body.push(self.parse_statement());
+    |                                ^^^^^^^^^^^^^^^ multiple `parse_statement` found
+    |
+note: candidate #1 is defined in an impl for the type `Parser`
+   --> parser/parser.rs:163:5
+    |
+163 |     pub fn parse_statement(&mut self)  ->  Statement {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `Parser`
+   --> parser/parser.rs:239:5
+    |
+239 |     pub fn parse_statement(&mut self)  ->  Statement {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0308]: mismatched types
+   --> parser/parser.rs:193:85
+    |
+193 |                 if self.tokens[self.current_pos].token_type == TokenType::Newline { self.advance() }
+    |                 --------------------------------------------------------------------^^^^^^^^^^^^^^--
+    |                 |                                                                   |
+    |                 |                                                                   expected `()`, found `Token`
+    |                 expected this to be `()`
+    |
+help: consider using a semicolon here
+    |
+193 |                 if self.tokens[self.current_pos].token_type == TokenType::Newline { self.advance(); }
+    |                                                                                                   +
+help: consider using a semicolon here
+    |
+193 |                 if self.tokens[self.current_pos].token_type == TokenType::Newline { self.advance() };
+    |                                                                                                     +
+
+error[E0560]: struct `nodes::FunctionDecl` has no field named `params`
+   --> parser/parser.rs:196:104
+    |
+196 | ...STNode{line: 1, column: 1}, name: name, params: vec![], body: body, return_type: "Any"});
+    |                                            ^^^^^^ `nodes::FunctionDecl` does not have this field
+    |
+    = note: available fields are: `is_async`, `parameters`, `decorators`
+
+error[E0034]: multiple applicable items in scope
+   --> parser/parser.rs:214:38
+    |
+214 |                 statements.push(self.parse_statement());
+    |                                      ^^^^^^^^^^^^^^^ multiple `parse_statement` found
+    |
+note: candidate #1 is defined in an impl for the type `Parser`
+   --> parser/parser.rs:163:5
+    |
+163 |     pub fn parse_statement(&mut self)  ->  Statement {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `Parser`
+   --> parser/parser.rs:239:5
+    |
+239 |     pub fn parse_statement(&mut self)  ->  Statement {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0061]: this method takes 1 argument but 0 arguments were supplied
+   --> parser/parser.rs:298:26
+    |
+298 |         let value = self.parse_expression();
+    |                          ^^^^^^^^^^^^^^^^-- argument #1 of type `Precedence` is missing
+    |
+note: method defined here
+   --> parser/parser.rs:110:12
+    |
+110 |     pub fn parse_expression(&mut self, min_precedence: Precedence)  ->  Expression {
+    |            ^^^^^^^^^^^^^^^^            --------------------------
+help: provide the argument
+    |
+298 |         let value = self.parse_expression(/* Precedence */);
+    |                                           ++++++++++++++++
+
+error[E0061]: this method takes 1 argument but 0 arguments were supplied
+   --> parser/parser.rs:323:26
+    |
+323 |         let value = self.parse_expression();
+    |                          ^^^^^^^^^^^^^^^^-- argument #1 of type `Precedence` is missing
+    |
+note: method defined here
+   --> parser/parser.rs:110:12
+    |
+110 |     pub fn parse_expression(&mut self, min_precedence: Precedence)  ->  Expression {
+    |            ^^^^^^^^^^^^^^^^            --------------------------
+help: provide the argument
+    |
+323 |         let value = self.parse_expression(/* Precedence */);
+    |                                           ++++++++++++++++
+
+error[E0308]: mismatched types
+   --> parser/parser.rs:407:28
+    |
+407 |             default_value: None, // TODO: parse default values
+    |                            ^^^^ expected `Expression`, found `Option<_>`
+    |
+    = note: expected enum `nodes::Expression`
+               found enum `Option<_>`
+
+error[E0034]: multiple applicable items in scope
+   --> parser/parser.rs:421:34
+    |
+421 |             statements.push(self.parse_statement());
+    |                                  ^^^^^^^^^^^^^^^ multiple `parse_statement` found
+    |
+note: candidate #1 is defined in an impl for the type `Parser`
+   --> parser/parser.rs:163:5
+    |
+163 |     pub fn parse_statement(&mut self)  ->  Statement {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+note: candidate #2 is defined in an impl for the type `Parser`
+   --> parser/parser.rs:239:5
+    |
+239 |     pub fn parse_statement(&mut self)  ->  Statement {
+    |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0061]: this method takes 1 argument but 0 arguments were supplied
+   --> parser/parser.rs:432:30
+    |
+432 |         let condition = self.parse_expression();
+    |                              ^^^^^^^^^^^^^^^^-- argument #1 of type `Precedence` is missing
+    |
+note: method defined here
+   --> parser/parser.rs:110:12
+    |
+110 |     pub fn parse_expression(&mut self, min_precedence: Precedence)  ->  Expression {
+    |            ^^^^^^^^^^^^^^^^            --------------------------
+help: provide the argument
+    |
+432 |         let condition = self.parse_expression(/* Precedence */);
+    |                                               ++++++++++++++++
+
+error[E0061]: this method takes 1 argument but 0 arguments were supplied
+   --> parser/parser.rs:445:39
+    |
+445 |             let elif_condition = self.parse_expression();
+    |                                       ^^^^^^^^^^^^^^^^-- argument #1 of type `Precedence` is missing
+    |
+note: method defined here
+   --> parser/parser.rs:110:12
+    |
+110 |     pub fn parse_expression(&mut self, min_precedence: Precedence)  ->  Expression {
+    |            ^^^^^^^^^^^^^^^^            --------------------------
+help: provide the argument
+    |
+445 |             let elif_condition = self.parse_expression(/* Precedence */);
+    |                                                        ++++++++++++++++
+
+error[E0061]: this method takes 1 argument but 0 arguments were supplied
+   --> parser/parser.rs:481:30
+    |
+481 |         let condition = self.parse_expression();
+    |                              ^^^^^^^^^^^^^^^^-- argument #1 of type `Precedence` is missing
+    |
+note: method defined here
+   --> parser/parser.rs:110:12
+    |
+110 |     pub fn parse_expression(&mut self, min_precedence: Precedence)  ->  Expression {
+    |            ^^^^^^^^^^^^^^^^            --------------------------
+help: provide the argument
+    |
+481 |         let condition = self.parse_expression(/* Precedence */);
+    |                                               ++++++++++++++++
+
+error[E0061]: this method takes 1 argument but 0 arguments were supplied
+   --> parser/parser.rs:500:29
+    |
+500 |         let iterable = self.parse_expression();
+    |                             ^^^^^^^^^^^^^^^^-- argument #1 of type `Precedence` is missing
+    |
+note: method defined here
+   --> parser/parser.rs:110:12
+    |
+110 |     pub fn parse_expression(&mut self, min_precedence: Precedence)  ->  Expression {
+    |            ^^^^^^^^^^^^^^^^            --------------------------
+help: provide the argument
+    |
+500 |         let iterable = self.parse_expression(/* Precedence */);
+    |                                              ++++++++++++++++
+
+error[E0061]: this method takes 1 argument but 0 arguments were supplied
+   --> parser/parser.rs:522:26
+    |
+522 |             value = self.parse_expression();
+    |                          ^^^^^^^^^^^^^^^^-- argument #1 of type `Precedence` is missing
+    |
+note: method defined here
+   --> parser/parser.rs:110:12
+    |
+110 |     pub fn parse_expression(&mut self, min_precedence: Precedence)  ->  Expression {
+    |            ^^^^^^^^^^^^^^^^            --------------------------
+help: provide the argument
+    |
+522 |             value = self.parse_expression(/* Precedence */);
+    |                                           ++++++++++++++++
+
+error[E0308]: mismatched types
+   --> parser/parser.rs:522:21
+    |
+518 |         let mut value = None;
+    |                         ---- expected due to this value
+...
+522 |             value = self.parse_expression();
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^ expected `Option<_>`, found `Expression`
+    |
+    = note: expected enum `Option<_>`
+               found enum `nodes::Expression`
+help: try wrapping the expression in `Some`
+    |
+522 |             value = Some(self.parse_expression());
+    |                     +++++                       +
+
+error[E0308]: mismatched types
+   --> parser/parser.rs:527:20
+    |
+527 |             value: value,
+    |                    ^^^^^ expected `Expression`, found `Option<_>`
+    |
+    = note: expected enum `nodes::Expression`
+               found enum `Option<_>`
+help: consider using `Option::expect` to unwrap the `Option<_>` value, panicking if the value is an `Option::None`
+    |
+527 |             value: value.expect("REASON"),
+    |                         +++++++++++++++++
+
+error[E0308]: mismatched types
+   --> parser/parser.rs:563:26
+    |
+563 |             import_type: "single",
+    |                          ^^^^^^^^ expected `String`, found `&str`
+    |
+help: try using a conversion method
+    |
+563 |             import_type: "single".to_string(),
+    |                                  ++++++++++++
+
+error[E0061]: this method takes 1 argument but 0 arguments were supplied
+   --> parser/parser.rs:572:25
+    |
+572 |         let expr = self.parse_expression();
+    |                         ^^^^^^^^^^^^^^^^-- argument #1 of type `Precedence` is missing
+    |
+note: method defined here
+   --> parser/parser.rs:110:12
+    |
+110 |     pub fn parse_expression(&mut self, min_precedence: Precedence)  ->  Expression {
+    |            ^^^^^^^^^^^^^^^^            --------------------------
+help: provide the argument
+    |
+572 |         let expr = self.parse_expression(/* Precedence */);
+    |                                          ++++++++++++++++
+
+error[E0061]: this method takes 1 argument but 0 arguments were supplied
+   --> parser/parser.rs:577:30
+    |
+577 |             let value = self.parse_expression();
+    |                              ^^^^^^^^^^^^^^^^-- argument #1 of type `Precedence` is missing
+    |
+note: method defined here
+   --> parser/parser.rs:110:12
+    |
+110 |     pub fn parse_expression(&mut self, min_precedence: Precedence)  ->  Expression {
+    |            ^^^^^^^^^^^^^^^^            --------------------------
+help: provide the argument
+    |
+577 |             let value = self.parse_expression(/* Precedence */);
+    |                                               ++++++++++++++++
+
+error[E0609]: no field `node` on type `nodes::Expression`
+   --> parser/parser.rs:580:28
+    |
+580 |                 node: expr.node,
+    |                            ^^^^ unknown field
+
+error[E0609]: no field `node` on type `nodes::Expression`
+   --> parser/parser.rs:590:24
+    |
+590 |             node: expr.node,
+    |                        ^^^^ unknown field
+
+error[E0308]: mismatched types
+  --> semantic/analyzer.rs:26:51
+   |
+26 |     return Scope{symbols: HashMap::new(), parent: None};
+   |                                                   ^^^^ expected `Scope`, found `Option<_>`
+   |
+   = note: expected struct `analyzer::Scope`
+                found enum `Option<_>`
+
+error[E0308]: mismatched types
+  --> semantic/analyzer.rs:35:22
+   |
+35 |         self.symbols[name] = symbol;
+   |                      ^^^^ expected `&_`, found `String`
+   |
+   = note: expected reference `&_`
+                 found struct `String`
+help: consider borrowing here
+   |
+35 |         self.symbols[&name] = symbol;
+   |                      +
+
+error[E0308]: mismatched types
+  --> semantic/analyzer.rs:35:30
+   |
+35 |         self.symbols[name] = symbol;
+   |         ------------------   ^^^^^^ expected `String`, found `Symbol`
+   |         |
+   |         expected due to the type of this binding
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:74:33
+    |
+ 74 |             self.analyze_import(import_stmt);
+    |                  -------------- ^^^^^^^^^^^ expected `&ImportStmt`, found `ImportStmt`
+    |                  |
+    |                  arguments to this method are incorrect
+    |
+note: method defined here
+   --> semantic/analyzer.rs:336:12
+    |
+336 |     pub fn analyze_import(&mut self, stmt: &ImportStmt) {
+    |            ^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+ 74 |             self.analyze_import(&import_stmt);
+    |                                 +
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:79:36
+    |
+ 79 |             self.analyze_statement(stmt);
+    |                  ----------------- ^^^^ expected `&Statement`, found `Statement`
+    |                  |
+    |                  arguments to this method are incorrect
+    |
+note: method defined here
+   --> semantic/analyzer.rs:117:12
+    |
+117 |     pub fn analyze_statement(&mut self, stmt: &Statement) {
+    |            ^^^^^^^^^^^^^^^^^            ----------------
+help: consider borrowing here
+    |
+ 79 |             self.analyze_statement(&stmt);
+    |                                    +
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:84:36
+    |
+ 84 |             self.analyze_statement(stmt);
+    |                  ----------------- ^^^^ expected `&Statement`, found `Statement`
+    |                  |
+    |                  arguments to this method are incorrect
+    |
+note: method defined here
+   --> semantic/analyzer.rs:117:12
+    |
+117 |     pub fn analyze_statement(&mut self, stmt: &Statement) {
+    |            ^^^^^^^^^^^^^^^^^            ----------------
+help: consider borrowing here
+    |
+ 84 |             self.analyze_statement(&stmt);
+    |                                    +
+
+error: reached the recursion limit finding the struct tail for `analyzer::Scope`
+  --> semantic/analyzer.rs:20:1
+   |
+20 | pub struct Scope {
+   | ^^^^^^^^^^^^^^^^
+   |
+   = help: consider increasing the recursion limit by adding a `#![recursion_limit = "256"]`
+
+error[E0308]: mismatched types
+  --> semantic/analyzer.rs:95:12
+   |
+95 |         if self.current_scope.parent {
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^ expected `bool`, found `Scope`
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:142:50
+    |
+142 |         let value_type = self.analyze_expression(stmt.value);
+    |                               ------------------ ^^^^^^^^^^ expected `&Expression`, found `Expression`
+    |                               |
+    |                               arguments to this method are incorrect
+    |
+note: method defined here
+   --> semantic/analyzer.rs:346:12
+    |
+346 |     pub fn analyze_expression(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+142 |         let value_type = self.analyze_expression(&stmt.value);
+    |                                                  +
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:145:12
+    |
+145 |         if stmt.type_annotation && value_type {
+    |            ^^^^^^^^^^^^^^^^^^^^ expected `bool`, found `String`
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:145:36
+    |
+145 |         if stmt.type_annotation && value_type {
+    |                                    ^^^^^^^^^^ expected `bool`, found `String`
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:155:26
+    |
+155 |             symbol_type: stmt.type_annotation || value_type,
+    |                          ^^^^^^^^^^^^^^^^^^^^ expected `bool`, found `String`
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:155:50
+    |
+155 |             symbol_type: stmt.type_annotation || value_type,
+    |                                                  ^^^^^^^^^^ expected `bool`, found `String`
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:155:26
+    |
+155 |             symbol_type: stmt.type_annotation || value_type,
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `String`, found `bool`
+    |
+help: try using a conversion method
+    |
+155 |             symbol_type: (stmt.type_annotation || value_type).to_string(),
+    |                          +                                  +++++++++++++
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:170:50
+    |
+170 |         let value_type = self.analyze_expression(stmt.value);
+    |                               ------------------ ^^^^^^^^^^ expected `&Expression`, found `Expression`
+    |                               |
+    |                               arguments to this method are incorrect
+    |
+note: method defined here
+   --> semantic/analyzer.rs:346:12
+    |
+346 |     pub fn analyze_expression(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+170 |         let value_type = self.analyze_expression(&stmt.value);
+    |                                                  +
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:172:12
+    |
+172 |         if stmt.type_annotation && value_type {
+    |            ^^^^^^^^^^^^^^^^^^^^ expected `bool`, found `String`
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:172:36
+    |
+172 |         if stmt.type_annotation && value_type {
+    |                                    ^^^^^^^^^^ expected `bool`, found `String`
+
+error[E0609]: no field `base` on type `&nodes::VarStmt`
+   --> semantic/analyzer.rs:175:30
+    |
+175 |                         stmt.base.node.line, stmt.base.node.column);
+    |                              ^^^^ unknown field
+    |
+    = note: available fields are: `node`, `name`, `type_annotation`, `value`
+
+error[E0609]: no field `base` on type `&nodes::VarStmt`
+   --> semantic/analyzer.rs:175:51
+    |
+175 |                         stmt.base.node.line, stmt.base.node.column);
+    |                                                   ^^^^ unknown field
+    |
+    = note: available fields are: `node`, `name`, `type_annotation`, `value`
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:181:26
+    |
+181 |             symbol_type: stmt.type_annotation || value_type,
+    |                          ^^^^^^^^^^^^^^^^^^^^ expected `bool`, found `String`
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:181:50
+    |
+181 |             symbol_type: stmt.type_annotation || value_type,
+    |                                                  ^^^^^^^^^^ expected `bool`, found `String`
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:181:26
+    |
+181 |             symbol_type: stmt.type_annotation || value_type,
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `String`, found `bool`
+    |
+help: try using a conversion method
+    |
+181 |             symbol_type: (stmt.type_annotation || value_type).to_string(),
+    |                          +                                  +++++++++++++
+
+error[E0609]: no field `base` on type `&nodes::VarStmt`
+   --> semantic/analyzer.rs:184:24
+    |
+184 |             line: stmt.base.node.line,
+    |                        ^^^^ unknown field
+    |
+    = note: available fields are: `node`, `name`, `type_annotation`, `value`
+
+error[E0609]: no field `base` on type `&nodes::VarStmt`
+   --> semantic/analyzer.rs:185:26
+    |
+185 |             column: stmt.base.node.column,
+    |                          ^^^^ unknown field
+    |
+    = note: available fields are: `node`, `name`, `type_annotation`, `value`
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:199:26
+    |
+199 |             symbol_type: "function",
+    |                          ^^^^^^^^^^ expected `String`, found `&str`
+    |
+help: try using a conversion method
+    |
+199 |             symbol_type: "function".to_string(),
+    |                                    ++++++++++++
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:214:30
+    |
+214 |                 symbol_type: param.type_annotation || "any",
+    |                              ^^^^^^^^^^^^^^^^^^^^^ expected `bool`, found `String`
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:214:55
+    |
+214 |                 symbol_type: param.type_annotation || "any",
+    |                                                       ^^^^^ expected `bool`, found `&str`
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:214:30
+    |
+214 |                 symbol_type: param.type_annotation || "any",
+    |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `String`, found `bool`
+    |
+help: try using a conversion method
+    |
+214 |                 symbol_type: (param.type_annotation || "any").to_string(),
+    |                              +                              +++++++++++++
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:233:49
+    |
+233 |         let cond_type = self.analyze_expression(stmt.condition);
+    |                              ------------------ ^^^^^^^^^^^^^^ expected `&Expression`, found `Expression`
+    |                              |
+    |                              arguments to this method are incorrect
+    |
+note: method defined here
+   --> semantic/analyzer.rs:346:12
+    |
+346 |     pub fn analyze_expression(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+233 |         let cond_type = self.analyze_expression(&stmt.condition);
+    |                                                 +
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:236:12
+    |
+236 |         if cond_type && cond_type != "bool".to_string() && cond_type != "any".to_string() {
+    |            ^^^^^^^^^ expected `bool`, found `String`
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:249:58
+    |
+249 |             let elif_cond_type = self.analyze_expression(elif_clause.condition);
+    |                                       ------------------ ^^^^^^^^^^^^^^^^^^^^^ expected `&Expression`, found `Expression`
+    |                                       |
+    |                                       arguments to this method are incorrect
+    |
+note: method defined here
+   --> semantic/analyzer.rs:346:12
+    |
+346 |     pub fn analyze_expression(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+249 |             let elif_cond_type = self.analyze_expression(&elif_clause.condition);
+    |                                                          +
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:269:49
+    |
+269 |         let cond_type = self.analyze_expression(stmt.condition);
+    |                              ------------------ ^^^^^^^^^^^^^^ expected `&Expression`, found `Expression`
+    |                              |
+    |                              arguments to this method are incorrect
+    |
+note: method defined here
+   --> semantic/analyzer.rs:346:12
+    |
+346 |     pub fn analyze_expression(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+269 |         let cond_type = self.analyze_expression(&stmt.condition);
+    |                                                 +
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:280:53
+    |
+280 |         let iterable_type = self.analyze_expression(stmt.iterable);
+    |                                  ------------------ ^^^^^^^^^^^^^ expected `&Expression`, found `Expression`
+    |                                  |
+    |                                  arguments to this method are incorrect
+    |
+note: method defined here
+   --> semantic/analyzer.rs:346:12
+    |
+346 |     pub fn analyze_expression(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+280 |         let iterable_type = self.analyze_expression(&stmt.iterable);
+    |                                                     +
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:287:26
+    |
+287 |             symbol_type: "any", // TODO: infer from iterable type
+    |                          ^^^^^ expected `String`, found `&str`
+    |
+help: try using a conversion method
+    |
+287 |             symbol_type: "any".to_string(), // TODO: infer from iterable type
+    |                               ++++++++++++
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:304:12
+    |
+304 |         if stmt.value {
+    |            ^^^^^^^^^^ expected `bool`, found `Expression`
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:305:37
+    |
+305 |             self.analyze_expression(stmt.value);
+    |                  ------------------ ^^^^^^^^^^ expected `&Expression`, found `Expression`
+    |                  |
+    |                  arguments to this method are incorrect
+    |
+note: method defined here
+   --> semantic/analyzer.rs:346:12
+    |
+346 |     pub fn analyze_expression(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+305 |             self.analyze_expression(&stmt.value);
+    |                                     +
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:311:51
+    |
+311 |         let target_type = self.analyze_expression(stmt.target);
+    |                                ------------------ ^^^^^^^^^^^ expected `&Expression`, found `Expression`
+    |                                |
+    |                                arguments to this method are incorrect
+    |
+note: method defined here
+   --> semantic/analyzer.rs:346:12
+    |
+346 |     pub fn analyze_expression(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+311 |         let target_type = self.analyze_expression(&stmt.target);
+    |                                                   +
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:312:50
+    |
+312 |         let value_type = self.analyze_expression(stmt.value);
+    |                               ------------------ ^^^^^^^^^^ expected `&Expression`, found `Expression`
+    |                               |
+    |                               arguments to this method are incorrect
+    |
+note: method defined here
+   --> semantic/analyzer.rs:346:12
+    |
+346 |     pub fn analyze_expression(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+312 |         let value_type = self.analyze_expression(&stmt.value);
+    |                                                  +
+
+error[E0609]: no field `expr_type` on type `nodes::Expression`
+   --> semantic/analyzer.rs:317:24
+    |
+317 |         if stmt.target.expr_type == ExprType::Identifier {
+    |                        ^^^^^^^^^ unknown field
+
+error[E0600]: cannot apply unary operator `!` to type `Symbol`
+   --> semantic/analyzer.rs:321:16
+    |
+321 |             if ! symbol {
+    |                ^^^^^^^^ cannot apply unary operator `!`
+    |
+note: an implementation of `Not` might be missing for `Symbol`
+   --> semantic/analyzer.rs:10:1
+    |
+ 10 | pub struct Symbol {
+    | ^^^^^^^^^^^^^^^^^ must implement `Not`
+note: the trait `Not` must be implemented
+   --> /home/vu/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/ops/bit.rs:35:1
+    |
+ 35 | pub const trait Not {
+    | ^^^^^^^^^^^^^^^^^^^
+
+error[E0609]: no field `base` on type `&nodes::AssignmentStmt`
+   --> semantic/analyzer.rs:322:81
+    |
+322 |                 self.error(format!("Undefined variable '{}'", ident.name), stmt.base.node.line, stmt.base.node.column);
+    |                                                                                 ^^^^ unknown field
+    |
+    = note: available fields are: `node`, `target`, `operator`, `value`
+
+error[E0609]: no field `base` on type `&nodes::AssignmentStmt`
+   --> semantic/analyzer.rs:322:102
+    |
+322 |                 self.error(format!("Undefined variable '{}'", ident.name), stmt.base.node.line, stmt.base.node.column);
+    |                                                                                                      ^^^^ unknown field
+    |
+    = note: available fields are: `node`, `target`, `operator`, `value`
+
+error[E0609]: no field `base` on type `&nodes::AssignmentStmt`
+   --> semantic/analyzer.rs:326:30
+    |
+326 |                         stmt.base.node.line, stmt.base.node.column);
+    |                              ^^^^ unknown field
+    |
+    = note: available fields are: `node`, `target`, `operator`, `value`
+
+error[E0609]: no field `base` on type `&nodes::AssignmentStmt`
+   --> semantic/analyzer.rs:326:51
+    |
+326 |                         stmt.base.node.line, stmt.base.node.column);
+    |                                                   ^^^^ unknown field
+    |
+    = note: available fields are: `node`, `target`, `operator`, `value`
+
+error[E0605]: non-primitive cast: `nodes::Expression` as `nodes::IdentifierExpr`
+   --> semantic/analyzer.rs:318:25
+    |
+318 |             let ident = (stmt.target as IdentifierExpr);
+    |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ an `as` expression can only be used to convert between primitive types or to coerce to a specific trait object
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:333:33
+    |
+333 |         self.analyze_expression(stmt.expression);
+    |              ------------------ ^^^^^^^^^^^^^^^ expected `&Expression`, found `Expression`
+    |              |
+    |              arguments to this method are incorrect
+    |
+note: method defined here
+   --> semantic/analyzer.rs:346:12
+    |
+346 |     pub fn analyze_expression(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+333 |         self.analyze_expression(&stmt.expression);
+    |                                 +
+
+error[E0599]: no variant or associated item named `TrueKeyword` found for enum `token::TokenType` in the current scope
+   --> semantic/analyzer.rs:353:52
+    |
+353 |                 else if l.value_type == TokenType::TrueKeyword || l.value_type == TokenType::FalseKeyword { return "bool".to_string() }
+    |                                                    ^^^^^^^^^^^ variant or associated item not found in `token::TokenType`
+    |
+   ::: lexer/token.rs:8:1
+    |
+  8 | pub enum TokenType {
+    | ------------------ variant or associated item `TrueKeyword` not found for this enum
+
+error[E0599]: no variant or associated item named `FalseKeyword` found for enum `token::TokenType` in the current scope
+   --> semantic/analyzer.rs:353:94
+    |
+353 |                 else if l.value_type == TokenType::TrueKeyword || l.value_type == TokenType::FalseKeyword { return "bool".to_string() }
+    |                                                                                              ^^^^^^^^^^^^ variant or associated item not found in `token::TokenType`
+    |
+   ::: lexer/token.rs:8:1
+    |
+  8 | pub enum TokenType {
+    | ------------------ variant or associated item `FalseKeyword` not found for this enum
+
+error[E0308]: `match` arms have incompatible types
+   --> semantic/analyzer.rs:367:18
+    |
+348 | /         match expr {
+349 | |             Expression::Literal(l) => {
+350 | |                 if l.value_type == TokenType::Integer { return "int".to_string() }
+351 | |                 else if l.value_type == TokenType::Float { return "float".to_string() }
+...   |
+366 | |             Expression::TypeConstructor(e) => self.analyze_type_constructor(e),
+    | |                                               -------------------------------- this and all prior arms are found to be of type `String`
+367 | |             _ => "any",
+    | |                  ^^^^^ expected `String`, found `&str`
+368 | |
+369 | |         }
+    | |_________- `match` arms have incompatible types
+    |
+help: try using a conversion method
+    |
+367 |             _ => "any".to_string(),
+    |                       ++++++++++++
+
+error[E0600]: cannot apply unary operator `!` to type `Symbol`
+   --> semantic/analyzer.rs:375:12
+    |
+375 |         if ! symbol {
+    |            ^^^^^^^^ cannot apply unary operator `!`
+    |
+note: an implementation of `Not` might be missing for `Symbol`
+   --> semantic/analyzer.rs:10:1
+    |
+ 10 | pub struct Symbol {
+    | ^^^^^^^^^^^^^^^^^ must implement `Not`
+note: the trait `Not` must be implemented
+   --> /home/vu/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/ops/bit.rs:35:1
+    |
+ 35 | pub const trait Not {
+    | ^^^^^^^^^^^^^^^^^^^
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:385:49
+    |
+385 |         let left_type = self.analyze_expression(expr.left);
+    |                              ------------------ ^^^^^^^^^ expected `&Expression`, found `Box<Expression>`
+    |                              |
+    |                              arguments to this method are incorrect
+    |
+    = note: expected reference `&nodes::Expression`
+                  found struct `Box<nodes::Expression>`
+note: method defined here
+   --> semantic/analyzer.rs:346:12
+    |
+346 |     pub fn analyze_expression(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+385 |         let left_type = self.analyze_expression(&expr.left);
+    |                                                 +
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:386:50
+    |
+386 |         let right_type = self.analyze_expression(expr.right);
+    |                               ------------------ ^^^^^^^^^^ expected `&Expression`, found `Box<Expression>`
+    |                               |
+    |                               arguments to this method are incorrect
+    |
+    = note: expected reference `&nodes::Expression`
+                  found struct `Box<nodes::Expression>`
+note: method defined here
+   --> semantic/analyzer.rs:346:12
+    |
+346 |     pub fn analyze_expression(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+386 |         let right_type = self.analyze_expression(&expr.right);
+    |                                                  +
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:427:52
+    |
+427 |         let operand_type = self.analyze_expression(expr.operand);
+    |                                 ------------------ ^^^^^^^^^^^^ expected `&Expression`, found `Box<Expression>`
+    |                                 |
+    |                                 arguments to this method are incorrect
+    |
+    = note: expected reference `&nodes::Expression`
+                  found struct `Box<nodes::Expression>`
+note: method defined here
+   --> semantic/analyzer.rs:346:12
+    |
+346 |     pub fn analyze_expression(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+427 |         let operand_type = self.analyze_expression(&expr.operand);
+    |                                                    +
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:443:51
+    |
+443 |         let callee_type = self.analyze_expression(expr.callee);
+    |                                ------------------ ^^^^^^^^^^^ expected `&Expression`, found `Box<Expression>`
+    |                                |
+    |                                arguments to this method are incorrect
+    |
+    = note: expected reference `&nodes::Expression`
+                  found struct `Box<nodes::Expression>`
+note: method defined here
+   --> semantic/analyzer.rs:346:12
+    |
+346 |     pub fn analyze_expression(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+443 |         let callee_type = self.analyze_expression(&expr.callee);
+    |                                                   +
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:456:51
+    |
+456 |         let object_type = self.analyze_expression(expr.object);
+    |                                ------------------ ^^^^^^^^^^^ expected `&Expression`, found `Box<Expression>`
+    |                                |
+    |                                arguments to this method are incorrect
+    |
+    = note: expected reference `&nodes::Expression`
+                  found struct `Box<nodes::Expression>`
+note: method defined here
+   --> semantic/analyzer.rs:346:12
+    |
+346 |     pub fn analyze_expression(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+456 |         let object_type = self.analyze_expression(&expr.object);
+    |                                                   +
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:457:50
+    |
+457 |         let index_type = self.analyze_expression(expr.index);
+    |                               ------------------ ^^^^^^^^^^ expected `&Expression`, found `Box<Expression>`
+    |                               |
+    |                               arguments to this method are incorrect
+    |
+    = note: expected reference `&nodes::Expression`
+                  found struct `Box<nodes::Expression>`
+note: method defined here
+   --> semantic/analyzer.rs:346:12
+    |
+346 |     pub fn analyze_expression(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+457 |         let index_type = self.analyze_expression(&expr.index);
+    |                                                  +
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:465:51
+    |
+465 |         let object_type = self.analyze_expression(expr.object);
+    |                                ------------------ ^^^^^^^^^^^ expected `&Expression`, found `Box<Expression>`
+    |                                |
+    |                                arguments to this method are incorrect
+    |
+    = note: expected reference `&nodes::Expression`
+                  found struct `Box<nodes::Expression>`
+note: method defined here
+   --> semantic/analyzer.rs:346:12
+    |
+346 |     pub fn analyze_expression(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+465 |         let object_type = self.analyze_expression(&expr.object);
+    |                                                   +
+
+error[E0608]: cannot index into a value of type `&(nodes::Expression, nodes::Expression)`
+   --> semantic/analyzer.rs:498:41
+    |
+498 |             self.analyze_expression(pair[0]);
+    |                                         ^^^
+
+error[E0608]: cannot index into a value of type `&(nodes::Expression, nodes::Expression)`
+   --> semantic/analyzer.rs:499:41
+    |
+499 |             self.analyze_expression(pair[1]);
+    |                                         ^^^
+
+error[E0308]: mismatched types
+   --> semantic/analyzer.rs:506:33
+    |
+506 |         self.analyze_expression(expr.argument);
+    |              ------------------ ^^^^^^^^^^^^^ expected `&Expression`, found `Box<Expression>`
+    |              |
+    |              arguments to this method are incorrect
+    |
+    = note: expected reference `&nodes::Expression`
+                  found struct `Box<nodes::Expression>`
+note: method defined here
+   --> semantic/analyzer.rs:346:12
+    |
+346 |     pub fn analyze_expression(&mut self, expr: &Expression)  ->  String {
+    |            ^^^^^^^^^^^^^^^^^^            -----------------
+help: consider borrowing here
+    |
+506 |         self.analyze_expression(&expr.argument);
+    |                                 +
+
+error[E0308]: mismatched types
+   --> main.rs:108:16
+    |
+101 | pub fn compiler_read_source_file(compiler: Compiler)  ->  String {
+    |                                                           ------ expected `String` because of return type
+...
+108 |         return "";
+    |                ^^ expected `String`, found `&str`
+    |
+help: try using a conversion method
+    |
+108 |         return "".to_string();
+    |                  ++++++++++++
+
+error[E0317]: `if` may be missing an `else` clause
+   --> main.rs:106:10
+    |
+106 |       else if false {
+    |  __________^
+107 | |         println!("{}", "Error reading file: ".to_string() + &format!("{}", e));
+108 | |         return "";
+109 | |
+110 | |     }
+    | |_____^ expected `String`, found `()`
+    |
+    = note: `if` expressions without `else` evaluate to `()`
+    = help: consider adding an `else` block that evaluates to the expected type
+
+error[E0308]: mismatched types
+   --> main.rs:117:71
+    |
+117 |             println!("{}", "Generated code written to ".to_string() + compiler.config.output_file);
+    |                                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `&str`, found `String`
+    |
+help: consider borrowing here
+    |
+117 |             println!("{}", "Generated code written to ".to_string() + &compiler.config.output_file);
+    |                                                                       +
+
+error[E0600]: cannot apply unary operator `!` to type `String`
+   --> main.rs:136:8
+    |
+136 |     if ! source {
+    |        ^^^^^^^^ cannot apply unary operator `!`
+    |
+note: the foreign item type `String` doesn't implement `Not`
+   --> /home/vu/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/alloc/src/string.rs:360:1
+    |
+360 | pub struct String {
+    | ^^^^^^^^^^^^^^^^^ not implement `Not`
+
+error[E0308]: mismatched types
+   --> main.rs:138:46
+    |
+138 |         return compiler_create_result(false, "", errors, warnings);
+    |                ----------------------        ^^ expected `String`, found `&str`
+    |                |
+    |                arguments to this function are incorrect
+    |
+note: function defined here
+   --> main.rs:125:8
+    |
+125 | pub fn compiler_create_result(success: bool, code: String, errors: Vec<String>, warnings: Vec<String>)  ->  CompileResult {
+    |        ^^^^^^^^^^^^^^^^^^^^^^                ------------
+help: try using a conversion method
+    |
+138 |         return compiler_create_result(false, "".to_string(), errors, warnings);
+    |                                                ++++++++++++
+
+error[E0425]: cannot find function `parse_with_tokens` in this scope
+   --> main.rs:146:15
+    |
+146 |     let ast = parse_with_tokens(tokens);
+    |               ^^^^^^^^^^^^^^^^^ not found in this scope
+
+error[E0308]: mismatched types
+   --> main.rs:160:50
+    |
+160 |             return compiler_create_result(false, "", errors, warnings);
+    |                    ----------------------        ^^ expected `String`, found `&str`
+    |                    |
+    |                    arguments to this function are incorrect
+    |
+note: function defined here
+   --> main.rs:125:8
+    |
+125 | pub fn compiler_create_result(success: bool, code: String, errors: Vec<String>, warnings: Vec<String>)  ->  CompileResult {
+    |        ^^^^^^^^^^^^^^^^^^^^^^                ------------
+help: try using a conversion method
+    |
+160 |             return compiler_create_result(false, "".to_string(), errors, warnings);
+    |                                                    ++++++++++++
+
+error[E0308]: mismatched types
+   --> main.rs:171:76
+    |
+171 |         println!("{}", "Debug: Generated Rust code length: ".to_string() + (rust_code).len());
+    |                                                                            ^^^^^^^^^^^^^^^^^ expected `&str`, found `usize`
+
+error[E0308]: mismatched types
+   --> main.rs:173:68
+    |
+173 |     println!("{}", "FORCE DEBUG: Rust code length: ".to_string() + (rust_code).len());
+    |                                                                    ^^^^^^^^^^^^^^^^^ expected `&str`, found `usize`
+
+error[E0061]: this method takes 1 argument but 2 arguments were supplied
+   --> main.rs:195:102
+    |
+195 | ...utput_file, emit_rust: options.get("emit_rust".to_string(), true), check_semantics: options.get("check_semantics".to_string(), true), ...
+    |                                   ^^^                          ---- unexpected argument #2 of type `bool`
+    |
+note: expected `&_`, found `String`
+   --> main.rs:195:106
+    |
+195 |     let config = CompilerConfig{input_file: input_file, output_file: output_file, emit_rust: options.get("emit_rust".to_string(), true), ...
+    |                                                                                                          ^^^^^^^^^^^^^^^^^^^^^^^
+    = note: expected reference `&_`
+                  found struct `String`
+note: method defined here
+   --> /home/vu/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/std/src/collections/hash/map.rs:909:12
+    |
+909 |     pub fn get<Q: ?Sized>(&self, k: &Q) -> Option<&V>
+    |            ^^^
+help: try removing the method call
+    |
+195 -     let config = CompilerConfig{input_file: input_file, output_file: output_file, emit_rust: options.get("emit_rust".to_string(), true), check_semantics: options.get("check_semantics".to_string(), true), verbose: options.get("verbose".to_string(), false)};
+195 +     let config = CompilerConfig{input_file: input_file, output_file: output_file, emit_rust: options.get("emit_rust", true), check_semantics: options.get("check_semantics".to_string(), true), verbose: options.get("verbose".to_string(), false)};
+    |
+help: remove the extra argument
+    |
+195 -     let config = CompilerConfig{input_file: input_file, output_file: output_file, emit_rust: options.get("emit_rust".to_string(), true), check_semantics: options.get("check_semantics".to_string(), true), verbose: options.get("verbose".to_string(), false)};
+195 +     let config = CompilerConfig{input_file: input_file, output_file: output_file, emit_rust: options.get(/* k */), check_semantics: options.get("check_semantics".to_string(), true), verbose: options.get("verbose".to_string(), false)};
+    |
+
+error[E0308]: mismatched types
+   --> main.rs:195:94
+    |
+195 | ... output_file, emit_rust: options.get("emit_rust".to_string(), true), check_semantics: options.get("check_semantics".to_string(), true)...
+    |                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `bool`, found `Option<&String>`
+    |
+    = note: expected type `bool`
+               found enum `Option<&String>`
+help: use `Option::is_some` to test if the `Option` has a value
+    |
+195 |     let config = CompilerConfig{input_file: input_file, output_file: output_file, emit_rust: options.get("emit_rust".to_string(), true).is_some(), check_semantics: options.get("check_semantics".to_string(), true), verbose: options.get("verbose".to_string(), false)};
+    |                                                                                                                                        ++++++++++
+
+error[E0061]: this method takes 1 argument but 2 arguments were supplied
+   --> main.rs:195:163
+    |
+195 | ...), check_semantics: options.get("check_semantics".to_string(), true), verbose: options.get("verbose".to_string(), false)};
+    |                                ^^^                                ---- unexpected argument #2 of type `bool`
+    |
+note: expected `&_`, found `String`
+   --> main.rs:195:167
+    |
+195 | ...t".to_string(), true), check_semantics: options.get("check_semantics".to_string(), true), verbose: options.get("verbose".to_string(), ...
+    |                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = note: expected reference `&_`
+                  found struct `String`
+note: method defined here
+   --> /home/vu/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/std/src/collections/hash/map.rs:909:12
+    |
+909 |     pub fn get<Q: ?Sized>(&self, k: &Q) -> Option<&V>
+    |            ^^^
+help: try removing the method call
+    |
+195 -     let config = CompilerConfig{input_file: input_file, output_file: output_file, emit_rust: options.get("emit_rust".to_string(), true), check_semantics: options.get("check_semantics".to_string(), true), verbose: options.get("verbose".to_string(), false)};
+195 +     let config = CompilerConfig{input_file: input_file, output_file: output_file, emit_rust: options.get("emit_rust".to_string(), true), check_semantics: options.get("check_semantics", true), verbose: options.get("verbose".to_string(), false)};
+    |
+help: remove the extra argument
+    |
+195 -     let config = CompilerConfig{input_file: input_file, output_file: output_file, emit_rust: options.get("emit_rust".to_string(), true), check_semantics: options.get("check_semantics".to_string(), true), verbose: options.get("verbose".to_string(), false)};
+195 +     let config = CompilerConfig{input_file: input_file, output_file: output_file, emit_rust: options.get("emit_rust".to_string(), true), check_semantics: options.get(/* k */), verbose: options.get("verbose".to_string(), false)};
+    |
+
+error[E0308]: mismatched types
+   --> main.rs:195:155
+    |
+195 | ...ue), check_semantics: options.get("check_semantics".to_string(), true), verbose: options.get("verbose".to_string(), false)};
+    |                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `bool`, found `Option<&String>`
+    |
+    = note: expected type `bool`
+               found enum `Option<&String>`
+help: use `Option::is_some` to test if the `Option` has a value
+    |
+195 |     let config = CompilerConfig{input_file: input_file, output_file: output_file, emit_rust: options.get("emit_rust".to_string(), true), check_semantics: options.get("check_semantics".to_string(), true).is_some(), verbose: options.get("verbose".to_string(), false)};
+    |                                                                                                                                                                                                           ++++++++++
+
+error[E0061]: this method takes 1 argument but 2 arguments were supplied
+   --> main.rs:195:222
+    |
+195 | ...ring(), true), verbose: options.get("verbose".to_string(), false)};
+    |                                    ^^^                        ----- unexpected argument #2 of type `bool`
+    |
+note: expected `&_`, found `String`
+   --> main.rs:195:226
+    |
+195 | ...eck_semantics".to_string(), true), verbose: options.get("verbose".to_string(), false)};
+    |                                                            ^^^^^^^^^^^^^^^^^^^^^
+    = note: expected reference `&_`
+                  found struct `String`
+note: method defined here
+   --> /home/vu/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/std/src/collections/hash/map.rs:909:12
+    |
+909 |     pub fn get<Q: ?Sized>(&self, k: &Q) -> Option<&V>
+    |            ^^^
+help: try removing the method call
+    |
+195 -     let config = CompilerConfig{input_file: input_file, output_file: output_file, emit_rust: options.get("emit_rust".to_string(), true), check_semantics: options.get("check_semantics".to_string(), true), verbose: options.get("verbose".to_string(), false)};
+195 +     let config = CompilerConfig{input_file: input_file, output_file: output_file, emit_rust: options.get("emit_rust".to_string(), true), check_semantics: options.get("check_semantics".to_string(), true), verbose: options.get("verbose", false)};
+    |
+help: remove the extra argument
+    |
+195 -     let config = CompilerConfig{input_file: input_file, output_file: output_file, emit_rust: options.get("emit_rust".to_string(), true), check_semantics: options.get("check_semantics".to_string(), true), verbose: options.get("verbose".to_string(), false)};
+195 +     let config = CompilerConfig{input_file: input_file, output_file: output_file, emit_rust: options.get("emit_rust".to_string(), true), check_semantics: options.get("check_semantics".to_string(), true), verbose: options.get(/* k */)};
+    |
+
+error[E0308]: mismatched types
+   --> main.rs:195:214
+    |
+195 | ...string(), true), verbose: options.get("verbose".to_string(), false)};
+    |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `bool`, found `Option<&String>`
+    |
+    = note: expected type `bool`
+               found enum `Option<&String>`
+help: use `Option::is_some` to test if the `Option` has a value
+    |
+195 |     let config = CompilerConfig{input_file: input_file, output_file: output_file, emit_rust: options.get("emit_rust".to_string(), true), check_semantics: options.get("check_semantics".to_string(), true), verbose: options.get("verbose".to_string(), false).is_some()};
+    |                                                                                                                                                                                                                                                               ++++++++++
+
+error[E0609]: no field `fields` on type `CompileResult`
+   --> main.rs:200:81
+    |
+200 |     println!("{}", "DEBUG: Result fields: ".to_string() + &format!("{}", result.fields));
+    |                                                                                 ^^^^^^ unknown field
+    |
+    = note: available fields are: `success`, `output_code`, `errors`, `warnings`
+
+error[E0308]: mismatched types
+   --> main.rs:226:18
+    |
+210 |     let mut input_file = "";
+    |                          -- expected due to this value
+...
+226 |     input_file = args[1];
+    |                  ^^^^^^^ expected `&str`, found `String`
+    |
+help: consider borrowing here
+    |
+226 |     input_file = &args[1];
+    |                  +
+
+error[E0308]: mismatched types
+   --> main.rs:234:31
+    |
+211 |     let mut output_file = "";
+    |                           -- expected due to this value
+...
+234 |                 output_file = args[i + 1];
+    |                               ^^^^^^^^^^^ expected `&str`, found `String`
+    |
+help: consider borrowing here
+    |
+234 |                 output_file = &args[i + 1];
+    |                               +
+
+error[E0277]: the trait bound `String: Pattern` is not satisfied
+   --> main.rs:253:42
+    |
+253 |         output_file = input_file.replace(".mn".to_string(), ".rs".to_string());
+    |                                  ------- ^^^^^^^^^^^^^^^^^ the trait `Pattern` is not implemented for `String`
+    |                                  |
+    |                                  required by a bound introduced by this call
+    |
+    = note: required for `String` to implement `Pattern`
+note: required by a bound in `str::<impl str>::replace`
+   --> /home/vu/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/alloc/src/str.rs:268:23
+    |
+268 |     pub fn replace<P: Pattern>(&self, from: P, to: &str) -> String {
+    |                       ^^^^^^^ required by this bound in `str::<impl str>::replace`
+help: consider borrowing here
+    |
+253 |         output_file = input_file.replace(&".mn".to_string(), ".rs".to_string());
+    |                                          +
+
+error[E0308]: mismatched types
+   --> main.rs:253:61
+    |
+253 |         output_file = input_file.replace(".mn".to_string(), ".rs".to_string());
+    |                                  -------                    ^^^^^^^^^^^^^^^^^ expected `&str`, found `String`
+    |                                  |
+    |                                  arguments to this method are incorrect
+    |
+note: method defined here
+   --> /home/vu/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/alloc/src/str.rs:268:12
+    |
+268 |     pub fn replace<P: Pattern>(&self, from: P, to: &str) -> String {
+    |            ^^^^^^^
+help: try removing the method call
+    |
+253 -         output_file = input_file.replace(".mn".to_string(), ".rs".to_string());
+253 +         output_file = input_file.replace(".mn".to_string(), ".rs");
+    |
+
+error[E0308]: mismatched types
+   --> main.rs:253:23
+    |
+211 |     let mut output_file = "";
+    |                           -- expected due to this value
+...
+253 |         output_file = input_file.replace(".mn".to_string(), ".rs".to_string());
+    |                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ expected `&str`, found `String`
+    |
+help: consider borrowing here
+    |
+253 |         output_file = &input_file.replace(".mn".to_string(), ".rs".to_string());
+    |                       +
+
+error[E0308]: arguments to this function are incorrect
+   --> main.rs:257:18
+    |
+257 |     let result = compile_file(input_file, output_file, HashMap::from([("emit_rust".to_string().to_string(), true), ("check_semantics".to_...
+    |                  ^^^^^^^^^^^^ ----------  ----------- expected `String`, found `&str`
+    |                               |
+    |                               expected `String`, found `&str`
+    |
+note: expected `HashMap<String, String>`, found `HashMap<String, bool>`
+   --> main.rs:257:56
+    |
+257 | ...e, HashMap::from([("emit_rust".to_string().to_string(), true), ("check_semantics".to_string().to_string(), check_semantics), ("verbose".to_string().to_string(), verbose)]));
+    |       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    = note: expected struct `HashMap<_, String>`
+               found struct `HashMap<_, bool>`
+note: function defined here
+   --> main.rs:192:8
+    |
+192 | pub fn compile_file(input_file: String, output_file: String, options: HashMap<String, String>)  ->  CompileResult {
+    |        ^^^^^^^^^^^^ ------------------  -------------------  --------------------------------
+help: try using a conversion method
+    |
+257 |     let result = compile_file(input_file.to_string(), output_file, HashMap::from([("emit_rust".to_string().to_string(), true), ("check_semantics".to_string().to_string(), check_semantics), ("verbose".to_string().to_string(), verbose)]));
+    |                                         ++++++++++++
+help: try using a conversion method
+    |
+257 |     let result = compile_file(input_file, output_file.to_string(), HashMap::from([("emit_rust".to_string().to_string(), true), ("check_semantics".to_string().to_string(), check_semantics), ("verbose".to_string().to_string(), verbose)]));
+    |                                                      ++++++++++++
+
+error[E0308]: mismatched types
+   --> main.rs:272:12
+    |
+272 |         if errs {
+    |            ^^^^ expected `bool`, found `Vec<String>`
+    |
+    = note: expected type `bool`
+             found struct `Vec<String>`
+
+error[E0308]: mismatched types
+   --> main.rs:273:65
+    |
+273 |             println!("{}", "Errors list length: ".to_string() + (errs).len());
+    |                                                                 ^^^^^^^^^^^^ expected `&str`, found `usize`
+
+error[E0308]: mismatched types
+   --> main.rs:275:51
+    |
+275 |                 println!("{}", "  ".to_string() + error);
+    |                                                   ^^^^^ expected `&str`, found `String`
+    |
+help: consider borrowing here
+    |
+275 |                 println!("{}", "  ".to_string() + &error);
+    |                                                   +
+
+error[E0507]: cannot move out of `expr.name` which is behind a shared reference
+   --> codegen/rust_backend.rs:301:16
+    |
+301 |         return expr.name;
+    |                ^^^^^^^^^ move occurs because `expr.name` has type `String`, which does not implement the `Copy` trait
+    |
+help: consider cloning the value if the performance cost is acceptable
+    |
+301 |         return expr.name.clone();
+    |                         ++++++++
+
+error[E0507]: cannot move out of index of `Vec<token::Token>`
+  --> parser/parser.rs:73:16
+   |
+73 |         return self.tokens[self.current_pos];
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ move occurs because value has type `token::Token`, which does not implement the `Copy` trait
+   |
+help: consider cloning the value if the performance cost is acceptable
+   |
+73 |         return self.tokens[self.current_pos].clone();
+   |                                             ++++++++
+
+error[E0507]: cannot move out of index of `Vec<token::Token>`
+  --> parser/parser.rs:77:21
+   |
+77 |         let token = self.tokens[self.current_pos];
+   |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ move occurs because value has type `token::Token`, which does not implement the `Copy` trait
+   |
+help: consider borrowing here
+   |
+77 |         let token = &self.tokens[self.current_pos];
+   |                     +
+help: consider cloning the value if the performance cost is acceptable
+   |
+77 |         let token = self.tokens[self.current_pos].clone();
+   |                                                  ++++++++
+
+error[E0507]: cannot move out of index of `Vec<token::Token>`
+  --> parser/parser.rs:86:19
+   |
+86 |         let tok = self.tokens[self.current_pos];
+   |                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ move occurs because value has type `token::Token`, which does not implement the `Copy` trait
+   |
+help: consider borrowing here
+   |
+86 |         let tok = &self.tokens[self.current_pos];
+   |                   +
+help: consider cloning the value if the performance cost is acceptable
+   |
+86 |         let tok = self.tokens[self.current_pos].clone();
+   |                                                ++++++++
+
+error[E0391]: cycle detected when computing drop-check constraints for `semantic::analyzer::Scope`
+  --> semantic/analyzer.rs:20:1
+   |
+20 | pub struct Scope {
+   | ^^^^^^^^^^^^^^^^
+   |
+   = note: ...which immediately requires computing drop-check constraints for `semantic::analyzer::Scope` again
+   = note: cycle used when computing dropck types for `semantic::analyzer::Scope`
+   = note: see https://rustc-dev-guide.rust-lang.org/overview.html#queries and https://rustc-dev-guide.rust-lang.org/query.html for more information
+
+error[E0382]: borrow of moved value: `error_msg`
+   --> semantic/analyzer.rs:104:24
+    |
+102 |         let error_msg = format!("Semantic error at {}:{}: {}", line, column, message);
+    |             --------- move occurs because `error_msg` has type `String`, which does not implement the `Copy` trait
+103 |         self.errors.push(error_msg);
+    |                          --------- value moved here
+104 |         println!("{}", error_msg);
+    |                        ^^^^^^^^^ value borrowed here after move
+    |
+    = note: this error originates in the macro `$crate::format_args_nl` which comes from the expansion of the macro `println` (in Nightly builds, run with -Z macro-backtrace for more info)
+help: consider cloning the value if the performance cost is acceptable
+    |
+103 |         self.errors.push(error_msg.clone());
+    |                                   ++++++++
+
+error[E0308]: mismatched types
+   --> parser/parser.rs:196:145
+    |
+196 | ... name, params: vec![], body: body, return_type: "Any"});
+    |                                                    ^^^^^ expected `String`, found `&str`
+    |
+help: try using a conversion method
+    |
+196 |             return Statement::FunctionDecl(FunctionDecl{node: ASTNode{line: 1, column: 1}, name: name, params: vec![], body: body, return_type: "Any".to_string()});
+    |                                                                                                                                                      ++++++++++++
+
+Some errors have detailed explanations: E0034, E0061, E0063, E0072, E0277, E0308, E0317, E0369, E0382...
+For more information about an error, try `rustc --explain E0034`.
+warning: `gul-compiler` (bin "gul-compile") generated 16 warnings
+error: could not compile `gul-compiler` (bin "gul-compile") due to 272 previous errors; 16 warnings emitted
+
+🎉 SUCCESS! GUL compiler built successfully!
+
+Compiler location: compiler_rust/target/release/gul-compile
+
+Test it with:
+  ./target/release/gul-compile --help
+
+Build process complete!

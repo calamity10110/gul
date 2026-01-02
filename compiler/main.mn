@@ -8,7 +8,7 @@
 @imp compiler.semantic.analyzer
 @imp compiler.codegen.rust_backend
 
-print("COMPILER MODULES LOADED")
+# print("COMPILER MODULES LOADED")
 
 # Compiler configuration
 struct CompilerConfig:

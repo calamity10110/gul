@@ -1,0 +1,6 @@
+fn main():
+    let s = "Hello World"
+    print(s) # EXPECT: Hello World
+    let x = 42
+    print(x) # EXPECT: 42
+    return x

@@ -16,6 +16,8 @@ echo "Step 2: Creating Rust project structure..."
 
 # Create Cargo.toml for the transpiled compiler
 cat > compiler_rust/Cargo.toml << 'EOF'
+[workspace]
+
 [package]
 name = "gul-compiler"
 version = "0.1.0"

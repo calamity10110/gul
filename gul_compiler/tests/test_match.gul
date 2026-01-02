@@ -1,0 +1,18 @@
+fn main():
+    let x = 1
+    match x:
+        1 => 
+            print("One")
+        2 =>
+            print("Two")
+        _ =>
+            print("Other")
+            
+    let y = 2
+    match y:
+        1 => print("One")
+        2 => print("Two")
+        _ => print("Other")
+        
+    match 10:
+        val => print(val)

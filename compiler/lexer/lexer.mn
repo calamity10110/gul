@@ -12,7 +12,7 @@ fn tokenize(source: @str) -> @list[Token]:
         let ch = source[l_pos]
         
         # Handle indentation at start of line
-        if at_line_start and ch != " " and ch != "\t" and ch != "\n" and ch != "#":
+        if at_line_start and ch != " " and ch != "\t" and ch != "\n" and ch != "\x23":
             # We reached a non-space character at the start of a line (after potential spaces)
             # Wait, this logic needs to know how many spaces were there!
             at_line_start = @bool(false) # Should have handled it before
@@ -31,26 +31,26 @@ fn tokenize(source: @str) -> @list[Token]:
                 # After whitespace, check if it's a real line
                 if l_pos < l_len:
                     let c2 = source[l_pos]
-                    if c2 != "\n" and c2 != "#":
+                    if c2 != "\n" and c2 != "\x23":
                         let s_size = len(indent_stack)
                         let last_indent = indent_stack[s_size - 1]
                         if indent > last_indent:
                             indent_stack.add(indent)
-                            l_tokens.add(Token{type: TokenType.Indent, value: "", line: 1, column: 1})
+                            l_tokens.add(Token{token_type: TokenType.Indent, value: "", line: 1, column: 1})
                         elif indent < last_indent:
                             var cur_size = len(indent_stack)
                             while cur_size > 1 and indent_stack[cur_size - 1] > indent:
                                 indent_stack.remove(cur_size - 1)
-                                l_tokens.add(Token{type: TokenType.Dedent, value: "", line: 1, column: 1})
+                                l_tokens.add(Token{token_type: TokenType.Dedent, value: "", line: 1, column: 1})
                                 cur_size = len(indent_stack)
                 at_line_start = @bool(false)
             else:
                 l_pos = l_pos + 1
         elif ch == "\n":
-            l_tokens.add(Token{type: TokenType.Newline, value: "\n", line: 1, column: 1})
+            l_tokens.add(Token{token_type: TokenType.Newline, value: "\n", line: 1, column: 1})
             l_pos = l_pos + 1
             at_line_start = @bool(true)
-        elif ch == "#":
+        elif ch == "\x23":
             while l_pos < l_len and source[l_pos] != "\n":
                 l_pos = l_pos + 1
         elif (ch >= "a" and ch <= "z") or (ch >= "A" and ch <= "Z") or ch == "_" or ch == "@":
@@ -61,7 +61,7 @@ fn tokenize(source: @str) -> @list[Token]:
                 if last_0 > 0:
                     while len(indent_stack) > 1 and indent_stack[len(indent_stack) - 1] > 0:
                         indent_stack.remove(len(indent_stack) - 1)
-                        l_tokens.add(Token{type: TokenType.Dedent, value: "", line: 1, column: 1})
+                        l_tokens.add(Token{token_type: TokenType.Dedent, value: "", line: 1, column: 1})
                 at_line_start = @bool(false)
 
             var ident = ch
@@ -73,20 +73,15 @@ fn tokenize(source: @str) -> @list[Token]:
                     l_pos = l_pos + 1
                 else: break
             var t = TokenType.Identifier
-            if ident == "let": t = TokenType.Let
-            elif ident == "var": t = TokenType.Var
-            elif ident == "fn": t = TokenType.Fn
-            elif ident == "return": t = TokenType.Return
-            elif ident == "if": t = TokenType.If
-            elif ident == "else": t = TokenType.Else
-            elif ident == "while": t = TokenType.While
-            l_tokens.add(Token{type: t, value: ident, line: 1, column: 1})
+            if token.is_keyword(ident):
+                t = token.get_keyword_type(ident)
+            l_tokens.add(Token{token_type: t, value: ident, line: 1, column: 1})
         elif ch >= "0" and ch <= "9":
             # If we were at line start with 0 indent
             if at_line_start:
                 while len(indent_stack) > 1:
                     indent_stack.remove(len(indent_stack)-1)
-                    l_tokens.add(Token{type: TokenType.Dedent, value: "", line: 1, column: 1})
+                    l_tokens.add(Token{token_type: TokenType.Dedent, value: "", line: 1, column: 1})
                 at_line_start = @bool(false)
             var num = ch
             l_pos = l_pos + 1
@@ -96,13 +91,13 @@ fn tokenize(source: @str) -> @list[Token]:
                     num = num + c
                     l_pos = l_pos + 1
                 else: break
-            l_tokens.add(Token{type: TokenType.Integer, value: num, line: 1, column: 1})
+            l_tokens.add(Token{token_type: TokenType.Integer, value: num, line: 1, column: 1})
         else:
             # If we were at line start with 0 indent
             if at_line_start:
                 while len(indent_stack) > 1:
                     indent_stack.remove(len(indent_stack)-1)
-                    l_tokens.add(Token{type: TokenType.Dedent, value: "", line: 1, column: 1})
+                    l_tokens.add(Token{token_type: TokenType.Dedent, value: "", line: 1, column: 1})
                 at_line_start = @bool(false)
             var t_p = TokenType.Error
             if ch == "+": t_p = TokenType.Plus
@@ -110,15 +105,15 @@ fn tokenize(source: @str) -> @list[Token]:
             elif ch == "*": t_p = TokenType.Star
             elif ch == "/": t_p = TokenType.Slash
             elif ch == "=": t_p = TokenType.Equal
-            elif ch == ":": t_p = TokenType.Colon
+            elif ch == "\x3a": t_p = TokenType.Colon
             elif ch == ",": t_p = TokenType.Comma
             elif ch == "(": t_p = TokenType.LeftParen
             elif ch == ")": t_p = TokenType.RightParen
-            l_tokens.add(Token{type: t_p, value: ch, line: 1, column: 1})
+            l_tokens.add(Token{token_type: t_p, value: ch, line: 1, column: 1})
             l_pos = l_pos + 1
             
     while len(indent_stack) > 1:
         indent_stack.remove(len(indent_stack)-1)
-        l_tokens.add(Token{type: TokenType.Dedent, value: "", line: 1, column: 1})
-    l_tokens.add(Token{type: TokenType.Eof, value: "", line: 1, column: 1})
+        l_tokens.add(Token{token_type: TokenType.Dedent, value: "", line: 1, column: 1})
+    l_tokens.add(Token{token_type: TokenType.Eof, value: "", line: 1, column: 1})
     return l_tokens

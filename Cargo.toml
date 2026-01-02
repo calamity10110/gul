@@ -83,7 +83,7 @@ postgres = []
 sqlite = []
 
 [workspace]
-members = ["packages/*/*"]
+members = ["gul_compiler","packages/*/*"]
 exclude = [
   "packages/*/src",
   "packages/*/tests",

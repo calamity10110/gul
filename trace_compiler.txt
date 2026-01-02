@@ -1,0 +1,2772 @@
+Found 44 GUL files to transpile
+Transpiling main.mn -> main.rs
+DEBUG: @imp std.io Depth: 0
+DEBUG: @imp std.fs Depth: 0
+DEBUG: @imp compiler.lexer.lexer Depth: 0
+DEBUG: @imp compiler.parser.parser Depth: 0
+DEBUG: @imp compiler.semantic.analyzer Depth: 0
+DEBUG: @imp compiler.codegen.rust_backend Depth: 0
+DEBUG: struct CompilerConfig: Depth: 0
+DEBUG: input_file: @str Depth: 0
+DEBUG: output_file: @str Depth: 0
+DEBUG: emit_rust: @bool Depth: 0
+DEBUG: check_semantics: @bool Depth: 0
+DEBUG: verbose: @bool Depth: 0
+DEBUG: struct CompileResult: Depth: 0
+DEBUG: success: @bool Depth: 0
+DEBUG: output_code: @str Depth: 0
+DEBUG: errors: @list[@str] Depth: 0
+DEBUG: warnings: @list[@str] Depth: 0
+DEBUG: struct Compiler: Depth: 0
+DEBUG: config: CompilerConfig Depth: 0
+DEBUG: fn create_compiler(config: CompilerConfig) -> Compiler: Depth: 0
+DEBUG: return Compiler{config: config} Depth: 0
+DEBUG: fn compiler_read_source_file(compiler: Compiler) -> @str: Depth: 0
+DEBUG: """Read source file contents""" Depth: 0
+DEBUG: try: Depth: 0
+DEBUG: return read_file(compiler.config.input_file) Depth: 0
+DEBUG: catch e: Depth: 0
+DEBUG: print("Error reading file: " + str(e)) Depth: 0
+DEBUG: return "" Depth: 0
+DEBUG: fn compiler_write_output_file(compiler: Compiler, code: @str): Depth: 0
+DEBUG: """Write generated code to output file""" Depth: 0
+DEBUG: try: Depth: 0
+DEBUG: write_file(compiler.config.output_file, code) Depth: 0
+DEBUG: if compiler.config.verbose: Depth: 0
+DEBUG: print("Generated code written to " + compiler.config.output_file) Depth: 0
+DEBUG: catch e: Depth: 0
+DEBUG: print("Error writing file: " + str(e)) Depth: 0
+DEBUG: fn compiler_create_result(success: @bool, code: @str, errors: @list[@str], warnings: @list[@str]) -> CompileResult: Depth: 0
+DEBUG: """Create compile result""" Depth: 0
+DEBUG: return CompileResult{success: success, output_code: code, errors: errors, warnings: warnings} Depth: 0
+DEBUG: fn compiler_compile(compiler: Compiler) -> CompileResult: Depth: 0
+DEBUG: """Compile GUL source file""" Depth: 0
+DEBUG: var errors = @list[] Depth: 0
+DEBUG: var warnings = @list[] Depth: 0
+DEBUG: let source = compiler_read_source_file(compiler) Depth: 0
+DEBUG: if not source: Depth: 0
+DEBUG: errors.add("Failed to read source file") Depth: 0
+DEBUG: return compiler_create_result(@bool(false), "", errors, warnings) Depth: 0
+DEBUG: print("  [1/4] Lexing...") Depth: 0
+DEBUG: let tokens = tokenize(source) Depth: 0
+DEBUG: print("    Lexed " + str(len(tokens)) + " tokens") Depth: 0
+DEBUG: print("  [2/4] Parsing...") Depth: 0
+DEBUG: let ast = parse_with_tokens(tokens) Depth: 0
+DEBUG: if compiler.config.check_semantics: Depth: 0
+DEBUG: if compiler.config.verbose: Depth: 0
+DEBUG: print("  [3/4] Semantic analysis...") Depth: 0
+DEBUG: let semantic_errors = analyze_semantics(ast) Depth: 0
+DEBUG: errors.extend(semantic_errors) Depth: 0
+DEBUG: if len(semantic_errors) > 0: Depth: 0
+DEBUG: return compiler_create_result(@bool(false), "", errors, warnings) Depth: 0
+DEBUG: print("  [3/4] Semantic analysis...") Depth: 0
+DEBUG: analyze_semantics(ast) Depth: 0
+DEBUG: print("  [4/4] Generating Rust code...") Depth: 0
+DEBUG: let rust_code = generate_rust_code(ast) Depth: 0
+DEBUG: if compiler.config.verbose: Depth: 0
+DEBUG: print("Debug: Generated Rust code length: " + len(rust_code)) Depth: 0
+DEBUG: print("FORCE DEBUG: Rust code length: " + len(rust_code)) Depth: 0
+DEBUG: if len(rust_code) > 0: Depth: 0
+DEBUG: print("Debug: Rust code preview:") Depth: 0
+DEBUG: print(rust_code) Depth: 0
+DEBUG: if compiler.config.emit_rust: Depth: 0
+DEBUG: compiler_write_output_file(compiler, rust_code) Depth: 0
+DEBUG: if compiler.config.verbose: Depth: 0
+DEBUG: print("Compilation successful!") Depth: 0
+DEBUG: return compiler_create_result(@bool(true), rust_code, errors, warnings) Depth: 0
+DEBUG: fn compile_file(input_file: @str, output_file: @str, options: @dict) -> CompileResult: Depth: 0
+DEBUG: print("ENTER compile_file") Depth: 0
+DEBUG: """Compile a GUL file to Rust""" Depth: 0
+DEBUG: let config = CompilerConfig{input_file: input_file, output_file: output_file, emit_rust: options.get("emit_rust", @bool(true)), check_semantics: options.get("check_semantics", @bool(true)), verbose: options.get("verbose", @bool(false))} Depth: 0
+DEBUG: var compiler = create_compiler(config) Depth: 0
+DEBUG: let result = compiler_compile(compiler) Depth: 0
+DEBUG: print("DEBUG: Result success: " + str(result.success)) Depth: 0
+DEBUG: print("DEBUG: Result fields: " + str(result.fields)) Depth: 0
+DEBUG: return result Depth: 0
+DEBUG: mn: Depth: 0
+DEBUG: let args = sys.argv Depth: 0
+DEBUG: var input_file = "" Depth: 0
+DEBUG: var output_file = "" Depth: 0
+DEBUG: var verbose = @bool(false) Depth: 0
+DEBUG: var check_semantics = @bool(true) Depth: 0
+DEBUG: if len(args) < 2: Depth: 0
+DEBUG: print("GUL Compiler v0.1.0") Depth: 0
+DEBUG: print("Usage: gul-compile <input.mn> [options]") Depth: 0
+DEBUG: print("Options:") Depth: 0
+DEBUG: print("  -o <file>      Output file (default: input.rs)") Depth: 0
+DEBUG: print("  --verbose      Verbose output") Depth: 0
+DEBUG: print("  --no-semantic  Skip semantic analysis") Depth: 0
+DEBUG: return Depth: 0
+DEBUG: input_file = args[1] Depth: 0
+DEBUG: var i = 2 Depth: 0
+DEBUG: while i < len(args): Depth: 0
+DEBUG: let arg = args[i] Depth: 0
+DEBUG: if arg == "-o": Depth: 0
+DEBUG: if i + 1 < len(args): Depth: 0
+DEBUG: output_file = args[i + 1] Depth: 0
+DEBUG: i = i + 2 Depth: 0
+DEBUG: elif arg == "--verbose": Depth: 0
+DEBUG: verbose = @bool(true) Depth: 0
+DEBUG: i = i + 1 Depth: 0
+DEBUG: elif arg == "--no-semantic": Depth: 0
+DEBUG: check_semantics = @bool(false) Depth: 0
+DEBUG: i = i + 1 Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: i = i + 1 Depth: 0
+DEBUG: if output_file == "": Depth: 0
+DEBUG: output_file = input_file.replace(".mn", ".rs") Depth: 0
+DEBUG: let result = compile_file(input_file, output_file, @dict{"emit_rust": @bool(true), "check_semantics": check_semantics, "verbose": verbose}) Depth: 0
+DEBUG: if result.success: Depth: 0
+DEBUG: print("Compilation successful!") Depth: 0
+DEBUG: if len(result.warnings) > 0: Depth: 0
+DEBUG: print("Warnings: " + str(len(result.warnings))) Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: print("Compilation failed!") Depth: 0
+DEBUG: print("DEBUG: Result fields available? (Check interpreter debug)") Depth: 0
+DEBUG: let errs = result.errors Depth: 0
+DEBUG: print("DEBUG: errors var type: " + str(type(errs))) Depth: 0
+DEBUG: if errs: Depth: 0
+DEBUG: print("Errors list length: " + len(errs)) Depth: 0
+DEBUG: for error in errs: Depth: 0
+DEBUG: print("  " + error) Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: print("Result.errors is None or empty") Depth: 0
+✅ Generated main.rs
+Transpiling ast/nodes.mn -> ast/nodes.rs
+DEBUG: @imp std.collections Depth: 0
+DEBUG: @imp compiler.lexer.token Depth: 0
+DEBUG: struct ASTNode: Depth: 0
+DEBUG: line: @int Depth: 0
+DEBUG: column: @int Depth: 0
+DEBUG: impl ASTNode: Depth: 0
+DEBUG: fn location(self) -> @str: Depth: 0
+DEBUG: return @str(f"{self.line}:{self.column}") Depth: 0
+DEBUG: enum ExprType: Depth: 0
+DEBUG: IntegerLiteral Depth: 0
+DEBUG: FloatLiteral Depth: 0
+DEBUG: StringLiteral Depth: 0
+DEBUG: BooleanLiteral Depth: 0
+DEBUG: NoneLiteral Depth: 0
+DEBUG: ListLiteral Depth: 0
+DEBUG: TupleLiteral Depth: 0
+DEBUG: SetLiteral Depth: 0
+DEBUG: DictLiteral Depth: 0
+DEBUG: Identifier Depth: 0
+DEBUG: BinaryOp Depth: 0
+DEBUG: UnaryOp Depth: 0
+DEBUG: Call Depth: 0
+DEBUG: Index Depth: 0
+DEBUG: Attribute Depth: 0
+DEBUG: Lambda Depth: 0
+DEBUG: MatchExpr Depth: 0
+DEBUG: TypeConstructor Depth: 0
+DEBUG: Grouped Depth: 0
+DEBUG: struct Expression: Depth: 0
+DEBUG: node: ASTNode Depth: 0
+DEBUG: expr_type: ExprType Depth: 0
+DEBUG: struct LiteralExpr: Depth: 0
+DEBUG: base: Expression Depth: 0
+DEBUG: value: @str Depth: 0
+DEBUG: value_type: TokenType Depth: 0
+DEBUG: struct IdentifierExpr: Depth: 0
+DEBUG: base: Expression Depth: 0
+DEBUG: name: @str Depth: 0
+DEBUG: struct BinaryOpExpr: Depth: 0
+DEBUG: base: Expression Depth: 0
+DEBUG: left: Expression Depth: 0
+DEBUG: operator: TokenType Depth: 0
+DEBUG: right: Expression Depth: 0
+DEBUG: struct UnaryOpExpr: Depth: 0
+DEBUG: base: Expression Depth: 0
+DEBUG: operator: TokenType Depth: 0
+DEBUG: operand: Expression Depth: 0
+DEBUG: struct CallExpr: Depth: 0
+DEBUG: base: Expression Depth: 0
+DEBUG: callee: Expression Depth: 0
+DEBUG: arguments: @list[Expression] Depth: 0
+DEBUG: keyword_args: @dict Depth: 0
+DEBUG: struct IndexExpr: Depth: 0
+DEBUG: base: Expression Depth: 0
+DEBUG: object: Expression Depth: 0
+DEBUG: index: Expression Depth: 0
+DEBUG: struct AttributeExpr: Depth: 0
+DEBUG: base: Expression Depth: 0
+DEBUG: object: Expression Depth: 0
+DEBUG: attribute: @str Depth: 0
+DEBUG: struct ListExpr: Depth: 0
+DEBUG: base: Expression Depth: 0
+DEBUG: elements: @list[Expression] Depth: 0
+DEBUG: struct TupleExpr: Depth: 0
+DEBUG: base: Expression Depth: 0
+DEBUG: elements: @list[Expression] Depth: 0
+DEBUG: struct SetExpr: Depth: 0
+DEBUG: base: Expression Depth: 0
+DEBUG: elements: @list[Expression] Depth: 0
+DEBUG: struct DictExpr: Depth: 0
+DEBUG: base: Expression Depth: 0
+DEBUG: pairs: @list[@tuple(Expression, Expression)] Depth: 0
+DEBUG: struct LambdaExpr: Depth: 0
+DEBUG: base: Expression Depth: 0
+DEBUG: parameters: @list[@str] Depth: 0
+DEBUG: body: Expression Depth: 0
+DEBUG: struct MatchExpr: Depth: 0
+DEBUG: base: Expression Depth: 0
+DEBUG: value: Expression Depth: 0
+DEBUG: cases: @list[MatchCase] Depth: 0
+DEBUG: struct MatchCase: Depth: 0
+DEBUG: pattern: Expression Depth: 0
+DEBUG: guard: Expression Depth: 0
+DEBUG: body: Expression Depth: 0
+DEBUG: struct TypeConstructorExpr: Depth: 0
+DEBUG: base: Expression Depth: 0
+DEBUG: type_name: @str Depth: 0
+DEBUG: argument: Expression Depth: 0
+DEBUG: enum StmtType: Depth: 0
+DEBUG: LetDecl Depth: 0
+DEBUG: VarDecl Depth: 0
+DEBUG: FunctionDecl Depth: 0
+DEBUG: StructDecl Depth: 0
+DEBUG: EnumDecl Depth: 0
+DEBUG: IfStmt Depth: 0
+DEBUG: WhileStmt Depth: 0
+DEBUG: ForStmt Depth: 0
+DEBUG: LoopStmt Depth: 0
+DEBUG: MatchStmt Depth: 0
+DEBUG: BreakStmt Depth: 0
+DEBUG: ContinueStmt Depth: 0
+DEBUG: ReturnStmt Depth: 0
+DEBUG: TryStmt Depth: 0
+DEBUG: ExpressionStmt Depth: 0
+DEBUG: AssignmentStmt Depth: 0
+DEBUG: ImportStmt Depth: 0
+DEBUG: ForeignCodeBlock Depth: 0
+DEBUG: PassStmt Depth: 0
+DEBUG: struct Statement: Depth: 0
+DEBUG: node: ASTNode Depth: 0
+DEBUG: stmt_type: StmtType Depth: 0
+DEBUG: struct LetStmt: Depth: 0
+DEBUG: base: Statement Depth: 0
+DEBUG: name: @str Depth: 0
+DEBUG: type_annotation: @str Depth: 0
+DEBUG: value: Expression Depth: 0
+DEBUG: struct VarStmt: Depth: 0
+DEBUG: base: Statement Depth: 0
+DEBUG: name: @str Depth: 0
+DEBUG: type_annotation: @str Depth: 0
+DEBUG: value: Expression Depth: 0
+DEBUG: struct AssignmentStmt: Depth: 0
+DEBUG: base: Statement Depth: 0
+DEBUG: target: Expression Depth: 0
+DEBUG: operator: TokenType Depth: 0
+DEBUG: value: Expression Depth: 0
+DEBUG: struct FunctionDecl: Depth: 0
+DEBUG: base: Statement Depth: 0
+DEBUG: name: @str Depth: 0
+DEBUG: is_async: @bool Depth: 0
+DEBUG: parameters: @list[Parameter] Depth: 0
+DEBUG: return_type: @str Depth: 0
+DEBUG: body: @list[Statement] Depth: 0
+DEBUG: decorators: @list[@str] Depth: 0
+DEBUG: struct Parameter: Depth: 0
+DEBUG: name: @str Depth: 0
+DEBUG: type_annotation: @str Depth: 0
+DEBUG: ownership_mode: @str Depth: 0
+DEBUG: default_value: Expression Depth: 0
+DEBUG: struct StructDecl: Depth: 0
+DEBUG: base: Statement Depth: 0
+DEBUG: name: @str Depth: 0
+DEBUG: fields: @list[StructField] Depth: 0
+DEBUG: methods: @list[FunctionDecl] Depth: 0
+DEBUG: struct StructField: Depth: 0
+DEBUG: name: @str Depth: 0
+DEBUG: type_annotation: @str Depth: 0
+DEBUG: struct EnumDecl: Depth: 0
+DEBUG: base: Statement Depth: 0
+DEBUG: name: @str Depth: 0
+DEBUG: variants: @list[@str] Depth: 0
+DEBUG: struct IfStmt: Depth: 0
+DEBUG: base: Statement Depth: 0
+DEBUG: condition: Expression Depth: 0
+DEBUG: then_body: @list[Statement] Depth: 0
+DEBUG: elif_clauses: @list[ElifClause] Depth: 0
+DEBUG: else_body: @list[Statement] Depth: 0
+DEBUG: struct ElifClause: Depth: 0
+DEBUG: condition: Expression Depth: 0
+DEBUG: body: @list[Statement] Depth: 0
+DEBUG: struct WhileStmt: Depth: 0
+DEBUG: base: Statement Depth: 0
+DEBUG: condition: Expression Depth: 0
+DEBUG: body: @list[Statement] Depth: 0
+DEBUG: struct ForStmt: Depth: 0
+DEBUG: base: Statement Depth: 0
+DEBUG: variable: @str Depth: 0
+DEBUG: iterable: Expression Depth: 0
+DEBUG: body: @list[Statement] Depth: 0
+DEBUG: struct LoopStmt: Depth: 0
+DEBUG: base: Statement Depth: 0
+DEBUG: body: @list[Statement] Depth: 0
+DEBUG: struct MatchStmt: Depth: 0
+DEBUG: base: Statement Depth: 0
+DEBUG: value: Expression Depth: 0
+DEBUG: cases: @list[MatchStmtCase] Depth: 0
+DEBUG: struct MatchStmtCase: Depth: 0
+DEBUG: pattern: Expression Depth: 0
+DEBUG: guard: Expression Depth: 0
+DEBUG: body: @list[Statement] Depth: 0
+DEBUG: struct BreakStmt: Depth: 0
+DEBUG: base: Statement Depth: 0
+DEBUG: struct ContinueStmt: Depth: 0
+DEBUG: base: Statement Depth: 0
+DEBUG: struct ReturnStmt: Depth: 0
+DEBUG: base: Statement Depth: 0
+DEBUG: value: Expression Depth: 0
+DEBUG: struct TryStmt: Depth: 0
+DEBUG: base: Statement Depth: 0
+DEBUG: try_body: @list[Statement] Depth: 0
+DEBUG: catch_clauses: @list[CatchClause] Depth: 0
+DEBUG: finally_body: @list[Statement] Depth: 0
+DEBUG: struct CatchClause: Depth: 0
+DEBUG: exception_type: @str Depth: 0
+DEBUG: variable_name: @str Depth: 0
+DEBUG: body: @list[Statement] Depth: 0
+DEBUG: struct ImportStmt: Depth: 0
+DEBUG: base: Statement Depth: 0
+DEBUG: module_path: @list[@str] Depth: 0
+DEBUG: import_type: @str Depth: 0
+DEBUG: items: @list[@str] Depth: 0
+DEBUG: struct ForeignCodeBlock: Depth: 0
+DEBUG: base: Statement Depth: 0
+DEBUG: language: @str Depth: 0
+DEBUG: code: @str Depth: 0
+DEBUG: struct ExpressionStmt: Depth: 0
+DEBUG: base: Statement Depth: 0
+DEBUG: expression: Expression Depth: 0
+DEBUG: struct PassStmt: Depth: 0
+DEBUG: base: Statement Depth: 0
+DEBUG: struct Program: Depth: 0
+DEBUG: statements: @list[Statement] Depth: 0
+DEBUG: imports: @list[ImportStmt] Depth: 0
+DEBUG: main_entry: @list[Statement] Depth: 0
+DEBUG: fn create_node(line: @int, column: @int) -> ASTNode: Depth: 0
+DEBUG: return ASTNode{line: line, column: column} Depth: 0
+DEBUG: fn create_literal_expr(value: @str, value_type: TokenType, line: @int, column: @int) -> LiteralExpr: Depth: 0
+DEBUG: return LiteralExpr{base: Expression{node: create_node(line, column), expr_type: ExprType.IntegerLiteral}, value: value, value_type: value_type} Depth: 0
+DEBUG: fn create_identifier_expr(name: @str, line: @int, column: @int) -> IdentifierExpr: Depth: 0
+DEBUG: return IdentifierExpr{base: Expression{node: create_node(line, column), expr_type: ExprType.Identifier}, name: name} Depth: 0
+DEBUG: fn create_binary_op_expr(left: Expression, op: TokenType, right: Expression, line: @int, column: @int) -> BinaryOpExpr: Depth: 0
+DEBUG: return BinaryOpExpr{base: Expression{node: create_node(line, column), expr_type: ExprType.BinaryOp}, left: left, operator: op, right: right} Depth: 0
+✅ Generated ast/nodes.rs
+Transpiling parser/parser.mn -> parser/parser.rs
+DEBUG: @imp compiler.lexer.token Depth: 0
+DEBUG: @imp compiler.ast.nodes Depth: 0
+DEBUG: enum Precedence: Depth: 0
+DEBUG: NoPrec Depth: 0
+DEBUG: Assignment Depth: 0
+DEBUG: Or Depth: 0
+DEBUG: And Depth: 0
+DEBUG: Comparison Depth: 0
+DEBUG: Term Depth: 0
+DEBUG: Factor Depth: 0
+DEBUG: Power Depth: 0
+DEBUG: Range Depth: 0
+DEBUG: Prefix Depth: 0
+DEBUG: Call Depth: 0
+DEBUG: Index Depth: 0
+DEBUG: Unpack Depth: 0
+DEBUG: fn get_precedence(token_type: TokenType) -> Precedence: Depth: 0
+DEBUG: """Get the precedence level for a given token type""" Depth: 0
+DEBUG: if token_type == TokenType.Equal: Depth: 0
+DEBUG: return Precedence.Assignment Depth: 0
+DEBUG: elif token_type == TokenType.Or or token_type == TokenType.Not: Depth: 0
+DEBUG: return Precedence.Or Depth: 0
+DEBUG: elif token_type == TokenType.And: Depth: 0
+DEBUG: return Precedence.And Depth: 0
+DEBUG: elif token_type == TokenType.EqualEqual or token_type == TokenType.NotEqual: Depth: 0
+DEBUG: return Precedence.Comparison Depth: 0
+DEBUG: elif token_type == TokenType.Less or token_type == TokenType.LessEq or token_type == TokenType.Greater or token_type == TokenType.GreaterEq: Depth: 0
+DEBUG: return Precedence.Comparison Depth: 0
+DEBUG: elif token_type == TokenType.Plus or token_type == TokenType.Minus: Depth: 0
+DEBUG: return Precedence.Term Depth: 0
+DEBUG: elif token_type == TokenType.Star or token_type == TokenType.Slash or token_type == TokenType.Percent: Depth: 0
+DEBUG: return Precedence.Factor Depth: 0
+DEBUG: elif token_type == TokenType.DoubleStar: Depth: 0
+DEBUG: return Precedence.Power Depth: 0
+DEBUG: elif token_type == TokenType.LeftParen or token_type == TokenType.LeftBracket or token_type == TokenType.Dot: Depth: 0
+DEBUG: return Precedence.Call Depth: 0
+DEBUG: return Precedence.NoPrec Depth: 0
+DEBUG: struct Parser: Depth: 0
+DEBUG: tokens: @list[Token] Depth: 0
+DEBUG: current_pos: @int Depth: 0
+DEBUG: errors: @list[@str] Depth: 0
+DEBUG: impl Parser: Depth: 0
+DEBUG: fn create(tokens: @list[Token]) -> Parser: Depth: 0
+DEBUG: return Parser{tokens: tokens, current_pos: @int(0), errors: @list[]} Depth: 0
+DEBUG: fn is_at_end(ref self) -> @bool: Depth: 0
+DEBUG: let size = len(self.tokens) Depth: 0
+DEBUG: return self.current_pos >= size - 1 Depth: 0
+DEBUG: fn current(ref self) -> Token: Depth: 0
+DEBUG: return self.tokens[self.current_pos] Depth: 0
+DEBUG: fn advance(ref self) -> Token: Depth: 0
+DEBUG: let token = self.tokens[self.current_pos] Depth: 0
+DEBUG: let size = len(self.tokens) Depth: 0
+DEBUG: if self.current_pos < size - 1: Depth: 0
+DEBUG: self.current_pos = self.current_pos + 1 Depth: 0
+DEBUG: return token Depth: 0
+DEBUG: fn match_token(ref self, type: TokenType) -> @bool: Depth: 0
+DEBUG: let tok = self.tokens[self.current_pos] Depth: 0
+DEBUG: if tok.type == type: Depth: 0
+DEBUG: let size = len(self.tokens) Depth: 0
+DEBUG: if self.current_pos < size - 1: Depth: 0
+DEBUG: self.current_pos = self.current_pos + 1 Depth: 0
+DEBUG: return true Depth: 0
+DEBUG: return false Depth: 0
+DEBUG: fn expect(ref self, type: TokenType, message: @str) -> Token: Depth: 0
+DEBUG: let tok = self.tokens[self.current_pos] Depth: 0
+DEBUG: if tok.type == type: Depth: 0
+DEBUG: let size = len(self.tokens) Depth: 0
+DEBUG: if self.current_pos < size - 1: Depth: 0
+DEBUG: self.current_pos = self.current_pos + 1 Depth: 0
+DEBUG: return tok Depth: 0
+DEBUG: print("Parse error: " + message) Depth: 0
+DEBUG: return tok Depth: 0
+DEBUG: fn parse_expression(ref self, min_precedence: Precedence) -> Expression: Depth: 0
+DEBUG: var left = self.parse_prefix() Depth: 0
+DEBUG: while @bool(true): Depth: 0
+DEBUG: if self.current_pos >= len(self.tokens) - 1: break Depth: 0
+DEBUG: let tok = self.tokens[self.current_pos] Depth: 0
+DEBUG: let prec = get_precedence(tok.type) Depth: 0
+DEBUG: if prec <= min_precedence: break Depth: 0
+DEBUG: left = self.parse_infix(left, prec) Depth: 0
+DEBUG: return left Depth: 0
+DEBUG: fn parse_prefix(ref self) -> Expression: Depth: 0
+DEBUG: let token = self.advance() Depth: 0
+DEBUG: let t_type = token.type Depth: 0
+DEBUG: if t_type == TokenType.Identifier: Depth: 0
+DEBUG: return IdentifierExpr{base: Expression{node: ASTNode{line: 1, column: 1}, expr_type: ExprType.Identifier}, name: token.value} Depth: 0
+DEBUG: elif t_type == TokenType.Integer: Depth: 0
+DEBUG: return LiteralExpr{base: Expression{node: ASTNode{line: 1, column: 1}, expr_type: ExprType.IntegerLiteral}, value: token.value, value_type: TokenType.Integer} Depth: 0
+DEBUG: elif t_type == TokenType.LeftParen: Depth: 0
+DEBUG: let expr = self.parse_expression(Precedence.NoPrec) Depth: 0
+DEBUG: self.expect(TokenType.RightParen, "Expected ')'") Depth: 0
+DEBUG: return expr Depth: 0
+DEBUG: elif t_type == TokenType.Minus: Depth: 0
+DEBUG: let op = self.parse_expression(Precedence.Prefix) Depth: 0
+DEBUG: return UnaryOpExpr{base: Expression{node: ASTNode{line: 1, column: 1}, expr_type: ExprType.UnaryOp}, operator: TokenType.Minus, operand: op} Depth: 0
+DEBUG: return LiteralExpr{base: Expression{node: ASTNode{line: 1, column: 1}, expr_type: ExprType.NoneLiteral}, value: "None", value_type: TokenType.NoneLiteral} Depth: 0
+DEBUG: fn parse_infix(ref self, left: Expression, precedence: Precedence) -> Expression: Depth: 0
+DEBUG: let token = self.advance() Depth: 0
+DEBUG: if token.type == TokenType.Plus or token.type == TokenType.Minus or token.type == TokenType.Star or token.type == TokenType.Slash: Depth: 0
+DEBUG: let right = self.parse_expression(precedence) Depth: 0
+DEBUG: return BinaryOpExpr{base: Expression{node: ASTNode{line: 1, column: 1}, expr_type: ExprType.BinaryOp}, left: left, operator: token.type, right: right} Depth: 0
+DEBUG: elif token.type == TokenType.LeftParen: Depth: 0
+DEBUG: let args = @list[] Depth: 0
+DEBUG: if not (self.tokens[self.current_pos].type == TokenType.RightParen): Depth: 0
+DEBUG: args.add(self.parse_expression(Precedence.NoPrec)) Depth: 0
+DEBUG: while self.match_token(TokenType.Comma): Depth: 0
+DEBUG: args.add(self.parse_expression(Precedence.NoPrec)) Depth: 0
+DEBUG: self.expect(TokenType.RightParen, "Expected ')'") Depth: 0
+DEBUG: return CallExpr{base: Expression{node: ASTNode{line: 1, column: 1}, expr_type: ExprType.Call}, callee: left, arguments: args} Depth: 0
+DEBUG: return left Depth: 0
+DEBUG: fn parse_statement(ref self) -> Statement: Depth: 0
+DEBUG: let tok = self.tokens[self.current_pos] Depth: 0
+DEBUG: if tok.type == TokenType.Let: Depth: 0
+DEBUG: self.advance() Depth: 0
+DEBUG: let name = self.expect(TokenType.Identifier, "Expected identifier").value Depth: 0
+DEBUG: self.expect(TokenType.Equal, "Expected '='") Depth: 0
+DEBUG: let val = self.parse_expression(Precedence.NoPrec) Depth: 0
+DEBUG: return LetStmt{base: Statement{node: ASTNode{line: 1, column: 1}, stmt_type: StmtType.LetStmt}, name: name, value: val, is_var: @bool(false)} Depth: 0
+DEBUG: elif tok.type == TokenType.Return: Depth: 0
+DEBUG: self.advance() Depth: 0
+DEBUG: let val = self.parse_expression(Precedence.NoPrec) Depth: 0
+DEBUG: return ReturnStmt{base: Statement{node: ASTNode{line: 1, column: 1}, stmt_type: StmtType.ReturnStmt}, value: val} Depth: 0
+DEBUG: elif tok.type == TokenType.Fn: Depth: 0
+DEBUG: self.advance() Depth: 0
+DEBUG: let name = self.expect(TokenType.Identifier, "Expected function name").value Depth: 0
+DEBUG: self.expect(TokenType.LeftParen, "Expected '('") Depth: 0
+DEBUG: let params = @list[] Depth: 0
+DEBUG: while not (self.tokens[self.current_pos].type == TokenType.RightParen): Depth: 0
+DEBUG: self.advance() Depth: 0
+DEBUG: if self.tokens[self.current_pos].type == TokenType.Comma: self.advance() Depth: 0
+DEBUG: self.advance() Depth: 0
+DEBUG: self.expect(TokenType.Colon, "Expected ':'") Depth: 0
+DEBUG: self.expect(TokenType.Newline, "Expected Newline") Depth: 0
+DEBUG: self.expect(TokenType.Indent, "Expected Indent") Depth: 0
+DEBUG: let body = @list[] Depth: 0
+DEBUG: while not (self.tokens[self.current_pos].type == TokenType.Dedent): Depth: 0
+DEBUG: body.add(self.parse_statement()) Depth: 0
+DEBUG: if self.tokens[self.current_pos].type == TokenType.Newline: self.advance() Depth: 0
+DEBUG: self.advance() Depth: 0
+DEBUG: return FunctionDecl{base: Statement{node: ASTNode{line: 1, column: 1}, stmt_type: StmtType.FunctionDecl}, name: name, params: @list[], body: body, return_type: "Any"} Depth: 0
+DEBUG: let expr = self.parse_expression(Precedence.NoPrec) Depth: 0
+DEBUG: return ExpressionStmt{base: Statement{node: ASTNode{line: 1, column: 1}, stmt_type: StmtType.ExpressionStmt}, expression: expr} Depth: 0
+DEBUG: fn parse_program(ref self) -> Program: Depth: 0
+DEBUG: let statements = @list[] Depth: 0
+DEBUG: print("    Parser: parse_program start") Depth: 0
+DEBUG: while self.current_pos < len(self.tokens) - 1: Depth: 0
+DEBUG: print("    Parser POS: " + str(self.current_pos)) Depth: 0
+DEBUG: let tok = self.tokens[self.current_pos] Depth: 0
+DEBUG: if tok.type == TokenType.Newline: Depth: 0
+DEBUG: self.advance() Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: statements.add(self.parse_statement()) Depth: 0
+DEBUG: return Program{statements: statements, imports: @list[], main_entry: @list[]} Depth: 0
+DEBUG: fn parse(tokens: @list[Token]) -> Program: Depth: 0
+DEBUG: var parser = Parser.create(tokens) Depth: 0
+DEBUG: return parser.parse_program() Depth: 0
+✅ Generated parser/parser.rs
+Transpiling parser/statement_parser.mn -> parser/statement_parser.rs
+DEBUG: impl Parser: Depth: 0
+DEBUG: fn parse_statement(ref self) -> Statement: Depth: 0
+DEBUG: """Parse a single statement""" Depth: 0
+DEBUG: self.skip_newlines() Depth: 0
+DEBUG: let token = self.current() Depth: 0
+DEBUG: match token.type: Depth: 0
+DEBUG: TokenType.Let => return self.parse_let_statement() Depth: 0
+DEBUG: TokenType.Var => return self.parse_var_statement() Depth: 0
+DEBUG: TokenType.Fn => return self.parse_function_declaration() Depth: 0
+DEBUG: TokenType.If => return self.parse_if_statement() Depth: 0
+DEBUG: TokenType.While => return self.parse_while_statement() Depth: 0
+DEBUG: TokenType.For => return self.parse_for_statement() Depth: 0
+DEBUG: TokenType.Return => return self.parse_return_statement() Depth: 0
+DEBUG: TokenType.AtImp => return self.parse_import() Depth: 0
+DEBUG: _ => Depth: 0
+DEBUG: return self.parse_expression_or_assignment() Depth: 0
+DEBUG: fn parse_let_statement(ref self) -> Statement: Depth: 0
+DEBUG: """Parse let declaration: let x = 5 or let x: int = 5""" Depth: 0
+DEBUG: let let_token = self.advance() Depth: 0
+DEBUG: let name_token = self.expect(TokenType.Identifier, "Expected variable name after 'let'") Depth: 0
+DEBUG: let name = name_token.value Depth: 0
+DEBUG: var type_annotation = @str("") Depth: 0
+DEBUG: if self.match_token(TokenType.Colon): Depth: 0
+DEBUG: let type_token = self.expect(TokenType.Identifier, "Expected type after ':'") Depth: 0
+DEBUG: type_annotation = type_token.value Depth: 0
+DEBUG: self.expect(TokenType.Equal, "Expected '=' in let declaration") Depth: 0
+DEBUG: let value = self.parse_expression() Depth: 0
+DEBUG: return LetStmt{ Depth: 0
+DEBUG: base: Statement{ Depth: 0
+DEBUG: node: create_node(let_token.line, let_token.column), Depth: 0
+DEBUG: stmt_type: StmtType.LetDecl, Depth: 0
+DEBUG: }, Depth: 0
+DEBUG: name: name, Depth: 0
+DEBUG: type_annotation: type_annotation, Depth: 0
+DEBUG: value: value, Depth: 0
+DEBUG: }; Depth: 0
+DEBUG: fn parse_var_statement(ref self) -> Statement: Depth: 0
+DEBUG: """Parse var declaration: var x = 5""" Depth: 0
+DEBUG: let var_token = self.advance() Depth: 0
+DEBUG: let name_token = self.expect(TokenType.Identifier, "Expected variable name after 'var'") Depth: 0
+DEBUG: let name = name_token.value Depth: 0
+DEBUG: var type_annotation = @str("") Depth: 0
+DEBUG: if self.match_token(TokenType.Colon): Depth: 0
+DEBUG: let type_token = self.expect(TokenType.Identifier, "Expected type after ':'") Depth: 0
+DEBUG: type_annotation = type_token.value Depth: 0
+DEBUG: self.expect(TokenType.Equal, "Expected '=' in var declaration") Depth: 0
+DEBUG: let value = self.parse_expression() Depth: 0
+DEBUG: return VarStmt{ Depth: 0
+DEBUG: base: Statement{ Depth: 0
+DEBUG: node: create_node(var_token.line, var_token.column), Depth: 0
+DEBUG: stmt_type: StmtType.VarDecl, Depth: 0
+DEBUG: }, Depth: 0
+DEBUG: name: name, Depth: 0
+DEBUG: type_annotation: type_annotation, Depth: 0
+DEBUG: value: value, Depth: 0
+DEBUG: }; Depth: 0
+DEBUG: fn parse_function_declaration(ref self) -> Statement: Depth: 0
+DEBUG: """Parse function: fn add(a, b) -> int: ...""" Depth: 0
+DEBUG: let fn_token = self.advance() Depth: 0
+DEBUG: var return_type = @str("") Depth: 0
+DEBUG: if self.current().type == TokenType.AtInt or self.current().type == TokenType.AtStr: Depth: 0
+DEBUG: let type_token = self.advance() Depth: 0
+DEBUG: return_type = type_token.value[1:] Depth: 0
+DEBUG: let name_token = self.expect(TokenType.Identifier, "Expected function name") Depth: 0
+DEBUG: let name = name_token.value Depth: 0
+DEBUG: self.expect(TokenType.LeftParen, "Expected '(' after function name") Depth: 0
+DEBUG: var parameters = @list[] Depth: 0
+DEBUG: while not self.match_token(TokenType.RightParen): Depth: 0
+DEBUG: let param = self.parse_parameter() Depth: 0
+DEBUG: parameters.add(param) Depth: 0
+DEBUG: if not self.match_token(TokenType.Comma): Depth: 0
+DEBUG: self.expect(TokenType.RightParen, "Expected ')' or ',' in parameters") Depth: 0
+DEBUG: break Depth: 0
+DEBUG: if self.match_token(TokenType.Arrow): Depth: 0
+DEBUG: let type_token = self.expect(TokenType.Identifier, "Expected return type after '->'") Depth: 0
+DEBUG: return_type = type_token.value Depth: 0
+DEBUG: self.expect(TokenType.Colon, "Expected ':' before function body") Depth: 0
+DEBUG: self.skip_newlines() Depth: 0
+DEBUG: self.expect(TokenType.Indent, "Expected indented block for function body") Depth: 0
+DEBUG: let body = self.parse_block() Depth: 0
+DEBUG: return FunctionDecl{ Depth: 0
+DEBUG: base: Statement{ Depth: 0
+DEBUG: node: create_node(fn_token.line, fn_token.column), Depth: 0
+DEBUG: stmt_type: StmtType.FunctionDecl Depth: 0
+DEBUG: }, Depth: 0
+DEBUG: name: name, Depth: 0
+DEBUG: is_async: @bool(false), Depth: 0
+DEBUG: parameters: parameters, Depth: 0
+DEBUG: return_type: return_type, Depth: 0
+DEBUG: body: body, Depth: 0
+DEBUG: decorators: @list[], Depth: 0
+DEBUG: }; Depth: 0
+DEBUG: fn parse_parameter(ref self) -> Parameter: Depth: 0
+DEBUG: """Parse function parameter: name: type or name""" Depth: 0
+DEBUG: let name_token = self.expect(TokenType.Identifier, "Expected parameter name") Depth: 0
+DEBUG: var type_annotation = @str("") Depth: 0
+DEBUG: var ownership_mode = @str("") Depth: 0
+DEBUG: if self.match_token(TokenType.Colon): Depth: 0
+DEBUG: if self.current().type == TokenType.Borrow or Depth: 0
+DEBUG: self.current().type == TokenType.Ref or Depth: 0
+DEBUG: self.current().type == TokenType.Move or Depth: 0
+DEBUG: self.current().type == TokenType.Kept: Depth: 0
+DEBUG: ownership_mode = self.advance().value Depth: 0
+DEBUG: let type_token = self.expect(TokenType.Identifier, "Expected parameter type") Depth: 0
+DEBUG: type_annotation = type_token.value Depth: 0
+DEBUG: return Parameter{ Depth: 0
+DEBUG: name: name_token.value, Depth: 0
+DEBUG: type_annotation: type_annotation, Depth: 0
+DEBUG: ownership_mode: ownership_mode, Depth: 0
+DEBUG: default_value: None, Depth: 0
+DEBUG: }; Depth: 0
+DEBUG: fn parse_block(ref self) -> @list[Statement]: Depth: 0
+DEBUG: """Parse indented block of statements""" Depth: 0
+DEBUG: var statements = @list[] Depth: 0
+DEBUG: while not self.is_at_end() and self.current().type != TokenType.Dedent: Depth: 0
+DEBUG: self.skip_newlines() Depth: 0
+DEBUG: if self.current().type == TokenType.Dedent: Depth: 0
+DEBUG: break Depth: 0
+DEBUG: statements.add(self.parse_statement()) Depth: 0
+DEBUG: self.match_token(TokenType.Dedent) Depth: 0
+DEBUG: return statements Depth: 0
+DEBUG: fn parse_if_statement(ref self) -> Statement: Depth: 0
+DEBUG: """Parse if statement with elif and else""" Depth: 0
+DEBUG: let if_token = self.advance() Depth: 0
+DEBUG: let condition = self.parse_expression() Depth: 0
+DEBUG: self.expect(TokenType.Colon, "Expected ':' after if condition") Depth: 0
+DEBUG: self.skip_newlines() Depth: 0
+DEBUG: self.expect(TokenType.Indent, "Expected indented block") Depth: 0
+DEBUG: let then_body = self.parse_block() Depth: 0
+DEBUG: var elif_clauses = @list[] Depth: 0
+DEBUG: var else_body = @list[] Depth: 0
+DEBUG: while self.current().type == TokenType.Elif: Depth: 0
+DEBUG: self.advance() Depth: 0
+DEBUG: let elif_condition = self.parse_expression() Depth: 0
+DEBUG: self.expect(TokenType.Colon, "Expected ':' after elif condition") Depth: 0
+DEBUG: self.skip_newlines() Depth: 0
+DEBUG: self.expect(TokenType.Indent, "Expected indented block") Depth: 0
+DEBUG: let elif_body = self.parse_block() Depth: 0
+DEBUG: let clause = ElifClause{ Depth: 0
+DEBUG: condition: elif_condition, Depth: 0
+DEBUG: body: elif_body, Depth: 0
+DEBUG: }; Depth: 0
+DEBUG: elif_clauses.add(clause); Depth: 0
+DEBUG: if self.match_token(TokenType.Else): Depth: 0
+DEBUG: self.expect(TokenType.Colon, "Expected ':' after else") Depth: 0
+DEBUG: self.skip_newlines() Depth: 0
+DEBUG: self.expect(TokenType.Indent, "Expected indented block") Depth: 0
+DEBUG: else_body = self.parse_block() Depth: 0
+DEBUG: return IfStmt{ Depth: 0
+DEBUG: base: Statement{ Depth: 0
+DEBUG: node: create_node(if_token.line, if_token.column), Depth: 0
+DEBUG: stmt_type: StmtType.IfStmt, Depth: 0
+DEBUG: }, Depth: 0
+DEBUG: condition: condition, Depth: 0
+DEBUG: then_body: then_body, Depth: 0
+DEBUG: elif_clauses: elif_clauses, Depth: 0
+DEBUG: else_body: else_body, Depth: 0
+DEBUG: }; Depth: 0
+DEBUG: fn parse_while_statement(ref self) -> Statement: Depth: 0
+DEBUG: """Parse while loop""" Depth: 0
+DEBUG: let while_token = self.advance() Depth: 0
+DEBUG: let condition = self.parse_expression() Depth: 0
+DEBUG: self.expect(TokenType.Colon, "Expected ':' after while condition") Depth: 0
+DEBUG: self.skip_newlines() Depth: 0
+DEBUG: self.expect(TokenType.Indent, "Expected indented block") Depth: 0
+DEBUG: let body = self.parse_block() Depth: 0
+DEBUG: return WhileStmt{ Depth: 0
+DEBUG: base: Statement{ Depth: 0
+DEBUG: node: create_node(while_token.line, while_token.column), Depth: 0
+DEBUG: stmt_type: StmtType.WhileStmt, Depth: 0
+DEBUG: }, Depth: 0
+DEBUG: condition: condition, Depth: 0
+DEBUG: body: body, Depth: 0
+DEBUG: }; Depth: 0
+DEBUG: fn parse_for_statement(ref self) -> Statement: Depth: 0
+DEBUG: """Parse for loop: for x in items:""" Depth: 0
+DEBUG: let for_token = self.advance() Depth: 0
+DEBUG: let var_token = self.expect(TokenType.Identifier, "Expected variable in for loop") Depth: 0
+DEBUG: self.expect(TokenType.In, "Expected 'in' in for loop") Depth: 0
+DEBUG: let iterable = self.parse_expression() Depth: 0
+DEBUG: self.expect(TokenType.Colon, "Expected ':' after for") Depth: 0
+DEBUG: self.skip_newlines() Depth: 0
+DEBUG: self.expect(TokenType.Indent, "Expected indented block") Depth: 0
+DEBUG: let body = self.parse_block() Depth: 0
+DEBUG: return ForStmt{ Depth: 0
+DEBUG: base: Statement{ Depth: 0
+DEBUG: node: create_node(for_token.line, for_token.column), Depth: 0
+DEBUG: stmt_type: StmtType.ForStmt, Depth: 0
+DEBUG: }, Depth: 0
+DEBUG: variable: var_token.value, Depth: 0
+DEBUG: iterable: iterable, Depth: 0
+DEBUG: body: body, Depth: 0
+DEBUG: }; Depth: 0
+DEBUG: fn parse_return_statement(ref self) -> Statement: Depth: 0
+DEBUG: """Parse return statement""" Depth: 0
+DEBUG: let return_token = self.advance() Depth: 0
+DEBUG: var value = None Depth: 0
+DEBUG: if self.current().type != TokenType.Newline and self.current().type != TokenType.Eof: Depth: 0
+DEBUG: value = self.parse_expression() Depth: 0
+DEBUG: return ReturnStmt{ Depth: 0
+DEBUG: base: Statement{ Depth: 0
+DEBUG: node: create_node(return_token.line, return_token.column), Depth: 0
+DEBUG: stmt_type: StmtType.ReturnStmt, Depth: 0
+DEBUG: }, Depth: 0
+DEBUG: value: value, Depth: 0
+DEBUG: }; Depth: 0
+DEBUG: fn parse_import(ref self) -> Statement: Depth: 0
+DEBUG: """Parse import: @imp std.io or @imp std{io, http}""" Depth: 0
+DEBUG: let imp_token = self.advance() Depth: 0
+DEBUG: var module_path = @list[] Depth: 0
+DEBUG: var items = @list[] Depth: 0
+DEBUG: let first_part = self.expect(TokenType.Identifier, "Expected module name") Depth: 0
+DEBUG: module_path.add(first_part.value) Depth: 0
+DEBUG: while self.match_token(TokenType.Dot): Depth: 0
+DEBUG: let part = self.expect(TokenType.Identifier, "Expected module part") Depth: 0
+DEBUG: module_path.add(part.value) Depth: 0
+DEBUG: if self.match_token(TokenType.LeftBrace): Depth: 0
+DEBUG: while not self.match_token(TokenType.RightBrace): Depth: 0
+DEBUG: let item = self.expect(TokenType.Identifier, "Expected import item") Depth: 0
+DEBUG: items.add(item.value) Depth: 0
+DEBUG: if not self.match_token(TokenType.Comma): Depth: 0
+DEBUG: self.expect(TokenType.RightBrace, "Expected '}' or ','") Depth: 0
+DEBUG: break Depth: 0
+DEBUG: return ImportStmt{ Depth: 0
+DEBUG: base: Statement{ Depth: 0
+DEBUG: node: create_node(imp_token.line, imp_token.column), Depth: 0
+DEBUG: stmt_type: StmtType.ImportStmt, Depth: 0
+DEBUG: }, Depth: 0
+DEBUG: module_path: module_path, Depth: 0
+DEBUG: import_type: "single", Depth: 0
+DEBUG: items: items, Depth: 0
+DEBUG: }; Depth: 0
+DEBUG: fn parse_expression_or_assignment(ref self) -> Statement: Depth: 0
+DEBUG: """Parse expression statement or assignment""" Depth: 0
+DEBUG: let start_pos = self.current_pos Depth: 0
+DEBUG: let expr = self.parse_expression() Depth: 0
+DEBUG: if self.current().type == TokenType.Equal or Depth: 0
+DEBUG: self.current().type == TokenType.PlusEq or Depth: 0
+DEBUG: self.current().type == TokenType.MinusEq or Depth: 0
+DEBUG: self.current().type == TokenType.StarEq or Depth: 0
+DEBUG: self.current().type == TokenType.SlashEq: Depth: 0
+DEBUG: let op = self.advance() Depth: 0
+DEBUG: let value = self.parse_expression() Depth: 0
+DEBUG: return AssignmentStmt{ Depth: 0
+DEBUG: base: Statement{ Depth: 0
+DEBUG: node: expr.node, Depth: 0
+DEBUG: stmt_type: StmtType.AssignmentStmt, Depth: 0
+DEBUG: }, Depth: 0
+DEBUG: target: expr, Depth: 0
+DEBUG: operator: op.type, Depth: 0
+DEBUG: value: value, Depth: 0
+DEBUG: }; Depth: 0
+DEBUG: return ExpressionStmt{ Depth: 0
+DEBUG: base: Statement{ Depth: 0
+DEBUG: node: expr.node, Depth: 0
+DEBUG: stmt_type: StmtType.ExpressionStmt, Depth: 0
+DEBUG: }, Depth: 0
+DEBUG: expression: expr, Depth: 0
+DEBUG: }; Depth: 0
+✅ Generated parser/statement_parser.rs
+Transpiling ir/ir_builder.mn -> ir/ir_builder.rs
+DEBUG: @imp compiler.ir.ir_nodes Depth: 0
+DEBUG: @imp compiler.ast.nodes Depth: 0
+DEBUG: @imp compiler.builtins.codegen_helpers Depth: 0
+DEBUG: struct IRBuilder: Depth: 0
+DEBUG: current_module: IRModule, Depth: 0
+DEBUG: current_struct: @str, Depth: 0
+DEBUG: pending_impls: HashMap<String, Vec<IRFunction>> Depth: 0
+DEBUG: impl IRBuilder: Depth: 0
+DEBUG: fn create() -> IRBuilder: Depth: 0
+DEBUG: return IRBuilder { Depth: 0
+DEBUG: current_module: IRModule { Depth: 0
+DEBUG: base: IRNode {node_type: IRNodeType.Module, line: 0, column: 0}, Depth: 0
+DEBUG: name: "", Depth: 0
+DEBUG: imports: @list[], Depth: 0
+DEBUG: structs: @list[], Depth: 0
+DEBUG: impls: @list[], Depth: 0
+DEBUG: functions: @list[] Depth: 0
+DEBUG: }, Depth: 0
+DEBUG: current_struct: "", Depth: 0
+DEBUG: pending_impls: @dict{} Depth: 0
+DEBUG: } Depth: 0
+DEBUG: fn build_module(ref self, ast: Module) -> IRModule: Depth: 0
+DEBUG: self.current_module.name = ast.name Depth: 0
+DEBUG: for stmt in ast.body: Depth: 0
+DEBUG: self.process_statement(stmt) Depth: 0
+DEBUG: self.finalize_impls() Depth: 0
+DEBUG: return self.current_module Depth: 0
+DEBUG: fn process_statement(ref self, stmt: Statement): Depth: 0
+DEBUG: if stmt.stmt_type == StmtType.StructDecl: Depth: 0
+DEBUG: self.process_struct(stmt) Depth: 0
+DEBUG: elif stmt.stmt_type == StmtType.FunctionDecl: Depth: 0
+DEBUG: self.process_function(stmt) Depth: 0
+DEBUG: elif stmt.stmt_type == StmtType.ImportStmt: Depth: 0
+DEBUG: self.process_import(stmt) Depth: 0
+DEBUG: fn process_struct(ref self, stmt: Statement): Depth: 0
+DEBUG: let decl = stmt Depth: 0
+DEBUG: var ir_struct = IRStruct {base: IRNode {node_type: IRNodeType.Struct, line: stmt.base.line, column: stmt.base.column}, name: decl.name, fields: @list[]} Depth: 0
+DEBUG: self.current_struct = decl.name Depth: 0
+DEBUG: for member in decl.body: Depth: 0
+DEBUG: if member.stmt_type == StmtType.FieldDecl: Depth: 0
+DEBUG: let field = IRField {base: IRNode {node_type: IRNodeType.Field, line: member.base.line, column: member.base.column}, name: member.name, type_name: gul_type_to_rust(member.type_annotation), default_value: ""} Depth: 0
+DEBUG: ir_struct.fields.add(field) Depth: 0
+DEBUG: elif member.stmt_type == StmtType.FunctionDecl: Depth: 0
+DEBUG: let ir_func = self.build_function(member) Depth: 0
+DEBUG: if !self.pending_impls.contains_key(decl.name): Depth: 0
+DEBUG: self.pending_impls[decl.name] = @list[] Depth: 0
+DEBUG: self.pending_impls[decl.name].add(ir_func) Depth: 0
+DEBUG: self.current_module.structs.add(ir_struct) Depth: 0
+DEBUG: self.current_struct = "" Depth: 0
+DEBUG: fn process_function(ref self, stmt: Statement): Depth: 0
+DEBUG: let ir_func = self.build_function(stmt) Depth: 0
+DEBUG: self.current_module.functions.add(ir_func) Depth: 0
+DEBUG: fn build_function(ref self, decl: FunctionDecl) -> IRFunction: Depth: 0
+DEBUG: var ir_func = IRFunction {base: IRNode {node_type: IRNodeType.Function, line: decl.base.line, column: decl.base.column}, name: decl.name, params: @list[], return_type: gul_type_to_rust(decl.return_type), body: @list[], is_method: @bool(false), receiver: ""} Depth: 0
+DEBUG: for param in decl.parameters: Depth: 0
+DEBUG: if param.name == "self" or param.name == "ref self": Depth: 0
+DEBUG: ir_func.is_method = @bool(true) Depth: 0
+DEBUG: ir_func.receiver = param.name Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: let ir_param = IRParameter {base: IRNode {node_type: IRNodeType.Parameter, line: param.base.line, column: param.base.column}, name: param.name, type_name: gul_type_to_rust(param.type_annotation), ownership: param.ownership_mode} Depth: 0
+DEBUG: ir_func.params.add(ir_param) Depth: 0
+DEBUG: return ir_func Depth: 0
+DEBUG: fn process_import(ref self, stmt: Statement): Depth: 0
+DEBUG: let parts = stmt.module_path Depth: 0
+DEBUG: var path = "" Depth: 0
+DEBUG: for part in parts: Depth: 0
+DEBUG: if len(path) > 0: Depth: 0
+DEBUG: path = path + "::" Depth: 0
+DEBUG: path = path + part Depth: 0
+DEBUG: self.current_module.imports.add(path) Depth: 0
+DEBUG: fn finalize_impls(ref self): Depth: 0
+DEBUG: pass Depth: 0
+✅ Generated ir/ir_builder.rs
+Transpiling ir/ir_nodes.mn -> ir/ir_nodes.rs
+DEBUG: enum IRNodeType: Depth: 0
+DEBUG: Module Depth: 0
+DEBUG: Function Depth: 0
+DEBUG: Struct Depth: 0
+DEBUG: Impl Depth: 0
+DEBUG: Field Depth: 0
+DEBUG: Parameter Depth: 0
+DEBUG: Statement Depth: 0
+DEBUG: Expression Depth: 0
+DEBUG: Type Depth: 0
+DEBUG: struct IRNode: Depth: 0
+DEBUG: node_type: IRNodeType Depth: 0
+DEBUG: line: @int Depth: 0
+DEBUG: column: @int Depth: 0
+DEBUG: struct IRModule: Depth: 0
+DEBUG: base: IRNode Depth: 0
+DEBUG: name: @str Depth: 0
+DEBUG: imports: @list[@str] Depth: 0
+DEBUG: structs: @list[IRStruct] Depth: 0
+DEBUG: impls: @list[IRImpl] Depth: 0
+DEBUG: functions: @list[IRFunction] Depth: 0
+DEBUG: struct IRStruct: Depth: 0
+DEBUG: base: IRNode Depth: 0
+DEBUG: name: @str Depth: 0
+DEBUG: fields: @list[IRField] Depth: 0
+DEBUG: struct IRImpl: Depth: 0
+DEBUG: base: IRNode Depth: 0
+DEBUG: target_type: @str Depth: 0
+DEBUG: methods: @list[IRFunction] Depth: 0
+DEBUG: struct IRField: Depth: 0
+DEBUG: base: IRNode Depth: 0
+DEBUG: name: @str Depth: 0
+DEBUG: type_name: @str Depth: 0
+DEBUG: default_value: @str Depth: 0
+DEBUG: struct IRFunction: Depth: 0
+DEBUG: base: IRNode Depth: 0
+DEBUG: name: @str Depth: 0
+DEBUG: params: @list[IRParameter] Depth: 0
+DEBUG: return_type: @str Depth: 0
+DEBUG: body: @list[IRStatement] Depth: 0
+DEBUG: is_method: @bool Depth: 0
+DEBUG: receiver: @str Depth: 0
+DEBUG: struct IRParameter: Depth: 0
+DEBUG: base: IRNode Depth: 0
+DEBUG: name: @str Depth: 0
+DEBUG: type_name: @str Depth: 0
+DEBUG: ownership: @str Depth: 0
+DEBUG: enum IRStmtType: Depth: 0
+DEBUG: Let Depth: 0
+DEBUG: Var Depth: 0
+DEBUG: Assign Depth: 0
+DEBUG: Return Depth: 0
+DEBUG: If Depth: 0
+DEBUG: While Depth: 0
+DEBUG: For Depth: 0
+DEBUG: Match Depth: 0
+DEBUG: Expr Depth: 0
+DEBUG: Block Depth: 0
+DEBUG: struct IRStatement: Depth: 0
+DEBUG: base: IRNode Depth: 0
+DEBUG: stmt_type: IRStmtType Depth: 0
+DEBUG: content: @str Depth: 0
+DEBUG: enum IRExprType: Depth: 0
+DEBUG: Literal Depth: 0
+DEBUG: Identifier Depth: 0
+DEBUG: BinaryOp Depth: 0
+DEBUG: UnaryOp Depth: 0
+DEBUG: Call Depth: 0
+DEBUG: Index Depth: 0
+DEBUG: Attribute Depth: 0
+DEBUG: Construct Depth: 0
+DEBUG: struct IRExpression: Depth: 0
+DEBUG: base: IRNode Depth: 0
+DEBUG: expr_type: IRExprType Depth: 0
+DEBUG: value: @str Depth: 0
+DEBUG: children: @list[IRExpression] Depth: 0
+DEBUG: struct IRType: Depth: 0
+DEBUG: name: @str Depth: 0
+DEBUG: generics: @list[IRType] Depth: 0
+DEBUG: is_reference: @bool Depth: 0
+DEBUG: is_mutable: @bool Depth: 0
+✅ Generated ir/ir_nodes.rs
+Transpiling lexer/lexer.mn -> lexer/lexer.rs
+DEBUG: @imp compiler.lexer.token Depth: 0
+DEBUG: fn tokenize(source: @str) -> @list[Token]: Depth: 0
+DEBUG: var l_pos = @int(0) Depth: 0
+DEBUG: var l_len = len(source) Depth: 0
+DEBUG: var l_tokens = @list[] Depth: 0
+DEBUG: var indent_stack = @list[0] Depth: 0
+DEBUG: var at_line_start = @bool(true) Depth: 0
+DEBUG: while l_pos < l_len: Depth: 0
+DEBUG: let ch = source[l_pos] Depth: 0
+DEBUG: if at_line_start and ch != " " and ch != "\t" and ch != "\n" and ch != "\x23": Depth: 0
+DEBUG: at_line_start = @bool(false) Depth: 0
+DEBUG: if ch == " " or ch == "\t" or ch == "\r": Depth: 0
+DEBUG: if at_line_start: Depth: 0
+DEBUG: var indent = @int(0) Depth: 0
+DEBUG: while l_pos < l_len: Depth: 0
+DEBUG: let c = source[l_pos] Depth: 0
+DEBUG: if c == " ": indent = indent + 1 Depth: 0
+DEBUG: elif c == "\t": indent = indent + 4 Depth: 0
+DEBUG: elif c == " " or c == "\t" or c == "\r": indent = indent + 0 Depth: 0
+DEBUG: else: break Depth: 0
+DEBUG: l_pos = l_pos + 1 Depth: 0
+DEBUG: if l_pos < l_len: Depth: 0
+DEBUG: let c2 = source[l_pos] Depth: 0
+DEBUG: if c2 != "\n" and c2 != "\x23": Depth: 0
+DEBUG: let s_size = len(indent_stack) Depth: 0
+DEBUG: let last_indent = indent_stack[s_size - 1] Depth: 0
+DEBUG: if indent > last_indent: Depth: 0
+DEBUG: indent_stack.add(indent) Depth: 0
+DEBUG: l_tokens.add(Token{token_type: TokenType.Indent, value: "", line: 1, column: 1}) Depth: 0
+DEBUG: elif indent < last_indent: Depth: 0
+DEBUG: var cur_size = len(indent_stack) Depth: 0
+DEBUG: while cur_size > 1 and indent_stack[cur_size - 1] > indent: Depth: 0
+DEBUG: indent_stack.remove(cur_size - 1) Depth: 0
+DEBUG: l_tokens.add(Token{token_type: TokenType.Dedent, value: "", line: 1, column: 1}) Depth: 0
+DEBUG: cur_size = len(indent_stack) Depth: 0
+DEBUG: at_line_start = @bool(false) Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: l_pos = l_pos + 1 Depth: 0
+DEBUG: elif ch == "\n": Depth: 0
+DEBUG: l_tokens.add(Token{token_type: TokenType.Newline, value: "\n", line: 1, column: 1}) Depth: 0
+DEBUG: l_pos = l_pos + 1 Depth: 0
+DEBUG: at_line_start = @bool(true) Depth: 0
+DEBUG: elif ch == "\x23": Depth: 0
+DEBUG: while l_pos < l_len and source[l_pos] != "\n": Depth: 0
+DEBUG: l_pos = l_pos + 1 Depth: 0
+DEBUG: elif (ch >= "a" and ch <= "z") or (ch >= "A" and ch <= "Z") or ch == "_" or ch == "@": Depth: 0
+DEBUG: if at_line_start: Depth: 0
+DEBUG: let s_size_0 = len(indent_stack) Depth: 0
+DEBUG: let last_0 = indent_stack[s_size_0 - 1] Depth: 0
+DEBUG: if last_0 > 0: Depth: 0
+DEBUG: while len(indent_stack) > 1 and indent_stack[len(indent_stack) - 1] > 0: Depth: 0
+DEBUG: indent_stack.remove(len(indent_stack) - 1) Depth: 0
+DEBUG: l_tokens.add(Token{token_type: TokenType.Dedent, value: "", line: 1, column: 1}) Depth: 0
+DEBUG: at_line_start = @bool(false) Depth: 0
+DEBUG: var ident = ch Depth: 0
+DEBUG: l_pos = l_pos + 1 Depth: 0
+DEBUG: while l_pos < l_len: Depth: 0
+DEBUG: let c = source[l_pos] Depth: 0
+DEBUG: if (c >= "a" and c <= "z") or (c >= "A" and c <= "Z") or (c >= "0" and c <= "9") or c == "_" or c == "@": Depth: 0
+DEBUG: ident = ident + c Depth: 0
+DEBUG: l_pos = l_pos + 1 Depth: 0
+DEBUG: else: break Depth: 0
+DEBUG: var t = TokenType.Identifier Depth: 0
+DEBUG: if token.is_keyword(ident): Depth: 0
+DEBUG: t = token.get_keyword_type(ident) Depth: 0
+DEBUG: l_tokens.add(Token{token_type: t, value: ident, line: 1, column: 1}) Depth: 0
+DEBUG: elif ch >= "0" and ch <= "9": Depth: 0
+DEBUG: if at_line_start: Depth: 0
+DEBUG: while len(indent_stack) > 1: Depth: 0
+DEBUG: indent_stack.remove(len(indent_stack)-1) Depth: 0
+DEBUG: l_tokens.add(Token{token_type: TokenType.Dedent, value: "", line: 1, column: 1}) Depth: 0
+DEBUG: at_line_start = @bool(false) Depth: 0
+DEBUG: var num = ch Depth: 0
+DEBUG: l_pos = l_pos + 1 Depth: 0
+DEBUG: while l_pos < l_len: Depth: 0
+DEBUG: let c = source[l_pos] Depth: 0
+DEBUG: if c >= "0" and c <= "9": Depth: 0
+DEBUG: num = num + c Depth: 0
+DEBUG: l_pos = l_pos + 1 Depth: 0
+DEBUG: else: break Depth: 0
+DEBUG: l_tokens.add(Token{token_type: TokenType.Integer, value: num, line: 1, column: 1}) Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: if at_line_start: Depth: 0
+DEBUG: while len(indent_stack) > 1: Depth: 0
+DEBUG: indent_stack.remove(len(indent_stack)-1) Depth: 0
+DEBUG: l_tokens.add(Token{token_type: TokenType.Dedent, value: "", line: 1, column: 1}) Depth: 0
+DEBUG: at_line_start = @bool(false) Depth: 0
+DEBUG: var t_p = TokenType.Error Depth: 0
+DEBUG: if ch == "+": t_p = TokenType.Plus Depth: 0
+DEBUG: elif ch == "-": t_p = TokenType.Minus Depth: 0
+DEBUG: elif ch == "*": t_p = TokenType.Star Depth: 0
+DEBUG: elif ch == "/": t_p = TokenType.Slash Depth: 0
+DEBUG: elif ch == "=": t_p = TokenType.Equal Depth: 0
+DEBUG: elif ch == "\x3a": t_p = TokenType.Colon Depth: 0
+DEBUG: elif ch == ",": t_p = TokenType.Comma Depth: 0
+DEBUG: elif ch == "(": t_p = TokenType.LeftParen Depth: 0
+DEBUG: elif ch == ")": t_p = TokenType.RightParen Depth: 0
+DEBUG: l_tokens.add(Token{token_type: t_p, value: ch, line: 1, column: 1}) Depth: 0
+DEBUG: l_pos = l_pos + 1 Depth: 0
+DEBUG: while len(indent_stack) > 1: Depth: 0
+DEBUG: indent_stack.remove(len(indent_stack)-1) Depth: 0
+DEBUG: l_tokens.add(Token{token_type: TokenType.Dedent, value: "", line: 1, column: 1}) Depth: 0
+DEBUG: l_tokens.add(Token{token_type: TokenType.Eof, value: "", line: 1, column: 1}) Depth: 0
+DEBUG: return l_tokens Depth: 0
+✅ Generated lexer/lexer.rs
+Transpiling lexer/token.mn -> lexer/token.rs
+DEBUG: @imp std.collections Depth: 0
+DEBUG: enum TokenType: Depth: 0
+DEBUG: Integer Depth: 0
+DEBUG: Float Depth: 0
+DEBUG: String Depth: 0
+DEBUG: Boolean Depth: 0
+DEBUG: Identifier Depth: 0
+DEBUG: Let Depth: 0
+DEBUG: Var Depth: 0
+DEBUG: Fn Depth: 0
+DEBUG: Async Depth: 0
+DEBUG: Struct Depth: 0
+DEBUG: Enum Depth: 0
+DEBUG: Match Depth: 0
+DEBUG: If Depth: 0
+DEBUG: Elif Depth: 0
+DEBUG: Else Depth: 0
+DEBUG: For Depth: 0
+DEBUG: While Depth: 0
+DEBUG: Loop Depth: 0
+DEBUG: In Depth: 0
+DEBUG: Break Depth: 0
+DEBUG: Continue Depth: 0
+DEBUG: Return Depth: 0
+DEBUG: Try Depth: 0
+DEBUG: Catch Depth: 0
+DEBUG: Finally Depth: 0
+DEBUG: AtImp Depth: 0
+DEBUG: AtPython Depth: 0
+DEBUG: AtRust Depth: 0
+DEBUG: AtSql Depth: 0
+DEBUG: AtJs Depth: 0
+DEBUG: AtUi Depth: 0
+DEBUG: AtInt Depth: 0
+DEBUG: AtFloat Depth: 0
+DEBUG: AtStr Depth: 0
+DEBUG: AtBool Depth: 0
+DEBUG: AtList Depth: 0
+DEBUG: AtTuple Depth: 0
+DEBUG: AtSet Depth: 0
+DEBUG: AtDict Depth: 0
+DEBUG: Borrow Depth: 0
+DEBUG: Ref Depth: 0
+DEBUG: Move Depth: 0
+DEBUG: Kept Depth: 0
+DEBUG: Plus Depth: 0
+DEBUG: Minus Depth: 0
+DEBUG: Star Depth: 0
+DEBUG: Slash Depth: 0
+DEBUG: Percent Depth: 0
+DEBUG: DoubleStar Depth: 0
+DEBUG: EqualEqual Depth: 0
+DEBUG: NotEqual Depth: 0
+DEBUG: Greater Depth: 0
+DEBUG: GreaterEq Depth: 0
+DEBUG: Less Depth: 0
+DEBUG: LessEq Depth: 0
+DEBUG: And Depth: 0
+DEBUG: Or Depth: 0
+DEBUG: Not Depth: 0
+DEBUG: Equal Depth: 0
+DEBUG: PlusEq Depth: 0
+DEBUG: MinusEq Depth: 0
+DEBUG: StarEq Depth: 0
+DEBUG: SlashEq Depth: 0
+DEBUG: LeftParen Depth: 0
+DEBUG: RightParen Depth: 0
+DEBUG: LeftBrace Depth: 0
+DEBUG: RightBrace Depth: 0
+DEBUG: LeftBracket Depth: 0
+DEBUG: RightBracket Depth: 0
+DEBUG: Comma Depth: 0
+DEBUG: Colon Depth: 0
+DEBUG: Semicolon Depth: 0
+DEBUG: Dot Depth: 0
+DEBUG: Arrow Depth: 0
+DEBUG: FatArrow Depth: 0
+DEBUG: DotDot Depth: 0
+DEBUG: DotDotEq Depth: 0
+DEBUG: Newline Depth: 0
+DEBUG: Indent Depth: 0
+DEBUG: Dedent Depth: 0
+DEBUG: Eof Depth: 0
+DEBUG: Comment Depth: 0
+DEBUG: Error Depth: 0
+DEBUG: Mn Depth: 0
+DEBUG: struct Token: Depth: 0
+DEBUG: token_type: TokenType Depth: 0
+DEBUG: value: @str Depth: 0
+DEBUG: line: @int Depth: 0
+DEBUG: column: @int Depth: 0
+DEBUG: impl Token: Depth: 0
+DEBUG: fn to_string(ref self) -> @str: Depth: 0
+DEBUG: return format!("{self.token_type}('{self.value}') at {self.line}:{self.column}") Depth: 0
+DEBUG: fn is_keyword(self) -> @bool: Depth: 0
+DEBUG: """Check if token is a keyword""" Depth: 0
+DEBUG: let keywords = @set{ Depth: 0
+DEBUG: TokenType.Let, TokenType.Var, TokenType.Fn, Depth: 0
+DEBUG: TokenType.Async, TokenType.Struct, TokenType.Enum, Depth: 0
+DEBUG: TokenType.Match, TokenType.If, TokenType.Elif, Depth: 0
+DEBUG: TokenType.Else, TokenType.For, TokenType.While, Depth: 0
+DEBUG: TokenType.Loop, TokenType.In, TokenType.Break, Depth: 0
+DEBUG: TokenType.Continue, TokenType.Return, TokenType.Try, Depth: 0
+DEBUG: TokenType.Catch, TokenType.Finally, TokenType.Mn Depth: 0
+DEBUG: }; Depth: 0
+DEBUG: return self.token_type in keywords Depth: 0
+DEBUG: fn is_operator(self) -> @bool: Depth: 0
+DEBUG: """Check if token is an operator""" Depth: 0
+DEBUG: let operators = @set{ Depth: 0
+DEBUG: TokenType.Plus, TokenType.Minus, TokenType.Star, Depth: 0
+DEBUG: TokenType.Slash, TokenType.Percent, TokenType.DoubleStar, Depth: 0
+DEBUG: TokenType.EqualEqual, TokenType.NotEqual, Depth: 0
+DEBUG: TokenType.Greater, TokenType.GreaterEq, Depth: 0
+DEBUG: TokenType.Less, TokenType.LessEq, Depth: 0
+DEBUG: TokenType.And, TokenType.Or, TokenType.Not Depth: 0
+DEBUG: }; Depth: 0
+DEBUG: return self.token_type in operators Depth: 0
+DEBUG: fn is_literal(self) -> @bool: Depth: 0
+DEBUG: """Check if token is a literal value""" Depth: 0
+DEBUG: let literals = @set{ Depth: 0
+DEBUG: TokenType.Integer, TokenType.Float, Depth: 0
+DEBUG: TokenType.String, TokenType.Boolean Depth: 0
+DEBUG: }; Depth: 0
+DEBUG: return self.token_type in literals Depth: 0
+DEBUG: fn create_token(token_type: TokenType, value: @str, line: @int, column: @int) -> Token: Depth: 0
+DEBUG: let t = Token{ Depth: 0
+DEBUG: token_type: token_type, Depth: 0
+DEBUG: value: value, Depth: 0
+DEBUG: line: line, Depth: 0
+DEBUG: column: column, Depth: 0
+DEBUG: }; Depth: 0
+DEBUG: return t Depth: 0
+DEBUG: fn get_keyword_type(word: @str) -> TokenType: Depth: 0
+DEBUG: """Get the token type for a keyword""" Depth: 0
+DEBUG: if word == "let": Depth: 0
+DEBUG: return TokenType.Let Depth: 0
+DEBUG: elif word == "var": Depth: 0
+DEBUG: return TokenType.Var Depth: 0
+DEBUG: elif word == "fn": Depth: 0
+DEBUG: return TokenType.Fn Depth: 0
+DEBUG: elif word == "async": Depth: 0
+DEBUG: return TokenType.Async Depth: 0
+DEBUG: elif word == "struct": Depth: 0
+DEBUG: return TokenType.Struct Depth: 0
+DEBUG: elif word == "enum": Depth: 0
+DEBUG: return TokenType.Enum Depth: 0
+DEBUG: elif word == "match": Depth: 0
+DEBUG: return TokenType.Match Depth: 0
+DEBUG: elif word == "if": Depth: 0
+DEBUG: return TokenType.If Depth: 0
+DEBUG: elif word == "elif": Depth: 0
+DEBUG: return TokenType.Elif Depth: 0
+DEBUG: elif word == "else": Depth: 0
+DEBUG: return TokenType.Else Depth: 0
+DEBUG: elif word == "for": Depth: 0
+DEBUG: return TokenType.For Depth: 0
+DEBUG: elif word == "while": Depth: 0
+DEBUG: return TokenType.While Depth: 0
+DEBUG: elif word == "loop": Depth: 0
+DEBUG: return TokenType.Loop Depth: 0
+DEBUG: elif word == "in": Depth: 0
+DEBUG: return TokenType.In Depth: 0
+DEBUG: elif word == "break": Depth: 0
+DEBUG: return TokenType.Break Depth: 0
+DEBUG: elif word == "continue": Depth: 0
+DEBUG: return TokenType.Continue Depth: 0
+DEBUG: elif word == "return": Depth: 0
+DEBUG: return TokenType.Return Depth: 0
+DEBUG: elif word == "try": Depth: 0
+DEBUG: return TokenType.Try Depth: 0
+DEBUG: elif word == "catch": Depth: 0
+DEBUG: return TokenType.Catch Depth: 0
+DEBUG: elif word == "finally": Depth: 0
+DEBUG: return TokenType.Finally Depth: 0
+DEBUG: elif word == "mn": Depth: 0
+DEBUG: return TokenType.Mn Depth: 0
+DEBUG: elif word == "borrow": Depth: 0
+DEBUG: return TokenType.Borrow Depth: 0
+DEBUG: elif word == "ref": Depth: 0
+DEBUG: return TokenType.Ref Depth: 0
+DEBUG: elif word == "move": Depth: 0
+DEBUG: return TokenType.Move Depth: 0
+DEBUG: elif word == "kept": Depth: 0
+DEBUG: return TokenType.Kept Depth: 0
+DEBUG: elif word == "and": Depth: 0
+DEBUG: return TokenType.And Depth: 0
+DEBUG: elif word == "or": Depth: 0
+DEBUG: return TokenType.Or Depth: 0
+DEBUG: elif word == "not": Depth: 0
+DEBUG: return TokenType.Not Depth: 0
+DEBUG: elif word == "true": Depth: 0
+DEBUG: return TokenType.Boolean Depth: 0
+DEBUG: elif word == "false": Depth: 0
+DEBUG: return TokenType.Boolean Depth: 0
+DEBUG: return TokenType.Error Depth: 0
+DEBUG: fn is_keyword(word: @str) -> @bool: Depth: 0
+DEBUG: """Check if word is a reserved keyword""" Depth: 0
+DEBUG: return get_keyword_type(word) != TokenType.Error Depth: 0
+DEBUG: fn get_type_constructor_type(text: @str) -> TokenType: Depth: 0
+DEBUG: """Get the token type for a type constructor""" Depth: 0
+DEBUG: if text.len() < 2 or text.as_bytes()[0] != 64: Depth: 0
+DEBUG: return TokenType.Error Depth: 0
+DEBUG: let suffix = &text[1..] Depth: 0
+DEBUG: if suffix == "int": Depth: 0
+DEBUG: return TokenType.AtInt Depth: 0
+DEBUG: elif suffix == "float": Depth: 0
+DEBUG: return TokenType.AtFloat Depth: 0
+DEBUG: elif suffix == "str": Depth: 0
+DEBUG: return TokenType.AtStr Depth: 0
+DEBUG: elif suffix == "bool": Depth: 0
+DEBUG: return TokenType.AtBool Depth: 0
+DEBUG: elif suffix == "list": Depth: 0
+DEBUG: return TokenType.AtList Depth: 0
+DEBUG: elif suffix == "tuple": Depth: 0
+DEBUG: return TokenType.AtTuple Depth: 0
+DEBUG: elif suffix == "set": Depth: 0
+DEBUG: return TokenType.AtSet Depth: 0
+DEBUG: elif suffix == "dict": Depth: 0
+DEBUG: return TokenType.AtDict Depth: 0
+DEBUG: return TokenType.Error Depth: 0
+DEBUG: fn is_type_constructor(text: @str) -> @bool: Depth: 0
+DEBUG: """Check if text is a type constructor""" Depth: 0
+DEBUG: return get_type_constructor_type(text) != TokenType.Error Depth: 0
+DEBUG: fn get_decorator_type(text: @str) -> TokenType: Depth: 0
+DEBUG: """Get the token type for a decorator""" Depth: 0
+DEBUG: if text.len() < 2 or text.as_bytes()[0] != 64: Depth: 0
+DEBUG: return TokenType.Error Depth: 0
+DEBUG: let suffix = &text[1..] Depth: 0
+DEBUG: if suffix == "imp": Depth: 0
+DEBUG: return TokenType.AtImp Depth: 0
+DEBUG: elif suffix == "python": Depth: 0
+DEBUG: return TokenType.AtPython Depth: 0
+DEBUG: elif suffix == "rust": Depth: 0
+DEBUG: return TokenType.AtRust Depth: 0
+DEBUG: elif suffix == "sql": Depth: 0
+DEBUG: return TokenType.AtSql Depth: 0
+DEBUG: elif suffix == "js": Depth: 0
+DEBUG: return TokenType.AtJs Depth: 0
+DEBUG: elif suffix == "ui": Depth: 0
+DEBUG: return TokenType.AtUi Depth: 0
+DEBUG: return TokenType.Error Depth: 0
+DEBUG: fn is_decorator(text: @str) -> @bool: Depth: 0
+DEBUG: """Check if text is a decorator/annotation""" Depth: 0
+DEBUG: return get_decorator_type(text) != TokenType.Error Depth: 0
+✅ Generated lexer/token.rs
+Transpiling builtins/codegen_helpers.mn -> builtins/codegen_helpers.rs
+DEBUG: @imp std.collections Depth: 0
+DEBUG: fn escape_string(s: @str) -> @str: Depth: 0
+DEBUG: """Properly escape string literals for Rust output""" Depth: 0
+DEBUG: var result = "" Depth: 0
+DEBUG: var i = @int(0) Depth: 0
+DEBUG: let length = len(s) Depth: 0
+DEBUG: while i < length: Depth: 0
+DEBUG: let ch = s[i] Depth: 0
+DEBUG: if ch == "\\": Depth: 0
+DEBUG: if i + 1 < length: Depth: 0
+DEBUG: let next = s[i + 1] Depth: 0
+DEBUG: if next == "n": Depth: 0
+DEBUG: result = result + "\\n" Depth: 0
+DEBUG: i = i + 2 Depth: 0
+DEBUG: elif next == "t": Depth: 0
+DEBUG: result = result + "\\t" Depth: 0
+DEBUG: i = i + 2 Depth: 0
+DEBUG: elif next == "r": Depth: 0
+DEBUG: result = result + "\\r" Depth: 0
+DEBUG: i = i + 2 Depth: 0
+DEBUG: elif next == "\\": Depth: 0
+DEBUG: result = result + "\\\\" Depth: 0
+DEBUG: i = i + 2 Depth: 0
+DEBUG: elif next == "\"": Depth: 0
+DEBUG: result = result + "\\\"" Depth: 0
+DEBUG: i = i + 2 Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: result = result + ch Depth: 0
+DEBUG: i = i + 1 Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: result = result + ch Depth: 0
+DEBUG: i = i + 1 Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: result = result + ch Depth: 0
+DEBUG: i = i + 1 Depth: 0
+DEBUG: return result Depth: 0
+DEBUG: fn quote_string(s: @str) -> @str: Depth: 0
+DEBUG: """Wrap string in quotes with proper escaping""" Depth: 0
+DEBUG: return "\"" + escape_string(s) + "\"" Depth: 0
+DEBUG: fn gul_type_to_rust(gul_type: @str) -> @str: Depth: 0
+DEBUG: """Convert GUL type annotation to Rust type""" Depth: 0
+DEBUG: if gul_type == "@int": Depth: 0
+DEBUG: return "i64" Depth: 0
+DEBUG: elif gul_type == "@flt" or gul_type == "@float": Depth: 0
+DEBUG: return "f64" Depth: 0
+DEBUG: elif gul_type == "@str": Depth: 0
+DEBUG: return "String" Depth: 0
+DEBUG: elif gul_type == "@bool": Depth: 0
+DEBUG: return "bool" Depth: 0
+DEBUG: elif gul_type == "@list": Depth: 0
+DEBUG: return "Vec" Depth: 0
+DEBUG: elif gul_type == "@dict": Depth: 0
+DEBUG: return "HashMap" Depth: 0
+DEBUG: elif gul_type == "@set": Depth: 0
+DEBUG: return "HashSet" Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: return gul_type Depth: 0
+DEBUG: fn gul_generic_to_rust(type_str: @str) -> @str: Depth: 0
+DEBUG: """Convert @list[T] to Vec<T>""" Depth: 0
+DEBUG: if type_str.startswith("@list["): Depth: 0
+DEBUG: let inner = type_str.substring(6, len(type_str) - 1) Depth: 0
+DEBUG: return "Vec<" + gul_type_to_rust(inner) + ">" Depth: 0
+DEBUG: elif type_str.startswith("@dict["): Depth: 0
+DEBUG: let inner = type_str.substring(6, len(type_str) - 1) Depth: 0
+DEBUG: return "HashMap<" + inner + ">" Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: return gul_type_to_rust(type_str) Depth: 0
+DEBUG: fn self_param_to_rust(param: @str) -> @str: Depth: 0
+DEBUG: """Convert GUL self params to Rust style""" Depth: 0
+DEBUG: if param == "self": Depth: 0
+DEBUG: return "&self" Depth: 0
+DEBUG: elif param == "ref self": Depth: 0
+DEBUG: return "&mut self" Depth: 0
+DEBUG: elif param == "own self": Depth: 0
+DEBUG: return "self" Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: return param Depth: 0
+DEBUG: fn struct_method_signature(name: @str, params: @list[@str], return_type: @str, receiver: @str) -> @str: Depth: 0
+DEBUG: """Generate Rust method signature""" Depth: 0
+DEBUG: var result = "fn " + name + "(" Depth: 0
+DEBUG: if receiver != "": Depth: 0
+DEBUG: result = result + self_param_to_rust(receiver) Depth: 0
+DEBUG: if len(params) > 0: Depth: 0
+DEBUG: result = result + ", " Depth: 0
+DEBUG: var first = @bool(true) Depth: 0
+DEBUG: for p in params: Depth: 0
+DEBUG: if not first: Depth: 0
+DEBUG: result = result + ", " Depth: 0
+DEBUG: result = result + p Depth: 0
+DEBUG: first = @bool(false) Depth: 0
+DEBUG: result = result + ")" Depth: 0
+DEBUG: if return_type != "": Depth: 0
+DEBUG: result = result + " -> " + gul_type_to_rust(return_type) Depth: 0
+DEBUG: return result Depth: 0
+DEBUG: fn indent_code(code: @str, level: @int) -> @str: Depth: 0
+DEBUG: """Add indentation to code block""" Depth: 0
+DEBUG: var indent = "" Depth: 0
+DEBUG: var i = @int(0) Depth: 0
+DEBUG: while i < level: Depth: 0
+DEBUG: indent = indent + "    " Depth: 0
+DEBUG: i = i + 1 Depth: 0
+DEBUG: var result = "" Depth: 0
+DEBUG: let lines = code.split("\n") Depth: 0
+DEBUG: for line in lines: Depth: 0
+DEBUG: if len(line) > 0: Depth: 0
+DEBUG: result = result + indent + line + "\n" Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: result = result + "\n" Depth: 0
+DEBUG: return result Depth: 0
+DEBUG: fn wrap_in_braces(code: @str) -> @str: Depth: 0
+DEBUG: """Wrap code block in braces""" Depth: 0
+DEBUG: return "{\n" + code + "}\n" Depth: 0
+✅ Generated builtins/codegen_helpers.rs
+Transpiling codegen/rust_backend.mn -> codegen/rust_backend.rs
+DEBUG: @imp std.collections Depth: 0
+DEBUG: @imp std.io Depth: 0
+DEBUG: @imp compiler.ast.nodes Depth: 0
+DEBUG: struct CodeGenerator: Depth: 0
+DEBUG: output: @list[@str] Depth: 0
+DEBUG: indent_level: @int Depth: 0
+DEBUG: impl CodeGenerator: Depth: 0
+DEBUG: fn create() -> CodeGenerator: Depth: 0
+DEBUG: return CodeGenerator { Depth: 0
+DEBUG: output: @list[], Depth: 0
+DEBUG: indent_level: @int(0) Depth: 0
+DEBUG: } Depth: 0
+DEBUG: fn indent(ref self): Depth: 0
+DEBUG: """Increase indentation level""" Depth: 0
+DEBUG: self.indent_level = self.indent_level + 1 Depth: 0
+DEBUG: fn dedent(ref self): Depth: 0
+DEBUG: """Decrease indentation level""" Depth: 0
+DEBUG: if self.indent_level > 0: Depth: 0
+DEBUG: self.indent_level = self.indent_level - 1 Depth: 0
+DEBUG: fn emit(ref self, code: @str): Depth: 0
+DEBUG: """Emit a line of code with current indentation""" Depth: 0
+DEBUG: let indent_str = "    " * self.indent_level Depth: 0
+DEBUG: self.output.add(indent_str + code) Depth: 0
+DEBUG: fn emit_raw(ref self, code: @str): Depth: 0
+DEBUG: """Emit code without indentation""" Depth: 0
+DEBUG: self.output.add(code) Depth: 0
+DEBUG: fn get_output(self) -> @str: Depth: 0
+DEBUG: """Get generated code as string""" Depth: 0
+DEBUG: return "\n".join(self.output) Depth: 0
+DEBUG: fn generate_program(ref self, program: Program): Depth: 0
+DEBUG: """Generate code for entire program""" Depth: 0
+DEBUG: self.emit_raw("// Generated by GUL compiler") Depth: 0
+DEBUG: self.emit_raw("") Depth: 0
+DEBUG: for import_stmt in program.imports: Depth: 0
+DEBUG: self.generate_import(import_stmt) Depth: 0
+DEBUG: if len(program.imports) > 0: Depth: 0
+DEBUG: self.emit_raw("") Depth: 0
+DEBUG: for stmt in program.statements: Depth: 0
+DEBUG: self.generate_statement(stmt) Depth: 0
+DEBUG: if len(program.main_entry) > 0: Depth: 0
+DEBUG: self.emit_raw("") Depth: 0
+DEBUG: self.emit("fn main() {") Depth: 0
+DEBUG: self.indent() Depth: 0
+DEBUG: for stmt in program.main_entry: Depth: 0
+DEBUG: self.generate_statement(stmt) Depth: 0
+DEBUG: self.dedent() Depth: 0
+DEBUG: self.emit("}") Depth: 0
+DEBUG: fn generate_statement(ref self, stmt: Statement): Depth: 0
+DEBUG: let st = stmt.stmt_type Depth: 0
+DEBUG: if st == StmtType.LetDecl: self.generate_let(stmt) Depth: 0
+DEBUG: elif st == StmtType.VarDecl: self.generate_var(stmt) Depth: 0
+DEBUG: elif st == StmtType.FunctionDecl: self.generate_function(stmt) Depth: 0
+DEBUG: elif st == StmtType.IfStmt: self.generate_if(stmt) Depth: 0
+DEBUG: elif st == StmtType.WhileStmt: self.generate_while(stmt) Depth: 0
+DEBUG: elif st == StmtType.ForStmt: self.generate_for(stmt) Depth: 0
+DEBUG: elif st == StmtType.ReturnStmt: self.generate_return(stmt) Depth: 0
+DEBUG: elif st == StmtType.AssignmentStmt: self.generate_assignment(stmt) Depth: 0
+DEBUG: elif st == StmtType.ExpressionStmt: self.generate_expression_stmt(stmt) Depth: 0
+DEBUG: fn generate_let(ref self, stmt: LetStmt): Depth: 0
+DEBUG: """Generate let declaration""" Depth: 0
+DEBUG: var code = "let " + stmt.name Depth: 0
+DEBUG: if stmt.type_annotation: code = code + ": " + self.map_type(stmt.type_annotation) Depth: 0
+DEBUG: code = code + " = " + self.generate_expression_str(stmt.value) + ";" Depth: 0
+DEBUG: self.emit(code) Depth: 0
+DEBUG: fn generate_var(ref self, stmt: VarStmt): Depth: 0
+DEBUG: """Generate var declaration (mutable)""" Depth: 0
+DEBUG: var code = "let mut " + stmt.name Depth: 0
+DEBUG: if stmt.type_annotation: code = code + ": " + self.map_type(stmt.type_annotation) Depth: 0
+DEBUG: code = code + " = " + self.generate_expression_str(stmt.value) + ";" Depth: 0
+DEBUG: self.emit(code) Depth: 0
+DEBUG: fn generate_function(ref self, stmt: FunctionDecl): Depth: 0
+DEBUG: """Generate function declaration""" Depth: 0
+DEBUG: var signature = "fn " + stmt.name + "(" Depth: 0
+DEBUG: var params = @list[] Depth: 0
+DEBUG: for param in stmt.parameters: Depth: 0
+DEBUG: var param_str = param.name Depth: 0
+DEBUG: if param.type_annotation: param_str = param_str + ": " + self.map_type(param.type_annotation) Depth: 0
+DEBUG: params.add(param_str) Depth: 0
+DEBUG: signature = signature + ", ".join(params) + ")" Depth: 0
+DEBUG: if stmt.return_type: signature = signature + " -> " + self.map_type(stmt.return_type) Depth: 0
+DEBUG: signature = signature + " {" Depth: 0
+DEBUG: self.emit(signature) Depth: 0
+DEBUG: self.indent() Depth: 0
+DEBUG: for body_stmt in stmt.body: self.generate_statement(body_stmt) Depth: 0
+DEBUG: self.dedent() Depth: 0
+DEBUG: self.emit("}") Depth: 0
+DEBUG: self.emit_raw("") Depth: 0
+DEBUG: fn generate_if(ref self, stmt: IfStmt): Depth: 0
+DEBUG: """Generate if statement""" Depth: 0
+DEBUG: let condition = self.generate_expression_str(stmt.condition) Depth: 0
+DEBUG: self.emit("if " + condition + " {") Depth: 0
+DEBUG: self.indent() Depth: 0
+DEBUG: for s in stmt.then_body: Depth: 0
+DEBUG: self.generate_statement(s) Depth: 0
+DEBUG: self.dedent() Depth: 0
+DEBUG: for elif_clause in stmt.elif_clauses: Depth: 0
+DEBUG: let elif_cond = self.generate_expression_str(elif_clause.condition) Depth: 0
+DEBUG: self.emit("} else if " + elif_cond + " {") Depth: 0
+DEBUG: self.indent() Depth: 0
+DEBUG: for s in elif_clause.body: Depth: 0
+DEBUG: self.generate_statement(s) Depth: 0
+DEBUG: self.dedent() Depth: 0
+DEBUG: if len(stmt.else_body) > 0: Depth: 0
+DEBUG: self.emit("} else {") Depth: 0
+DEBUG: self.indent() Depth: 0
+DEBUG: for s in stmt.else_body: Depth: 0
+DEBUG: self.generate_statement(s) Depth: 0
+DEBUG: self.dedent() Depth: 0
+DEBUG: self.emit("}") Depth: 0
+DEBUG: fn generate_while(ref self, stmt: WhileStmt): Depth: 0
+DEBUG: """Generate while loop""" Depth: 0
+DEBUG: let condition = self.generate_expression_str(stmt.condition) Depth: 0
+DEBUG: self.emit("while " + condition + " {") Depth: 0
+DEBUG: self.indent() Depth: 0
+DEBUG: for s in stmt.body: Depth: 0
+DEBUG: self.generate_statement(s) Depth: 0
+DEBUG: self.dedent() Depth: 0
+DEBUG: self.emit("}") Depth: 0
+DEBUG: fn generate_for(ref self, stmt: ForStmt): Depth: 0
+DEBUG: """Generate for loop""" Depth: 0
+DEBUG: let iterable = self.generate_expression_str(stmt.iterable) Depth: 0
+DEBUG: self.emit("for " + stmt.variable + " in " + iterable + " {") Depth: 0
+DEBUG: self.indent() Depth: 0
+DEBUG: for s in stmt.body: Depth: 0
+DEBUG: self.generate_statement(s) Depth: 0
+DEBUG: self.dedent() Depth: 0
+DEBUG: self.emit("}") Depth: 0
+DEBUG: fn generate_return(ref self, stmt: ReturnStmt): Depth: 0
+DEBUG: """Generate return statement""" Depth: 0
+DEBUG: if stmt.value: Depth: 0
+DEBUG: let value = self.generate_expression_str(stmt.value) Depth: 0
+DEBUG: self.emit("return " + value + ";") Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: self.emit("return;") Depth: 0
+DEBUG: fn generate_assignment(ref self, stmt: AssignmentStmt): Depth: 0
+DEBUG: """Generate assignment""" Depth: 0
+DEBUG: let target = self.generate_expression_str(stmt.target) Depth: 0
+DEBUG: let value = self.generate_expression_str(stmt.value) Depth: 0
+DEBUG: var op = "=" Depth: 0
+DEBUG: if stmt.operator == TokenType.PlusEq: Depth: 0
+DEBUG: op = "+=" Depth: 0
+DEBUG: elif stmt.operator == TokenType.MinusEq: Depth: 0
+DEBUG: op = "-=" Depth: 0
+DEBUG: elif stmt.operator == TokenType.StarEq: Depth: 0
+DEBUG: op = "*=" Depth: 0
+DEBUG: elif stmt.operator == TokenType.SlashEq: Depth: 0
+DEBUG: op = "/=" Depth: 0
+DEBUG: self.emit(target + " " + op + " " + value + ";") Depth: 0
+DEBUG: fn generate_expression_stmt(ref self, stmt: ExpressionStmt): Depth: 0
+DEBUG: """Generate expression statement""" Depth: 0
+DEBUG: let expr = self.generate_expression_str(stmt.expression) Depth: 0
+DEBUG: self.emit(expr + ";") Depth: 0
+DEBUG: fn generate_import(ref self, stmt: ImportStmt): Depth: 0
+DEBUG: """Generate import (as Rust use statement)""" Depth: 0
+DEBUG: let module = "::".join(stmt.module_path) Depth: 0
+DEBUG: if len(stmt.items) > 0: Depth: 0
+DEBUG: let items = ", ".join(items) Depth: 0
+DEBUG: self.emit_raw("use " + module + "::{" + items + "};") Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: self.emit_raw("use " + module + ";") Depth: 0
+DEBUG: fn generate_expression_str(ref self, expr: Expression) -> @str: Depth: 0
+DEBUG: let et = expr.expr_type Depth: 0
+DEBUG: if et == ExprType.IntegerLiteral: return self.generate_literal(@cast(LiteralExpr, expr)) Depth: 0
+DEBUG: if et == ExprType.FloatLiteral: return self.generate_literal(@cast(LiteralExpr, expr)) Depth: 0
+DEBUG: if et == ExprType.StringLiteral: return self.generate_string_literal(@cast(LiteralExpr, expr)) Depth: 0
+DEBUG: if et == ExprType.BooleanLiteral: return self.generate_literal(@cast(LiteralExpr, expr)) Depth: 0
+DEBUG: if et == ExprType.Identifier: return self.generate_identifier(@cast(IdentifierExpr, expr)) Depth: 0
+DEBUG: if et == ExprType.BinaryOp: return self.generate_binary_op(@cast(BinaryOpExpr, expr)) Depth: 0
+DEBUG: if et == ExprType.UnaryOp: return self.generate_unary_op(@cast(UnaryOpExpr, expr)) Depth: 0
+DEBUG: if et == ExprType.Call: return self.generate_call(@cast(CallExpr, expr)) Depth: 0
+DEBUG: if et == ExprType.Index: return self.generate_index(@cast(IndexExpr, expr)) Depth: 0
+DEBUG: if et == ExprType.Attribute: return self.generate_attribute(@cast(AttributeExpr, expr)) Depth: 0
+DEBUG: if et == ExprType.ListLiteral: return self.generate_list(@cast(ListExpr, expr)) Depth: 0
+DEBUG: if et == ExprType.TupleLiteral: return self.generate_tuple(@cast(TupleExpr, expr)) Depth: 0
+DEBUG: if et == ExprType.SetLiteral: return self.generate_set(@cast(SetExpr, expr)) Depth: 0
+DEBUG: if et == ExprType.DictLiteral: return self.generate_dict(@cast(DictExpr, expr)) Depth: 0
+DEBUG: if et == ExprType.TypeConstructor: return self.generate_type_constructor(@cast(TypeConstructorExpr, expr)) Depth: 0
+DEBUG: return "/* unsupported expression */" Depth: 0
+DEBUG: fn generate_literal(ref self, expr: LiteralExpr) -> @str: Depth: 0
+DEBUG: """Generate literal value""" Depth: 0
+DEBUG: return expr.value Depth: 0
+DEBUG: fn generate_string_literal(ref self, expr: LiteralExpr) -> @str: Depth: 0
+DEBUG: """Generate string literal with quotes""" Depth: 0
+DEBUG: return "\"" + expr.value + "\"" Depth: 0
+DEBUG: fn generate_identifier(ref self, expr: IdentifierExpr) -> @str: Depth: 0
+DEBUG: """Generate identifier""" Depth: 0
+DEBUG: return expr.name Depth: 0
+DEBUG: fn generate_binary_op(ref self, expr: BinaryOpExpr) -> @str: Depth: 0
+DEBUG: let left = self.generate_expression_str(expr.left) Depth: 0
+DEBUG: let right = self.generate_expression_str(expr.right) Depth: 0
+DEBUG: let op_t = expr.operator Depth: 0
+DEBUG: var op = "" Depth: 0
+DEBUG: if op_t == TokenType.Plus: op = "+" Depth: 0
+DEBUG: elif op_t == TokenType.Minus: op = "-" Depth: 0
+DEBUG: elif op_t == TokenType.Star: op = "*" Depth: 0
+DEBUG: elif op_t == TokenType.Slash: op = "/" Depth: 0
+DEBUG: elif op_t == TokenType.Percent: op = "%" Depth: 0
+DEBUG: elif op_t == TokenType.DoubleStar: return left + ".pow(" + right + ")" Depth: 0
+DEBUG: elif op_t == TokenType.EqualEqual: op = "==" Depth: 0
+DEBUG: elif op_t == TokenType.NotEqual: op = "!=" Depth: 0
+DEBUG: elif op_t == TokenType.Less: op = "<" Depth: 0
+DEBUG: elif op_t == TokenType.Greater: op = ">" Depth: 0
+DEBUG: elif op_t == TokenType.LessEq: op = "<=" Depth: 0
+DEBUG: elif op_t == TokenType.GreaterEq: op = ">=" Depth: 0
+DEBUG: elif op_t == TokenType.And: op = "&&" Depth: 0
+DEBUG: elif op_t == TokenType.Or: op = "||" Depth: 0
+DEBUG: elif op_t == TokenType.DotDot: return left + ".." + right Depth: 0
+DEBUG: elif op_t == TokenType.DotDotEq: return left + "..=" + right Depth: 0
+DEBUG: else: op = "?" Depth: 0
+DEBUG: return "(" + left + " " + op + " " + right + ")" Depth: 0
+DEBUG: fn generate_unary_op(ref self, expr: UnaryOpExpr) -> @str: Depth: 0
+DEBUG: """Generate unary operation""" Depth: 0
+DEBUG: let operand = self.generate_expression_str(expr.operand) Depth: 0
+DEBUG: if expr.operator == TokenType.Minus: Depth: 0
+DEBUG: return "-" + operand Depth: 0
+DEBUG: elif expr.operator == TokenType.Not: Depth: 0
+DEBUG: return "!" + operand Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: return "?" + operand Depth: 0
+DEBUG: fn generate_call(ref self, expr: CallExpr) -> @str: Depth: 0
+DEBUG: """Generate function call""" Depth: 0
+DEBUG: let callee = self.generate_expression_str(expr.callee) Depth: 0
+DEBUG: var args = @list[] Depth: 0
+DEBUG: for arg in expr.arguments: Depth: 0
+DEBUG: args.add(self.generate_expression_str(arg)) Depth: 0
+DEBUG: let args_str = ", ".join(args) Depth: 0
+DEBUG: return callee + "(" + args_str + ")" Depth: 0
+DEBUG: fn generate_index(ref self, expr: IndexExpr) -> @str: Depth: 0
+DEBUG: """Generate index operation""" Depth: 0
+DEBUG: let object = self.generate_expression_str(expr.object) Depth: 0
+DEBUG: let index = self.generate_expression_str(expr.index) Depth: 0
+DEBUG: return object + "[" + index + "]" Depth: 0
+DEBUG: fn generate_attribute(ref self, expr: AttributeExpr) -> @str: Depth: 0
+DEBUG: """Generate attribute access""" Depth: 0
+DEBUG: let object = self.generate_expression_str(expr.object) Depth: 0
+DEBUG: return object + "." + expr.attribute Depth: 0
+DEBUG: fn generate_list(ref self, expr: ListExpr) -> @str: Depth: 0
+DEBUG: """Generate list literal""" Depth: 0
+DEBUG: var elements = @list[] Depth: 0
+DEBUG: for elem in expr.elements: Depth: 0
+DEBUG: elements.add(self.generate_expression_str(elem)) Depth: 0
+DEBUG: let elems_str = ", ".join(elements) Depth: 0
+DEBUG: return "vec![" + elems_str + "]" Depth: 0
+DEBUG: fn generate_tuple(ref self, expr: TupleExpr) -> @str: Depth: 0
+DEBUG: """Generate tuple literal""" Depth: 0
+DEBUG: var elements = @list[] Depth: 0
+DEBUG: for elem in expr.elements: Depth: 0
+DEBUG: elements.add(self.generate_expression_str(elem)) Depth: 0
+DEBUG: let elems_str = ", ".join(elements) Depth: 0
+DEBUG: return "(" + elems_str + ")" Depth: 0
+DEBUG: fn generate_set(ref self, expr: SetExpr) -> @str: Depth: 0
+DEBUG: """Generate set literal""" Depth: 0
+DEBUG: var elements = @list[] Depth: 0
+DEBUG: for elem in expr.elements: Depth: 0
+DEBUG: elements.add(self.generate_expression_str(elem)) Depth: 0
+DEBUG: let elems_str = ", ".join(elements) Depth: 0
+DEBUG: return "HashSet::from([" + elems_str + "])" Depth: 0
+DEBUG: fn generate_dict(ref self, expr: DictExpr) -> @str: Depth: 0
+DEBUG: """Generate dictionary literal""" Depth: 0
+DEBUG: var pairs = @list[] Depth: 0
+DEBUG: for pair in expr.pairs: Depth: 0
+DEBUG: let key = self.generate_expression_str(pair[0]) Depth: 0
+DEBUG: let value = self.generate_expression_str(pair[1]) Depth: 0
+DEBUG: pairs.add("(" + key + ", " + value + ")") Depth: 0
+DEBUG: let pairs_str = ", ".join(pairs) Depth: 0
+DEBUG: return "HashMap::from([" + pairs_str + "])" Depth: 0
+DEBUG: fn generate_type_constructor(ref self, expr: TypeConstructorExpr) -> @str: Depth: 0
+DEBUG: """Generate type constructor/cast""" Depth: 0
+DEBUG: let arg = self.generate_expression_str(expr.argument) Depth: 0
+DEBUG: match expr.type_name: Depth: 0
+DEBUG: "int" => return "(" + arg + " as i64)" Depth: 0
+DEBUG: "float" => return "(" + arg + " as f64)" Depth: 0
+DEBUG: "str" => return "(" + arg + ".to_string())" Depth: 0
+DEBUG: "bool" => return "(" + arg + " as bool)" Depth: 0
+DEBUG: _ => return arg + " /* " + expr.type_name + " */" Depth: 0
+DEBUG: fn map_type(self, gul_type: @str) -> @str: Depth: 0
+DEBUG: if gul_type == "int": return "i64" Depth: 0
+DEBUG: if gul_type == "float": return "f64" Depth: 0
+DEBUG: if gul_type == "str": return "String" Depth: 0
+DEBUG: if gul_type == "bool": return "bool" Depth: 0
+DEBUG: if gul_type == "list": return "Vec<_>" Depth: 0
+DEBUG: if gul_type == "dict": return "HashMap<_, _>" Depth: 0
+DEBUG: if gul_type == "set": return "HashSet<_>" Depth: 0
+DEBUG: if gul_type == "tuple": return "(_)" Depth: 0
+DEBUG: return gul_type Depth: 0
+DEBUG: fn generate_rust_code(program: Program) -> @str: Depth: 0
+DEBUG: """Generate Rust code from GUL AST""" Depth: 0
+DEBUG: var generator = CodeGenerator.create() Depth: 0
+DEBUG: generator.generate_program(program) Depth: 0
+DEBUG: return generator.get_output() Depth: 0
+✅ Generated codegen/rust_backend.rs
+Transpiling semantic/analyzer.mn -> semantic/analyzer.rs
+DEBUG: @imp std.collections Depth: 0
+DEBUG: @imp compiler.ast.nodes Depth: 0
+DEBUG: @imp compiler.lexer.token Depth: 0
+DEBUG: struct Symbol: Depth: 0
+DEBUG: name: @str Depth: 0
+DEBUG: type: @str Depth: 0
+DEBUG: is_mutable: @bool Depth: 0
+DEBUG: is_function: @bool Depth: 0
+DEBUG: line: @int Depth: 0
+DEBUG: column: @int Depth: 0
+DEBUG: struct Scope: Depth: 0
+DEBUG: symbols: @dict Depth: 0
+DEBUG: parent: Scope Depth: 0
+DEBUG: fn create_scope() -> Scope: Depth: 0
+DEBUG: return Scope{symbols: @dict{}, parent: None} Depth: 0
+DEBUG: fn create_child_scope(parent: Scope) -> Scope: Depth: 0
+DEBUG: return Scope{symbols: @dict{}, parent: parent} Depth: 0
+DEBUG: impl Scope: Depth: 0
+DEBUG: fn define(ref self, name: @str, symbol: Symbol): Depth: 0
+DEBUG: """Define a symbol in this scope""" Depth: 0
+DEBUG: self.symbols[name] = symbol Depth: 0
+DEBUG: fn resolve(self, name: @str) -> Symbol: Depth: 0
+DEBUG: """Resolve a symbol, checking parent scopes""" Depth: 0
+DEBUG: if name in self.symbols: Depth: 0
+DEBUG: return self.symbols[name] Depth: 0
+DEBUG: if self.parent: Depth: 0
+DEBUG: return self.parent.resolve(name) Depth: 0
+DEBUG: return None Depth: 0
+DEBUG: fn exists_in_current(self, name: @str) -> @bool: Depth: 0
+DEBUG: """Check if symbol exists in current scope only""" Depth: 0
+DEBUG: return name in self.symbols Depth: 0
+DEBUG: struct SemanticAnalyzer: Depth: 0
+DEBUG: current_scope: Scope Depth: 0
+DEBUG: errors: @list[@str] Depth: 0
+DEBUG: warnings: @list[@str] Depth: 0
+DEBUG: fn create_analyzer() -> SemanticAnalyzer: Depth: 0
+DEBUG: return SemanticAnalyzer{current_scope: create_scope(), errors: @list[], warnings: @list[]} Depth: 0
+DEBUG: impl SemanticAnalyzer: Depth: 0
+DEBUG: fn analyze_program(ref self, program: Program): Depth: 0
+DEBUG: """Analyze entire program""" Depth: 0
+DEBUG: for import_stmt in program.imports: Depth: 0
+DEBUG: self.analyze_import(import_stmt) Depth: 0
+DEBUG: for stmt in program.statements: Depth: 0
+DEBUG: self.analyze_statement(stmt) Depth: 0
+DEBUG: for stmt in program.main_entry: Depth: 0
+DEBUG: self.analyze_statement(stmt) Depth: 0
+DEBUG: fn enter_scope(ref self): Depth: 0
+DEBUG: """Enter a new scope""" Depth: 0
+DEBUG: self.current_scope = create_child_scope(self.current_scope) Depth: 0
+DEBUG: fn exit_scope(ref self): Depth: 0
+DEBUG: """Exit current scope""" Depth: 0
+DEBUG: if self.current_scope.parent: Depth: 0
+DEBUG: self.current_scope = self.current_scope.parent Depth: 0
+DEBUG: fn error(ref self, message: @str, line: @int, column: @int): Depth: 0
+DEBUG: """Record a semantic error""" Depth: 0
+DEBUG: let error_msg = "Semantic error at " + str(line) + ":" + str(column) + ": " + message Depth: 0
+DEBUG: self.errors.add(error_msg) Depth: 0
+DEBUG: print(error_msg) Depth: 0
+DEBUG: fn warn(ref self, message: @str, line: @int, column: @int): Depth: 0
+DEBUG: """Record a warning""" Depth: 0
+DEBUG: let warn_msg = "Warning at " + str(line) + ":" + str(column) + ": " + message Depth: 0
+DEBUG: self.warnings.add(warn_msg) Depth: 0
+DEBUG: fn analyze_statement(ref self, stmt: Statement): Depth: 0
+DEBUG: """Analyze a statement""" Depth: 0
+DEBUG: let st = stmt.stmt_type Depth: 0
+DEBUG: if st == StmtType.LetDecl: self.analyze_let_stmt(@cast(LetStmt, stmt)) Depth: 0
+DEBUG: elif st == StmtType.VarDecl: self.analyze_var_stmt(@cast(VarStmt, stmt)) Depth: 0
+DEBUG: elif st == StmtType.FunctionDecl: self.analyze_function_decl(@cast(FunctionDecl, stmt)) Depth: 0
+DEBUG: elif st == StmtType.IfStmt: self.analyze_if_stmt(@cast(IfStmt, stmt)) Depth: 0
+DEBUG: elif st == StmtType.WhileStmt: self.analyze_while_stmt(@cast(WhileStmt, stmt)) Depth: 0
+DEBUG: elif st == StmtType.ForStmt: self.analyze_for_stmt(@cast(ForStmt, stmt)) Depth: 0
+DEBUG: elif st == StmtType.ReturnStmt: self.analyze_return_stmt(@cast(ReturnStmt, stmt)) Depth: 0
+DEBUG: elif st == StmtType.AssignmentStmt: self.analyze_assignment(@cast(AssignmentStmt, stmt)) Depth: 0
+DEBUG: elif st == StmtType.ExpressionStmt: self.analyze_expression_stmt(@cast(ExpressionStmt, stmt)) Depth: 0
+DEBUG: elif st == StmtType.ImportStmt: self.analyze_import(@cast(ImportStmt, stmt)) Depth: 0
+DEBUG: else: pass Depth: 0
+DEBUG: fn analyze_let_stmt(ref self, stmt: LetStmt): Depth: 0
+DEBUG: """Analyze let declaration""" Depth: 0
+DEBUG: if self.current_scope.exists_in_current(stmt.name): Depth: 0
+DEBUG: self.error(f"Variable '{stmt.name}' already defined", stmt.base.node.line, stmt.base.node.column) Depth: 0
+DEBUG: let value_type = self.analyze_expression(stmt.value) Depth: 0
+DEBUG: if stmt.type_annotation and value_type: Depth: 0
+DEBUG: if not self.types_compatible(stmt.type_annotation, value_type): Depth: 0
+DEBUG: self.error(f"Type mismatch: expected {stmt.type_annotation}, got {value_type}", Depth: 1
+DEBUG: stmt.base.node.line, stmt.base.node.column) Depth: 0
+DEBUG: self.current_scope.define(stmt.name, Symbol{ Depth: 1
+DEBUG: name: stmt.name, Depth: 1
+DEBUG: type: stmt.type_annotation or value_type, Depth: 1
+DEBUG: is_mutable: @bool(false), Depth: 1
+DEBUG: is_function: @bool(false), Depth: 1
+DEBUG: line: stmt.base.node.line, Depth: 1
+DEBUG: column: stmt.base.node.column Depth: 1
+DEBUG: }) Depth: 0
+DEBUG: fn analyze_var_stmt(ref self, stmt: VarStmt): Depth: 0
+DEBUG: """Analyze var declaration (similar to let but mutable)""" Depth: 0
+DEBUG: if self.current_scope.exists_in_current(stmt.name): Depth: 0
+DEBUG: self.error(f"Variable '{stmt.name}' already defined", stmt.base.node.line, stmt.base.node.column) Depth: 0
+DEBUG: let value_type = self.analyze_expression(stmt.value) Depth: 0
+DEBUG: if stmt.type_annotation and value_type: Depth: 0
+DEBUG: if not self.types_compatible(stmt.type_annotation, value_type): Depth: 0
+DEBUG: self.error(f"Type mismatch: expected {stmt.type_annotation}, got {value_type}", Depth: 1
+DEBUG: stmt.base.node.line, stmt.base.node.column) Depth: 0
+DEBUG: self.current_scope.define(stmt.name, Symbol{ Depth: 1
+DEBUG: name: stmt.name, Depth: 1
+DEBUG: type: stmt.type_annotation or value_type, Depth: 1
+DEBUG: is_mutable: @bool(true), Depth: 1
+DEBUG: is_function: @bool(false), Depth: 1
+DEBUG: line: stmt.base.node.line, Depth: 1
+DEBUG: column: stmt.base.node.column Depth: 1
+DEBUG: }) Depth: 0
+DEBUG: fn analyze_function_decl(ref self, stmt: FunctionDecl): Depth: 0
+DEBUG: """Analyze function declaration""" Depth: 0
+DEBUG: if self.current_scope.exists_in_current(stmt.name): Depth: 0
+DEBUG: self.error(f"Function '{stmt.name}' already defined", stmt.base.node.line, stmt.base.node.column) Depth: 0
+DEBUG: self.current_scope.define(stmt.name, Symbol{ Depth: 1
+DEBUG: name: stmt.name, Depth: 1
+DEBUG: type: stmt.return_type or "void", Depth: 1
+DEBUG: is_mutable: @bool(false), Depth: 1
+DEBUG: is_function: @bool(true), Depth: 1
+DEBUG: line: stmt.base.node.line, Depth: 1
+DEBUG: column: stmt.base.node.column Depth: 1
+DEBUG: }) Depth: 0
+DEBUG: self.enter_scope() Depth: 0
+DEBUG: for param in stmt.parameters: Depth: 0
+DEBUG: self.current_scope.define(param.name, Symbol{ Depth: 1
+DEBUG: name: param.name, Depth: 1
+DEBUG: type: param.type_annotation or "any", Depth: 1
+DEBUG: is_mutable: param.ownership_mode == "ref", Depth: 1
+DEBUG: is_function: @bool(false), Depth: 1
+DEBUG: line: stmt.base.node.line, Depth: 1
+DEBUG: column: stmt.base.node.column Depth: 1
+DEBUG: }) Depth: 0
+DEBUG: for body_stmt in stmt.body: Depth: 0
+DEBUG: self.analyze_statement(body_stmt) Depth: 0
+DEBUG: self.exit_scope() Depth: 0
+DEBUG: fn analyze_if_stmt(ref self, stmt: IfStmt): Depth: 0
+DEBUG: """Analyze if statement""" Depth: 0
+DEBUG: let cond_type = self.analyze_expression(stmt.condition) Depth: 0
+DEBUG: if cond_type and cond_type != "bool": Depth: 0
+DEBUG: self.warn(f"Condition should be bool, got {cond_type}", stmt.base.node.line, stmt.base.node.column) Depth: 0
+DEBUG: self.enter_scope() Depth: 0
+DEBUG: for s in stmt.then_body: Depth: 0
+DEBUG: self.analyze_statement(s) Depth: 0
+DEBUG: self.exit_scope() Depth: 0
+DEBUG: for elif_clause in stmt.elif_clauses: Depth: 0
+DEBUG: let elif_cond_type = self.analyze_expression(elif_clause.condition) Depth: 0
+DEBUG: self.enter_scope() Depth: 0
+DEBUG: for s in elif_clause.body: Depth: 0
+DEBUG: self.analyze_statement(s) Depth: 0
+DEBUG: self.exit_scope() Depth: 0
+DEBUG: if stmt.else_body: Depth: 0
+DEBUG: self.enter_scope() Depth: 0
+DEBUG: for s in stmt.else_body: Depth: 0
+DEBUG: self.analyze_statement(s) Depth: 0
+DEBUG: self.exit_scope() Depth: 0
+DEBUG: fn analyze_while_stmt(ref self, stmt: WhileStmt): Depth: 0
+DEBUG: """Analyze while loop""" Depth: 0
+DEBUG: let cond_type = self.analyze_expression(stmt.condition) Depth: 0
+DEBUG: self.enter_scope() Depth: 0
+DEBUG: for s in stmt.body: Depth: 0
+DEBUG: self.analyze_statement(s) Depth: 0
+DEBUG: self.exit_scope() Depth: 0
+DEBUG: fn analyze_for_stmt(ref self, stmt: ForStmt): Depth: 0
+DEBUG: """Analyze for loop""" Depth: 0
+DEBUG: let iterable_type = self.analyze_expression(stmt.iterable) Depth: 0
+DEBUG: self.enter_scope() Depth: 0
+DEBUG: self.current_scope.define(stmt.variable, Symbol{ Depth: 1
+DEBUG: name: stmt.variable, Depth: 1
+DEBUG: type: "any", Depth: 1
+DEBUG: is_mutable: @bool(false), Depth: 1
+DEBUG: is_function: @bool(false), Depth: 1
+DEBUG: line: stmt.base.node.line, Depth: 1
+DEBUG: column: stmt.base.node.column Depth: 1
+DEBUG: }) Depth: 0
+DEBUG: for s in stmt.body: Depth: 0
+DEBUG: self.analyze_statement(s) Depth: 0
+DEBUG: self.exit_scope() Depth: 0
+DEBUG: fn analyze_return_stmt(ref self, stmt: ReturnStmt): Depth: 0
+DEBUG: """Analyze return statement""" Depth: 0
+DEBUG: if stmt.value: Depth: 0
+DEBUG: self.analyze_expression(stmt.value) Depth: 0
+DEBUG: fn analyze_assignment(ref self, stmt: AssignmentStmt): Depth: 0
+DEBUG: """Analyze assignment""" Depth: 0
+DEBUG: if stmt.target.expr_type == ExprType.Identifier: Depth: 0
+DEBUG: let ident = @cast(IdentifierExpr, stmt.target) Depth: 0
+DEBUG: let symbol = self.current_scope.resolve(ident.name) Depth: 0
+DEBUG: if not symbol: Depth: 0
+DEBUG: self.error(f"Undefined variable '{ident.name}'", stmt.base.node.line, stmt.base.node.column) Depth: 0
+DEBUG: elif not symbol.is_mutable: Depth: 0
+DEBUG: self.error(f"Cannot assign to immutable variable '{ident.name}'", Depth: 1
+DEBUG: stmt.base.node.line, stmt.base.node.column) Depth: 0
+DEBUG: self.analyze_expression(stmt.value) Depth: 0
+DEBUG: fn analyze_expression_stmt(ref self, stmt: ExpressionStmt): Depth: 0
+DEBUG: """Analyze expression statement""" Depth: 0
+DEBUG: self.analyze_expression(stmt.expression) Depth: 0
+DEBUG: fn analyze_import(ref self, stmt: ImportStmt): Depth: 0
+DEBUG: """Analyze import statement""" Depth: 0
+DEBUG: pass Depth: 0
+DEBUG: fn analyze_expression(ref self, expr: Expression) -> @str: Depth: 0
+DEBUG: """Analyze expression and return its type""" Depth: 0
+DEBUG: let et = expr.expr_type Depth: 0
+DEBUG: if et == ExprType.IntegerLiteral: return "int" Depth: 0
+DEBUG: elif et == ExprType.FloatLiteral: return "float" Depth: 0
+DEBUG: elif et == ExprType.StringLiteral: return "str" Depth: 0
+DEBUG: elif et == ExprType.BooleanLiteral: return "bool" Depth: 0
+DEBUG: elif et == ExprType.Identifier: return self.analyze_identifier(@cast(IdentifierExpr, expr)) Depth: 0
+DEBUG: elif et == ExprType.BinaryOp: return self.analyze_binary_op(@cast(BinaryOpExpr, expr)) Depth: 0
+DEBUG: elif et == ExprType.UnaryOp: return self.analyze_unary_op(@cast(UnaryOpExpr, expr)) Depth: 0
+DEBUG: elif et == ExprType.Call: return self.analyze_call(@cast(CallExpr, expr)) Depth: 0
+DEBUG: elif et == ExprType.Index: return self.analyze_index(@cast(IndexExpr, expr)) Depth: 0
+DEBUG: elif et == ExprType.Attribute: return self.analyze_attribute(@cast(AttributeExpr, expr)) Depth: 0
+DEBUG: elif et == ExprType.ListLiteral: return self.analyze_list_literal(@cast(ListLiteralExpr, expr)) Depth: 0
+DEBUG: elif et == ExprType.TupleLiteral: return self.analyze_tuple_literal(@cast(TupleLiteralExpr, expr)) Depth: 0
+DEBUG: elif et == ExprType.SetLiteral: return self.analyze_set_literal(@cast(SetLiteralExpr, expr)) Depth: 0
+DEBUG: elif et == ExprType.DictLiteral: return self.analyze_dict_literal(@cast(DictLiteralExpr, expr)) Depth: 0
+DEBUG: elif et == ExprType.TypeConstructor: return self.analyze_type_constructor(@cast(TypeConstructorExpr, expr)) Depth: 0
+DEBUG: else: return "any" Depth: 0
+DEBUG: fn analyze_identifier(ref self, expr: IdentifierExpr) -> @str: Depth: 0
+DEBUG: """Analyze identifier and return type""" Depth: 0
+DEBUG: let symbol = self.current_scope.resolve(expr.name) Depth: 0
+DEBUG: if not symbol: Depth: 0
+DEBUG: self.error(f"Undefined variable '{expr.name}'", expr.base.node.line, expr.base.node.column) Depth: 0
+DEBUG: return "any" Depth: 0
+DEBUG: return symbol.type Depth: 0
+DEBUG: fn analyze_binary_op(ref self, expr: BinaryOpExpr) -> @str: Depth: 0
+DEBUG: """Analyze binary operation""" Depth: 0
+DEBUG: let left_type = self.analyze_expression(expr.left) Depth: 0
+DEBUG: let right_type = self.analyze_expression(expr.right) Depth: 0
+DEBUG: if expr.operator == TokenType.Plus or Depth: 0
+DEBUG: expr.operator == TokenType.Minus or Depth: 0
+DEBUG: expr.operator == TokenType.Star or Depth: 0
+DEBUG: expr.operator == TokenType.Slash: Depth: 0
+DEBUG: if left_type == "int" and right_type == "int": Depth: 0
+DEBUG: return "int" Depth: 0
+DEBUG: elif left_type == "float" or right_type == "float": Depth: 0
+DEBUG: return "float" Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: return "any" Depth: 0
+DEBUG: elif expr.operator == TokenType.EqualEqual or Depth: 0
+DEBUG: expr.operator == TokenType.NotEqual or Depth: 0
+DEBUG: expr.operator == TokenType.Less or Depth: 0
+DEBUG: expr.operator == TokenType.Greater or Depth: 0
+DEBUG: expr.operator == TokenType.LessEq or Depth: 0
+DEBUG: expr.operator == TokenType.GreaterEq: Depth: 0
+DEBUG: return "bool" Depth: 0
+DEBUG: elif expr.operator == TokenType.And or expr.operator == TokenType.Or: Depth: 0
+DEBUG: return "bool" Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: return "any" Depth: 0
+DEBUG: fn analyze_unary_op(ref self, expr: UnaryOpExpr) -> @str: Depth: 0
+DEBUG: """Analyze unary operation""" Depth: 0
+DEBUG: let operand_type = self.analyze_expression(expr.operand) Depth: 0
+DEBUG: if expr.operator == TokenType.Minus: Depth: 0
+DEBUG: return operand_type Depth: 0
+DEBUG: elif expr.operator == TokenType.Not: Depth: 0
+DEBUG: return "bool" Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: return "any" Depth: 0
+DEBUG: fn analyze_call(ref self, expr: CallExpr) -> @str: Depth: 0
+DEBUG: """Analyze function call""" Depth: 0
+DEBUG: let callee_type = self.analyze_expression(expr.callee) Depth: 0
+DEBUG: for arg in expr.arguments: Depth: 0
+DEBUG: self.analyze_expression(arg) Depth: 0
+DEBUG: return "any" Depth: 0
+DEBUG: fn analyze_index(ref self, expr: IndexExpr) -> @str: Depth: 0
+DEBUG: """Analyze index operation""" Depth: 0
+DEBUG: let object_type = self.analyze_expression(expr.object) Depth: 0
+DEBUG: let index_type = self.analyze_expression(expr.index) Depth: 0
+DEBUG: return "any" Depth: 0
+DEBUG: fn analyze_attribute(ref self, expr: AttributeExpr) -> @str: Depth: 0
+DEBUG: """Analyze attribute access""" Depth: 0
+DEBUG: let object_type = self.analyze_expression(expr.object) Depth: 0
+DEBUG: return "any" Depth: 0
+DEBUG: fn analyze_type_constructor(ref self, expr: TypeConstructorExpr) -> @str: Depth: 0
+DEBUG: """Analyze type constructor""" Depth: 0
+DEBUG: self.analyze_expression(expr.argument) Depth: 0
+DEBUG: return expr.type_name Depth: 0
+DEBUG: fn types_compatible(self, expected: @str, actual: @str) -> @bool: Depth: 0
+DEBUG: """Check if two types are compatible""" Depth: 0
+DEBUG: if expected == actual: Depth: 0
+DEBUG: return @bool(true) Depth: 0
+DEBUG: if expected == "any" or actual == "any": Depth: 0
+DEBUG: return @bool(true) Depth: 0
+DEBUG: return @bool(false) Depth: 0
+DEBUG: fn analyze_semantics(program: Program) -> @list[@str]: Depth: 0
+DEBUG: """Perform semantic analysis on program, return errors""" Depth: 0
+DEBUG: var sem_analyzer = create_analyzer() Depth: 0
+DEBUG: sem_analyzer.analyze_program(program) Depth: 0
+DEBUG: return sem_analyzer.errors Depth: 0
+✅ Generated semantic/analyzer.rs
+Transpiling tests/test_sys.mn -> tests/test_sys.rs
+DEBUG: print("Testing sys module...") Depth: 0
+DEBUG: print("sys object:", sys) Depth: 0
+DEBUG: print("sys.argv:", sys.argv) Depth: 0
+DEBUG: print("Arguments:") Depth: 0
+DEBUG: for arg in sys.argv: Depth: 0
+DEBUG: print("  ", arg) Depth: 0
+DEBUG: print("Done!") Depth: 0
+✅ Generated tests/test_sys.rs
+Transpiling tests/test_trycatch.mn -> tests/test_trycatch.rs
+DEBUG: print("Testing try/catch...") Depth: 0
+DEBUG: try: Depth: 0
+DEBUG: print("In try block") Depth: 0
+DEBUG: let result = read_file("nonexistent_file.txt") Depth: 0
+DEBUG: print("Should not reach here") Depth: 0
+DEBUG: catch e: Depth: 0
+DEBUG: print("In catch block - error handled!") Depth: 0
+DEBUG: print("After try/catch block") Depth: 0
+DEBUG: print("Test complete!") Depth: 0
+✅ Generated tests/test_trycatch.rs
+Transpiling tests/test_min.mn -> tests/test_min.rs
+DEBUG: let x = 1 Depth: 0
+✅ Generated tests/test_min.rs
+Transpiling tests/test_list.mn -> tests/test_list.rs
+DEBUG: let s = "abc" Depth: 0
+DEBUG: let l = @list[s] Depth: 0
+DEBUG: print(len(l)) Depth: 0
+DEBUG: print(l[0]) Depth: 0
+✅ Generated tests/test_list.rs
+Transpiling tests/test_fileio.mn -> tests/test_fileio.rs
+DEBUG: print("Testing file I/O...") Depth: 0
+DEBUG: let content = "Hello from GUL compiler test!" Depth: 0
+DEBUG: let success = write_file("test_output.txt", content) Depth: 0
+DEBUG: print("Write successful:", success) Depth: 0
+DEBUG: let read_content = read_file("test_output.txt") Depth: 0
+DEBUG: print("Read content:", read_content) Depth: 0
+DEBUG: let exists = file_exists("test_output.txt") Depth: 0
+DEBUG: print("File exists:", exists) Depth: 0
+DEBUG: print("File I/O test complete!") Depth: 0
+✅ Generated tests/test_fileio.rs
+Transpiling tests/test_write_direct.mn -> tests/test_write_direct.rs
+DEBUG: print("Testing write_file directly...") Depth: 0
+DEBUG: let test_content = "// Generated by GUL compiler\nfn main() {\n    println!(\"Hello from generated code!\");\n}\n" Depth: 0
+DEBUG: let success = write_file("direct_test.rs", test_content) Depth: 0
+DEBUG: print("Write result:", success) Depth: 0
+DEBUG: let exists = file_exists("direct_test.rs") Depth: 0
+DEBUG: print("File exists:", exists) Depth: 0
+DEBUG: if exists: Depth: 0
+DEBUG: let content = read_file("direct_test.rs") Depth: 0
+DEBUG: print("Content:", content) Depth: 0
+✅ Generated tests/test_write_direct.rs
+Transpiling tests/test_collections.mn -> tests/test_collections.rs
+DEBUG: let numbers: list = [1, 2, 3, 4, 5] Depth: 0
+DEBUG: var items: list = [1, 2, 3] Depth: 0
+DEBUG: let labels: set = {"a", "b"} Depth: 0
+DEBUG: var tags: set = {"rust", "python"} Depth: 0
+DEBUG: let user: dict = {name: "Alice", age: 25} Depth: 0
+DEBUG: var cfg: dict = {host: "localhost", port: 8080} Depth: 0
+DEBUG: let name = @str("Alice") Depth: 0
+DEBUG: let age = @int(30) Depth: 0
+DEBUG: let score = @float(95.5) Depth: 0
+DEBUG: let active = @bool(true) Depth: 0
+DEBUG: let nums = @list(1, 2, 3) Depth: 0
+DEBUG: var mut_items = @list(1, 2, 3, "four") Depth: 0
+DEBUG: let point = @tuple(10, 20) Depth: 0
+DEBUG: let tag_set = @set{"a", "b", "c"} Depth: 0
+DEBUG: let config = @dict{ Depth: 0
+DEBUG: host: "localhost", Depth: 0
+DEBUG: port: 8080, Depth: 0
+DEBUG: debug: true Depth: 0
+DEBUG: } Depth: 0
+DEBUG: let first = numbers[0] Depth: 0
+DEBUG: let last = numbers[-1] Depth: 0
+DEBUG: var my_cfg = @dict{ Depth: 0
+DEBUG: host: "localhost", Depth: 0
+DEBUG: port: 8080 Depth: 0
+DEBUG: } Depth: 0
+DEBUG: print("All syntax tests passed!") Depth: 0
+✅ Generated tests/test_collections.rs
+Transpiling tests/test_method_return.mn -> tests/test_method_return.rs
+DEBUG: struct Token: Depth: 0
+DEBUG: type: @str Depth: 0
+DEBUG: value: @str Depth: 0
+DEBUG: struct Parser: Depth: 0
+DEBUG: position: @int Depth: 0
+DEBUG: fn current(self) -> Token: Depth: 0
+DEBUG: return Token{type: "Fn", value: "fn"} Depth: 0
+DEBUG: fn test_method_return_access(p: Parser): Depth: 0
+DEBUG: let tok = p.current() Depth: 0
+DEBUG: print("Inside function after method call:") Depth: 0
+DEBUG: print(tok.type) Depth: 0
+DEBUG: print(tok.value) Depth: 0
+DEBUG: let parser = Parser{position: 0} Depth: 0
+DEBUG: test_method_return_access(parser) Depth: 0
+DEBUG: mn: Depth: 0
+DEBUG: print("Done!") Depth: 0
+✅ Generated tests/test_method_return.rs
+Transpiling tests/example.mn -> tests/example.rs
+DEBUG: let x = 42 Depth: 0
+DEBUG: let y = 10 Depth: 0
+DEBUG: let z = x + y Depth: 0
+DEBUG: print(z) Depth: 0
+✅ Generated tests/example.rs
+Transpiling tests/test_struct_method_ref.mn -> tests/test_struct_method_ref.rs
+DEBUG: struct Result: Depth: 0
+DEBUG: value: @str Depth: 0
+DEBUG: struct Parser: Depth: 0
+DEBUG: data: @str Depth: 0
+DEBUG: fn create(d: @str) -> Parser: Depth: 0
+DEBUG: return Parser{data: d} Depth: 0
+DEBUG: fn simple_method(ref self) -> Result: Depth: 0
+DEBUG: print("DEBUG: Inside simple_method") Depth: 0
+DEBUG: print("DEBUG: self.data is:") Depth: 0
+DEBUG: print(self.data) Depth: 0
+DEBUG: return Result{value: "success"} Depth: 0
+DEBUG: fn use_parser(): Depth: 0
+DEBUG: var p = Parser.create("test data") Depth: 0
+DEBUG: print("DEBUG: Calling simple_method...") Depth: 0
+DEBUG: var r = p.simple_method() Depth: 0
+DEBUG: print("DEBUG: simple_method returned") Depth: 0
+DEBUG: print("DEBUG: result.value:") Depth: 0
+DEBUG: print(r.value) Depth: 0
+DEBUG: use_parser() Depth: 0
+DEBUG: mn: Depth: 0
+DEBUG: print("Done!") Depth: 0
+✅ Generated tests/test_struct_method_ref.rs
+Transpiling tests/test_slice.mn -> tests/test_slice.rs
+DEBUG: let s = "abcdef" Depth: 0
+DEBUG: print(s[0:2]) Depth: 0
+DEBUG: print(s[1:3]) Depth: 0
+✅ Generated tests/test_slice.rs
+Transpiling tests/test_alpha.mn -> tests/test_alpha.rs
+DEBUG: fn @bool is_alpha(ch: @str) -> @bool: Depth: 0
+DEBUG: let lower = "abcdefghijklmnopqrstuvwxyz" Depth: 0
+DEBUG: let res = ch in lower Depth: 0
+DEBUG: if not res: Depth: 0
+DEBUG: print("FAIL: " + ch) Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: print("PASS: " + ch) Depth: 0
+DEBUG: return res Depth: 0
+DEBUG: mn: Depth: 0
+DEBUG: let r1 = is_alpha("f") Depth: 0
+DEBUG: print("Result f: " + r1) Depth: 0
+DEBUG: let r2 = is_alpha("1") Depth: 0
+DEBUG: print("Result 1: " + r2) Depth: 0
+✅ Generated tests/test_alpha.rs
+Transpiling tests/test_struct_fields.mn -> tests/test_struct_fields.rs
+DEBUG: @imp compiler.lexer.lexer Depth: 0
+DEBUG: fn test_parser_fields(): Depth: 0
+DEBUG: let source = "let x = 5" Depth: 0
+DEBUG: let tokens = tokenize(source) Depth: 0
+DEBUG: print("DEBUG: tokens count before create:") Depth: 0
+DEBUG: print(len(tokens)) Depth: 0
+DEBUG: struct TestParser: Depth: 0
+DEBUG: data: @list[Token] Depth: 0
+DEBUG: pos: @int Depth: 0
+DEBUG: fn create(toks: @list[Token]) -> TestParser: Depth: 0
+DEBUG: return TestParser{data: toks, pos: @int(0)} Depth: 0
+DEBUG: fn show(self): Depth: 0
+DEBUG: print("Inside show method") Depth: 0
+DEBUG: print(self.pos) Depth: 0
+DEBUG: print(len(self.data)) Depth: 0
+DEBUG: var p = TestParser.create(tokens) Depth: 0
+DEBUG: print("Parser created") Depth: 0
+DEBUG: p.show() Depth: 0
+DEBUG: test_parser_fields() Depth: 0
+DEBUG: mn: Depth: 0
+DEBUG: print("Done") Depth: 0
+✅ Generated tests/test_struct_fields.rs
+Transpiling tests/simple_add.mn -> tests/simple_add.rs
+DEBUG: fn add(a, b): Depth: 0
+DEBUG: return a + b Depth: 0
+DEBUG: mn: Depth: 0
+DEBUG: let result = add(5, 3) Depth: 0
+DEBUG: print(result) Depth: 0
+✅ Generated tests/simple_add.rs
+Transpiling tests/test_perf.mn -> tests/test_perf.rs
+DEBUG: @imp std.io Depth: 0
+DEBUG: fn tokenize_min(source: @str) -> @int: Depth: 0
+DEBUG: var l_pos = @int(0) Depth: 0
+DEBUG: var l_len = len(source) Depth: 0
+DEBUG: var count = @int(0) Depth: 0
+DEBUG: while l_pos < l_len: Depth: 0
+DEBUG: let ch = source[l_pos] Depth: 0
+DEBUG: if ch == " " or ch == "\t" or ch == "\n" or ch == "\r": Depth: 0
+DEBUG: l_pos = l_pos + 1 Depth: 0
+DEBUG: continue Depth: 0
+DEBUG: if ch == " Depth: 0
+DEBUG: while l_pos < l_len and source[l_pos] != "\n": Depth: 0
+DEBUG: l_pos = l_pos + 1 Depth: 0
+DEBUG: continue Depth: 0
+DEBUG: l_pos = l_pos + 1 Depth: 0
+DEBUG: count = count + 1 Depth: 0
+DEBUG: return count Depth: 0
+DEBUG: fn main(): Depth: 0
+DEBUG: let source = " Depth: 0
+DEBUG: print("START") Depth: 0
+DEBUG: let count = tokenize_min(source) Depth: 0
+DEBUG: print("DONE: " + str(count)) Depth: 0
+DEBUG: main() Depth: 0
+✅ Generated tests/test_perf.rs
+Transpiling tests/test_fn.mn -> tests/test_fn.rs
+DEBUG: fn add(a, b): Depth: 0
+DEBUG: return a + b Depth: 0
+DEBUG: let result = add(5, 3) Depth: 0
+DEBUG: print("Result:", result) Depth: 0
+✅ Generated tests/test_fn.rs
+Transpiling tests/test_lexer.mn -> tests/test_lexer.rs
+DEBUG: @imp compiler.lexer.lexer Depth: 0
+DEBUG: @imp compiler.lexer.token Depth: 0
+DEBUG: @imp std.testing Depth: 0
+DEBUG: fn assert_tokens_equal(actual: @list[Token], expected: @list[TokenType], test_name: @str): Depth: 0
+DEBUG: if len(actual) != len(expected): Depth: 0
+DEBUG: print(f"FAIL {test_name}: Expected {len(expected)} tokens, got {len(actual)}") Depth: 0
+DEBUG: return @bool(false) Depth: 0
+DEBUG: for i in range(len(actual)): Depth: 0
+DEBUG: if actual[i].type != expected[i]: Depth: 0
+DEBUG: print(f"FAIL {test_name}: Token {i} expected {expected[i]}, got {actual[i].type}") Depth: 0
+DEBUG: return @bool(false) Depth: 0
+DEBUG: print(f"PASS {test_name}") Depth: 0
+DEBUG: return @bool(true) Depth: 0
+DEBUG: fn test_empty_file(): Depth: 0
+DEBUG: let tokens = tokenize("") Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[TokenType.Eof], "Empty file") Depth: 0
+DEBUG: fn test_single_integer(): Depth: 0
+DEBUG: let tokens = tokenize("42") Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[ Depth: 1
+DEBUG: TokenType.Integer, Depth: 1
+DEBUG: TokenType.Eof Depth: 1
+DEBUG: ], "Single integer") Depth: 0
+DEBUG: fn test_single_float(): Depth: 0
+DEBUG: let tokens = tokenize("3.14") Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[ Depth: 1
+DEBUG: TokenType.Float, Depth: 1
+DEBUG: TokenType.Eof Depth: 1
+DEBUG: ], "Single float") Depth: 0
+DEBUG: fn test_scientific_notation(): Depth: 0
+DEBUG: let tokens = tokenize("1.23e10") Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[ Depth: 1
+DEBUG: TokenType.Float, Depth: 1
+DEBUG: TokenType.Eof Depth: 1
+DEBUG: ], "Scientific notation") Depth: 0
+DEBUG: fn test_single_identifier(): Depth: 0
+DEBUG: let tokens = tokenize("hello") Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[ Depth: 1
+DEBUG: TokenType.Identifier, Depth: 1
+DEBUG: TokenType.Eof Depth: 1
+DEBUG: ], "Single identifier") Depth: 0
+DEBUG: fn test_single_keyword(): Depth: 0
+DEBUG: let tokens = tokenize("let") Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[ Depth: 1
+DEBUG: TokenType.Let, Depth: 1
+DEBUG: TokenType.Eof Depth: 1
+DEBUG: ], "Single keyword (let)") Depth: 0
+DEBUG: fn test_arithmetic_operators(): Depth: 0
+DEBUG: let tokens = tokenize("+ - * / %") Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[ Depth: 1
+DEBUG: TokenType.Plus, Depth: 1
+DEBUG: TokenType.Minus, Depth: 1
+DEBUG: TokenType.Star, Depth: 1
+DEBUG: TokenType.Slash, Depth: 1
+DEBUG: TokenType.Percent, Depth: 1
+DEBUG: TokenType.Eof Depth: 1
+DEBUG: ], "Arithmetic operators") Depth: 0
+DEBUG: fn test_compound_operators(): Depth: 0
+DEBUG: let tokens = tokenize("**") Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[ Depth: 1
+DEBUG: TokenType.DoubleStar, Depth: 1
+DEBUG: TokenType.Eof Depth: 1
+DEBUG: ], "Double star operator") Depth: 0
+DEBUG: fn test_comparison_operators(): Depth: 0
+DEBUG: let tokens = tokenize("== != > >= < <=") Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[ Depth: 1
+DEBUG: TokenType.EqualEqual, Depth: 1
+DEBUG: TokenType.NotEqual, Depth: 1
+DEBUG: TokenType.Greater, Depth: 1
+DEBUG: TokenType.GreaterEq, Depth: 1
+DEBUG: TokenType.Less, Depth: 1
+DEBUG: TokenType.LessEq, Depth: 1
+DEBUG: TokenType.Eof Depth: 1
+DEBUG: ], "Comparison operators") Depth: 0
+DEBUG: fn test_logical_operators(): Depth: 0
+DEBUG: let tokens = tokenize("and or not && ||") Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[ Depth: 1
+DEBUG: TokenType.And, Depth: 1
+DEBUG: TokenType.Or, Depth: 1
+DEBUG: TokenType.Not, Depth: 1
+DEBUG: TokenType.And, Depth: 1
+DEBUG: TokenType.Or, Depth: 1
+DEBUG: TokenType.Eof Depth: 1
+DEBUG: ], "Logical operators") Depth: 0
+DEBUG: fn test_arrows(): Depth: 0
+DEBUG: let tokens = tokenize("-> =>") Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[ Depth: 1
+DEBUG: TokenType.Arrow, Depth: 1
+DEBUG: TokenType.FatArrow, Depth: 1
+DEBUG: TokenType.Eof Depth: 1
+DEBUG: ], "Arrow operators") Depth: 0
+DEBUG: fn test_all_keywords(): Depth: 0
+DEBUG: let source = "let var fn async struct enum match if elif else for while loop in break continue return try catch finally mn" Depth: 0
+DEBUG: let tokens = tokenize(source) Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[ Depth: 1
+DEBUG: TokenType.Let, TokenType.Var, TokenType.Fn, TokenType.Async, Depth: 1
+DEBUG: TokenType.Struct, TokenType.Enum, TokenType.Match, Depth: 1
+DEBUG: TokenType.If, TokenType.Elif, TokenType.Else, Depth: 1
+DEBUG: TokenType.For, TokenType.While, TokenType.Loop, TokenType.In, Depth: 1
+DEBUG: TokenType.Break, TokenType.Continue, TokenType.Return, Depth: 1
+DEBUG: TokenType.Try, TokenType.Catch, TokenType.Finally, Depth: 1
+DEBUG: TokenType.Mn, Depth: 1
+DEBUG: TokenType.Eof Depth: 1
+DEBUG: ], "All keywords") Depth: 0
+DEBUG: fn test_ownership_keywords(): Depth: 0
+DEBUG: let tokens = tokenize("borrow ref move kept") Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[ Depth: 1
+DEBUG: TokenType.Borrow, Depth: 1
+DEBUG: TokenType.Ref, Depth: 1
+DEBUG: TokenType.Move, Depth: 1
+DEBUG: TokenType.Kept, Depth: 1
+DEBUG: TokenType.Eof Depth: 1
+DEBUG: ], "Ownership keywords") Depth: 0
+DEBUG: fn test_type_constructors(): Depth: 0
+DEBUG: let tokens = tokenize("@int @float @str @bool @list @tuple @set @dict") Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[ Depth: 1
+DEBUG: TokenType.AtInt, TokenType.AtFloat, TokenType.AtStr, TokenType.AtBool, Depth: 1
+DEBUG: TokenType.AtList, TokenType.AtTuple, TokenType.AtSet, TokenType.AtDict, Depth: 1
+DEBUG: TokenType.Eof Depth: 1
+DEBUG: ], "Type constructors") Depth: 0
+DEBUG: fn test_decorator_tokens(): Depth: 0
+DEBUG: let tokens = tokenize("@imp @python @rust @sql @js @ui") Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[ Depth: 1
+DEBUG: TokenType.AtImp, TokenType.AtPython, TokenType.AtRust, Depth: 1
+DEBUG: TokenType.AtSql, TokenType.AtJs, TokenType.AtUi, Depth: 1
+DEBUG: TokenType.Eof Depth: 1
+DEBUG: ], "Decorator tokens") Depth: 0
+DEBUG: fn test_simple_string(): Depth: 0
+DEBUG: let tokens = tokenize("\"hello\"") Depth: 0
+DEBUG: let actual = tokens[0] Depth: 0
+DEBUG: if actual.type != TokenType.String: Depth: 0
+DEBUG: print("FAIL Simple string: Wrong token type") Depth: 0
+DEBUG: return Depth: 0
+DEBUG: if actual.value != "hello": Depth: 0
+DEBUG: print(f"FAIL Simple string: Expected 'hello', got '{actual.value}'") Depth: 0
+DEBUG: return Depth: 0
+DEBUG: print("PASS Simple string") Depth: 0
+DEBUG: fn test_string_with_escapes(): Depth: 0
+DEBUG: let tokens = tokenize("\"hello\\nworld\\t!\"") Depth: 0
+DEBUG: let actual = tokens[0] Depth: 0
+DEBUG: if actual.value != "hello\nworld\t!": Depth: 0
+DEBUG: print(f"FAIL String escapes: Expected 'hello\\nworld\\t!', got '{actual.value}'") Depth: 0
+DEBUG: return Depth: 0
+DEBUG: print("PASS String with escapes") Depth: 0
+DEBUG: fn test_single_quote_string(): Depth: 0
+DEBUG: let tokens = tokenize("'hello'") Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[ Depth: 1
+DEBUG: TokenType.String, Depth: 1
+DEBUG: TokenType.Eof Depth: 1
+DEBUG: ], "Single quote string") Depth: 0
+DEBUG: fn test_simple_indentation(): Depth: 0
+DEBUG: let source = "if x:\n    print(y)" Depth: 0
+DEBUG: let tokens = tokenize(source) Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[ Depth: 1
+DEBUG: TokenType.If, Depth: 1
+DEBUG: TokenType.Identifier, Depth: 1
+DEBUG: TokenType.Colon, Depth: 1
+DEBUG: TokenType.Newline, Depth: 1
+DEBUG: TokenType.Indent, Depth: 1
+DEBUG: TokenType.Identifier, Depth: 1
+DEBUG: TokenType.LeftParen, Depth: 1
+DEBUG: TokenType.Identifier, Depth: 1
+DEBUG: TokenType.RightParen, Depth: 1
+DEBUG: TokenType.Dedent, Depth: 1
+DEBUG: TokenType.Eof Depth: 1
+DEBUG: ], "Simple indentation") Depth: 0
+DEBUG: fn test_nested_indentation(): Depth: 0
+DEBUG: let source = "if a:\n    if b:\n        foo()\n    bar()" Depth: 0
+DEBUG: let tokens = tokenize(source) Depth: 0
+DEBUG: var expected_count = 20 Depth: 0
+DEBUG: if len(tokens) < expected_count: Depth: 0
+DEBUG: print(f"FAIL Nested indentation: Too few tokens ({len(tokens)})") Depth: 0
+DEBUG: return Depth: 0
+DEBUG: print("PASS Nested indentation") Depth: 0
+DEBUG: fn test_multiple_dedents(): Depth: 0
+DEBUG: let source = "if a:\n    if b:\n        if c:\n            foo()\nbar()" Depth: 0
+DEBUG: let tokens = tokenize(source) Depth: 0
+DEBUG: var dedent_count = 0 Depth: 0
+DEBUG: for token in tokens: Depth: 0
+DEBUG: if token.type == TokenType.Dedent: Depth: 0
+DEBUG: dedent_count = dedent_count + 1 Depth: 0
+DEBUG: if dedent_count != 3: Depth: 0
+DEBUG: print(f"FAIL Multiple dedents: Expected 3, got {dedent_count}") Depth: 0
+DEBUG: return Depth: 0
+DEBUG: print("PASS Multiple dedents") Depth: 0
+DEBUG: fn test_single_line_comment(): Depth: 0
+DEBUG: let source = "let x = 5 Depth: 0
+DEBUG: let tokens = tokenize(source) Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[ Depth: 1
+DEBUG: TokenType.Let, Depth: 1
+DEBUG: TokenType.Identifier, Depth: 1
+DEBUG: TokenType.Equal, Depth: 1
+DEBUG: TokenType.Integer, Depth: 1
+DEBUG: TokenType.Eof Depth: 1
+DEBUG: ], "Single line comment") Depth: 0
+DEBUG: fn test_comment_only_line(): Depth: 0
+DEBUG: let source = " Depth: 0
+DEBUG: let tokens = tokenize(source) Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[ Depth: 1
+DEBUG: TokenType.Newline, Depth: 1
+DEBUG: TokenType.Let, Depth: 1
+DEBUG: TokenType.Identifier, Depth: 1
+DEBUG: TokenType.Equal, Depth: 1
+DEBUG: TokenType.Integer, Depth: 1
+DEBUG: TokenType.Eof Depth: 1
+DEBUG: ], "Comment only line") Depth: 0
+DEBUG: fn test_variable_declaration(): Depth: 0
+DEBUG: let source = "let x = @int(42)" Depth: 0
+DEBUG: let tokens = tokenize(source) Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[ Depth: 1
+DEBUG: TokenType.Let, Depth: 1
+DEBUG: TokenType.Identifier, Depth: 1
+DEBUG: TokenType.Equal, Depth: 1
+DEBUG: TokenType.AtInt, Depth: 1
+DEBUG: TokenType.LeftParen, Depth: 1
+DEBUG: TokenType.Integer, Depth: 1
+DEBUG: TokenType.RightParen, Depth: 1
+DEBUG: TokenType.Eof Depth: 1
+DEBUG: ], "Variable declaration") Depth: 0
+DEBUG: fn test_function_definition(): Depth: 0
+DEBUG: let source = "fn add(a, b):\n    return a + b" Depth: 0
+DEBUG: let tokens = tokenize(source) Depth: 0
+DEBUG: var has_fn = @bool(false) Depth: 0
+DEBUG: var has_return = @bool(false) Depth: 0
+DEBUG: var has_indent = @bool(false) Depth: 0
+DEBUG: for token in tokens: Depth: 0
+DEBUG: if token.type == TokenType.Fn: Depth: 0
+DEBUG: has_fn = @bool(true) Depth: 0
+DEBUG: if token.type == TokenType.Return: Depth: 0
+DEBUG: has_return = @bool(true) Depth: 0
+DEBUG: if token.type == TokenType.Indent: Depth: 0
+DEBUG: has_indent = @bool(true) Depth: 0
+DEBUG: if has_fn and has_return and has_indent: Depth: 0
+DEBUG: print("PASS Function definition") Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: print("FAIL Function definition: Missing expected tokens") Depth: 0
+DEBUG: fn test_import_statement(): Depth: 0
+DEBUG: let source = "@imp std.io" Depth: 0
+DEBUG: let tokens = tokenize(source) Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[ Depth: 1
+DEBUG: TokenType.AtImp, Depth: 1
+DEBUG: TokenType.Identifier, Depth: 1
+DEBUG: TokenType.Dot, Depth: 1
+DEBUG: TokenType.Identifier, Depth: 1
+DEBUG: TokenType.Eof Depth: 1
+DEBUG: ], "Import statement") Depth: 0
+DEBUG: fn test_list_literal(): Depth: 0
+DEBUG: let source = "@list[1, 2, 3]" Depth: 0
+DEBUG: let tokens = tokenize(source) Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[ Depth: 1
+DEBUG: TokenType.AtList, Depth: 1
+DEBUG: TokenType.LeftBracket, Depth: 1
+DEBUG: TokenType.Integer, Depth: 1
+DEBUG: TokenType.Comma, Depth: 1
+DEBUG: TokenType.Integer, Depth: 1
+DEBUG: TokenType.Comma, Depth: 1
+DEBUG: TokenType.Integer, Depth: 1
+DEBUG: TokenType.RightBracket, Depth: 1
+DEBUG: TokenType.Eof Depth: 1
+DEBUG: ], "List literal") Depth: 0
+DEBUG: fn test_dict_literal(): Depth: 0
+DEBUG: let source = "@dict{name: \"Alice\", age: 30}" Depth: 0
+DEBUG: let tokens = tokenize(source) Depth: 0
+DEBUG: var has_dict = @bool(false) Depth: 0
+DEBUG: var has_colon = @bool(false) Depth: 0
+DEBUG: var has_comma = @bool(false) Depth: 0
+DEBUG: for token in tokens: Depth: 0
+DEBUG: if token.type == TokenType.AtDict: Depth: 0
+DEBUG: has_dict = @bool(true) Depth: 0
+DEBUG: if token.type == TokenType.Colon: Depth: 0
+DEBUG: has_colon = @bool(true) Depth: 0
+DEBUG: if token.type == TokenType.Comma: Depth: 0
+DEBUG: has_comma = @bool(true) Depth: 0
+DEBUG: if has_dict and has_colon and has_comma: Depth: 0
+DEBUG: print("PASS Dict literal") Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: print("FAIL Dict literal") Depth: 0
+DEBUG: fn test_consecutive_operators(): Depth: 0
+DEBUG: let source = "++--" Depth: 0
+DEBUG: let tokens = tokenize(source) Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[ Depth: 1
+DEBUG: TokenType.Plus, Depth: 1
+DEBUG: TokenType.Plus, Depth: 1
+DEBUG: TokenType.Minus, Depth: 1
+DEBUG: TokenType.Minus, Depth: 1
+DEBUG: TokenType.Eof Depth: 1
+DEBUG: ], "Consecutive operators") Depth: 0
+DEBUG: fn test_number_with_dots(): Depth: 0
+DEBUG: let source = "1..10" Depth: 0
+DEBUG: let tokens = tokenize(source) Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[ Depth: 1
+DEBUG: TokenType.Integer, Depth: 1
+DEBUG: TokenType.DotDot, Depth: 1
+DEBUG: TokenType.Integer, Depth: 1
+DEBUG: TokenType.Eof Depth: 1
+DEBUG: ], "Range with double dot") Depth: 0
+DEBUG: fn test_mixed_quotes(): Depth: 0
+DEBUG: let source = "\"hello\" 'world'" Depth: 0
+DEBUG: let tokens = tokenize(source) Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[ Depth: 1
+DEBUG: TokenType.String, Depth: 1
+DEBUG: TokenType.String, Depth: 1
+DEBUG: TokenType.Eof Depth: 1
+DEBUG: ], "Mixed quote styles") Depth: 0
+DEBUG: fn test_very_long_identifier(): Depth: 0
+DEBUG: let long_id = "a" * 1000 Depth: 0
+DEBUG: let tokens = tokenize(long_id) Depth: 0
+DEBUG: if tokens[0].type == TokenType.Identifier and len(tokens[0].value) == 1000: Depth: 0
+DEBUG: print("PASS Very long identifier") Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: print("FAIL Very long identifier") Depth: 0
+DEBUG: fn test_large_number(): Depth: 0
+DEBUG: let source = "99999999999999999999" Depth: 0
+DEBUG: let tokens = tokenize(source) Depth: 0
+DEBUG: assert_tokens_equal(tokens, @list[ Depth: 1
+DEBUG: TokenType.Integer, Depth: 1
+DEBUG: TokenType.Eof Depth: 1
+DEBUG: ], "Large number") Depth: 0
+DEBUG: fn run_all_tests(): Depth: 0
+DEBUG: print("=" * 70) Depth: 0
+DEBUG: print("GUL LEXER TEST SUITE") Depth: 0
+DEBUG: print("=" * 70) Depth: 0
+DEBUG: print() Depth: 0
+DEBUG: print("--- Basic Token Tests ---") Depth: 0
+DEBUG: test_empty_file() Depth: 0
+DEBUG: test_single_integer() Depth: 0
+DEBUG: test_single_float() Depth: 0
+DEBUG: test_scientific_notation() Depth: 0
+DEBUG: test_single_identifier() Depth: 0
+DEBUG: test_single_keyword() Depth: 0
+DEBUG: print() Depth: 0
+DEBUG: print("--- Operator Tests ---") Depth: 0
+DEBUG: test_arithmetic_operators() Depth: 0
+DEBUG: test_compound_operators() Depth: 0
+DEBUG: test_comparison_operators() Depth: 0
+DEBUG: test_logical_operators() Depth: 0
+DEBUG: test_arrows() Depth: 0
+DEBUG: print() Depth: 0
+DEBUG: print("--- Keyword Tests ---") Depth: 0
+DEBUG: test_all_keywords() Depth: 0
+DEBUG: test_ownership_keywords() Depth: 0
+DEBUG: print() Depth: 0
+DEBUG: print("--- Type Constructor Tests ---") Depth: 0
+DEBUG: test_type_constructors() Depth: 0
+DEBUG: test_decorator_tokens() Depth: 0
+DEBUG: print() Depth: 0
+DEBUG: print("--- String Tests ---") Depth: 0
+DEBUG: test_simple_string() Depth: 0
+DEBUG: test_string_with_escapes() Depth: 0
+DEBUG: test_single_quote_string() Depth: 0
+DEBUG: print() Depth: 0
+DEBUG: print("--- Indentation Tests ---") Depth: 0
+DEBUG: test_simple_indentation() Depth: 0
+DEBUG: test_nested_indentation() Depth: 0
+DEBUG: test_multiple_dedents() Depth: 0
+DEBUG: print() Depth: 0
+DEBUG: print("--- Comment Tests ---") Depth: 0
+DEBUG: test_single_line_comment() Depth: 0
+DEBUG: test_comment_only_line() Depth: 0
+DEBUG: print() Depth: 0
+DEBUG: print("--- Complex Expression Tests ---") Depth: 0
+DEBUG: test_variable_declaration() Depth: 0
+DEBUG: test_function_definition() Depth: 0
+DEBUG: test_import_statement() Depth: 0
+DEBUG: test_list_literal() Depth: 0
+DEBUG: test_dict_literal() Depth: 0
+DEBUG: print() Depth: 0
+DEBUG: print("--- Edge Case Tests ---") Depth: 0
+DEBUG: test_consecutive_operators() Depth: 0
+DEBUG: test_number_with_dots() Depth: 0
+DEBUG: test_mixed_quotes() Depth: 0
+DEBUG: test_very_long_identifier() Depth: 0
+DEBUG: test_large_number() Depth: 0
+DEBUG: print() Depth: 0
+DEBUG: print("=" * 70) Depth: 0
+DEBUG: print("TEST SUITE COMPLETE") Depth: 0
+DEBUG: print("=" * 70) Depth: 0
+DEBUG: mn: Depth: 0
+DEBUG: run_all_tests() Depth: 0
+✅ Generated tests/test_lexer.rs
+Transpiling tests/test_dict_single.mn -> tests/test_dict_single.rs
+DEBUG: let single_line_dict = @dict{"fn": "keyword1", "let": "keyword2"} Depth: 0
+DEBUG: print("Single-line dict:") Depth: 0
+DEBUG: print(single_line_dict) Depth: 0
+DEBUG: print("fn in single_line_dict: " + str("fn" in single_line_dict)) Depth: 0
+DEBUG: mn: Depth: 0
+DEBUG: print("Done!") Depth: 0
+✅ Generated tests/test_dict_single.rs
+Transpiling tests/test_simple.mn -> tests/test_simple.rs
+DEBUG: let x = 42 Depth: 0
+DEBUG: let y = 10 Depth: 0
+DEBUG: let z = x + y Depth: 0
+DEBUG: print("x =", x) Depth: 0
+DEBUG: print("y =", y) Depth: 0
+DEBUG: print("z = x + y =", z) Depth: 0
+DEBUG: let message = "Hello from GUL!" Depth: 0
+DEBUG: print(message) Depth: 0
+DEBUG: let numbers = @list[1, 2, 3, 4, 5] Depth: 0
+DEBUG: print("Numbers:", numbers) Depth: 0
+DEBUG: print("Length:", len(numbers)) Depth: 0
+✅ Generated tests/test_simple.rs
+Transpiling tests/test_import.mn -> tests/test_import.rs
+DEBUG: print("Testing import system...") Depth: 0
+DEBUG: @imp compiler.tests.test_module Depth: 0
+DEBUG: print("Calling imported function...") Depth: 0
+DEBUG: let result = helper_function(21) Depth: 0
+DEBUG: print("Result:", result) Depth: 0
+DEBUG: let greeting = greet("World") Depth: 0
+DEBUG: print(greeting) Depth: 0
+DEBUG: print("Module constant:", MODULE_CONSTANT) Depth: 0
+DEBUG: print("Import test complete!") Depth: 0
+✅ Generated tests/test_import.rs
+Transpiling tests/test_match2.mn -> tests/test_match2.rs
+DEBUG: enum Color: Depth: 0
+DEBUG: Red Depth: 0
+DEBUG: Blue Depth: 0
+DEBUG: Green Depth: 0
+DEBUG: fn get_name(c: Color) -> @str: Depth: 0
+DEBUG: match c: Depth: 0
+DEBUG: Color.Red => return "red" Depth: 0
+DEBUG: Color.Blue => return "blue" Depth: 0
+DEBUG: _ => return "other" Depth: 0
+DEBUG: let r = Color.Red Depth: 0
+DEBUG: let result = get_name(r) Depth: 0
+DEBUG: print("Result: " + result) Depth: 0
+DEBUG: mn: Depth: 0
+DEBUG: print("Done") Depth: 0
+✅ Generated tests/test_match2.rs
+Transpiling tests/simple_add_stripped.mn -> tests/simple_add_stripped.rs
+DEBUG: fn add(a, b): Depth: 0
+DEBUG: return a + b Depth: 0
+DEBUG: mn: Depth: 0
+DEBUG: let result = add(5, 3) Depth: 0
+DEBUG: print(result) Depth: 0
+✅ Generated tests/simple_add_stripped.rs
+Transpiling tests/test_dict_in.mn -> tests/test_dict_in.rs
+DEBUG: let test_dict = @dict{ Depth: 0
+DEBUG: "fn": "keyword1", Depth: 0
+DEBUG: "let": "keyword2", Depth: 0
+DEBUG: "var": "keyword3" Depth: 0
+DEBUG: } Depth: 0
+DEBUG: print("Testing dict membership:") Depth: 0
+DEBUG: print("fn in test_dict: " + str("fn" in test_dict)) Depth: 0
+DEBUG: print("let in test_dict: " + str("let" in test_dict)) Depth: 0
+DEBUG: print("xyz in test_dict: " + str("xyz" in test_dict)) Depth: 0
+DEBUG: mn: Depth: 0
+DEBUG: print("Done!") Depth: 0
+✅ Generated tests/test_dict_in.rs
+Transpiling tests/test_if_color.mn -> tests/test_if_color.rs
+DEBUG: enum Color: Depth: 0
+DEBUG: Red Depth: 0
+DEBUG: Blue Depth: 0
+DEBUG: Green Depth: 0
+DEBUG: fn get_name(c: Color) -> @str: Depth: 0
+DEBUG: if c == Color.Red: Depth: 0
+DEBUG: return "red" Depth: 0
+DEBUG: elif c == Color.Blue: Depth: 0
+DEBUG: return "blue" Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: return "other" Depth: 0
+DEBUG: let r = Color.Red Depth: 0
+DEBUG: let result = get_name(r) Depth: 0
+DEBUG: print("Result: " + result) Depth: 0
+DEBUG: mn: Depth: 0
+DEBUG: print("Done") Depth: 0
+✅ Generated tests/test_if_color.rs
+Transpiling tests/test_dict_debug.mn -> tests/test_dict_debug.rs
+DEBUG: let test_dict = @dict{ Depth: 0
+DEBUG: "fn": "keyword1", Depth: 0
+DEBUG: "let": "keyword2" Depth: 0
+DEBUG: } Depth: 0
+DEBUG: print("Test dict contents:") Depth: 0
+DEBUG: print(test_dict) Depth: 0
+DEBUG: print("Keys:") Depth: 0
+DEBUG: let has_fn = "fn" in test_dict Depth: 0
+DEBUG: print("fn check result: " + str(has_fn)) Depth: 0
+DEBUG: mn: Depth: 0
+DEBUG: print("Done!") Depth: 0
+✅ Generated tests/test_dict_debug.rs
+Transpiling tests/test_args.mn -> tests/test_args.rs
+DEBUG: let args = sys.argv Depth: 0
+DEBUG: print("Arguments received:") Depth: 0
+DEBUG: for arg in args: Depth: 0
+DEBUG: print("  -", arg) Depth: 0
+DEBUG: print("") Depth: 0
+DEBUG: print("Total arguments:", len(args)) Depth: 0
+✅ Generated tests/test_args.rs
+Transpiling tests/test_parser_import.mn -> tests/test_parser_import.rs
+DEBUG: @imp compiler.lexer.lexer Depth: 0
+DEBUG: @imp compiler.parser.parser Depth: 0
+DEBUG: fn test_it(): Depth: 0
+DEBUG: let source = "let x = 5" Depth: 0
+DEBUG: let tokens = tokenize(source) Depth: 0
+DEBUG: var p = Parser.create(tokens) Depth: 0
+DEBUG: print("DEBUG: p created") Depth: 0
+DEBUG: print("DEBUG: p type check") Depth: 0
+DEBUG: print(p) Depth: 0
+DEBUG: print("Before calling test_method_works") Depth: 0
+DEBUG: p.test_method_works() Depth: 0
+DEBUG: print("After calling test_method_works") Depth: 0
+DEBUG: test_it() Depth: 0
+DEBUG: mn: Depth: 0
+DEBUG: print("Done") Depth: 0
+✅ Generated tests/test_parser_import.rs
+Transpiling tests/test_match.mn -> tests/test_match.rs
+DEBUG: enum Color: Depth: 0
+DEBUG: Red Depth: 0
+DEBUG: Blue Depth: 0
+DEBUG: Green Depth: 0
+DEBUG: fn get_name(c: Color) -> @str: Depth: 0
+DEBUG: match c: Depth: 0
+DEBUG: Color.Red => "red" Depth: 0
+DEBUG: Color.Blue => "blue" Depth: 0
+DEBUG: _ => "other" Depth: 0
+DEBUG: let r = Color.Red Depth: 0
+DEBUG: let result = get_name(r) Depth: 0
+DEBUG: print("Result: " + result) Depth: 0
+DEBUG: mn: Depth: 0
+DEBUG: print("Done") Depth: 0
+✅ Generated tests/test_match.rs
+Transpiling tests/test_module.mn -> tests/test_module.rs
+DEBUG: fn helper_function(x): Depth: 0
+DEBUG: return x * 2 Depth: 0
+DEBUG: fn greet(name): Depth: 0
+DEBUG: return "Hello, " + name Depth: 0
+DEBUG: let MODULE_CONSTANT = 42 Depth: 0
+✅ Generated tests/test_module.rs
+Transpiling tests/test_struct_param.mn -> tests/test_struct_param.rs
+DEBUG: struct TestStruct: Depth: 0
+DEBUG: name: @str Depth: 0
+DEBUG: value: @int Depth: 0
+DEBUG: fn test_param_access(ts: TestStruct): Depth: 0
+DEBUG: print("Inside function:") Depth: 0
+DEBUG: print(ts.name) Depth: 0
+DEBUG: print(ts.value) Depth: 0
+DEBUG: let test = TestStruct{name: "hello", value: 42} Depth: 0
+DEBUG: test_param_access(test) Depth: 0
+DEBUG: mn: Depth: 0
+DEBUG: print("Done!") Depth: 0
+✅ Generated tests/test_struct_param.rs
+Transpiling tests/test_struct_access.mn -> tests/test_struct_access.rs
+DEBUG: struct TestStruct: Depth: 0
+DEBUG: name: @str Depth: 0
+DEBUG: value: @int Depth: 0
+DEBUG: let test = TestStruct{name: "hello", value: 42} Depth: 0
+DEBUG: print("Testing struct field access:") Depth: 0
+DEBUG: print(test.name) Depth: 0
+DEBUG: print(test.value) Depth: 0
+DEBUG: mn: Depth: 0
+DEBUG: print("Done!") Depth: 0
+✅ Generated tests/test_struct_access.rs
+Transpiling tests/test_str.mn -> tests/test_str.rs
+DEBUG: print("b" > "a") Depth: 0
+✅ Generated tests/test_str.rs
+Transpiling tests/test_full.mn -> tests/test_full.rs
+DEBUG: let x = 42 Depth: 0
+DEBUG: var y = 10 Depth: 0
+DEBUG: fn add(a, b): Depth: 0
+DEBUG: return a + b Depth: 0
+DEBUG: fn greet(name): Depth: 0
+DEBUG: let message = "Hello, " + name Depth: 0
+DEBUG: return message Depth: 0
+DEBUG: if x > 30: Depth: 0
+DEBUG: print("x is large:", x) Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: print("x is small") Depth: 0
+DEBUG: print("Counting:") Depth: 0
+DEBUG: for i in range(5): Depth: 0
+DEBUG: print("  ", i) Depth: 0
+DEBUG: let total = 0 Depth: 0
+DEBUG: while total < 10: Depth: 0
+DEBUG: total = total + 1 Depth: 0
+DEBUG: print("Total:", total) Depth: 0
+DEBUG: let sum = add(5, 3) Depth: 0
+DEBUG: print("5 + 3 =", sum) Depth: 0
+DEBUG: let greeting = greet("World") Depth: 0
+DEBUG: print(greeting) Depth: 0
+DEBUG: let numbers = [1, 2, 3, 4, 5] Depth: 0
+DEBUG: print("Numbers:", numbers) Depth: 0
+DEBUG: print("Length:", len(numbers)) Depth: 0
+DEBUG: print("✨ All features tested!") Depth: 0
+✅ Generated tests/test_full.rs

@@ -1,0 +1,11 @@
+fn main():
+    let s = ["Hello", "World"]
+    print(s[0])
+    print(s[1])
+    
+    let combined = s[0] + " " + s[1]
+    print(combined)
+
+# EXPECT: Hello
+# EXPECT: World
+# EXPECT: Hello World

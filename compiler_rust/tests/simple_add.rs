@@ -1,0 +1,9 @@
+// Simpler test program for compiler
+fn add(a, b) {
+    return a + b;
+
+}
+fn main() {
+    let result = add(5, 3);
+    println!("{}", result);
+}

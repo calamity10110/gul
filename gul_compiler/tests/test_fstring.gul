@@ -1,0 +1,18 @@
+fn main():
+    let name = "World"
+    print(f"Hello {name}")
+    
+    let x = 10
+    print(f"X is {x}")
+    
+    # Complex expression inside
+    print(f"Next is {x + 1}")
+    
+    match f"{x}":
+        "10" => print("Matched String 10")
+        _ => print("No match")
+
+# EXPECT: Hello World
+# EXPECT: X is 10
+# EXPECT: Next is 11
+# EXPECT: Matched String 10

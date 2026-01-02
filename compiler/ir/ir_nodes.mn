@@ -1,0 +1,122 @@
+# GUL v3.2 Compiler - IR Node Definitions
+# Intermediate Representation for code generation
+
+# ================================================================================
+# IR TYPES
+# ================================================================================
+
+enum IRNodeType:
+    Module
+    Function
+    Struct
+    Impl
+    Field
+    Parameter
+    Statement
+    Expression
+    Type
+
+# Base IR node
+struct IRNode:
+    node_type: IRNodeType
+    line: @int
+    column: @int
+
+# ================================================================================
+# MODULE LEVEL
+# ================================================================================
+
+struct IRModule:
+    base: IRNode
+    name: @str
+    imports: @list[@str]
+    structs: @list[IRStruct]
+    impls: @list[IRImpl]
+    functions: @list[IRFunction]
+
+struct IRStruct:
+    base: IRNode
+    name: @str
+    fields: @list[IRField]
+    # No methods - methods go in IRImpl
+
+struct IRImpl:
+    base: IRNode
+    target_type: @str
+    methods: @list[IRFunction]
+
+struct IRField:
+    base: IRNode
+    name: @str
+    type_name: @str
+    default_value: @str  # Optional
+
+# ================================================================================
+# FUNCTIONS
+# ================================================================================
+
+struct IRFunction:
+    base: IRNode
+    name: @str
+    params: @list[IRParameter]
+    return_type: @str
+    body: @list[IRStatement]
+    is_method: @bool
+    receiver: @str  # "self", "ref self", or empty
+
+struct IRParameter:
+    base: IRNode
+    name: @str
+    type_name: @str
+    ownership: @str  # "borrow", "ref", "move", ""
+
+# ================================================================================
+# STATEMENTS
+# ================================================================================
+
+enum IRStmtType:
+    Let
+    Var
+    Assign
+    Return
+    If
+    While
+    For
+    Match
+    Expr
+    Block
+
+struct IRStatement:
+    base: IRNode
+    stmt_type: IRStmtType
+    content: @str  # Serialized expression/details
+
+# ================================================================================
+# EXPRESSIONS
+# ================================================================================
+
+enum IRExprType:
+    Literal
+    Identifier
+    BinaryOp
+    UnaryOp
+    Call
+    Index
+    Attribute
+    Construct
+
+struct IRExpression:
+    base: IRNode
+    expr_type: IRExprType
+    value: @str
+    children: @list[IRExpression]
+
+# ================================================================================
+# TYPES
+# ================================================================================
+
+struct IRType:
+    name: @str
+    generics: @list[IRType]
+    is_reference: @bool
+    is_mutable: @bool

@@ -1,0 +1,124 @@
+# GUL v3.2 Compiler - Codegen Helpers
+# Builtin functions for code transformation and generation
+
+@imp std.collections
+
+# ================================================================================
+# STRING UTILITIES
+# ================================================================================
+
+fn escape_string(s: @str) -> @str:
+    """Properly escape string literals for Rust output"""
+    # For now, return as-is since Rust string literals are similar
+    # TODO: Implement proper escaping if needed
+    return s
+
+fn quote_string(s: @str) -> @str:
+    """Wrap string in quotes with proper escaping"""
+    return f"\"{escape_string(s)}\""
+
+# ================================================================================
+# TYPE CONVERSION
+# ================================================================================
+
+fn gul_type_to_rust(gul_type: @str) -> @str:
+    """Convert GUL type annotation to Rust type"""
+    if gul_type == "@int":
+        return "i64"
+    elif gul_type == "@flt" or gul_type == "@float":
+        return "f64"
+    elif gul_type == "@str":
+        return "String"
+    elif gul_type == "@bool":
+        return "bool"
+    elif gul_type == "@list":
+        return "Vec"
+    elif gul_type == "@dict":
+        return "HashMap"
+    elif gul_type == "@set":
+        return "HashSet"
+    else:
+        return gul_type
+
+fn gul_generic_to_rust(type_str: @str) -> @str:
+    """Convert @list[T] to Vec<T>"""
+    # Simplified version - just replace common patterns
+    var result = type_str
+    if result.starts_with("@list["):
+        result = result.replace("@list[", "Vec<").replace("]", ">")
+    elif result.starts_with("@dict["):
+        result = result.replace("@dict[", "HashMap<").replace("]", ">")
+    elif result.starts_with("@set["):
+        result = result.replace("@set[", "HashSet<").replace("]", ">")
+    elif result.starts_with("@option["):
+        result = result.replace("@option[", "Option<").replace("]", ">")
+    elif result.starts_with("@box["):
+        result = result.replace("@box[", "Box<").replace("]", ">")
+    return result
+
+# ================================================================================
+# INDENTATION
+# ================================================================================
+
+fn indent(code: @str, level: @int) -> @str:
+    """Add indentation to code"""
+    let spaces = "    "
+    var indent_str = ""
+    var i = 0
+    while i < level:
+        indent_str = f"{indent_str}{spaces}"
+        i = i + 1
+    
+    return f"{indent_str}{code}"
+
+fn indent_block(code: @str, level: @int) -> @str:
+    """Indent each line in a code block"""
+    # For now, just add indentation once
+    # TODO: Split by newlines and indent each line
+    return indent(code, level)
+
+# ================================================================================
+# CODE FORMATTING
+# ================================================================================
+
+fn format_parameters(params: @list) -> @str:
+    """Format function parameters as comma-separated list"""
+    # Simplified - assuming params is already formatted
+    return "/* TODO: format params */"
+
+fn format_arguments(args: @list) -> @str:
+    """Format function arguments as comma-separated list"""
+    # Simplified - assuming args is already formatted
+    return "/* TODO: format args */"
+
+# ================================================================================
+# OPERATORS
+# ================================================================================
+
+fn gul_op_to_rust(op: @str) -> @str:
+    """Convert GUL operator to Rust operator"""
+    if op == "and":
+        return "&&"
+    elif op == "or":
+        return "||"
+    elif op == "not":
+        return "!"
+    else:
+        return op
+
+# ================================================================================
+# UTILITY FUNCTIONS
+# ================================================================================
+
+fn is_primitive_type(type_name: @str) -> @bool:
+    """Check if type is a primitive"""
+    if type_name == "i64" or type_name == "f64" or type_name == "bool" or type_name == "String":
+        return @bool(true)
+    return @bool(false)
+
+fn sanitize_identifier(name: @str) -> @str:
+    """Ensure identifier is valid Rust"""
+    # Check if it's a Rust keyword and prefix with r#
+    if name == "type" or name == "match" or name == "ref" or name == "mod":
+        return f"r#{name}"
+    return name

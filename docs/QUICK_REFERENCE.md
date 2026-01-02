@@ -1,6 +1,6 @@
 # GUL v3.2 Quick Reference
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-30
 
 ---
 
@@ -22,23 +22,26 @@
 ### Primitive Types (@ prefix)
 
 ```gul
-let name = @str("Alice")      # all value(input, output, return) are default as String unless specified
+let name = "Alice"            # Default String
+let name2 = @str("Alice")     # Explicit String
 let age = @int(30)            # Integer
-let score = @float(95.5)      # Float
+let score = @float(95.5)      # Float also accepts @flt(95)
 let active = @bool(true)      # Boolean
 ```
 
 ## Variables
 
 ```gul
-let x = @int(10)     # Immutable
+let x = @int(10)     # Immutable 
 var y = @int(20)     # Mutable
 
 y = 30               # OK
-# x = 15             # Error: x is immutable
+# x = 15             # Error: immutable
 ```
 
 ---
+
+## Collections
 
 ### Collection Types
 
@@ -46,162 +49,90 @@ y = 30               # OK
 let numbers = @list[1, 2, 3]           # List (immutable)
 let tags = @set{"a", "b", "c"}         # Set (immutable)
 let user = @dict{name: "Bob", age: 25} # Dictionary (immutable)
+
+var numbers = @list[1, 2, 3]           # List (mutable)
+var tags = @set{"a", "b", "c"}         # Set (mutable)
+var user = @dict{name: "Bob", age: 25} # Dictionary (mutable)
 ```
 
-## Collections
-
-### Lists - Position-Based Collection (Non-Unique Items)
+### Lists
 
 ```gul
-# Immutable list
-let nums = @list(1, 2, 3)
-# Mutable list  
-var items = @list(1, 2, 3, "four")
+var items = @list(1, 2, 3)
 
-# insertbefore(value) - default insert at begin (position 0)
-items.insertbefore(0)  # → (0, 1, 2, 3, "four")
-# insertbefore(target, value) - insert before element (case-sensitive)
-items.insertbefore("four", 3.5)  # → (0, 1, 2, 3, 3.5, "four")
-# insertbefore(position, value) - insert at specific position
-items.insertbefore(2, 1.5)  # → (0, 1, 1.5, 2, 3, 3.5, "four")
-
-# insertafter(value) - default insert at end
-items.insertafter("Five")  # → (..., "four", "Five")
-# insertafter(target, value) - insert after element or position
-items.insertafter("four", "fourth")  # After "four" element
-items.insertafter(0, 0.5)  # After position 0
-
-# add(value) - add at end
-items.add(6)
-
-# remove(target) - remove by value or position
-items.remove(1)  # Remove at position 1
-items.remove("four")  # Remove element "four"
-
-# Access by position
-let first = items[0] # immutable position 
-let first2 = items.pick("four") # immutable position
-#or 
-var picker(@int) = items.pick() # mutable position
-
-
-let last = items[-1]
+items.add(4)
+items.insertbefore(0, 0)
+let val = items[0]
 ```
 
-### Sets - Unordered Unique Collection
+### Sets
 
 ```gul
-# Immutable set
-let labels = @set{"a", "b", "c"}
-
-# Mutable set
-var tags = @set{"rust", "python", "js"}
-
-# add(value) - add unique element
-tags.add("go")  # {"rust", "python", "js", "go"}
-
-# remove(value) - remove element
-tags.remove("js")  # {"rust", "python", "go"}
-
-# Membership check
+var tags = @set{"rust", "python"}
+tags.add("go")
 if "rust" in tags:
-    print("Found Rust")
+    print("Found")
 ```
 
-### Dictionaries - Ordered Key-Value Pairs (Unique Keys)
+### Dictionaries
 
 ```gul
-# Immutable dict
-let config = @dict{
-    host: "localhost",
-    port: 8080,
-    debug: true
-}
-
-# Mutable dict
-var cfg = @dict{
-    host: "localhost",
-    port: 8080,
-    debug: true
-}
-
-# insertbefore(position, key: value) - default at begin
-cfg.insertbefore(0, name: "user")  # Insert at position 0
-cfg.insertbefore(name: "user")  # Default at begin
-# insertbefore(target_key, key: value) - insert before key
-cfg.insertbefore(port, prim: "prpl")
-
-# insertafter(key: value) - default at end
-cfg.insertafter(verbose: true)
-
-# insertafter(target_key/position, key: value) - insert after key/position
-cfg.insertafter(port, timeout: 30)
-
-# add(key: value) - add at end
+var cfg = @dict{host: "localhost", port: 8080}
 cfg.add(ssl: true)
-
-# remove(target) - remove by position, key-value, or key
-cfg.remove(2)  # Remove at position 2
-cfg.remove(debug: true)  # Remove key-value pair
-cfg.remove(debug)  # Remove by key name
-
-# Access
-let port_val = cfg[port]  # Access by identifier
-let port_val2 = cfg(2)  # Access by position
-let port_valc = cfg("port")  # Access by string
+let p = cfg["port"]
 ```
 
 ---
 
 ## Functions
 
-### Basic Functions
+### Basic
 
 ```gul
-fn greet(name):    # default return type @str
+fn greet(name: str) -> str:
     return "Hello, " + name
 
-fn @int add(a, b): # explicit type @int return
+fn add(a: int, b: int) -> int:
     return a + b
 ```
 
 ### Arrow Functions
 
 ```gul
-let @int double = (x) => x * 2
-var @int multiply = (x, y) => x * y
-let @int add = (a, b) => a + b
-let greet = (name) => "Hello, " + name # default return type @str
+let double = (x) => x * 2
+let add = (a, b) => a + b
 ```
 
 ### Async Functions
 
-.# default return type @list
-
 ```gul
-async @dict fetch_data(std.time, url):
-    var response = await http.get(url)
-    return (std.time, response.json())
+async fetch_data(url: str) -> dict:
+    let response = await http.get(url)
+    return response.json()
 ```
 
----Checked command status
+### Input/Output
+
+```gul
+fn greet(name(std.input)):
+    print("Hello " + name)
+```
+
+---
 
 ## Structs
 
 ```gul
 struct Point:
-    x: @float
-    y: @float
+    x: float
+    y: float
 
-    fn @float distance(self):
+    fn distance(self) -> float:
         return math.sqrt(self.x^2 + self.y^2)
-
-    fn @str to_string(self):
-        return "Point(" + str(self.x) + ", " + str(self.y) + ")"
 
 # Usage
 let p = Point{x: 3.0, y: 4.0}
-print(p.distance())  # 5.0
+print(p.distance())
 ```
 
 ---
@@ -222,17 +153,13 @@ else:
 ### Loops
 
 ```gul
-# While loop
 while count < 10:
-    print(count)
     count = count + 1
 
-# For loop
 for item in items:
     print(item)
 
-# Range
-for i in range(10):
+for i in 0..10:
     print(i)
 ```
 
@@ -241,7 +168,6 @@ for i in range(10):
 ```gul
 match value:
     1 => print("One")
-    2 => print("Two")
     _ => print("Other")
 ```
 
@@ -252,10 +178,10 @@ match value:
 ### Python
 
 ```gul
+@imp python{pandas}
+
 @python {
     import pandas as pd
-    import numpy as np
-
     df = pd.read_csv("data.csv")
     mean = df['age'].mean()
 }
@@ -267,27 +193,18 @@ let result = python.mean
 
 ```gul
 @rust {
-    fn fast_fibonacci(n: u64) -> u64 {
-        if n <= 1 { return n; }
-        let mut a = 0;
-        let mut b = 1;
-        for _ in 2..=n {
-            let c = a + b;
-            a = b;
-            b = c;
-        }
-        b
+    fn fib(n: u64) -> u64 {
+        // Rust code
+        n
     }
 }
-
-let fib = rust.fast_fibonacci(20)
 ```
 
 ### SQL
 
 ```gul
 @sql {
-    SELECT * FROM users WHERE age > 18
+    SELECT * FROM users
 }
 ```
 
@@ -295,208 +212,38 @@ let fib = rust.fast_fibonacci(20)
 
 ## MCP Commands
 
-### Code Generation
-
 ```bash
-# Generate from description
-gul-mcp generate "REST API for users" --type application
+# Generate code
+gul-mcp generate "REST API"
 
-# Create package
-gul-mcp create my-app --type web
-
-# Run code
-gul-mcp run main.mn
-
-# Install dependencies
-gul-mcp install pandas numpy tensorflow
-```
-
-### Auto-Maintenance
-
-```bash
-# Individual tasks
-gul-mcp auto lint      # cargo clippy
-gul-mcp auto fmt       # cargo fmt
-gul-mcp auto check     # cargo check
-gul-mcp auto audit     # cargo audit
-
-# All at once
+# Auto tasks
 gul-mcp auto all
-```
 
-### Workflows
-
-```bash
-# List workflows
-gul-mcp workflow list
-
-# Run workflow
-gul-mcp workflow run ci_workflow
-
-# Add custom workflow
-gul-mcp workflow add deploy deploy.json
-```
-
-### Scheduling
-
-```bash
-# List schedules
-gul-mcp schedule list
-
-# Enable/disable
-gul-mcp schedule enable auto_lint
-gul-mcp schedule disable weekly_deps
-```
-
-### Server
-
-```bash
-# Start MCP server
-gul-mcp serve --port 3000
-
-# TUI dashboard
+# Dashboard
 gul-mcp tui
-
-# Web UI
-gul-mcp webui --port 8080
-
-# Status
-gul-mcp status
-gul-mcp tools
 ```
 
 ---
 
-## Import System
-
-```gul
-@imp std.io                    # Single module
-@imp std{io, math, http}       # Multiple modules
-@imp python{pandas, numpy}     # Foreign modules
-```
-
----
-
-## Main Entry Point
+## Entry Point
 
 ```gul
 mn:
     print("Hello, World!")
-
-# Or with function
-fn main():
-    print("Hello!")
-
-mn:
-    main()
 ```
-
----
-
-## Common Patterns
-
-### Web Server
-
-```gul
-@imp std.http
-
-fn @dict handler(req):
-    return @dict{status: "ok"}
-
-mn:
-    http.listen(8080, handler)
-```
-
-### Data Analysis
-
-```gul
-@imp python{pandas}
-
-@python {
-    df = pd.read_csv("data.csv")
-    stats = {
-        "mean": float(df.mean().mean()),
-        "count": len(df)
-    }
-}
-```
-
-### Async Operations
-
-```gul
-async main():
-    let data = await fetch("https://api.example.com")
-    print(data)
-
-mn:
-    await main()
-```
-
----
 
 ## Error Handling
 
 ```gul
 try:
-    let result = risky_operation()
-catch error:
-    print("Error:", error)
+    risky()
+catch e:
+    print(e)
 finally:
     cleanup()
+
+# Result Type
+match divide(10, 0):
+    Ok(v) => print(v)
+    Err(e) => print(e)
 ```
-
----
-
-## Ownership Modes
-
-```gul
-fn process(data: borrow @list):    # Borrow
-    # Can read but not modify
-
-fn mutate(data: ref @list):        # Mutable reference
-    data.append(10)
-
-fn consume(data: move @list):      # Move ownership
-    # Takes ownership
-
-fn keep(data: kept @list):         # Keep copy
-    # Makes a copy
-```
-
----
-
-## Quick Start Example
-
-```gul
-@imp std.io
-@imp python{numpy, pandas}
-
-struct DataProcessor:
-    filepath: @str
-
-    fn @dict analyze(self):
-        @python {
-            df = pd.read_csv(self.filepath)
-            return {
-                "count": len(df),
-                "mean": float(df.mean().mean())
-            }
-        }
-        return python.result
-
-fn main():
-    let processor = DataProcessor{
-        filepath: "data.csv"
-    }
-    let results = processor.analyze()
-    print("Results:", results)
-
-mn:
-    main()
-```
-
----
-
-**More**: See [complete documentation](README.md)  
-**MCP Guide**: [MCP_QUICKSTART.md](guides/MCP_QUICKSTART.md)  
-**Advanced**: [MCP_ADVANCED.md](../MCP_ADVANCED.md)

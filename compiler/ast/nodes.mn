@@ -1,239 +1,205 @@
-# GUL v3.2 Compiler - AST Node Definitions
-# Abstract Syntax Tree node types for representing parsed GUL code
-
+# GUL v3.2 Compiler - AST Node Definitions (Refactored)
 @imp std.collections
 @imp compiler.lexer.token
 
-# ================================================================================
-# BASE NODE TYPES
-# ================================================================================
-
-# Base node for all AST nodes
 struct ASTNode:
     line: @int
     column: @int
-    
-    fn @str location(self) -> @str:
-        return @str(f"{self.line}:{self.column}")
 
-# ================================================================================
-# EXPRESSION NODES
-# ================================================================================
+impl ASTNode:
+    fn location(self) -> @str:
+        return f"{self.line}:{self.column}"
 
+# Enums for Types
 enum ExprType:
-    # Literals
-    IntegerLiteral
-    FloatLiteral
-    StringLiteral
-    BooleanLiteral
-    NoneLiteral
-    
-    # Collections
-    ListLiteral
-    TupleLiteral
-    SetLiteral
-    DictLiteral
-    
-    # Variables and names
-    Identifier
-    
-    # Binary operations
-    BinaryOp
-    
-    # Unary operations
-    UnaryOp
-    
-    # Function call
-    Call
-    
-    # Index/subscript
-    Index
-    
-    # Attribute access
-    Attribute
-    
-    # Lambda/arrow function
-    Lambda
-    
-    # Match expression
-    MatchExpr
-    
-    # Type constructor
-    TypeConstructor
-    
-    # Parenthesized expression
-    Grouped
+    IntegerLiteral, FloatLiteral, StringLiteral, BooleanLiteral, NoneLiteral,
+    ListLiteral, TupleLiteral, SetLiteral, DictLiteral,
+    Identifier, BinaryOp, UnaryOp, Call, Index, Attribute,
+    Lambda, MatchExpr, TypeConstructor, Grouped
 
-# Expression base struct
-struct Expression:
-    node: ASTNode
-    expr_type: ExprType
+enum StmtType:
+    LetDecl, VarDecl, FunctionDecl, StructDecl, EnumDecl,
+    IfStmt, WhileStmt, ForStmt, LoopStmt, MatchStmt,
+    BreakStmt, ContinueStmt, ReturnStmt,
+    TryStmt, ExpressionStmt, AssignmentStmt, ImportStmt, ForeignCodeBlock, PassStmt
 
-# Literal value expression
+# Expression Enum
+enum Expression:
+    Literal(LiteralExpr),
+    Identifier(IdentifierExpr),
+    BinaryOp(BinaryOpExpr),
+    UnaryOp(UnaryOpExpr),
+    Call(CallExpr),
+    Index(IndexExpr),
+    Attribute(AttributeExpr),
+    List(ListExpr),
+    Tuple(TupleExpr),
+    Set(SetExpr),
+    Dict(DictExpr),
+    Lambda(LambdaExpr),
+    Match(MatchExpr),
+    TypeConstructor(TypeConstructorExpr),
+    Grouped(GroupedExpr)
+
+# Statement Enum
+enum Statement:
+    LetDecl(LetStmt),
+    VarDecl(VarStmt),
+    FunctionDecl(FunctionDecl),
+    StructDecl(StructDecl),
+    EnumDecl(EnumDecl),
+    IfStmt(IfStmt),
+    WhileStmt(WhileStmt),
+    ForStmt(ForStmt),
+    LoopStmt(LoopStmt),
+    MatchStmt(MatchStmt),
+    BreakStmt(BreakStmt),
+    ContinueStmt(ContinueStmt),
+    ReturnStmt(ReturnStmt),
+    TryStmt(TryStmt),
+    ExpressionStmt(ExpressionStmt),
+    AssignmentStmt(AssignmentStmt),
+    ImportStmt(ImportStmt),
+    ForeignCodeBlock(ForeignCodeBlock),
+    PassStmt(PassStmt)
+
+# Implement basic methods for Statement
+impl Statement:
+    fn stmt_type(ref self) -> StmtType:
+        match self:
+             Statement.LetDecl(s) => return StmtType.LetDecl
+             Statement.VarDecl(s) => return StmtType.VarDecl
+             Statement.FunctionDecl(s) => return StmtType.FunctionDecl
+             Statement.StructDecl(s) => return StmtType.StructDecl
+             Statement.EnumDecl(s) => return StmtType.EnumDecl
+             Statement.IfStmt(s) => return StmtType.IfStmt
+             Statement.WhileStmt(s) => return StmtType.WhileStmt
+             Statement.ForStmt(s) => return StmtType.ForStmt
+             Statement.LoopStmt(s) => return StmtType.LoopStmt
+             Statement.MatchStmt(s) => return StmtType.MatchStmt
+             Statement.BreakStmt(s) => return StmtType.BreakStmt
+             Statement.ContinueStmt(s) => return StmtType.ContinueStmt
+             Statement.ReturnStmt(s) => return StmtType.ReturnStmt
+             Statement.TryStmt(s) => return StmtType.TryStmt
+             Statement.ExpressionStmt(s) => return StmtType.ExpressionStmt
+             Statement.AssignmentStmt(s) => return StmtType.AssignmentStmt
+             Statement.ImportStmt(s) => return StmtType.ImportStmt
+             Statement.ForeignCodeBlock(s) => return StmtType.ForeignCodeBlock
+             Statement.PassStmt(s) => return StmtType.PassStmt
+
+# Expression Structs
 struct LiteralExpr:
-    base: Expression
-    value: @str  # String representation of the value
-    value_type: TokenType  # Integer, Float, String, Boolean
+    node: ASTNode
+    value: @str
+    value_type: TokenType
 
-# Identifier (variable name)
 struct IdentifierExpr:
-    base: Expression
+    node: ASTNode
     name: @str
 
-# Binary operation (a + b, x == y, etc.)
 struct BinaryOpExpr:
-    base: Expression
-    left: Expression
+    node: ASTNode
+    left: @box[Expression]
     operator: TokenType
-    right: Expression
+    right: @box[Expression]
 
-# Unary operation (not x, -y, etc.)
 struct UnaryOpExpr:
-    base: Expression
+    node: ASTNode
     operator: TokenType
-    operand: Expression
+    operand: @box[Expression]
 
-# Function call
 struct CallExpr:
-    base: Expression
-    callee: Expression  # Function being called
+    node: ASTNode
+    callee: @box[Expression]
     arguments: @list[Expression]
-    keyword_args: @dict  # name -> Expression
+    keyword_args: @dict
 
-# Index/subscript (list[0], dict[key])
 struct IndexExpr:
-    base: Expression
-    object: Expression
-    index: Expression
+    node: ASTNode
+    object: @box[Expression]
+    index: @box[Expression]
 
-# Attribute access (obj.field)
 struct AttributeExpr:
-    base: Expression
-    object: Expression
+    node: ASTNode
+    object: @box[Expression]
     attribute: @str
 
-# List literal
 struct ListExpr:
-    base: Expression
+    node: ASTNode
     elements: @list[Expression]
 
-# Tuple literal
 struct TupleExpr:
-    base: Expression
+    node: ASTNode
     elements: @list[Expression]
 
-# Set literal
 struct SetExpr:
-    base: Expression
+    node: ASTNode
     elements: @list[Expression]
 
-# Dictionary literal
 struct DictExpr:
-    base: Expression
-    pairs: @list[@tuple(Expression, Expression)]  # (key, value) pairs
+    node: ASTNode
+    pairs: @list[@tuple(Expression, Expression)]
 
-# Lambda/arrow function
 struct LambdaExpr:
-    base: Expression
+    node: ASTNode
     parameters: @list[@str]
-    body: Expression
+    body: @box[Expression]
 
-# Match expression
 struct MatchExpr:
-    base: Expression
-    value: Expression
+    node: ASTNode
+    value: @box[Expression]
     cases: @list[MatchCase]
 
 struct MatchCase:
     pattern: Expression
-    guard: Expression  # Optional condition (can be None)
+    guard: Expression 
     body: Expression
 
-# Type constructor (@int(42), @str("hello"))
 struct TypeConstructorExpr:
-    base: Expression
-    type_name: @str  # "int", "float", "str", etc.
-    argument: Expression  # Value being cast/constructed
-
-# ================================================================================
-# STATEMENT NODES
-# ================================================================================
-
-enum StmtType:
-    # Declarations
-    LetDecl
-    VarDecl
-    FunctionDecl
-    StructDecl
-    EnumDecl
-    
-    # Control flow
-    IfStmt
-    WhileStmt
-    ForStmt
-    LoopStmt
-    MatchStmt
-    
-    # Flow control
-    BreakStmt
-    ContinueStmt
-    ReturnStmt
-    
-    # Error handling
-    TryStmt
-    
-    # Other
-    ExpressionStmt
-    AssignmentStmt
-    ImportStmt
-    ForeignCodeBlock
-    PassStmt
-
-# Statement base struct
-struct Statement:
     node: ASTNode
-    stmt_type: StmtType
+    type_name: @str
+    argument: @box[Expression]
 
-# Let declaration (immutable)
+struct GroupedExpr:
+    node: ASTNode
+    expression: @box[Expression]
+
+# Statements
 struct LetStmt:
-    base: Statement
-    name: @str
-    type_annotation: @str  # Optional type (can be empty)
-    value: Expression
-
-# Var declaration (mutable)
-struct VarStmt:
-    base: Statement
+    node: ASTNode
     name: @str
     type_annotation: @str
     value: Expression
 
-# Assignment statement (x = 5, x += 1)
-struct AssignmentStmt:
-    base: Statement
-    target: Expression  # Can be identifier, index, or attribute
-    operator: TokenType  # Equal, PlusEq, MinusEq, etc.
+struct VarStmt:
+    node: ASTNode
+    name: @str
+    type_annotation: @str
     value: Expression
 
-# Function declaration
+struct AssignmentStmt:
+    node: ASTNode
+    target: Expression
+    operator: TokenType
+    value: Expression
+
 struct FunctionDecl:
-    base: Statement
+    node: ASTNode
     name: @str
     is_async: @bool
     parameters: @list[Parameter]
-    return_type: @str  # Optional return type
+    return_type: @str
     body: @list[Statement]
-    decorators: @list[@str]  # Decorator names
+    decorators: @list[@str]
 
 struct Parameter:
     name: @str
-    type_annotation: @str  # Optional type
-    ownership_mode: @str  # "borrow", "ref", "move", "kept", or empty
-    default_value: Expression  # Optional default value
+    type_annotation: @str
+    ownership_mode: @str
+    default_value: Expression
 
-# Struct declaration
 struct StructDecl:
-    base: Statement
+    node: ASTNode
     name: @str
     fields: @list[StructField]
     methods: @list[FunctionDecl]
@@ -242,122 +208,90 @@ struct StructField:
     name: @str
     type_annotation: @str
 
-# Enum declaration
 struct EnumDecl:
-    base: Statement
+    node: ASTNode
     name: @str
     variants: @list[@str]
 
-# If statement
 struct IfStmt:
-    base: Statement
+    node: ASTNode
     condition: Expression
     then_body: @list[Statement]
     elif_clauses: @list[ElifClause]
-    else_body: @list[Statement]  # Can be empty
+    else_body: @list[Statement]
 
 struct ElifClause:
     condition: Expression
     body: @list[Statement]
 
-# While loop
 struct WhileStmt:
-    base: Statement
+    node: ASTNode
     condition: Expression
     body: @list[Statement]
 
-# For loop
 struct ForStmt:
-    base: Statement
+    node: ASTNode
     variable: @str
     iterable: Expression
     body: @list[Statement]
 
-# Infinite loop
 struct LoopStmt:
-    base: Statement
+    node: ASTNode
     body: @list[Statement]
 
-# Match statement
 struct MatchStmt:
-    base: Statement
+    node: ASTNode
     value: Expression
     cases: @list[MatchStmtCase]
 
 struct MatchStmtCase:
     pattern: Expression
-    guard: Expression  # Optional
+    guard: Expression
     body: @list[Statement]
 
-# Break statement
 struct BreakStmt:
-    base: Statement
+    node: ASTNode
 
-# Continue statement
 struct ContinueStmt:
-    base: Statement
+    node: ASTNode
 
-# Return statement
 struct ReturnStmt:
-    base: Statement
-    value: Expression  # Optional (can be None)
+    node: ASTNode
+    value: Expression
 
-# Try/catch/finally
 struct TryStmt:
-    base: Statement
+    node: ASTNode
     try_body: @list[Statement]
     catch_clauses: @list[CatchClause]
-    finally_body: @list[Statement]  # Optional
+    finally_body: @list[Statement]
 
 struct CatchClause:
-    exception_type: @str  # Optional type filter
-    variable_name: @str  # Variable to bind exception to
+    exception_type: @str
+    variable_name: @str
     body: @list[Statement]
 
-# Import statement
 struct ImportStmt:
-    base: Statement
-    module_path: @list[@str]  # ["std", "io"]
-    import_type: @str  # "single", "multiple", "block"
-    items: @list[@str]  # Empty for full module import
+    node: ASTNode
+    module_path: @list[@str]
+    import_type: @str
+    items: @list[@str]
 
-# Foreign code block (@python{}, @rust{}, etc.)
 struct ForeignCodeBlock:
-    base: Statement
-    language: @str  # "python", "rust", "js", "sql"
-    code: @str  # Raw foreign code
+    node: ASTNode
+    language: @str
+    code: @str
 
-# Expression statement (just an expression as a statement)
 struct ExpressionStmt:
-    base: Statement
+    node: ASTNode
     expression: Expression
 
-# Pass statement (no-op)
 struct PassStmt:
-    base: Statement
+    node: ASTNode
 
-# ================================================================================
-# PROGRAM/MODULE NODE
-# ================================================================================
-
-# Top-level program/module
 struct Program:
     statements: @list[Statement]
     imports: @list[ImportStmt]
-    main_entry: @list[Statement]  # Code in mn: block
-
-# ================================================================================
-# HELPER FUNCTIONS
-# ================================================================================
+    main_entry: @list[Statement]
 
 fn create_node(line: @int, column: @int) -> ASTNode:
     return ASTNode{line: line, column: column}
-
-fn create_literal_expr(value: @str, value_type: TokenType, line: @int, column: @int) -> LiteralExpr:
-    return LiteralExpr{base: Expression{node: create_node(line, column), expr_type: ExprType.IntegerLiteral}, value: value, value_type: value_type}
-
-fn create_identifier_expr(name: @str, line: @int, column: @int) -> IdentifierExpr:
-    return IdentifierExpr{base: Expression{node: create_node(line, column), expr_type: ExprType.Identifier}, name: name}
-
-fn create_binary_op_expr(left: Expression, op: TokenType, right: Expression, line: @int, column: @int) -> BinaryOpExpr:
-    return BinaryOpExpr{base: Expression{node: create_node(line, column), expr_type: ExprType.BinaryOp}, left: left, operator: op, right: right}

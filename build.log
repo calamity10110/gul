@@ -1,0 +1,1510 @@
+🚀 Building GUL Compiler from GUL Source
+========================================
+
+Step 1: Transpiling GUL → Rust...
+Found 10 GUL files to transpile
+Transpiling main.mn -> main.rs
+✅ Generated main.rs
+Transpiling ast/nodes.mn -> ast/nodes.rs
+✅ Generated ast/nodes.rs
+Transpiling parser/parser.mn -> parser/parser.rs
+✅ Generated parser/parser.rs
+Transpiling ir/ir_builder.mn -> ir/ir_builder.rs
+✅ Generated ir/ir_builder.rs
+Transpiling ir/ir_nodes.mn -> ir/ir_nodes.rs
+✅ Generated ir/ir_nodes.rs
+Transpiling lexer/lexer.mn -> lexer/lexer.rs
+✅ Generated lexer/lexer.rs
+Transpiling lexer/token.mn -> lexer/token.rs
+✅ Generated lexer/token.rs
+Transpiling builtins/codegen_helpers.mn -> builtins/codegen_helpers.rs
+✅ Generated builtins/codegen_helpers.rs
+Transpiling codegen/rust_backend.mn -> codegen/rust_backend.rs
+✅ Generated codegen/rust_backend.rs
+Transpiling semantic/analyzer.mn -> semantic/analyzer.rs
+✅ Generated semantic/analyzer.rs
+
+Step 2: Creating Rust project structure...
+✅ Cargo.toml created
+
+Step 3: Compiling Rust code...
+   Compiling gul-compiler v0.1.0 (/media/vu/512gb/blob/gul/compiler_rust)
+error: expected one of `.`, `;`, `?`, `else`, or an operator, found `,`
+   --> main.rs:257:143
+    |
+257 | ...check_semantics, "verbose" => verbose}),
+    |                                           ^ expected one of `.`, `;`, `?`, `else`, or an operator
+
+error: expected one of `(`, `,`, `=`, `{`, or `}`, found `;`
+  --> ast/nodes.rs:23:48
+   |
+23 |     Lambda, MatchExpr, TypeConstructor, Grouped;
+   |                                                ^ expected one of `(`, `,`, `=`, `{`, or `}`
+   |
+   = help: enum variants can be `Variant`, `Variant = <integer>`, `Variant(Type, ..., TypeN)` or `Variant { fields: Types }`
+
+error: expected one of `(`, `,`, `=`, `{`, or `}`, found `;`
+  --> ast/nodes.rs:31:84
+   |
+31 |     TryStmt, ExpressionStmt, AssignmentStmt, ImportStmt, ForeignCodeBlock, PassStmt;
+   |                                                                                    ^ expected one of `(`, `,`, `=`, `{`, or `}`
+   |
+   = help: enum variants can be `Variant`, `Variant = <integer>`, `Variant(Type, ..., TypeN)` or `Variant { fields: Types }`
+
+error: expected one of `,`, `=`, or `}`, found `;`
+  --> ast/nodes.rs:51:25
+   |
+51 |     Grouped(GroupedExpr);
+   |                         ^ expected one of `,`, `=`, or `}`
+   |
+   = help: enum variants can be `Variant`, `Variant = <integer>`, `Variant(Type, ..., TypeN)` or `Variant { fields: Types }`
+
+error: expected one of `,`, `=`, or `}`, found `;`
+  --> ast/nodes.rs:75:23
+   |
+75 |     PassStmt(PassStmt);
+   |                       ^ expected one of `,`, `=`, or `}`
+   |
+   = help: enum variants can be `Variant`, `Variant = <integer>`, `Variant(Type, ..., TypeN)` or `Variant { fields: Types }`
+
+error: expected a pattern, found an expression
+  --> ast/nodes.rs:82:13
+   |
+82 |             Statement.LetDecl(s) => return StmtType::LetDecl,
+   |             ^^^^^^^^^^^^^^^^^^^^ not a pattern
+   |
+   = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+   |
+82 -             Statement.LetDecl(s) => return StmtType::LetDecl,
+82 +             val if val == Statement.LetDecl(s) => return StmtType::LetDecl,
+   |
+help: consider extracting the expression into a `const`
+   |
+81 +         const VAL: /* Type */ = Statement.LetDecl(s);
+82 |         match self {
+83 ~             VAL => return StmtType::LetDecl,
+   |
+
+error: expected a pattern, found an expression
+  --> ast/nodes.rs:83:13
+   |
+83 |             Statement.VarDecl(s) => return StmtType::VarDecl,
+   |             ^^^^^^^^^^^^^^^^^^^^ not a pattern
+   |
+   = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+   |
+83 -             Statement.VarDecl(s) => return StmtType::VarDecl,
+83 +             val if val == Statement.VarDecl(s) => return StmtType::VarDecl,
+   |
+help: consider extracting the expression into a `const`
+   |
+81 +         const VAL: /* Type */ = Statement.VarDecl(s);
+82 |         match self {
+83 |             Statement.LetDecl(s) => return StmtType::LetDecl,
+84 ~             VAL => return StmtType::VarDecl,
+   |
+
+error: expected a pattern, found an expression
+  --> ast/nodes.rs:84:13
+   |
+84 |             Statement.FunctionDecl(s) => return StmtType::FunctionDecl,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^ not a pattern
+   |
+   = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+   |
+84 -             Statement.FunctionDecl(s) => return StmtType::FunctionDecl,
+84 +             val if val == Statement.FunctionDecl(s) => return StmtType::FunctionDecl,
+   |
+help: consider extracting the expression into a `const`
+   |
+81 +         const VAL: /* Type */ = Statement.FunctionDecl(s);
+82 |         match self {
+83 |             Statement.LetDecl(s) => return StmtType::LetDecl,
+84 |             Statement.VarDecl(s) => return StmtType::VarDecl,
+85 ~             VAL => return StmtType::FunctionDecl,
+   |
+
+error: expected a pattern, found an expression
+  --> ast/nodes.rs:85:13
+   |
+85 |             Statement.StructDecl(s) => return StmtType::StructDecl,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^ not a pattern
+   |
+   = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+   |
+85 -             Statement.StructDecl(s) => return StmtType::StructDecl,
+85 +             val if val == Statement.StructDecl(s) => return StmtType::StructDecl,
+   |
+help: consider extracting the expression into a `const`
+   |
+81 +         const VAL: /* Type */ = Statement.StructDecl(s);
+82 |         match self {
+83 |             Statement.LetDecl(s) => return StmtType::LetDecl,
+84 |             Statement.VarDecl(s) => return StmtType::VarDecl,
+85 |             Statement.FunctionDecl(s) => return StmtType::FunctionDecl,
+86 ~             VAL => return StmtType::StructDecl,
+   |
+
+error: expected a pattern, found an expression
+  --> ast/nodes.rs:86:13
+   |
+86 |             Statement.EnumDecl(s) => return StmtType::EnumDecl,
+   |             ^^^^^^^^^^^^^^^^^^^^^ not a pattern
+   |
+   = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+   |
+86 -             Statement.EnumDecl(s) => return StmtType::EnumDecl,
+86 +             val if val == Statement.EnumDecl(s) => return StmtType::EnumDecl,
+   |
+help: consider extracting the expression into a `const`
+   |
+81 +         const VAL: /* Type */ = Statement.EnumDecl(s);
+82 |         match self {
+83 |             Statement.LetDecl(s) => return StmtType::LetDecl,
+...
+86 |             Statement.StructDecl(s) => return StmtType::StructDecl,
+87 ~             VAL => return StmtType::EnumDecl,
+   |
+
+error: expected a pattern, found an expression
+  --> ast/nodes.rs:87:13
+   |
+87 |             Statement.IfStmt(s) => return StmtType::IfStmt,
+   |             ^^^^^^^^^^^^^^^^^^^ not a pattern
+   |
+   = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+   |
+87 -             Statement.IfStmt(s) => return StmtType::IfStmt,
+87 +             val if val == Statement.IfStmt(s) => return StmtType::IfStmt,
+   |
+help: consider extracting the expression into a `const`
+   |
+81 +         const VAL: /* Type */ = Statement.IfStmt(s);
+82 |         match self {
+83 |             Statement.LetDecl(s) => return StmtType::LetDecl,
+...
+87 |             Statement.EnumDecl(s) => return StmtType::EnumDecl,
+88 ~             VAL => return StmtType::IfStmt,
+   |
+
+error: expected a pattern, found an expression
+  --> ast/nodes.rs:88:13
+   |
+88 |             Statement.WhileStmt(s) => return StmtType::WhileStmt,
+   |             ^^^^^^^^^^^^^^^^^^^^^^ not a pattern
+   |
+   = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+   |
+88 -             Statement.WhileStmt(s) => return StmtType::WhileStmt,
+88 +             val if val == Statement.WhileStmt(s) => return StmtType::WhileStmt,
+   |
+help: consider extracting the expression into a `const`
+   |
+81 +         const VAL: /* Type */ = Statement.WhileStmt(s);
+82 |         match self {
+83 |             Statement.LetDecl(s) => return StmtType::LetDecl,
+...
+88 |             Statement.IfStmt(s) => return StmtType::IfStmt,
+89 ~             VAL => return StmtType::WhileStmt,
+   |
+
+error: expected a pattern, found an expression
+  --> ast/nodes.rs:89:13
+   |
+89 |             Statement.ForStmt(s) => return StmtType::ForStmt,
+   |             ^^^^^^^^^^^^^^^^^^^^ not a pattern
+   |
+   = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+   |
+89 -             Statement.ForStmt(s) => return StmtType::ForStmt,
+89 +             val if val == Statement.ForStmt(s) => return StmtType::ForStmt,
+   |
+help: consider extracting the expression into a `const`
+   |
+81 +         const VAL: /* Type */ = Statement.ForStmt(s);
+82 |         match self {
+83 |             Statement.LetDecl(s) => return StmtType::LetDecl,
+...
+89 |             Statement.WhileStmt(s) => return StmtType::WhileStmt,
+90 ~             VAL => return StmtType::ForStmt,
+   |
+
+error: expected a pattern, found an expression
+  --> ast/nodes.rs:90:13
+   |
+90 |             Statement.LoopStmt(s) => return StmtType::LoopStmt,
+   |             ^^^^^^^^^^^^^^^^^^^^^ not a pattern
+   |
+   = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+   |
+90 -             Statement.LoopStmt(s) => return StmtType::LoopStmt,
+90 +             val if val == Statement.LoopStmt(s) => return StmtType::LoopStmt,
+   |
+help: consider extracting the expression into a `const`
+   |
+81 +         const VAL: /* Type */ = Statement.LoopStmt(s);
+82 |         match self {
+83 |             Statement.LetDecl(s) => return StmtType::LetDecl,
+...
+90 |             Statement.ForStmt(s) => return StmtType::ForStmt,
+91 ~             VAL => return StmtType::LoopStmt,
+   |
+
+error: expected a pattern, found an expression
+  --> ast/nodes.rs:91:13
+   |
+91 |             Statement.MatchStmt(s) => return StmtType::MatchStmt,
+   |             ^^^^^^^^^^^^^^^^^^^^^^ not a pattern
+   |
+   = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+   |
+91 -             Statement.MatchStmt(s) => return StmtType::MatchStmt,
+91 +             val if val == Statement.MatchStmt(s) => return StmtType::MatchStmt,
+   |
+help: consider extracting the expression into a `const`
+   |
+81 +         const VAL: /* Type */ = Statement.MatchStmt(s);
+82 |         match self {
+83 |             Statement.LetDecl(s) => return StmtType::LetDecl,
+...
+91 |             Statement.LoopStmt(s) => return StmtType::LoopStmt,
+92 ~             VAL => return StmtType::MatchStmt,
+   |
+
+error: expected a pattern, found an expression
+  --> ast/nodes.rs:92:13
+   |
+92 |             Statement.BreakStmt(s) => return StmtType::BreakStmt,
+   |             ^^^^^^^^^^^^^^^^^^^^^^ not a pattern
+   |
+   = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+   |
+92 -             Statement.BreakStmt(s) => return StmtType::BreakStmt,
+92 +             val if val == Statement.BreakStmt(s) => return StmtType::BreakStmt,
+   |
+help: consider extracting the expression into a `const`
+   |
+81 +         const VAL: /* Type */ = Statement.BreakStmt(s);
+82 |         match self {
+83 |             Statement.LetDecl(s) => return StmtType::LetDecl,
+...
+92 |             Statement.MatchStmt(s) => return StmtType::MatchStmt,
+93 ~             VAL => return StmtType::BreakStmt,
+   |
+
+error: expected a pattern, found an expression
+  --> ast/nodes.rs:93:13
+   |
+93 |             Statement.ContinueStmt(s) => return StmtType::ContinueStmt,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^ not a pattern
+   |
+   = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+   |
+93 -             Statement.ContinueStmt(s) => return StmtType::ContinueStmt,
+93 +             val if val == Statement.ContinueStmt(s) => return StmtType::ContinueStmt,
+   |
+help: consider extracting the expression into a `const`
+   |
+81 +         const VAL: /* Type */ = Statement.ContinueStmt(s);
+82 |         match self {
+83 |             Statement.LetDecl(s) => return StmtType::LetDecl,
+...
+93 |             Statement.BreakStmt(s) => return StmtType::BreakStmt,
+94 ~             VAL => return StmtType::ContinueStmt,
+   |
+
+error: expected a pattern, found an expression
+  --> ast/nodes.rs:94:13
+   |
+94 |             Statement.ReturnStmt(s) => return StmtType::ReturnStmt,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^ not a pattern
+   |
+   = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+   |
+94 -             Statement.ReturnStmt(s) => return StmtType::ReturnStmt,
+94 +             val if val == Statement.ReturnStmt(s) => return StmtType::ReturnStmt,
+   |
+help: consider extracting the expression into a `const`
+   |
+81 +         const VAL: /* Type */ = Statement.ReturnStmt(s);
+82 |         match self {
+83 |             Statement.LetDecl(s) => return StmtType::LetDecl,
+...
+94 |             Statement.ContinueStmt(s) => return StmtType::ContinueStmt,
+95 ~             VAL => return StmtType::ReturnStmt,
+   |
+
+error: expected a pattern, found an expression
+  --> ast/nodes.rs:95:13
+   |
+95 |             Statement.TryStmt(s) => return StmtType::TryStmt,
+   |             ^^^^^^^^^^^^^^^^^^^^ not a pattern
+   |
+   = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+   |
+95 -             Statement.TryStmt(s) => return StmtType::TryStmt,
+95 +             val if val == Statement.TryStmt(s) => return StmtType::TryStmt,
+   |
+help: consider extracting the expression into a `const`
+   |
+81 +         const VAL: /* Type */ = Statement.TryStmt(s);
+82 |         match self {
+83 |             Statement.LetDecl(s) => return StmtType::LetDecl,
+...
+95 |             Statement.ReturnStmt(s) => return StmtType::ReturnStmt,
+96 ~             VAL => return StmtType::TryStmt,
+   |
+
+error: expected a pattern, found an expression
+  --> ast/nodes.rs:96:13
+   |
+96 |             Statement.ExpressionStmt(s) => return StmtType::ExpressionStmt,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^ not a pattern
+   |
+   = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+   |
+96 -             Statement.ExpressionStmt(s) => return StmtType::ExpressionStmt,
+96 +             val if val == Statement.ExpressionStmt(s) => return StmtType::ExpressionStmt,
+   |
+help: consider extracting the expression into a `const`
+   |
+81 +         const VAL: /* Type */ = Statement.ExpressionStmt(s);
+82 |         match self {
+83 |             Statement.LetDecl(s) => return StmtType::LetDecl,
+...
+96 |             Statement.TryStmt(s) => return StmtType::TryStmt,
+97 ~             VAL => return StmtType::ExpressionStmt,
+   |
+
+error: expected a pattern, found an expression
+  --> ast/nodes.rs:97:13
+   |
+97 |             Statement.AssignmentStmt(s) => return StmtType::AssignmentStmt,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^ not a pattern
+   |
+   = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+   |
+97 -             Statement.AssignmentStmt(s) => return StmtType::AssignmentStmt,
+97 +             val if val == Statement.AssignmentStmt(s) => return StmtType::AssignmentStmt,
+   |
+help: consider extracting the expression into a `const`
+   |
+81 +         const VAL: /* Type */ = Statement.AssignmentStmt(s);
+82 |         match self {
+83 |             Statement.LetDecl(s) => return StmtType::LetDecl,
+...
+97 |             Statement.ExpressionStmt(s) => return StmtType::ExpressionStmt,
+98 ~             VAL => return StmtType::AssignmentStmt,
+   |
+
+error: expected a pattern, found an expression
+  --> ast/nodes.rs:98:13
+   |
+98 |             Statement.ImportStmt(s) => return StmtType::ImportStmt,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^ not a pattern
+   |
+   = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+   |
+98 -             Statement.ImportStmt(s) => return StmtType::ImportStmt,
+98 +             val if val == Statement.ImportStmt(s) => return StmtType::ImportStmt,
+   |
+help: consider extracting the expression into a `const`
+   |
+81 +         const VAL: /* Type */ = Statement.ImportStmt(s);
+82 |         match self {
+83 |             Statement.LetDecl(s) => return StmtType::LetDecl,
+...
+98 |             Statement.AssignmentStmt(s) => return StmtType::AssignmentStmt,
+99 ~             VAL => return StmtType::ImportStmt,
+   |
+
+error: expected a pattern, found an expression
+  --> ast/nodes.rs:99:13
+   |
+99 |             Statement.ForeignCodeBlock(s) => return StmtType::ForeignCodeBlock,
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ not a pattern
+   |
+   = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+   |
+99 -             Statement.ForeignCodeBlock(s) => return StmtType::ForeignCodeBlock,
+99 +             val if val == Statement.ForeignCodeBlock(s) => return StmtType::ForeignCodeBlock,
+   |
+help: consider extracting the expression into a `const`
+   |
+81 +         const VAL: /* Type */ = Statement.ForeignCodeBlock(s);
+82 |         match self {
+83 |             Statement.LetDecl(s) => return StmtType::LetDecl,
+...
+99 |             Statement.ImportStmt(s) => return StmtType::ImportStmt,
+100~             VAL => return StmtType::ForeignCodeBlock,
+   |
+
+error: expected a pattern, found an expression
+   --> ast/nodes.rs:100:13
+    |
+100 |             Statement.PassStmt(s) => return StmtType::PassStmt,
+    |             ^^^^^^^^^^^^^^^^^^^^^ not a pattern
+    |
+    = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+    |
+100 -             Statement.PassStmt(s) => return StmtType::PassStmt,
+100 +             val if val == Statement.PassStmt(s) => return StmtType::PassStmt,
+    |
+help: consider extracting the expression into a `const`
+    |
+ 81 +         const VAL: /* Type */ = Statement.PassStmt(s);
+ 82 |         match self {
+ 83 |             Statement.LetDecl(s) => return StmtType::LetDecl,
+...
+100 |             Statement.ForeignCodeBlock(s) => return StmtType::ForeignCodeBlock,
+101 ~             VAL => return StmtType::PassStmt,
+    |
+
+error: expected `,`, or `}`, found `[`
+   --> ast/nodes.rs:122:18
+    |
+120 | pub struct BinaryOpExpr {
+    |            ------------ while parsing this struct
+121 |     pub node: ASTNode,
+122 |     pub left: Box[Expression],
+    |                  ^
+
+error: expected `,`, or `}`, found `[`
+   --> ast/nodes.rs:131:21
+    |
+128 | pub struct UnaryOpExpr {
+    |            ----------- while parsing this struct
+...
+131 |     pub operand: Box[Expression],
+    |                     ^
+
+error: expected `,`, or `}`, found `[`
+   --> ast/nodes.rs:137:20
+    |
+135 | pub struct CallExpr {
+    |            -------- while parsing this struct
+136 |     pub node: ASTNode,
+137 |     pub callee: Box[Expression],
+    |                    ^
+
+error: expected `,`, or `}`, found `[`
+   --> ast/nodes.rs:145:20
+    |
+143 | pub struct IndexExpr {
+    |            --------- while parsing this struct
+144 |     pub node: ASTNode,
+145 |     pub object: Box[Expression],
+    |                    ^
+
+error: expected `,`, or `}`, found `[`
+   --> ast/nodes.rs:152:20
+    |
+150 | pub struct AttributeExpr {
+    |            ------------- while parsing this struct
+151 |     pub node: ASTNode,
+152 |     pub object: Box[Expression],
+    |                    ^
+
+error: expected one of `>`, a const expression, lifetime, or type, found `@`
+   --> ast/nodes.rs:177:20
+    |
+175 | pub struct DictExpr {
+    |            -------- while parsing this struct
+176 |     pub node: ASTNode,
+177 |     pub pairs: Vec<@tuple(Expression, Expression)>,
+    |                    ^ expected one of `>`, a const expression, lifetime, or type
+
+error: expected `,`, or `}`, found `[`
+   --> ast/nodes.rs:184:18
+    |
+181 | pub struct LambdaExpr {
+    |            ---------- while parsing this struct
+...
+184 |     pub body: Box[Expression],
+    |                  ^
+
+error: expected `,`, or `}`, found `[`
+   --> ast/nodes.rs:190:19
+    |
+188 | pub struct MatchExpr {
+    |            --------- while parsing this struct
+189 |     pub node: ASTNode,
+190 |     pub value: Box[Expression],
+    |                   ^
+
+error: expected `,`, or `}`, found `[`
+   --> ast/nodes.rs:205:22
+    |
+202 | pub struct TypeConstructorExpr {
+    |            ------------------- while parsing this struct
+...
+205 |     pub argument: Box[Expression],
+    |                      ^
+
+error: expected `,`, or `}`, found `[`
+   --> ast/nodes.rs:211:24
+    |
+209 | pub struct GroupedExpr {
+    |            ----------- while parsing this struct
+210 |     pub node: ASTNode,
+211 |     pub expression: Box[Expression],
+    |                        ^
+
+error: invalid comparison operator `<>`
+  --> codegen/rust_backend.rs:19:24
+   |
+19 |             output: Vec<>,
+   |                        ^^
+   |
+help: `<>` is not a valid comparison operator, use `!=`
+   |
+19 -             output: Vec<>,
+19 +             output: Vec!=,
+   |
+
+error: expected expression, found `,`
+  --> codegen/rust_backend.rs:19:26
+   |
+18 |         return CodeGenerator {
+   |                ------------- while parsing this struct
+19 |             output: Vec<>,
+   |                          ^ expected expression
+
+error: expected identifier, found keyword `pub`
+  --> codegen/rust_backend.rs:20:13
+   |
+18 |         return CodeGenerator {
+   |                ------------- while parsing this struct
+19 |             output: Vec<>,
+20 |             pub indent_level: 0usize,
+   |             ^^^ expected identifier, found keyword
+
+error: expected a pattern, found an expression
+  --> codegen/rust_backend.rs:96:13
+   |
+96 |             Statement.LetDecl(s) => self.generate_let(s),
+   |             ^^^^^^^^^^^^^^^^^^^^ not a pattern
+   |
+   = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+   |
+96 -             Statement.LetDecl(s) => self.generate_let(s),
+96 +             val if val == Statement.LetDecl(s) => self.generate_let(s),
+   |
+help: consider extracting the expression into a `const`
+   |
+95 +         const VAL: /* Type */ = Statement.LetDecl(s);
+96 |         match stmt {
+97 ~             VAL => self.generate_let(s),
+   |
+
+error: expected a pattern, found an expression
+  --> codegen/rust_backend.rs:97:13
+   |
+97 |             Statement.VarDecl(s) => self.generate_var(s),
+   |             ^^^^^^^^^^^^^^^^^^^^ not a pattern
+   |
+   = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+   |
+97 -             Statement.VarDecl(s) => self.generate_var(s),
+97 +             val if val == Statement.VarDecl(s) => self.generate_var(s),
+   |
+help: consider extracting the expression into a `const`
+   |
+95 +         const VAL: /* Type */ = Statement.VarDecl(s);
+96 |         match stmt {
+97 |             Statement.LetDecl(s) => self.generate_let(s),
+98 ~             VAL => self.generate_var(s),
+   |
+
+error: expected a pattern, found an expression
+  --> codegen/rust_backend.rs:98:13
+   |
+98 |             Statement.FunctionDecl(s) => self.generate_function(s),
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^ not a pattern
+   |
+   = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+   |
+98 -             Statement.FunctionDecl(s) => self.generate_function(s),
+98 +             val if val == Statement.FunctionDecl(s) => self.generate_function(s),
+   |
+help: consider extracting the expression into a `const`
+   |
+95 +         const VAL: /* Type */ = Statement.FunctionDecl(s);
+96 |         match stmt {
+97 |             Statement.LetDecl(s) => self.generate_let(s),
+98 |             Statement.VarDecl(s) => self.generate_var(s),
+99 ~             VAL => self.generate_function(s),
+   |
+
+error: expected a pattern, found an expression
+  --> codegen/rust_backend.rs:99:13
+   |
+99 |             Statement.IfStmt(s) => self.generate_if(s),
+   |             ^^^^^^^^^^^^^^^^^^^ not a pattern
+   |
+   = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+   |
+99 -             Statement.IfStmt(s) => self.generate_if(s),
+99 +             val if val == Statement.IfStmt(s) => self.generate_if(s),
+   |
+help: consider extracting the expression into a `const`
+   |
+95 +         const VAL: /* Type */ = Statement.IfStmt(s);
+96 |         match stmt {
+97 |             Statement.LetDecl(s) => self.generate_let(s),
+98 |             Statement.VarDecl(s) => self.generate_var(s),
+99 |             Statement.FunctionDecl(s) => self.generate_function(s),
+100~             VAL => self.generate_if(s),
+   |
+
+error: expected a pattern, found an expression
+   --> codegen/rust_backend.rs:100:13
+    |
+100 |             Statement.WhileStmt(s) => self.generate_while(s),
+    |             ^^^^^^^^^^^^^^^^^^^^^^ not a pattern
+    |
+    = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+    |
+100 -             Statement.WhileStmt(s) => self.generate_while(s),
+100 +             val if val == Statement.WhileStmt(s) => self.generate_while(s),
+    |
+help: consider extracting the expression into a `const`
+    |
+ 95 +         const VAL: /* Type */ = Statement.WhileStmt(s);
+ 96 |         match stmt {
+ 97 |             Statement.LetDecl(s) => self.generate_let(s),
+...
+100 |             Statement.IfStmt(s) => self.generate_if(s),
+101 ~             VAL => self.generate_while(s),
+    |
+
+error: expected a pattern, found an expression
+   --> codegen/rust_backend.rs:101:13
+    |
+101 |             Statement.ForStmt(s) => self.generate_for(s),
+    |             ^^^^^^^^^^^^^^^^^^^^ not a pattern
+    |
+    = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+    |
+101 -             Statement.ForStmt(s) => self.generate_for(s),
+101 +             val if val == Statement.ForStmt(s) => self.generate_for(s),
+    |
+help: consider extracting the expression into a `const`
+    |
+ 95 +         const VAL: /* Type */ = Statement.ForStmt(s);
+ 96 |         match stmt {
+ 97 |             Statement.LetDecl(s) => self.generate_let(s),
+...
+101 |             Statement.WhileStmt(s) => self.generate_while(s),
+102 ~             VAL => self.generate_for(s),
+    |
+
+error: expected a pattern, found an expression
+   --> codegen/rust_backend.rs:102:13
+    |
+102 |             Statement.ReturnStmt(s) => self.generate_return(s),
+    |             ^^^^^^^^^^^^^^^^^^^^^^^ not a pattern
+    |
+    = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+    |
+102 -             Statement.ReturnStmt(s) => self.generate_return(s),
+102 +             val if val == Statement.ReturnStmt(s) => self.generate_return(s),
+    |
+help: consider extracting the expression into a `const`
+    |
+ 95 +         const VAL: /* Type */ = Statement.ReturnStmt(s);
+ 96 |         match stmt {
+ 97 |             Statement.LetDecl(s) => self.generate_let(s),
+...
+102 |             Statement.ForStmt(s) => self.generate_for(s),
+103 ~             VAL => self.generate_return(s),
+    |
+
+error: expected a pattern, found an expression
+   --> codegen/rust_backend.rs:103:13
+    |
+103 |             Statement.AssignmentStmt(s) => self.generate_assignment(s),
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^ not a pattern
+    |
+    = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+    |
+103 -             Statement.AssignmentStmt(s) => self.generate_assignment(s),
+103 +             val if val == Statement.AssignmentStmt(s) => self.generate_assignment(s),
+    |
+help: consider extracting the expression into a `const`
+    |
+ 95 +         const VAL: /* Type */ = Statement.AssignmentStmt(s);
+ 96 |         match stmt {
+ 97 |             Statement.LetDecl(s) => self.generate_let(s),
+...
+103 |             Statement.ReturnStmt(s) => self.generate_return(s),
+104 ~             VAL => self.generate_assignment(s),
+    |
+
+error: expected a pattern, found an expression
+   --> codegen/rust_backend.rs:104:13
+    |
+104 |             Statement.ExpressionStmt(s) => self.generate_expression_stmt(s),
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^ not a pattern
+    |
+    = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+    |
+104 -             Statement.ExpressionStmt(s) => self.generate_expression_stmt(s),
+104 +             val if val == Statement.ExpressionStmt(s) => self.generate_expression_stmt(s),
+    |
+help: consider extracting the expression into a `const`
+    |
+ 95 +         const VAL: /* Type */ = Statement.ExpressionStmt(s);
+ 96 |         match stmt {
+ 97 |             Statement.LetDecl(s) => self.generate_let(s),
+...
+104 |             Statement.AssignmentStmt(s) => self.generate_assignment(s),
+105 ~             VAL => self.generate_expression_stmt(s),
+    |
+
+error: expected a pattern, found an expression
+   --> codegen/rust_backend.rs:105:13
+    |
+105 |             Statement.StructDecl(s) => self.emit("// Struct decl".to_string().to_string()), // TODO
+    |             ^^^^^^^^^^^^^^^^^^^^^^^ not a pattern
+    |
+    = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+    |
+105 -             Statement.StructDecl(s) => self.emit("// Struct decl".to_string().to_string()), // TODO
+105 +             val if val == Statement.StructDecl(s) => self.emit("// Struct decl".to_string().to_string()), // TODO
+    |
+help: consider extracting the expression into a `const`
+    |
+ 95 +         const VAL: /* Type */ = Statement.StructDecl(s);
+ 96 |         match stmt {
+ 97 |             Statement.LetDecl(s) => self.generate_let(s),
+...
+105 |             Statement.ExpressionStmt(s) => self.generate_expression_stmt(s),
+106 ~             VAL => self.emit("// Struct decl".to_string().to_string()), // TODO
+    |
+
+error: expected a pattern, found an expression
+   --> codegen/rust_backend.rs:106:13
+    |
+106 |             Statement.EnumDecl(s) => self.emit("// Enum decl".to_string().to_string()), // TODO
+    |             ^^^^^^^^^^^^^^^^^^^^^ not a pattern
+    |
+    = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+    |
+106 -             Statement.EnumDecl(s) => self.emit("// Enum decl".to_string().to_string()), // TODO
+106 +             val if val == Statement.EnumDecl(s) => self.emit("// Enum decl".to_string().to_string()), // TODO
+    |
+help: consider extracting the expression into a `const`
+    |
+ 95 +         const VAL: /* Type */ = Statement.EnumDecl(s);
+ 96 |         match stmt {
+ 97 |             Statement.LetDecl(s) => self.generate_let(s),
+...
+106 |             Statement.StructDecl(s) => self.emit("// Struct decl".to_string().to_string()), // TODO
+107 ~             VAL => self.emit("// Enum decl".to_string().to_string()), // TODO
+    |
+
+error: expected a pattern, found an expression
+   --> codegen/rust_backend.rs:107:13
+    |
+107 |             Statement.ImportStmt(s) => self.generate_import(s),
+    |             ^^^^^^^^^^^^^^^^^^^^^^^ not a pattern
+    |
+    = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+    |
+107 -             Statement.ImportStmt(s) => self.generate_import(s),
+107 +             val if val == Statement.ImportStmt(s) => self.generate_import(s),
+    |
+help: consider extracting the expression into a `const`
+    |
+ 95 +         const VAL: /* Type */ = Statement.ImportStmt(s);
+ 96 |         match stmt {
+ 97 |             Statement.LetDecl(s) => self.generate_let(s),
+...
+107 |             Statement.EnumDecl(s) => self.emit("// Enum decl".to_string().to_string()), // TODO
+108 ~             VAL => self.generate_import(s),
+    |
+
+error: expected a pattern, found an expression
+   --> codegen/rust_backend.rs:108:13
+    |
+108 |             Statement.PassStmt(s) => pass,
+    |             ^^^^^^^^^^^^^^^^^^^^^ not a pattern
+    |
+    = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+help: consider moving the expression to a match arm guard
+    |
+108 -             Statement.PassStmt(s) => pass,
+108 +             val if val == Statement.PassStmt(s) => pass,
+    |
+help: consider extracting the expression into a `const`
+    |
+ 95 +         const VAL: /* Type */ = Statement.PassStmt(s);
+ 96 |         match stmt {
+ 97 |             Statement.LetDecl(s) => self.generate_let(s),
+...
+108 |             Statement.ImportStmt(s) => self.generate_import(s),
+109 ~             VAL => pass,
+    |
+
+error: expected expression, found `,`
+   --> codegen/rust_backend.rs:268:39
+    |
+268 |             Expression.Literal(lit) =>,
+    |                                     --^ expected expression
+    |                                     |
+    |                                     while parsing the `match` arm starting here
+
+error: invalid comparison operator `<>`
+  --> ir/ir_builder.rs:19:29
+   |
+19 |                 imports: Vec<>,
+   |                             ^^
+   |
+help: `<>` is not a valid comparison operator, use `!=`
+   |
+19 -                 imports: Vec<>,
+19 +                 imports: Vec!=,
+   |
+
+error: expected expression, found `,`
+  --> ir/ir_builder.rs:19:31
+   |
+16 |             current_module: IRModule {
+   |                             -------- while parsing this struct
+...
+19 |                 imports: Vec<>,
+   |                               ^ expected expression
+
+error: invalid comparison operator `<>`
+  --> ir/ir_builder.rs:20:29
+   |
+20 |                 structs: Vec<>,
+   |                             ^^
+   |
+help: `<>` is not a valid comparison operator, use `!=`
+   |
+20 -                 structs: Vec<>,
+20 +                 structs: Vec!=,
+   |
+
+error: expected expression, found `,`
+  --> ir/ir_builder.rs:20:31
+   |
+16 |             current_module: IRModule {
+   |                             -------- while parsing this struct
+...
+20 |                 structs: Vec<>,
+   |                               ^ expected expression
+
+error: invalid comparison operator `<>`
+  --> ir/ir_builder.rs:21:27
+   |
+21 |                 impls: Vec<>,
+   |                           ^^
+   |
+help: `<>` is not a valid comparison operator, use `!=`
+   |
+21 -                 impls: Vec<>,
+21 +                 impls: Vec!=,
+   |
+
+error: expected expression, found `,`
+  --> ir/ir_builder.rs:21:29
+   |
+16 |             current_module: IRModule {
+   |                             -------- while parsing this struct
+...
+21 |                 impls: Vec<>,
+   |                             ^ expected expression
+
+error: expected identifier, found keyword `pub`
+  --> ir/ir_builder.rs:22:17
+   |
+16 |             current_module: IRModule {
+   |                             -------- while parsing this struct
+...
+22 |                 pub functions: Vec<>,
+   |                 ^^^ expected identifier, found keyword
+
+error: expected identifier, found `,`
+  --> ir/ir_builder.rs:24:13
+   |
+15 |         return IRBuilder {
+   |                --------- while parsing this struct
+...
+24 |             ,
+   |             ^ expected identifier
+   |
+help: remove this comma
+   |
+24 -             ,
+   |
+
+error: invalid comparison operator `<>`
+  --> ir/ir_builder.rs:53:161
+   |
+53 | ...base.line, column: stmt.base.column}, name: decl.name, fields: Vec<>};
+   |                                                                      ^^
+   |
+help: `<>` is not a valid comparison operator, use `!=`
+   |
+53 -         let mut ir_struct = IRStruct {base: IRNode {node_type: IRNodeType::Struct, line: stmt.base.line, column: stmt.base.column}, name: decl.name, fields: Vec<>};
+53 +         let mut ir_struct = IRStruct {base: IRNode {node_type: IRNodeType::Struct, line: stmt.base.line, column: stmt.base.column}, name: decl.name, fields: Vec!=};
+   |
+
+error: expected expression, found `}`
+  --> ir/ir_builder.rs:53:163
+   |
+53 | ... = IRStruct {base: IRNode {node_type: IRNodeType::Struct, line: stmt.base.line, column: stmt.base.column}, name: decl.name, fields: Vec<>};
+   |       -------- while parsing this struct                                                                                                    ^ expected expression
+
+error: invalid comparison operator `<>`
+  --> ir/ir_builder.rs:78:163
+   |
+78 | ...base.line, column: decl.base.column}, name: decl.name, params: Vec<>, return_type: gul_type_to_rust(decl.return_type), body: Vec<>, is...
+   |                                                                      ^^
+   |
+help: `<>` is not a valid comparison operator, use `!=`
+   |
+78 -         let mut ir_func = IRFunction {base: IRNode {node_type: IRNodeType::Function, line: decl.base.line, column: decl.base.column}, name: decl.name, params: Vec<>, return_type: gul_type_to_rust(decl.return_type), body: Vec<>, is_method: false, receiver: ""};
+78 +         let mut ir_func = IRFunction {base: IRNode {node_type: IRNodeType::Function, line: decl.base.line, column: decl.base.column}, name: decl.name, params: Vec!=, return_type: gul_type_to_rust(decl.return_type), body: Vec<>, is_method: false, receiver: ""};
+   |
+
+error: expected expression, found `,`
+  --> ir/ir_builder.rs:78:165
+   |
+78 | ... = IRFunction {base: IRNode {node_type: IRNodeType::Function, line: decl.base.line, column: decl.base.column}, name: decl.name, params: Vec<>, re...
+   |       ---------- while parsing this struct                                                                                                      ^ expected expression
+
+error: invalid comparison operator `<>`
+  --> ir/ir_builder.rs:78:225
+   |
+78 | ... Vec<>, return_type: gul_type_to_rust(decl.return_type), body: Vec<>, is_method: false, receiver: ""};
+   |                                                                      ^^
+   |
+help: `<>` is not a valid comparison operator, use `!=`
+   |
+78 -         let mut ir_func = IRFunction {base: IRNode {node_type: IRNodeType::Function, line: decl.base.line, column: decl.base.column}, name: decl.name, params: Vec<>, return_type: gul_type_to_rust(decl.return_type), body: Vec<>, is_method: false, receiver: ""};
+78 +         let mut ir_func = IRFunction {base: IRNode {node_type: IRNodeType::Function, line: decl.base.line, column: decl.base.column}, name: decl.name, params: Vec<>, return_type: gul_type_to_rust(decl.return_type), body: Vec!=, is_method: false, receiver: ""};
+   |
+
+error: expected expression, found `,`
+  --> ir/ir_builder.rs:78:227
+   |
+78 | ... = IRFunction {base: IRNode {node_type: IRNodeType::Function, line: decl.base.line, column: decl.base.column}, name: decl.name, params: Vec<>, return_type: gul_type_to_rust(decl.return_type), body: Vec<>, is...
+   |       ---------- while parsing this struct                                                                                                                                                                    ^ expected expression
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:139:22
+    |
+138 |         let keywords = HashSet{
+    |                        ------- while parsing this struct
+139 |             TokenType::Let, TokenType::Var, TokenType::Fn,
+    |             ---------^^ expected one of `,`, `:`, or `}`
+    |             |
+    |             while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:139:38
+    |
+138 |         let keywords = HashSet{
+    |                        ------- while parsing this struct
+139 |             TokenType::Let, TokenType::Var, TokenType::Fn,
+    |                             ---------^^ expected one of `,`, `:`, or `}`
+    |                             |
+    |                             while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:139:54
+    |
+138 |         let keywords = HashSet{
+    |                        ------- while parsing this struct
+139 |             TokenType::Let, TokenType::Var, TokenType::Fn,
+    |                                             ---------^^ expected one of `,`, `:`, or `}`
+    |                                             |
+    |                                             while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:140:22
+    |
+138 |         let keywords = HashSet{
+    |                        ------- while parsing this struct
+139 |             TokenType::Let, TokenType::Var, TokenType::Fn,
+140 |             TokenType::Async, TokenType::Struct, TokenType::Enum,
+    |             ---------^^ expected one of `,`, `:`, or `}`
+    |             |
+    |             while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:140:40
+    |
+138 |         let keywords = HashSet{
+    |                        ------- while parsing this struct
+139 |             TokenType::Let, TokenType::Var, TokenType::Fn,
+140 |             TokenType::Async, TokenType::Struct, TokenType::Enum,
+    |                               ---------^^ expected one of `,`, `:`, or `}`
+    |                               |
+    |                               while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:140:59
+    |
+138 |         let keywords = HashSet{
+    |                        ------- while parsing this struct
+139 |             TokenType::Let, TokenType::Var, TokenType::Fn,
+140 |             TokenType::Async, TokenType::Struct, TokenType::Enum,
+    |                                                  ---------^^ expected one of `,`, `:`, or `}`
+    |                                                  |
+    |                                                  while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:141:22
+    |
+138 |         let keywords = HashSet{
+    |                        ------- while parsing this struct
+...
+141 |             TokenType::Match, TokenType::If, TokenType::Elif,
+    |             ---------^^ expected one of `,`, `:`, or `}`
+    |             |
+    |             while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:141:40
+    |
+138 |         let keywords = HashSet{
+    |                        ------- while parsing this struct
+...
+141 |             TokenType::Match, TokenType::If, TokenType::Elif,
+    |                               ---------^^ expected one of `,`, `:`, or `}`
+    |                               |
+    |                               while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:141:55
+    |
+138 |         let keywords = HashSet{
+    |                        ------- while parsing this struct
+...
+141 |             TokenType::Match, TokenType::If, TokenType::Elif,
+    |                                              ---------^^ expected one of `,`, `:`, or `}`
+    |                                              |
+    |                                              while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:142:22
+    |
+138 |         let keywords = HashSet{
+    |                        ------- while parsing this struct
+...
+142 |             TokenType::Else, TokenType::For, TokenType::While,
+    |             ---------^^ expected one of `,`, `:`, or `}`
+    |             |
+    |             while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:142:39
+    |
+138 |         let keywords = HashSet{
+    |                        ------- while parsing this struct
+...
+142 |             TokenType::Else, TokenType::For, TokenType::While,
+    |                              ---------^^ expected one of `,`, `:`, or `}`
+    |                              |
+    |                              while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:142:55
+    |
+138 |         let keywords = HashSet{
+    |                        ------- while parsing this struct
+...
+142 |             TokenType::Else, TokenType::For, TokenType::While,
+    |                                              ---------^^ expected one of `,`, `:`, or `}`
+    |                                              |
+    |                                              while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:143:22
+    |
+138 |         let keywords = HashSet{
+    |                        ------- while parsing this struct
+...
+143 |             TokenType::Loop, TokenType::In, TokenType::Break,
+    |             ---------^^ expected one of `,`, `:`, or `}`
+    |             |
+    |             while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:143:39
+    |
+138 |         let keywords = HashSet{
+    |                        ------- while parsing this struct
+...
+143 |             TokenType::Loop, TokenType::In, TokenType::Break,
+    |                              ---------^^ expected one of `,`, `:`, or `}`
+    |                              |
+    |                              while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:143:54
+    |
+138 |         let keywords = HashSet{
+    |                        ------- while parsing this struct
+...
+143 |             TokenType::Loop, TokenType::In, TokenType::Break,
+    |                                             ---------^^ expected one of `,`, `:`, or `}`
+    |                                             |
+    |                                             while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:144:22
+    |
+138 |         let keywords = HashSet{
+    |                        ------- while parsing this struct
+...
+144 |             TokenType::Continue, TokenType::Return, TokenType::Try,
+    |             ---------^^ expected one of `,`, `:`, or `}`
+    |             |
+    |             while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:144:43
+    |
+138 |         let keywords = HashSet{
+    |                        ------- while parsing this struct
+...
+144 |             TokenType::Continue, TokenType::Return, TokenType::Try,
+    |                                  ---------^^ expected one of `,`, `:`, or `}`
+    |                                  |
+    |                                  while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:144:62
+    |
+138 |         let keywords = HashSet{
+    |                        ------- while parsing this struct
+...
+144 |             TokenType::Continue, TokenType::Return, TokenType::Try,
+    |                                                     ---------^^ expected one of `,`, `:`, or `}`
+    |                                                     |
+    |                                                     while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:145:22
+    |
+138 |         let keywords = HashSet{
+    |                        ------- while parsing this struct
+...
+145 |             TokenType::Catch, TokenType::Finally, TokenType::Mn;
+    |             ---------^^ expected one of `,`, `:`, or `}`
+    |             |
+    |             while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:145:40
+    |
+138 |         let keywords = HashSet{
+    |                        ------- while parsing this struct
+...
+145 |             TokenType::Catch, TokenType::Finally, TokenType::Mn;
+    |                               ---------^^ expected one of `,`, `:`, or `}`
+    |                               |
+    |                               while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:145:60
+    |
+138 |         let keywords = HashSet{
+    |                        ------- while parsing this struct
+...
+145 |             TokenType::Catch, TokenType::Finally, TokenType::Mn;
+    |                                                   ---------^^ expected one of `,`, `:`, or `}`
+    |                                                   |
+    |                                                   while parsing this struct field
+
+error: expected one of `(`, `.`, `::`, `;`, `?`, `}`, or an operator, found keyword `in`
+   --> lexer/token.rs:148:32
+    |
+148 |         return self.token_type in keywords;
+    |                                ^^ expected one of 7 possible tokens
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:154:22
+    |
+153 |         let operators = HashSet{
+    |                         ------- while parsing this struct
+154 |             TokenType::Plus, TokenType::Minus, TokenType::Star,
+    |             ---------^^ expected one of `,`, `:`, or `}`
+    |             |
+    |             while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:154:39
+    |
+153 |         let operators = HashSet{
+    |                         ------- while parsing this struct
+154 |             TokenType::Plus, TokenType::Minus, TokenType::Star,
+    |                              ---------^^ expected one of `,`, `:`, or `}`
+    |                              |
+    |                              while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:154:57
+    |
+153 |         let operators = HashSet{
+    |                         ------- while parsing this struct
+154 |             TokenType::Plus, TokenType::Minus, TokenType::Star,
+    |                                                ---------^^ expected one of `,`, `:`, or `}`
+    |                                                |
+    |                                                while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:155:22
+    |
+153 |         let operators = HashSet{
+    |                         ------- while parsing this struct
+154 |             TokenType::Plus, TokenType::Minus, TokenType::Star,
+155 |             TokenType::Slash, TokenType::Percent, TokenType::DoubleStar,
+    |             ---------^^ expected one of `,`, `:`, or `}`
+    |             |
+    |             while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:155:40
+    |
+153 |         let operators = HashSet{
+    |                         ------- while parsing this struct
+154 |             TokenType::Plus, TokenType::Minus, TokenType::Star,
+155 |             TokenType::Slash, TokenType::Percent, TokenType::DoubleStar,
+    |                               ---------^^ expected one of `,`, `:`, or `}`
+    |                               |
+    |                               while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:155:60
+    |
+153 |         let operators = HashSet{
+    |                         ------- while parsing this struct
+154 |             TokenType::Plus, TokenType::Minus, TokenType::Star,
+155 |             TokenType::Slash, TokenType::Percent, TokenType::DoubleStar,
+    |                                                   ---------^^ expected one of `,`, `:`, or `}`
+    |                                                   |
+    |                                                   while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:156:22
+    |
+153 |         let operators = HashSet{
+    |                         ------- while parsing this struct
+...
+156 |             TokenType::EqualEqual, TokenType::NotEqual,
+    |             ---------^^ expected one of `,`, `:`, or `}`
+    |             |
+    |             while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:156:45
+    |
+153 |         let operators = HashSet{
+    |                         ------- while parsing this struct
+...
+156 |             TokenType::EqualEqual, TokenType::NotEqual,
+    |                                    ---------^^ expected one of `,`, `:`, or `}`
+    |                                    |
+    |                                    while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:157:22
+    |
+153 |         let operators = HashSet{
+    |                         ------- while parsing this struct
+...
+157 |             TokenType::Greater, TokenType::GreaterEq,
+    |             ---------^^ expected one of `,`, `:`, or `}`
+    |             |
+    |             while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:157:42
+    |
+153 |         let operators = HashSet{
+    |                         ------- while parsing this struct
+...
+157 |             TokenType::Greater, TokenType::GreaterEq,
+    |                                 ---------^^ expected one of `,`, `:`, or `}`
+    |                                 |
+    |                                 while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:158:22
+    |
+153 |         let operators = HashSet{
+    |                         ------- while parsing this struct
+...
+158 |             TokenType::Less, TokenType::LessEq,
+    |             ---------^^ expected one of `,`, `:`, or `}`
+    |             |
+    |             while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:158:39
+    |
+153 |         let operators = HashSet{
+    |                         ------- while parsing this struct
+...
+158 |             TokenType::Less, TokenType::LessEq,
+    |                              ---------^^ expected one of `,`, `:`, or `}`
+    |                              |
+    |                              while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:159:22
+    |
+153 |         let operators = HashSet{
+    |                         ------- while parsing this struct
+...
+159 |             TokenType::And, TokenType::Or, TokenType::Not;
+    |             ---------^^ expected one of `,`, `:`, or `}`
+    |             |
+    |             while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:159:38
+    |
+153 |         let operators = HashSet{
+    |                         ------- while parsing this struct
+...
+159 |             TokenType::And, TokenType::Or, TokenType::Not;
+    |                             ---------^^ expected one of `,`, `:`, or `}`
+    |                             |
+    |                             while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:159:53
+    |
+153 |         let operators = HashSet{
+    |                         ------- while parsing this struct
+...
+159 |             TokenType::And, TokenType::Or, TokenType::Not;
+    |                                            ---------^^ expected one of `,`, `:`, or `}`
+    |                                            |
+    |                                            while parsing this struct field
+
+error: expected one of `(`, `.`, `::`, `;`, `?`, `}`, or an operator, found keyword `in`
+   --> lexer/token.rs:162:32
+    |
+162 |         return self.token_type in operators;
+    |                                ^^ expected one of 7 possible tokens
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:168:22
+    |
+167 |         let literals = HashSet{
+    |                        ------- while parsing this struct
+168 |             TokenType::Integer, TokenType::Float,
+    |             ---------^^ expected one of `,`, `:`, or `}`
+    |             |
+    |             while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:168:42
+    |
+167 |         let literals = HashSet{
+    |                        ------- while parsing this struct
+168 |             TokenType::Integer, TokenType::Float,
+    |                                 ---------^^ expected one of `,`, `:`, or `}`
+    |                                 |
+    |                                 while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:169:22
+    |
+167 |         let literals = HashSet{
+    |                        ------- while parsing this struct
+168 |             TokenType::Integer, TokenType::Float,
+169 |             TokenType::String, TokenType::Boolean;
+    |             ---------^^ expected one of `,`, `:`, or `}`
+    |             |
+    |             while parsing this struct field
+
+error: expected one of `,`, `:`, or `}`, found `::`
+   --> lexer/token.rs:169:41
+    |
+167 |         let literals = HashSet{
+    |                        ------- while parsing this struct
+168 |             TokenType::Integer, TokenType::Float,
+169 |             TokenType::String, TokenType::Boolean;
+    |                                ---------^^ expected one of `,`, `:`, or `}`
+    |                                |
+    |                                while parsing this struct field
+
+error: expected one of `(`, `.`, `::`, `;`, `?`, `}`, or an operator, found keyword `in`
+   --> lexer/token.rs:172:32
+    |
+172 |         return self.token_type in literals;
+    |                                ^^ expected one of 7 possible tokens
+
+error: unexpected closing delimiter: `)`
+   --> parser/parser.rs:129:139
+    |
+122 |     pub fn parse_prefix(&mut self)  ->  Expression {
+    |                                                    - the nearest open delimiter
+...
+126 |             return Expression::Identifier(IdentifierExpr{node: ASTNode{line: 1, column: 1}), name: token.value});
+    |                                                         -                                 -                    - missing open `(` for this delimiter
+    |                                                         |                                 |
+    |                                                         the nearest open delimiter        missing open `(` for this delimiter
+...
+129 |             return Expression::Literal(LiteralExpr{node: ASTNode{line: 1, column: 1}), value: token.value, value_type: TokenType::Integer});
+    |                                                   - the nearest open delimiter      - missing open `(` for this delimiter                 ^ unexpected closing delimiter
+
+error: expected a pattern, found an expression
+   --> codegen/rust_backend.rs:268:13
+    |
+268 |             Expression.Literal(lit) =>,
+    |             ^^^^^^^^^^^^^^^^^^^^^^^ not a pattern
+    |
+    = note: arbitrary expressions are not allowed in patterns: <https://doc.rust-lang.org/book/ch19-00-patterns.html>
+
+error: could not compile `gul-compiler` (bin "gul-compile") due to 110 previous errors
+
+🎉 SUCCESS! GUL compiler built successfully!
+
+Compiler location: compiler_rust/target/release/gul-compile
+
+Test it with:
+  ./target/release/gul-compile --help
+
+Build process complete!

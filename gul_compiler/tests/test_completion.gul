@@ -1,0 +1,24 @@
+fn main():
+    print(true)
+    print(false)
+    
+    let x = 10
+    if x <= 10:
+        print("x is <= 10")
+    
+    if x >= 10:
+        print("x is >= 10")
+        
+    if x < 10:
+        print("Fail")
+    else:
+        print("x is not < 10")
+        
+    print(x >= 11)
+
+# EXPECT: true
+# EXPECT: false
+# EXPECT: x is <= 10
+# EXPECT: x is >= 10
+# EXPECT: x is not < 10
+# EXPECT: false

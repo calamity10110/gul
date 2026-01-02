@@ -1,0 +1,292 @@
+Found 1 GUL files to transpile
+Transpiling analyzer.mn -> analyzer.rs
+DEBUG: @imp std.collections Depth: 0
+DEBUG: @imp compiler.ast.nodes Depth: 0
+DEBUG: @imp compiler.lexer.token Depth: 0
+DEBUG: struct Symbol: Depth: 0
+DEBUG: name: @str Depth: 0
+DEBUG: type: @str Depth: 0
+DEBUG: is_mutable: @bool Depth: 0
+DEBUG: is_function: @bool Depth: 0
+DEBUG: line: @int Depth: 0
+DEBUG: column: @int Depth: 0
+DEBUG: struct Scope: Depth: 0
+DEBUG: symbols: @dict Depth: 0
+DEBUG: parent: Scope Depth: 0
+DEBUG: fn create_scope() -> Scope: Depth: 0
+DEBUG: return Scope{symbols: @dict{}, parent: None} Depth: 0
+DEBUG: fn create_child_scope(parent: Scope) -> Scope: Depth: 0
+DEBUG: return Scope{symbols: @dict{}, parent: parent} Depth: 0
+DEBUG: impl Scope: Depth: 0
+DEBUG: fn define(ref self, name: @str, symbol: Symbol): Depth: 0
+DEBUG: """Define a symbol in this scope""" Depth: 0
+DEBUG: self.symbols[name] = symbol Depth: 0
+DEBUG: fn resolve(self, name: @str) -> Symbol: Depth: 0
+DEBUG: """Resolve a symbol, checking parent scopes""" Depth: 0
+DEBUG: if name in self.symbols: Depth: 0
+DEBUG: return self.symbols[name] Depth: 0
+DEBUG: if self.parent: Depth: 0
+DEBUG: return self.parent.resolve(name) Depth: 0
+DEBUG: return None Depth: 0
+DEBUG: fn exists_in_current(self, name: @str) -> @bool: Depth: 0
+DEBUG: """Check if symbol exists in current scope only""" Depth: 0
+DEBUG: return name in self.symbols Depth: 0
+DEBUG: struct SemanticAnalyzer: Depth: 0
+DEBUG: current_scope: Scope Depth: 0
+DEBUG: errors: @list[@str] Depth: 0
+DEBUG: warnings: @list[@str] Depth: 0
+DEBUG: fn create_analyzer() -> SemanticAnalyzer: Depth: 0
+DEBUG: return SemanticAnalyzer{current_scope: create_scope(), errors: @list[], warnings: @list[]} Depth: 0
+DEBUG: impl SemanticAnalyzer: Depth: 0
+DEBUG: fn analyze_program(ref self, program: Program): Depth: 0
+DEBUG: """Analyze entire program""" Depth: 0
+DEBUG: for import_stmt in program.imports: Depth: 0
+DEBUG: self.analyze_import(import_stmt) Depth: 0
+DEBUG: for stmt in program.statements: Depth: 0
+DEBUG: self.analyze_statement(stmt) Depth: 0
+DEBUG: for stmt in program.main_entry: Depth: 0
+DEBUG: self.analyze_statement(stmt) Depth: 0
+DEBUG: fn enter_scope(ref self): Depth: 0
+DEBUG: """Enter a new scope""" Depth: 0
+DEBUG: self.current_scope = create_child_scope(self.current_scope) Depth: 0
+DEBUG: fn exit_scope(ref self): Depth: 0
+DEBUG: """Exit current scope""" Depth: 0
+DEBUG: if self.current_scope.parent: Depth: 0
+DEBUG: self.current_scope = self.current_scope.parent Depth: 0
+DEBUG: fn error(ref self, message: @str, line: @int, column: @int): Depth: 0
+DEBUG: """Record a semantic error""" Depth: 0
+DEBUG: let error_msg = "Semantic error at " + str(line) + ":" + str(column) + ": " + message Depth: 0
+DEBUG: self.errors.add(error_msg) Depth: 0
+DEBUG: print(error_msg) Depth: 0
+DEBUG: fn warn(ref self, message: @str, line: @int, column: @int): Depth: 0
+DEBUG: """Record a warning""" Depth: 0
+DEBUG: let warn_msg = "Warning at " + str(line) + ":" + str(column) + ": " + message Depth: 0
+DEBUG: self.warnings.add(warn_msg) Depth: 0
+DEBUG: fn analyze_statement(ref self, stmt: Statement): Depth: 0
+DEBUG: """Analyze a statement""" Depth: 0
+DEBUG: let st = stmt.stmt_type Depth: 0
+DEBUG: if st == StmtType.LetDecl: self.analyze_let_stmt(@cast(LetStmt, stmt)) Depth: 0
+DEBUG: elif st == StmtType.VarDecl: self.analyze_var_stmt(@cast(VarStmt, stmt)) Depth: 0
+DEBUG: elif st == StmtType.FunctionDecl: self.analyze_function_decl(@cast(FunctionDecl, stmt)) Depth: 0
+DEBUG: elif st == StmtType.IfStmt: self.analyze_if_stmt(@cast(IfStmt, stmt)) Depth: 0
+DEBUG: elif st == StmtType.WhileStmt: self.analyze_while_stmt(@cast(WhileStmt, stmt)) Depth: 0
+DEBUG: elif st == StmtType.ForStmt: self.analyze_for_stmt(@cast(ForStmt, stmt)) Depth: 0
+DEBUG: elif st == StmtType.ReturnStmt: self.analyze_return_stmt(@cast(ReturnStmt, stmt)) Depth: 0
+DEBUG: elif st == StmtType.AssignmentStmt: self.analyze_assignment(@cast(AssignmentStmt, stmt)) Depth: 0
+DEBUG: elif st == StmtType.ExpressionStmt: self.analyze_expression_stmt(@cast(ExpressionStmt, stmt)) Depth: 0
+DEBUG: elif st == StmtType.ImportStmt: self.analyze_import(@cast(ImportStmt, stmt)) Depth: 0
+DEBUG: else: pass Depth: 0
+DEBUG: fn analyze_let_stmt(ref self, stmt: LetStmt): Depth: 0
+DEBUG: """Analyze let declaration""" Depth: 0
+DEBUG: if self.current_scope.exists_in_current(stmt.name): Depth: 0
+DEBUG: self.error(f"Variable '{stmt.name}' already defined", stmt.base.node.line, stmt.base.node.column) Depth: 0
+DEBUG: let value_type = self.analyze_expression(stmt.value) Depth: 0
+DEBUG: if stmt.type_annotation and value_type: Depth: 0
+DEBUG: if not self.types_compatible(stmt.type_annotation, value_type): Depth: 0
+DEBUG: self.error(f"Type mismatch: expected {stmt.type_annotation}, got {value_type}", Depth: 1
+DEBUG: stmt.base.node.line, stmt.base.node.column) Depth: 0
+DEBUG: self.current_scope.define(stmt.name, Symbol{ Depth: 1
+DEBUG: name: stmt.name, Depth: 1
+DEBUG: type: stmt.type_annotation or value_type, Depth: 1
+DEBUG: is_mutable: @bool(false), Depth: 1
+DEBUG: is_function: @bool(false), Depth: 1
+DEBUG: line: stmt.base.node.line, Depth: 1
+DEBUG: column: stmt.base.node.column Depth: 1
+DEBUG: }) Depth: 0
+DEBUG: fn analyze_var_stmt(ref self, stmt: VarStmt): Depth: 0
+DEBUG: """Analyze var declaration (similar to let but mutable)""" Depth: 0
+DEBUG: if self.current_scope.exists_in_current(stmt.name): Depth: 0
+DEBUG: self.error(f"Variable '{stmt.name}' already defined", stmt.base.node.line, stmt.base.node.column) Depth: 0
+DEBUG: let value_type = self.analyze_expression(stmt.value) Depth: 0
+DEBUG: if stmt.type_annotation and value_type: Depth: 0
+DEBUG: if not self.types_compatible(stmt.type_annotation, value_type): Depth: 0
+DEBUG: self.error(f"Type mismatch: expected {stmt.type_annotation}, got {value_type}", Depth: 1
+DEBUG: stmt.base.node.line, stmt.base.node.column) Depth: 0
+DEBUG: self.current_scope.define(stmt.name, Symbol{ Depth: 1
+DEBUG: name: stmt.name, Depth: 1
+DEBUG: type: stmt.type_annotation or value_type, Depth: 1
+DEBUG: is_mutable: @bool(true), Depth: 1
+DEBUG: is_function: @bool(false), Depth: 1
+DEBUG: line: stmt.base.node.line, Depth: 1
+DEBUG: column: stmt.base.node.column Depth: 1
+DEBUG: }) Depth: 0
+DEBUG: fn analyze_function_decl(ref self, stmt: FunctionDecl): Depth: 0
+DEBUG: """Analyze function declaration""" Depth: 0
+DEBUG: if self.current_scope.exists_in_current(stmt.name): Depth: 0
+DEBUG: self.error(f"Function '{stmt.name}' already defined", stmt.base.node.line, stmt.base.node.column) Depth: 0
+DEBUG: self.current_scope.define(stmt.name, Symbol{ Depth: 1
+DEBUG: name: stmt.name, Depth: 1
+DEBUG: type: stmt.return_type or "void", Depth: 1
+DEBUG: is_mutable: @bool(false), Depth: 1
+DEBUG: is_function: @bool(true), Depth: 1
+DEBUG: line: stmt.base.node.line, Depth: 1
+DEBUG: column: stmt.base.node.column Depth: 1
+DEBUG: }) Depth: 0
+DEBUG: self.enter_scope() Depth: 0
+DEBUG: for param in stmt.parameters: Depth: 0
+DEBUG: self.current_scope.define(param.name, Symbol{ Depth: 1
+DEBUG: name: param.name, Depth: 1
+DEBUG: type: param.type_annotation or "any", Depth: 1
+DEBUG: is_mutable: param.ownership_mode == "ref", Depth: 1
+DEBUG: is_function: @bool(false), Depth: 1
+DEBUG: line: stmt.base.node.line, Depth: 1
+DEBUG: column: stmt.base.node.column Depth: 1
+DEBUG: }) Depth: 0
+DEBUG: for body_stmt in stmt.body: Depth: 0
+DEBUG: self.analyze_statement(body_stmt) Depth: 0
+DEBUG: self.exit_scope() Depth: 0
+DEBUG: fn analyze_if_stmt(ref self, stmt: IfStmt): Depth: 0
+DEBUG: """Analyze if statement""" Depth: 0
+DEBUG: let cond_type = self.analyze_expression(stmt.condition) Depth: 0
+DEBUG: if cond_type and cond_type != "bool": Depth: 0
+DEBUG: self.warn(f"Condition should be bool, got {cond_type}", stmt.base.node.line, stmt.base.node.column) Depth: 0
+DEBUG: self.enter_scope() Depth: 0
+DEBUG: for s in stmt.then_body: Depth: 0
+DEBUG: self.analyze_statement(s) Depth: 0
+DEBUG: self.exit_scope() Depth: 0
+DEBUG: for elif_clause in stmt.elif_clauses: Depth: 0
+DEBUG: let elif_cond_type = self.analyze_expression(elif_clause.condition) Depth: 0
+DEBUG: self.enter_scope() Depth: 0
+DEBUG: for s in elif_clause.body: Depth: 0
+DEBUG: self.analyze_statement(s) Depth: 0
+DEBUG: self.exit_scope() Depth: 0
+DEBUG: if stmt.else_body: Depth: 0
+DEBUG: self.enter_scope() Depth: 0
+DEBUG: for s in stmt.else_body: Depth: 0
+DEBUG: self.analyze_statement(s) Depth: 0
+DEBUG: self.exit_scope() Depth: 0
+DEBUG: fn analyze_while_stmt(ref self, stmt: WhileStmt): Depth: 0
+DEBUG: """Analyze while loop""" Depth: 0
+DEBUG: let cond_type = self.analyze_expression(stmt.condition) Depth: 0
+DEBUG: self.enter_scope() Depth: 0
+DEBUG: for s in stmt.body: Depth: 0
+DEBUG: self.analyze_statement(s) Depth: 0
+DEBUG: self.exit_scope() Depth: 0
+DEBUG: fn analyze_for_stmt(ref self, stmt: ForStmt): Depth: 0
+DEBUG: """Analyze for loop""" Depth: 0
+DEBUG: let iterable_type = self.analyze_expression(stmt.iterable) Depth: 0
+DEBUG: self.enter_scope() Depth: 0
+DEBUG: self.current_scope.define(stmt.variable, Symbol{ Depth: 1
+DEBUG: name: stmt.variable, Depth: 1
+DEBUG: type: "any", Depth: 1
+DEBUG: is_mutable: @bool(false), Depth: 1
+DEBUG: is_function: @bool(false), Depth: 1
+DEBUG: line: stmt.base.node.line, Depth: 1
+DEBUG: column: stmt.base.node.column Depth: 1
+DEBUG: }) Depth: 0
+DEBUG: for s in stmt.body: Depth: 0
+DEBUG: self.analyze_statement(s) Depth: 0
+DEBUG: self.exit_scope() Depth: 0
+DEBUG: fn analyze_return_stmt(ref self, stmt: ReturnStmt): Depth: 0
+DEBUG: """Analyze return statement""" Depth: 0
+DEBUG: if stmt.value: Depth: 0
+DEBUG: self.analyze_expression(stmt.value) Depth: 0
+DEBUG: fn analyze_assignment(ref self, stmt: AssignmentStmt): Depth: 0
+DEBUG: """Analyze assignment""" Depth: 0
+DEBUG: if stmt.target.expr_type == ExprType.Identifier: Depth: 0
+DEBUG: let ident = @cast(IdentifierExpr, stmt.target) Depth: 0
+DEBUG: let symbol = self.current_scope.resolve(ident.name) Depth: 0
+DEBUG: if not symbol: Depth: 0
+DEBUG: self.error(f"Undefined variable '{ident.name}'", stmt.base.node.line, stmt.base.node.column) Depth: 0
+DEBUG: elif not symbol.is_mutable: Depth: 0
+DEBUG: self.error(f"Cannot assign to immutable variable '{ident.name}'", Depth: 1
+DEBUG: stmt.base.node.line, stmt.base.node.column) Depth: 0
+DEBUG: self.analyze_expression(stmt.value) Depth: 0
+DEBUG: fn analyze_expression_stmt(ref self, stmt: ExpressionStmt): Depth: 0
+DEBUG: """Analyze expression statement""" Depth: 0
+DEBUG: self.analyze_expression(stmt.expression) Depth: 0
+DEBUG: fn analyze_import(ref self, stmt: ImportStmt): Depth: 0
+DEBUG: """Analyze import statement""" Depth: 0
+DEBUG: pass Depth: 0
+DEBUG: fn analyze_expression(ref self, expr: Expression) -> @str: Depth: 0
+DEBUG: """Analyze expression and return its type""" Depth: 0
+DEBUG: let et = expr.expr_type Depth: 0
+DEBUG: if et == ExprType.IntegerLiteral: return "int" Depth: 0
+DEBUG: elif et == ExprType.FloatLiteral: return "float" Depth: 0
+DEBUG: elif et == ExprType.StringLiteral: return "str" Depth: 0
+DEBUG: elif et == ExprType.BooleanLiteral: return "bool" Depth: 0
+DEBUG: elif et == ExprType.Identifier: return self.analyze_identifier(@cast(IdentifierExpr, expr)) Depth: 0
+DEBUG: elif et == ExprType.BinaryOp: return self.analyze_binary_op(@cast(BinaryOpExpr, expr)) Depth: 0
+DEBUG: elif et == ExprType.UnaryOp: return self.analyze_unary_op(@cast(UnaryOpExpr, expr)) Depth: 0
+DEBUG: elif et == ExprType.Call: return self.analyze_call(@cast(CallExpr, expr)) Depth: 0
+DEBUG: elif et == ExprType.Index: return self.analyze_index(@cast(IndexExpr, expr)) Depth: 0
+DEBUG: elif et == ExprType.Attribute: return self.analyze_attribute(@cast(AttributeExpr, expr)) Depth: 0
+DEBUG: elif et == ExprType.ListLiteral: return self.analyze_list_literal(@cast(ListLiteralExpr, expr)) Depth: 0
+DEBUG: elif et == ExprType.TupleLiteral: return self.analyze_tuple_literal(@cast(TupleLiteralExpr, expr)) Depth: 0
+DEBUG: elif et == ExprType.SetLiteral: return self.analyze_set_literal(@cast(SetLiteralExpr, expr)) Depth: 0
+DEBUG: elif et == ExprType.DictLiteral: return self.analyze_dict_literal(@cast(DictLiteralExpr, expr)) Depth: 0
+DEBUG: elif et == ExprType.TypeConstructor: return self.analyze_type_constructor(@cast(TypeConstructorExpr, expr)) Depth: 0
+DEBUG: else: return "any" Depth: 0
+DEBUG: fn analyze_identifier(ref self, expr: IdentifierExpr) -> @str: Depth: 0
+DEBUG: """Analyze identifier and return type""" Depth: 0
+DEBUG: let symbol = self.current_scope.resolve(expr.name) Depth: 0
+DEBUG: if not symbol: Depth: 0
+DEBUG: self.error(f"Undefined variable '{expr.name}'", expr.base.node.line, expr.base.node.column) Depth: 0
+DEBUG: return "any" Depth: 0
+DEBUG: return symbol.type Depth: 0
+DEBUG: fn analyze_binary_op(ref self, expr: BinaryOpExpr) -> @str: Depth: 0
+DEBUG: """Analyze binary operation""" Depth: 0
+DEBUG: let left_type = self.analyze_expression(expr.left) Depth: 0
+DEBUG: let right_type = self.analyze_expression(expr.right) Depth: 0
+DEBUG: if expr.operator == TokenType.Plus or Depth: 0
+DEBUG: expr.operator == TokenType.Minus or Depth: 0
+DEBUG: expr.operator == TokenType.Star or Depth: 0
+DEBUG: expr.operator == TokenType.Slash: Depth: 0
+DEBUG: if left_type == "int" and right_type == "int": Depth: 0
+DEBUG: return "int" Depth: 0
+DEBUG: elif left_type == "float" or right_type == "float": Depth: 0
+DEBUG: return "float" Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: return "any" Depth: 0
+DEBUG: elif expr.operator == TokenType.EqualEqual or Depth: 0
+DEBUG: expr.operator == TokenType.NotEqual or Depth: 0
+DEBUG: expr.operator == TokenType.Less or Depth: 0
+DEBUG: expr.operator == TokenType.Greater or Depth: 0
+DEBUG: expr.operator == TokenType.LessEq or Depth: 0
+DEBUG: expr.operator == TokenType.GreaterEq: Depth: 0
+DEBUG: return "bool" Depth: 0
+DEBUG: elif expr.operator == TokenType.And or expr.operator == TokenType.Or: Depth: 0
+DEBUG: return "bool" Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: return "any" Depth: 0
+DEBUG: fn analyze_unary_op(ref self, expr: UnaryOpExpr) -> @str: Depth: 0
+DEBUG: """Analyze unary operation""" Depth: 0
+DEBUG: let operand_type = self.analyze_expression(expr.operand) Depth: 0
+DEBUG: if expr.operator == TokenType.Minus: Depth: 0
+DEBUG: return operand_type Depth: 0
+DEBUG: elif expr.operator == TokenType.Not: Depth: 0
+DEBUG: return "bool" Depth: 0
+DEBUG: else: Depth: 0
+DEBUG: return "any" Depth: 0
+DEBUG: fn analyze_call(ref self, expr: CallExpr) -> @str: Depth: 0
+DEBUG: """Analyze function call""" Depth: 0
+DEBUG: let callee_type = self.analyze_expression(expr.callee) Depth: 0
+DEBUG: for arg in expr.arguments: Depth: 0
+DEBUG: self.analyze_expression(arg) Depth: 0
+DEBUG: return "any" Depth: 0
+DEBUG: fn analyze_index(ref self, expr: IndexExpr) -> @str: Depth: 0
+DEBUG: """Analyze index operation""" Depth: 0
+DEBUG: let object_type = self.analyze_expression(expr.object) Depth: 0
+DEBUG: let index_type = self.analyze_expression(expr.index) Depth: 0
+DEBUG: return "any" Depth: 0
+DEBUG: fn analyze_attribute(ref self, expr: AttributeExpr) -> @str: Depth: 0
+DEBUG: """Analyze attribute access""" Depth: 0
+DEBUG: let object_type = self.analyze_expression(expr.object) Depth: 0
+DEBUG: return "any" Depth: 0
+DEBUG: fn analyze_type_constructor(ref self, expr: TypeConstructorExpr) -> @str: Depth: 0
+DEBUG: """Analyze type constructor""" Depth: 0
+DEBUG: self.analyze_expression(expr.argument) Depth: 0
+DEBUG: return expr.type_name Depth: 0
+DEBUG: fn types_compatible(self, expected: @str, actual: @str) -> @bool: Depth: 0
+DEBUG: """Check if two types are compatible""" Depth: 0
+DEBUG: if expected == actual: Depth: 0
+DEBUG: return @bool(true) Depth: 0
+DEBUG: if expected == "any" or actual == "any": Depth: 0
+DEBUG: return @bool(true) Depth: 0
+DEBUG: return @bool(false) Depth: 0
+DEBUG: fn analyze_semantics(program: Program) -> @list[@str]: Depth: 0
+DEBUG: """Perform semantic analysis on program, return errors""" Depth: 0
+DEBUG: var sem_analyzer = create_analyzer() Depth: 0
+DEBUG: sem_analyzer.analyze_program(program) Depth: 0
+DEBUG: return sem_analyzer.errors Depth: 0
+✅ Generated analyzer.rs
