@@ -1,0 +1,28 @@
+# GUL Tensor Operations Test
+# Tests basic tensor functionality
+
+use std::tensor
+
+mn:
+    print("=== Tensor Test ===")
+    
+    # Create tensors
+    let a = Tensor::zeros([3])
+    print("Created zeros tensor")
+    
+    let b = Tensor::ones([3])
+    print("Created ones tensor")
+    
+    let c = Tensor::full([2, 2], 5.0)
+    print("Created 2x2 tensor filled with 5.0")
+    
+    # Test sum/mean
+    let s = sum(b)
+    print("Sum of ones(3):")
+    print(s)  # Should be 3.0
+    
+    let m = mean(b)
+    print("Mean of ones(3):")
+    print(m)  # Should be 1.0
+    
+    print("=== Test Complete ===")

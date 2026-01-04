@@ -134,3 +134,129 @@ void gul_debug_print(const char *msg) {
   fprintf(stderr, "[GUL DEBUG] %s\n", msg);
 }
 #endif
+
+// ============================================================================
+// Math Functions (for ML and numerical computing)
+// ============================================================================
+
+#include <math.h>
+
+// Trigonometric
+double gul_math_sin(double x) { return sin(x); }
+double gul_math_cos(double x) { return cos(x); }
+double gul_math_tan(double x) { return tan(x); }
+double gul_math_asin(double x) { return asin(x); }
+double gul_math_acos(double x) { return acos(x); }
+double gul_math_atan(double x) { return atan(x); }
+double gul_math_atan2(double y, double x) { return atan2(y, x); }
+
+// Exponential and logarithmic
+double gul_math_exp(double x) { return exp(x); }
+double gul_math_log(double x) { return log(x); }
+double gul_math_log10(double x) { return log10(x); }
+double gul_math_log2(double x) { return log2(x); }
+
+// Power and roots
+double gul_math_pow(double x, double y) { return pow(x, y); }
+double gul_math_sqrt(double x) { return sqrt(x); }
+double gul_math_cbrt(double x) { return cbrt(x); }
+
+// Rounding
+double gul_math_floor(double x) { return floor(x); }
+double gul_math_ceil(double x) { return ceil(x); }
+double gul_math_round(double x) { return round(x); }
+double gul_math_trunc(double x) { return trunc(x); }
+
+// Absolute value
+double gul_math_abs(double x) { return fabs(x); }
+int64_t gul_math_abs_int(int64_t x) { return x < 0 ? -x : x; }
+
+// Min/Max
+double gul_math_min(double a, double b) { return a < b ? a : b; }
+double gul_math_max(double a, double b) { return a > b ? a : b; }
+
+// ML-specific activation functions
+double gul_ml_sigmoid(double x) { return 1.0 / (1.0 + exp(-x)); }
+double gul_ml_tanh(double x) { return tanh(x); }
+double gul_ml_relu(double x) { return x > 0.0 ? x : 0.0; }
+
+// ============================================================================
+// Tensor Primitives (for ML)
+// ============================================================================
+
+// Allocate tensor data (flat array)
+int64_t gul_tensor_alloc(int64_t num_elements) {
+    double *data = (double *)malloc(num_elements * sizeof(double));
+    if (!data) {
+        fprintf(stderr, "GUL Runtime: Out of memory allocating tensor\n");
+        exit(1);
+    }
+    return (int64_t)data;
+}
+
+// Free tensor data
+void gul_tensor_free(int64_t ptr) {
+    free((void *)ptr);
+}
+
+// Fill tensor with value
+void gul_tensor_fill(int64_t ptr, int64_t size, double value) {
+    double *data = (double *)ptr;
+    for (int64_t i = 0; i < size; i++) {
+        data[i] = value;
+    }
+}
+
+// Element-wise add
+void gul_tensor_add(int64_t dst, int64_t a, int64_t b, int64_t size) {
+    double *d = (double *)dst;
+    double *x = (double *)a;
+    double *y = (double *)b;
+    for (int64_t i = 0; i < size; i++) {
+        d[i] = x[i] + y[i];
+    }
+}
+
+// Element-wise multiply
+void gul_tensor_mul(int64_t dst, int64_t a, int64_t b, int64_t size) {
+    double *d = (double *)dst;
+    double *x = (double *)a;
+    double *y = (double *)b;
+    for (int64_t i = 0; i < size; i++) {
+        d[i] = x[i] * y[i];
+    }
+}
+
+// Matrix multiply: C[m,n] = A[m,k] * B[k,n]
+void gul_tensor_matmul(int64_t c_ptr, int64_t a_ptr, int64_t b_ptr,
+                        int64_t m, int64_t k, int64_t n) {
+    double *C = (double *)c_ptr;
+    double *A = (double *)a_ptr;
+    double *B = (double *)b_ptr;
+    
+    for (int64_t i = 0; i < m; i++) {
+        for (int64_t j = 0; j < n; j++) {
+            double sum = 0.0;
+            for (int64_t l = 0; l < k; l++) {
+                sum += A[i * k + l] * B[l * n + j];
+            }
+            C[i * n + j] = sum;
+        }
+    }
+}
+
+// Sum all elements
+double gul_tensor_sum(int64_t ptr, int64_t size) {
+    double *data = (double *)ptr;
+    double sum = 0.0;
+    for (int64_t i = 0; i < size; i++) {
+        sum += data[i];
+    }
+    return sum;
+}
+
+// Mean of all elements
+double gul_tensor_mean(int64_t ptr, int64_t size) {
+    return gul_tensor_sum(ptr, size) / (double)size;
+}
+

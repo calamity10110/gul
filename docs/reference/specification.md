@@ -456,7 +456,7 @@ mn:
 ### 9.1 Test File Location
 
 | Path | Description |
-|------|-------------|
+| ------ | ----------- |
 | `compilers/shared/tests/` | Cross-compiler compatibility tests |
 | `compilers/nightly/tests/` | Nightly-specific feature tests |
 

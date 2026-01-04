@@ -635,7 +635,7 @@ mn:
 ### Core Modules
 
 | Module | Description | Key Functions |
-|--------|-------------|---------------|
+| -------- | ------------- | --------------- |
 | `std.io` | Input/Output | `print()`, `read_file()`, `write_file()` |
 | `std.http` | HTTP client/server | `get()`, `post()`, `listen()` |
 | `std.math` | Mathematics | `sqrt()`, `sin()`, `cos()`, `pow()` |
@@ -804,7 +804,7 @@ mn:
 ### Common Errors
 
 | Error | Cause | Solution |
-|-------|-------|----------|
+| ------- | ------- | ---------- |
 | "value moved here" | Using variable after `move` | Use `borrow` or `kept` |
 | "cannot modify immutable variable" | Trying to change `let` variable | Use `var` instead |
 | "type mismatch" | Wrong type passed | Check function signature |
@@ -819,7 +819,7 @@ mn:
 ### v2.0 → v3.2 Migration
 
 | Feature | v2.0 (Deprecated) | v3.2 (Current) |
-|---------|-------------------|----------------|
+| --------- | ------------------- | ---------------- |
 | Variables | `def x = 10` | `let x = 10` or `var x = 10` |
 | Functions | `fn:` block | `fn name():` |
 | Imports | `imp std.io` | `@imp std.io` |
@@ -833,7 +833,6 @@ mn:
 
 ### Current (v3.2)
 
-```
 let, var, @fn, @async, await, mn, @imp
 if, elif, else, for, while, loop, break, continue, return
 try, catch, finally, throw
@@ -841,14 +840,11 @@ match, struct, enum
 borrow, ref, move, kept
 @python, @rust, @sql, @js
 true, false, null
-```
 
 ### Deprecated (v2.0) - Still supported
 
-```
 def, imp, main, asy, cs
 own, copy (use borrow/move/kept instead)
-```
 
 ---
 
@@ -909,7 +905,7 @@ mn:
 GUL includes comprehensive test suites:
 
 | Location | Description |
-|----------|-------------|
+| -------- | ----------- |
 | `compilers/shared/tests/` | Cross-compiler tests |
 | `compilers/nightly/tests/` | Nightly feature tests |
 

@@ -1,0 +1,152 @@
+# GUL Standard Tensor Library
+# Core tensor operations for ML and numerical computing
+
+# ============================================
+# Tensor Type
+# ============================================
+
+struct Tensor:
+    data: int        # Pointer to float64 array
+    shape: vec<int>  # Dimensions
+    size: int        # Total elements
+    
+    # Factory functions
+    @extern("gul_tensor_alloc")
+    fn _alloc(size: int) -> int
+    
+    @extern("gul_tensor_free")
+    fn _free(ptr: int)
+    
+    @extern("gul_tensor_fill")
+    fn _fill(ptr: int, size: int, value: flt)
+    
+    fn new(shape: vec<int>) -> Tensor:
+        var size = 1
+        for dim in shape:
+            size = size * dim
+        let data = Tensor::_alloc(size)
+        return Tensor { data: data, shape: shape, size: size }
+    
+    fn zeros(shape: vec<int>) -> Tensor:
+        var t = Tensor::new(shape)
+        Tensor::_fill(t.data, t.size, 0.0)
+        return t
+    
+    fn ones(shape: vec<int>) -> Tensor:
+        var t = Tensor::new(shape)
+        Tensor::_fill(t.data, t.size, 1.0)
+        return t
+    
+    fn full(shape: vec<int>, value: flt) -> Tensor:
+        var t = Tensor::new(shape)
+        Tensor::_fill(t.data, t.size, value)
+        return t
+    
+    # Destructor (called when out of scope)
+    fn drop(var self):
+        Tensor::_free(self.data)
+
+# ============================================
+# Tensor Operations (Element-wise)
+# ============================================
+
+@extern("gul_tensor_add")
+fn tensor_add(dst: int, a: int, b: int, size: int)
+
+@extern("gul_tensor_mul")  
+fn tensor_mul(dst: int, a: int, b: int, size: int)
+
+fn add(a: Tensor, b: Tensor) -> Tensor:
+    var result = Tensor::new(a.shape)
+    tensor_add(result.data, a.data, b.data, a.size)
+    return result
+
+fn mul(a: Tensor, b: Tensor) -> Tensor:
+    var result = Tensor::new(a.shape)
+    tensor_mul(result.data, a.data, b.data, a.size)
+    return result
+
+# ============================================
+# Matrix Operations
+# ============================================
+
+@extern("gul_tensor_matmul")
+fn tensor_matmul(c: int, a: int, b: int, m: int, k: int, n: int)
+
+fn matmul(a: Tensor, b: Tensor) -> Tensor:
+    # a: [m, k], b: [k, n] -> result: [m, n]
+    let m = a.shape[0]
+    let k = a.shape[1]
+    let n = b.shape[1]
+    var result = Tensor::new([m, n])
+    tensor_matmul(result.data, a.data, b.data, m, k, n)
+    return result
+
+# ============================================
+# Reduction Operations
+# ============================================
+
+@extern("gul_tensor_sum")
+fn tensor_sum(ptr: int, size: int) -> flt
+
+@extern("gul_tensor_mean")
+fn tensor_mean(ptr: int, size: int) -> flt
+
+fn sum(t: Tensor) -> flt:
+    return tensor_sum(t.data, t.size)
+
+fn mean(t: Tensor) -> flt:
+    return tensor_mean(t.data, t.size)
+
+# ============================================
+# ML Activation Functions
+# ============================================
+
+@extern("gul_ml_sigmoid")
+fn _sigmoid(x: flt) -> flt
+
+@extern("gul_ml_tanh")
+fn _tanh(x: flt) -> flt
+
+@extern("gul_ml_relu")
+fn _relu(x: flt) -> flt
+
+fn sigmoid(t: Tensor) -> Tensor:
+    var result = Tensor::new(t.shape)
+    # Apply element-wise (would use SIMD in optimized version)
+    for i in range(t.size):
+        result[i] = _sigmoid(t[i])
+    return result
+
+fn relu(t: Tensor) -> Tensor:
+    var result = Tensor::new(t.shape)
+    for i in range(t.size):
+        result[i] = _relu(t[i])
+    return result
+
+# ============================================
+# Shape Operations
+# ============================================
+
+fn reshape(t: Tensor, new_shape: vec<int>) -> Tensor:
+    # Validate size matches
+    var new_size = 1
+    for dim in new_shape:
+        new_size = new_size * dim
+    if new_size != t.size:
+        print("Error: reshape size mismatch")
+        return t
+    return Tensor { data: t.data, shape: new_shape, size: t.size }
+
+fn transpose(t: Tensor) -> Tensor:
+    # For 2D tensors: [m, n] -> [n, m]
+    if len(t.shape) != 2:
+        print("Error: transpose requires 2D tensor")
+        return t
+    let m = t.shape[0]
+    let n = t.shape[1]
+    var result = Tensor::new([n, m])
+    for i in range(m):
+        for j in range(n):
+            result[j * m + i] = t[i * n + j]
+    return result
