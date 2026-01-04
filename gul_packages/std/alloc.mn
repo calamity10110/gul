@@ -1,0 +1,85 @@
+# GUL Standard Allocator Library
+# Arena and pool allocators for performance-critical code
+
+# ============================================
+# Arena Allocator - Fast bump allocation
+# ============================================
+
+struct Arena:
+    buffer: int      # Pointer to memory
+    capacity: int
+    offset: int      # Current allocation offset
+    
+    @extern("malloc")
+    fn _malloc(size: int) -> int
+    
+    @extern("free")
+    fn _free(ptr: int)
+    
+    fn new(capacity: int) -> Arena:
+        let buffer = Arena::_malloc(capacity)
+        return Arena { buffer: buffer, capacity: capacity, offset: 0 }
+    
+    fn alloc(var self, size: int) -> int:
+        if self.offset + size > self.capacity:
+            print("Arena: out of memory")
+            return 0
+        let ptr = self.buffer + self.offset
+        self.offset = self.offset + size
+        return ptr
+    
+    fn reset(var self):
+        # Reset to beginning, reuse all memory
+        self.offset = 0
+    
+    fn destroy(var self):
+        Arena::_free(self.buffer)
+        self.buffer = 0
+        self.capacity = 0
+        self.offset = 0
+
+# ============================================
+# Pool Allocator - Fixed-size object allocation  
+# ============================================
+
+struct Pool<T>:
+    buffer: int
+    item_size: int
+    capacity: int
+    free_list: vec<int>  # Indices of free slots
+    
+    fn new(capacity: int, item_size: int) -> Pool<T>:
+        let buffer = Arena::_malloc(capacity * item_size)
+        var free_list = []
+        for i in range(capacity):
+            free_list.push(i)
+        return Pool { 
+            buffer: buffer, 
+            item_size: item_size,
+            capacity: capacity,
+            free_list: free_list 
+        }
+    
+    fn alloc(var self) -> int:
+        if self.free_list.len() == 0:
+            print("Pool: out of slots")
+            return 0
+        let index = self.free_list.pop()
+        return self.buffer + (index * self.item_size)
+    
+    fn free(var self, ptr: int):
+        let index = (ptr - self.buffer) / self.item_size
+        self.free_list.push(index)
+    
+    fn destroy(var self):
+        Arena::_free(self.buffer)
+
+# ============================================
+# Scoped allocation helper
+# ============================================
+
+fn with_arena<T>(capacity: int, f: fn(Arena) -> T) -> T:
+    var arena = Arena::new(capacity)
+    let result = f(arena)
+    arena.destroy()
+    return result

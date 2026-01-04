@@ -1,0 +1,112 @@
+# GUL Standard Flow Library
+# Channels and async pipelines for data-flow programming
+
+# ============================================
+# Channel - Typed message passing
+# ============================================
+
+struct Channel<T>:
+    buffer: vec<T>
+    capacity: int
+    closed: bool
+    
+    fn new(capacity: int = 0) -> Channel<T>:
+        return Channel<T> { buffer: [], capacity: capacity, closed: false }
+    
+    fn send(var self, value: T):
+        if self.closed:
+            print("Error: sending on closed channel")
+            return
+        self.buffer.push(value)
+    
+    fn recv(var self) -> T?:
+        if self.buffer.len() == 0:
+            if self.closed:
+                return none
+            # Would block in real async implementation
+            return none
+        return self.buffer.pop(0)
+    
+    fn close(var self):
+        self.closed = true
+    
+    fn is_closed(self) -> bool:
+        return self.closed
+
+# ============================================
+# Pipeline - Composable data transformations
+# ============================================
+
+struct Pipeline<I, O>:
+    stages: vec<fn(any) -> any>
+    
+    fn new() -> Pipeline<I, O>:
+        return Pipeline { stages: [] }
+    
+    fn map<T>(var self, f: fn(O) -> T) -> Pipeline<I, T>:
+        self.stages.push(f)
+        return self
+    
+    fn filter(var self, predicate: fn(O) -> bool) -> Pipeline<I, O>:
+        # Add filter stage
+        return self
+    
+    fn collect(self, input: vec<I>) -> vec<O>:
+        var result = []
+        for item in input:
+            var val = item
+            for stage in self.stages:
+                val = stage(val)
+            result.push(val)
+        return result
+
+# ============================================
+# Parallel execution helpers
+# ============================================
+
+fn parallel_map<T, R>(items: vec<T>, f: fn(T) -> R) -> vec<R>:
+    # In full implementation: spawns threads
+    var results = []
+    for item in items:
+        results.push(f(item))
+    return results
+
+fn parallel_reduce<T>(items: vec<T>, f: fn(T, T) -> T, initial: T) -> T:
+    var acc = initial
+    for item in items:
+        acc = f(acc, item)
+    return acc
+
+# ============================================
+# Stream - Lazy evaluation
+# ============================================
+
+struct Stream<T>:
+    source: fn() -> T?
+    
+    fn from_iter<I>(iter: I) -> Stream<T>:
+        # Create stream from iterator
+        return Stream { source: || iter.next() }
+    
+    fn map<R>(self, f: fn(T) -> R) -> Stream<R>:
+        return Stream { 
+            source: || match self.source():
+                some(v) => some(f(v))
+                none => none
+        }
+    
+    fn filter(self, predicate: fn(T) -> bool) -> Stream<T>:
+        return Stream {
+            source: || loop:
+                match self.source():
+                    some(v) => if predicate(v): return some(v)
+                    none => return none
+        }
+    
+    fn take(self, n: int) -> vec<T>:
+        var result = []
+        for i in range(n):
+            match self.source():
+                some(v) => result.push(v)
+                none => break
+        return result
