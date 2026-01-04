@@ -1,9 +1,3 @@
-# Specification
-
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-30
-
----
-
 # GUL Language Specification v3.2
 
 **Version**: 0.13.0
@@ -239,23 +233,24 @@ numbers[-1]  # Last element
 let config = @dict{host: "localhost", port: 8080}  # Immutable
 var cfg = @dict{host: "localhost", port: 8080}  # Mutable
 
-# Methods
-# Methods
+#/ Methods
 config.contains("port")     # Membership verify
 config.len()                # Length property
 
-# Access
-cfg[key]  # By identifier
-cfg["key"]  # By string
+#/ Access
+name[key]  # By identifier
+config(host)
+name["key"]  # By string
+config("host")
 
-# Insertion methods (maintains order)
+#/ Insertion methods (maintains order)
 cfg.insertbefore(position, key: value)  # Insert at position/default begin
 cfg.insertbefore(target_key, key: value)  # Insert before key
 cfg.insertafter(key: value)  # Insert at end (default)
 cfg.insertafter(target_key, key: value)  # Insert after key
 cfg.add(key: value)  # Append at end
 
-# Removal
+#/ Removal
 cfg.remove(position)  # By position
 cfg.remove(key)  # By key
 cfg.remove(key: value)  # By key-value pair

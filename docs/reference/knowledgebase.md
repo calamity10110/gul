@@ -53,7 +53,7 @@ GUL (GUL Universal Language) is a modern, multi-paradigm programming language th
 ### Key Features
 
 | Feature | Description |
-|---------|-------------|
+| --------- | ------------- |
 | **Syntax v3.2** | Modern `let`/`var` syntax with `@` type prefixes |
 | **Ownership** | Rust-like move semantics with explicit `borrow`/`move`/`kept` |
 | **Foreign Code** | Embed Python, Rust, SQL directly in GUL code |
@@ -71,9 +71,7 @@ GUL (GUL Universal Language) is a modern, multi-paradigm programming language th
 
 ### File Extension
 
-```
 *.mn  - All GUL files use .mn extension
-```
 
 ### Comments
 
@@ -221,7 +219,7 @@ result = "now a string"  # OK with 'any' type
 ### Type Quick Reference
 
 | Type | Constructor | Example |
-|------|-------------|---------|
+| ------ | ------------- | --------- |
 | String (default) | `@str/@string(...)` | `@str("hello")` or `@string("hello")` or `"hello"` |
 | Integer | `@int(...)` | `@int(42)` |
 | Float | `@flt/@float(...)` | `@flt(3.14)` or `@float(3.14)` |
@@ -276,12 +274,10 @@ let result = double(5)  # 10
 mn:
     let data = await fetch_data("https://api.example.com")
     print(data)
-```
-
 ### Function Features
 
 | Feature | Syntax | Example |
-|---------|--------|---------|
+| --------- | -------- | --------- |
 | Type annotations | `fn name(x: type) -> type:` | `fn add(a: int, b: int) -> int:` |
 | Optional types | `x?: type` | `fn greet(name?: str):` |
 | Default values | `x = value` | `fn greet(name = "Guest"):` |
@@ -384,7 +380,7 @@ let description = match status_code:
 
 ### Module Structure
 
-```
+```directory
 project/
 ├── main.mn              # Entry point
 ├── utils.mn             # Utilities module  
@@ -493,7 +489,7 @@ mn:
 
 **Keywords**: @async, await, concurrency, futures, tasks
 
-### Async Functions
+### Async Function
 
 ```gul
 @async fetch_user(id: int) -> dict:
@@ -518,12 +514,11 @@ mn:
         fetch_user(3)
     ])
     return [user1, user2, user3]
-```
 
 ### Async Patterns
 
 | Pattern | Description | Example |
-|---------|-------------|---------|
+| --|---------|-------------|---------|
 | **Sequential** | One after another | `let a = await f1(); let b = await f2()` |
 | **Parallel** | All at once | `await parallel([f1(), f2(), f3()])` |
 | **Race** | First to complete | `await race([f1(), f2()])` |
@@ -582,7 +577,7 @@ print(data2)  # OK - still valid
 ### Ownership Quick Reference
 
 | Mode | Keyword | Can Read? | Can Modify? | Original Valid After? |
-|------|---------|-----------|-------------|----------------------|
+| ---- | ------- | --------- | ----------- | --------------------- |
 | **Borrow** | `borrow` | ✅ | ❌ | ✅ |
 | **Reference** | `ref` | ✅ | ✅ | ✅ |
 | **Move** | `move` | ✅ | ✅ | ❌ |

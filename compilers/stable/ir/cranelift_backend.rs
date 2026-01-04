@@ -380,6 +380,14 @@ impl CraneliftBackend {
                             "str" // default to string
                         } else if let Expression::TypeConstructor(tc) = &call.arguments[0] {
                             tc.type_name.as_str()
+                        } else if let Expression::Identifier(type_ident) = &call.arguments[0] {
+                            // Handle input(@int) where @int is parsed as identifier
+                            match type_ident.name.as_str() {
+                                "@int" => "int",
+                                "@flt" | "@float" => "flt",
+                                "@str" | "@string" => "str",
+                                _ => "str"
+                            }
                         } else {
                             "str"
                         };
@@ -402,8 +410,69 @@ impl CraneliftBackend {
                             }
                         }
                     }
+                    
+                    // Handle @int(input()), @flt(input()), @str(input()) - type constructor call syntax
+                    if ident.name.starts_with('@') && !call.arguments.is_empty() {
+                        // Check if argument is input() call
+                        if let Expression::Call(inner_call) = &call.arguments[0] {
+                            if let Expression::Identifier(inner_ident) = inner_call.callee.as_ref() {
+                                if inner_ident.name == "input" {
+                                    // Route to typed input function based on @-prefix
+                                    match ident.name.as_str() {
+                                        "@int" => {
+                                            let func_ref = ctx.module.declare_func_in_func(ctx.gul_input_int_id, ctx.builder.func);
+                                            let call_result = ctx.builder.ins().call(func_ref, &[]);
+                                            return Ok(ctx.builder.inst_results(call_result)[0]);
+                                        }
+                                        "@flt" | "@float" => {
+                                            let func_ref = ctx.module.declare_func_in_func(ctx.gul_input_flt_id, ctx.builder.func);
+                                            let call_result = ctx.builder.ins().call(func_ref, &[]);
+                                            return Ok(ctx.builder.inst_results(call_result)[0]);
+                                        }
+                                        "@str" | "@string" => {
+                                            let func_ref = ctx.module.declare_func_in_func(ctx.gul_input_str_id, ctx.builder.func);
+                                            let call_result = ctx.builder.ins().call(func_ref, &[]);
+                                            return Ok(ctx.builder.inst_results(call_result)[0]);
+                                        }
+                                        _ => {}
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
                 Ok(ctx.builder.ins().iconst(types::I64, 0))
+            }
+            // Handle type constructor: @int(input()), @flt(input()), @str(input())
+            Expression::TypeConstructor(tc) => {
+                // Check if argument is an input() call
+                if let Expression::Call(call) = tc.argument.as_ref() {
+                    if let Expression::Identifier(ident) = call.callee.as_ref() {
+                        if ident.name == "input" {
+                            // Call the appropriate typed input function
+                            match tc.type_name.as_str() {
+                                "int" => {
+                                    let func_ref = ctx.module.declare_func_in_func(ctx.gul_input_int_id, ctx.builder.func);
+                                    let call_result = ctx.builder.ins().call(func_ref, &[]);
+                                    return Ok(ctx.builder.inst_results(call_result)[0]);
+                                }
+                                "flt" | "float" => {
+                                    let func_ref = ctx.module.declare_func_in_func(ctx.gul_input_flt_id, ctx.builder.func);
+                                    let call_result = ctx.builder.ins().call(func_ref, &[]);
+                                    return Ok(ctx.builder.inst_results(call_result)[0]);
+                                }
+                                "str" | "string" => {
+                                    let func_ref = ctx.module.declare_func_in_func(ctx.gul_input_str_id, ctx.builder.func);
+                                    let call_result = ctx.builder.ins().call(func_ref, &[]);
+                                    return Ok(ctx.builder.inst_results(call_result)[0]);
+                                }
+                                _ => {}
+                            }
+                        }
+                    }
+                }
+                // Fallback: evaluate the argument expression
+                Self::generate_expression(&tc.argument, ctx)
             }
             _ => Ok(ctx.builder.ins().iconst(types::I64, 0))
         }

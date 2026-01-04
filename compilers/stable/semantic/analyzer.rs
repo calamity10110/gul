@@ -430,6 +430,16 @@ impl SemanticAnalyzer {
         let symbol_opt = self.current_scope.resolve(expr.name.clone());
 
         if symbol_opt.is_none() {
+            // Allow @-prefixed type constructors as valid
+            if expr.name.starts_with('@') {
+                match expr.name.as_str() {
+                    "@int" => return "int".to_string(),
+                    "@flt" | "@float" => return "flt".to_string(),
+                    "@str" | "@string" => return "str".to_string(),
+                    "@bool" => return "bool".to_string(),
+                    _ => {}
+                }
+            }
             self.error(format!("Undefined variable '{}'", expr.name), expr.node.line, expr.node.column);
             return "any".to_string();
 
