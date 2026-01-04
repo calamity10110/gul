@@ -14,19 +14,18 @@ mn:
 Use `imp` to include other packages or standard library modules.
 
 ```gul
-imp std.io
-imp std.fs as file_system
-imp my_package.utils
+@imp std.io
+@imp std.fs as file_system
+@imp my_package.utils
 ```
 
 ### Grouped Imports
 
 ```gul
-imp {
+@imp:
     std.io,
     std.net,
     package.module
-}
 ```
 
 ## Package Structure
@@ -53,6 +52,6 @@ GUL uses `@` for annotations (decorators).
 
 ```gul
 @test
-fn test_addition():
+@fn test_addition():
     assert(1 + 1 == 2)
 ```

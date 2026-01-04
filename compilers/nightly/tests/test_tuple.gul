@@ -1,0 +1,27 @@
+fn main():
+    print("--- Tuple Test ---")
+    let t = (1, 2, 3)
+    print("Tuple Len:")
+    print(t.len)
+    
+    print("Element 0:")
+    print(t[0])
+    
+    let t2 = (10, 20)
+    print("Tuple 2:")
+    print(t2[1])
+    
+    # Test valid expression grouping still works
+    let val = (1 + 2) * 3
+    print("Grouping:")
+    print(val)
+    
+# EXPECT: --- Tuple Test ---
+# EXPECT: Tuple Len:
+# EXPECT: 3
+# EXPECT: Element 0:
+# EXPECT: 1
+# EXPECT: Tuple 2:
+# EXPECT: 20
+# EXPECT: Grouping:
+# EXPECT: 9

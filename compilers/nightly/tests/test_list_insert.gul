@@ -1,0 +1,23 @@
+fn main():
+    var arr = @list[10, 30]
+    
+    # Insert 20 at index 1 -> [10, 20, 30]
+    arr.insertbefore(1, 20)
+    
+    print(arr[0])
+    print(arr[1])
+    print(arr[2])
+    print(arr.len)
+    
+    # Add 40 to end -> [10, 20, 30, 40]
+    arr.add(40)
+    
+    print(arr[3])
+    print(arr.len)
+
+# EXPECT: 10
+# EXPECT: 20
+# EXPECT: 30
+# EXPECT: 3
+# EXPECT: 40
+# EXPECT: 4

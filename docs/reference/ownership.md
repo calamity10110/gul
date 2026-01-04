@@ -54,24 +54,24 @@ mn:
 ### Immutable Borrowing
 
 ```gul
-fn calculate_length(s: &str): int:
+@fn calculate_length(s: borrow str) -> int:
     return len(s)        # Can read, but not modify
 
 mn:
-    text = "Hello, GUL!"
-    length = calculate_length(&text)  # Borrow immutably
+    let text = "Hello, GUL!"
+    let length = calculate_length(borrow text)  # Borrow immutably
     print(f"'{text}' has {length} characters")  # text still valid
 ```
 
 ### Mutable Borrowing
 
 ```gul
-fn append_text(s: &mut str, suffix: str):
+@fn append_text(s: ref str, suffix: str):
     s += suffix          # Can modify borrowed value
 
 mn:
     var text = "Hello"
-    append_text(&var text, ", World!")
+    append_text(ref text, ", World!")
     print(text)          # Output: "Hello, World!"
 ```
 
@@ -79,19 +79,19 @@ mn:
 
 ```gul
 mn:
-    var x = vec[1, 2, 3]
+    var x = @list[1, 2, 3]
 
     # Multiple immutable borrows allowed
-    r1 = &x
-    r2 = &x
+    let r1 = borrow x
+    let r2 = borrow x
     print(r1, r2)        # OK
 
     # Can't have mutable borrow while immutable borrows exist
-    # r3 = &var x        # Error: already borrowed as immutable
+    # let r3 = ref x        # Error: already borrowed as immutable
 
     # Can have one mutable borrow
     {
-        r_mut = &var x
+        let r_mut = ref x
         r_mut.push(4)
     }                    # r_mut goes out of scope
 
@@ -146,8 +146,8 @@ For non-Copy types, explicit cloning is required:
 
 ```gul
 # Clone for types that don't implement Copy
-original = vec[1, 2, 3]
-copy = original.clone()  # Explicit deep copy
+let original = @list[1, 2, 3]
+let copy = original.clone()  # Explicit deep copy
 print(original)          # OK: original still owns its data
 print(copy)              # OK: copy owns its own data
 ```
@@ -157,16 +157,16 @@ print(copy)              # OK: copy owns its own data
 ### Reference Basics
 
 ```gul
-fn longest(x: &str, y: &str): &str:
+@fn longest(x: borrow str, y: borrow str) -> borrow str:
     if len(x) > len(y):
         return x
     else:
         return y
 
 mn:
-    s1 = "short"
-    s2 = "much longer string"
-    result = longest(&s1, &s2)
+    let s1 = "short"
+    let s2 = "much longer string"
+    let result = longest(borrow s1, borrow s2)
     print(f"Longest: {result}")
 ```
 
@@ -190,15 +190,15 @@ fn longest<'a>(x: &'a str, y: &'a str): &'a str:
 
 ```gul
 # Struct with lifetime annotation
-struct TextAnalyzer<'a>:
-    text: &'a str
+struct TextAnalyzer:
+    text: borrow str
 
-    fn word_count(self): int:
+    @fn word_count(self) -> int:
         return len(self.text.split())
 
 mn:
-    content = "Hello world from GUL"
-    analyzer = TextAnalyzer { text: &content }
+    let content = "Hello world from GUL"
+    let analyzer = TextAnalyzer { text: borrow content }
     print(analyzer.word_count())
 ```
 
@@ -230,10 +230,10 @@ fn first(s: &str): &str:
 ### Box (Heap Allocation)
 
 ```gul
-import std.box
+@imp std.box
 
 # Allocate on heap
-boxed = Box.new(vec[1, 2, 3, 4, 5])
+let boxed = Box.new(@list[1, 2, 3, 4, 5])
 print(*boxed)            # Dereference to access value
 ```
 
@@ -476,7 +476,7 @@ query = QueryBuilder.new("users")
 
 ```gul
 # Option type
-fn find_user(id: int): Option[User]:
+@fn find_user(id: int) -> Option[User]:
     if user_exists(id):
         return Some(get_user(id))
     else:
@@ -572,12 +572,12 @@ mn:
 
 ```gul
 # ❌ Bad: Unnecessary ownership transfer
-fn process(data: vec[int]):
+@fn process(data: list[int]):
     for item in data:
         print(item)
 
 # ✅ Good: Borrow instead
-fn process(data: &vec[int]):
+@fn process(data: borrow list[int]):
     for item in data:
         print(item)
 ```

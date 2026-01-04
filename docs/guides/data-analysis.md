@@ -13,19 +13,19 @@ Learn to perform data analysis, statistical computing, and visualization with GU
 ### Loading Data
 
 ```gul
-import std.dataframe as df
-import std.filesystem as fs
+@imp std.dataframe as df
+@imp std.filesystem as fs
 
 # Load CSV
-data = df.read_csv("sales_data.csv")
+let data = df.read_csv("sales_data.csv")
 
 # Load JSON
-data = df.read_json("data.json")
+let data = df.read_json("data.json")
 
 # From database
-import std.database
-db = database.connect("postgresql://localhost/mydb")
-data = df.from_query(db, "SELECT * FROM sales")
+@imp std.database
+let db = database.connect("postgresql://localhost/mydb")
+let data = df.from_query(db, "SELECT * FROM sales")
 ```
 
 ### Data Exploration
@@ -51,52 +51,52 @@ print(f"Rows: {data.rows}, Columns: {data.cols}")
 
 ```gul
 # Handle missing values
-data_clean = data.drop_na()
-data_filled = data.fill_na(0)
+let data_clean = data.drop_na()
+let data_filled = data.fill_na(0)
 
 # Remove duplicates
-data_unique = data.drop_duplicates()
+let data_unique = data.drop_duplicates()
 
 # Filter rows
-filtered = data.filter(fn(row): row["age"] > 18)
+let filtered = data.filter((row) => row["age"] > 18)
 
 # Select columns
-subset = data.select(["name", "age", "city"])
+let subset = data.select(@list["name", "age", "city"])
 ```
 
 ### Aggregation and Grouping
 
 ```gul
 # Group by and aggregate
-by_city = data.group_by("city").agg({
-    "sales": "sum",
-    "count": "count",
-    "avg_age": fn(group): group["age"].mean()
+let by_city = data.group_by("city").agg(@dict{
+    sales: "sum",
+    count: "count",
+    avg_age: (group) => group["age"].mean()
 })
 
 # Multiple aggregations
-summary = data.agg({
-    "total_sales": fn(d): d["sales"].sum(),
-    "avg_sales": fn(d): d["sales"].mean(),
-    "max_sales": fn(d): d["sales"].max()
+let summary = data.agg(@dict{
+    total_sales: (d) => d["sales"].sum(),
+    avg_sales: (d) => d["sales"].mean(),
+    max_sales: (d) => d["sales"].max()
 })
 ```
 
 ## 📈 Statistical Analysis
 
 ```gul
-import std.stats
+@imp std.stats
 
 # Descriptive statistics
-mean = stats.mean(data["sales"])
-median = stats.median(data["sales"])
-std_dev = stats.std_dev(data["sales"])
+let mean = stats.mean(data["sales"])
+let median = stats.median(data["sales"])
+let std_dev = stats.std_dev(data["sales"])
 
 # Correlation
-corr = stats.correlation(data["age"], data["sales"])
+let corr = stats.correlation(data["age"], data["sales"])
 
 # Linear regression
-model = stats.linear_regression(
+let model = stats.linear_regression(
     x=data["years_experience"],
     y=data["salary"]
 )
@@ -107,10 +107,10 @@ print(f"R²: {model.r_squared}")
 ## 📉 Visualization
 
 ```gul
-import std.plot
+@imp std.plot
 
 # Line plot
-plt = plot.line(
+let plt = plot.line(
     x=data["date"],
     y=data["sales"],
     title="Sales Over Time"
@@ -140,21 +140,21 @@ plot.histogram(
 ## 🎯 Complete Example
 
 ```gul
-import std.dataframe as df
-import std.stats
-import std.plot
+@imp std.dataframe as df
+@imp std.stats
+@imp std.plot
 
-main:
+mn:
     # Load data
-    sales = df.read_csv("monthly_sales.csv")
+    let sales = df.read_csv("monthly_sales.csv")
 
     # Clean data
-    sales_clean = sales.drop_na().drop_duplicates()
+    let sales_clean = sales.drop_na().drop_duplicates()
 
     # Analysis
-    monthly_totals = sales_clean.group_by("month").agg({
-        "total_sales": fn(g): g["amount"].sum(),
-        "avg_sale": fn(g): g["amount"].mean()
+    let monthly_totals = sales_clean.group_by("month").agg(@dict{
+        total_sales: (g) => g["amount"].sum(),
+        avg_sale: (g) => g["amount"].mean()
     })
 
     # Statistics

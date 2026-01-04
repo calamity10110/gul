@@ -19,10 +19,10 @@ import std.ui.tui
 text = tui.Text("Hello, GUL!", color="blue", bold=True)
 
 # Button
-button = tui.Button("Click Me", on_click=fn(): print("Clicked!"))
+let button = tui.Button("Click Me", on_click=(e) => print("Clicked!"))
 
 # Input
-input = tui.Input(placeholder="Enter text...", on_change=fn(value): print(value))
+let input = tui.Input(placeholder="Enter text...", on_change=(value) => print(value))
 
 # Label
 label = tui.Label("Username:", color="green")
@@ -129,18 +129,18 @@ h2 = web.H2("Subtitle")
 p = web.P("This is a paragraph of text.")
 
 # Button
-button = web.Button(
+let button = web.Button(
     "Submit",
-    onclick=fn(): handle_submit(),
+    onclick=() => handle_submit(),
     class="btn btn-primary"
 )
 
 # Input
-input = web.Input(
+let input = web.Input(
     type="text",
     placeholder="Enter name...",
     value="",
-    oninput=fn(e): handle_input(e.target.value)
+    oninput=(e) => handle_input(e.target.value)
 )
 ```
 

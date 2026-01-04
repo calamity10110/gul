@@ -1,0 +1,23 @@
+fn main():
+    let s = @set{10, 20}
+    
+    print(10 in s)
+    print(30 in s)
+    
+    # "30" in s  <- type error if I enforced it, but currently dynamic
+    
+    var s2 = @set{"foo", "bar"}
+    print("foo" in s2)
+    print("baz" in s2)
+    
+    # Set add (currently duplicates allowed in backend, but API exists)
+    s.add(30)
+    print(30 in s)
+    print(s.len)
+
+# EXPECT: true
+# EXPECT: false
+# EXPECT: true
+# EXPECT: false
+# EXPECT: true
+# EXPECT: 3

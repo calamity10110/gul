@@ -24,9 +24,18 @@
 ```gul
 let name = "Alice"            # Default String
 let name2 = @str("Alice")     # Explicit String
+let discount = 0.2            # Default Float
 let age = @int(30)            # Integer
 let score = @float(95.5)      # Float also accepts @flt(95)
 let active = @bool(true)      # Boolean
+let tuple = (1, 2)            # Tuple (treated as List)
+```
+
+### String Interpolation
+
+```gul
+let name = "Alice"
+let msg = f"Hello {name}"     # F-String
 ```
 
 ## Variables
@@ -58,28 +67,69 @@ var user = @dict{name: "Bob", age: 25} # Dictionary (mutable)
 ### Lists
 
 ```gul
-var items = @list(1, 2, 3)
+let numbers = @list[1, 2, 3]        # Literal immutable
+var alpha = @list["a", "b", "c"]   # String mutable
+let matrix = @list[[1, 2], [3, 4]]  # Multi-dimensional immutable
+var matrix2 = @list[[1, 2], [3, 4], [5, 6]]  # Multi-dimensional mutable
 
-items.add(4)
-items.insertbefore(0, 0)
-let val = items[0]
+# Methods
+# Methods
+numbers.insertbefore(99) # Insert at begin
+numbers.insertbefore(0, 99) # Insert at index, count from begin
+numbers.insertafter(0, 99) # Insert at index, count from end 
+numbers.insertafter(99) # insert to end
+numbers.remove(2)           # Remove by value
+numbers.pop()               # Remove from end
+numbers.pop(0)              # Remove at index
+numbers.clear()             # Empty list
+numbers.contains("C")       # Membership verify
+numbers.len()               # Length property
+numbers[0]  # First element
+numbers[-1]  # Last element
 ```
 
 ### Sets
 
 ```gul
-var tags = @set{"rust", "python"}
-tags.add("go")
-if "rust" in tags:
-    print("Found")
+let tags = @set{"a", "b"}        # Literal immutable
+var tags = @set{"a", "b"}        # convert to mutable
+
+# Methods
+# Methods
+tags.add("c")             # Add element
+tags.contains("C")        # Membership verify
+tags.remove("b")          # Remove element
+tags.clear()              # Empty set
+tags.len()                # Length property
 ```
 
 ### Dictionaries
 
 ```gul
-var cfg = @dict{host: "localhost", port: 8080}
-cfg.add(ssl: true)
-let p = cfg["port"]
+let config = @dict{host: "localhost", port: 8080}  # Immutable
+var cfg = @dict{host: "localhost", port: 8080}  # Mutable
+
+# Methods
+# Methods
+config.contains("port")     # Membership verify
+config.len()                # Length property
+
+# Access
+cfg[key]  # By identifier
+cfg["key"]  # By string
+
+# Insertion methods (maintains order)
+cfg.insertbefore(position, key: value)  # Insert at position/default begin
+cfg.insertbefore(target_key, key: value)  # Insert before key
+cfg.insertafter(key: value)  # Insert at end (default)
+cfg.insertafter(target_key, key: value)  # Insert after key
+cfg.add(key: value)  # Append at end
+
+# Removal
+cfg.remove(position)  # By position
+cfg.remove(key)  # By key
+cfg.remove(key: value)  # By key-value pair
+
 ```
 
 ---
@@ -89,11 +139,15 @@ let p = cfg["port"]
 ### Basic
 
 ```gul
-fn greet(name: str) -> str:
+@fn  greet(name: str) -> str:
     return "Hello, " + name
 
-fn add(a: int, b: int) -> int:
+@fn  add(a: int, b: int) -> int:
     return a + b
+
+@fn  process(data: borrow list, config: move dict):
+    # Ownership: borrow (read-only), move (consume)
+    pass
 ```
 
 ### Arrow Functions
@@ -106,7 +160,7 @@ let add = (a, b) => a + b
 ### Async Functions
 
 ```gul
-async fetch_data(url: str) -> dict:
+@async fetch_data(url: str) -> dict:
     let response = await http.get(url)
     return response.json()
 ```
@@ -114,7 +168,7 @@ async fetch_data(url: str) -> dict:
 ### Input/Output
 
 ```gul
-fn greet(name(std.input)):
+@fn  greet(name(std.input)):
     print("Hello " + name)
 ```
 
@@ -127,7 +181,7 @@ struct Point:
     x: float
     y: float
 
-    fn distance(self) -> float:
+    @fn  distance(self) -> float:
         return math.sqrt(self.x^2 + self.y^2)
 
 # Usage
@@ -168,6 +222,8 @@ for i in 0..10:
 ```gul
 match value:
     1 => print("One")
+    "hello" => print("Greeting")
+    val => print("Captured: " + val) # Variable binding
     _ => print("Other")
 ```
 
@@ -193,7 +249,7 @@ let result = python.mean
 
 ```gul
 @rust {
-    fn fib(n: u64) -> u64 {
+    @fn  fib(n: u64) -> u64 {
         // Rust code
         n
     }

@@ -1,34 +1,6 @@
-<!-- META_START
-category: language-specification
-type: reference-manual
-complexity: comprehensive
-audience: [ai-agents, developers, learners]
-version: 0.13.0
-syntax-version: 3.2
-META_END -->
-
 # GUL Language Knowledgebase
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-30
-
-## Quick Navigation
-
-- [🚀 Quick Start](#quick-start)
-- [📖 Language Overview](#language-overview)
-- [🔤 Syntax v3.2](#syntax-v32)
-- [📝 Variables & Types](#variables-and-types)
-- [🔧 Functions](#functions)
-- [🔄 Control Flow](#control-flow)
-- [📦 Modules & Imports](#modules-and-imports)
-- [🌐 Foreign Language Integration](#foreign-language-integration)
-- [⚡ Async Programming](#async-programming)
-- [🔐 Ownership Model](#ownership-model)
-- [❌ Error Handling](#error-handling)
-- [📚 Standard Library](#standard-library)
-- [🛠️ Toolchain](#toolchain)
-- [❓ FAQ & Troubleshooting](#faq-and-troubleshooting)
-
----
+**Version**: 0.13.0 | **Syntax**: v3.2 |
 
 ## Quick Start
 
@@ -46,9 +18,9 @@ mn:
 ```gul
 @imp std.io
 
-fn greet(name: str) -> str:
+@fn greet(name: str) -> str:
     return "Hello, " + name
-
+# @fn @str(greet(name,("Hello, " + name)))
 mn:
     let message = greet("World")
     print(message)
@@ -117,13 +89,13 @@ comment
 ### Keywords
 
 **Variables**: `let` (immutable), `var` (mutable)  
-**Functions**: `fn`, `async`, `return`  
+**Functions**: `@fn`, `@async`, `return`  
 **Entry Point**: `mn:`  
 **Control Flow**: `if`, `elif`, `else`, `for`, `while`, `loop`, `break`, `continue`, `match`  
 **Error Handling**: `try`, `catch`, `finally`, `throw`  
 **Imports**: `@imp`  
 **Foreign Code**: `@python`, `@rust`, `@sql`, `@js`  
-**Async**: `async`, `await`  
+**Async**: `@async`, `await`  
 
 ### Operators
 
@@ -161,6 +133,7 @@ let name = @str("Alice")      # String
 let age = @int(30)            # Integer (64-bit signed)
 let score = @float(95.5)      # Float (64-bit IEEE), also accepts @flt(24)
 let active = @bool(true)      # Boolean
+let msg = f"Score: {score}"   # F-String interpolation
 ```
 
 #### Collections
@@ -168,33 +141,38 @@ let active = @bool(true)      # Boolean
 **Lists** - Position-based, ordered, allows duplicates:
 
 ```gul
-let nums = @list(1, 2, 3)  # Immutable
-var items = @list(1, 2, 3, "four")  # Mutable
+let numbers = @list[1, 2, 3]        # Literal immutable
+var numbers = @list[1, 2, 3]        # Literal mutable
+let matrix = @list[[1, 2], [3, 4]]  # Multi-dimensional immutable
+var matrix = @list[[1, 2], [3, 4]]  # Multi-dimensional mutable
 
-# Insertion methods
-items.insertbefore(val)  # Insert at begin (default)
-items.insertbefore(target, val)  # Insert before element/position
-items.insertafter(val)  # Insert at end (default)
-items.insertafter(target, val)  # Insert after element/position
-items.add(val)  # Append at end
-
-# Removal
-items.remove(target)  # By value or position
-
-# Access
-items[0]  # First element
-items[-1]  # Last element
+# Methods
+numbers.insertbefore(99) # Insert at begin
+numbers.insertbefore(0, 99) # Insert at index, count from begin
+numbers.insertafter(0, 99) # Insert at index, count from end 
+numbers.insertafter(99) # insert to end
+numbers.remove(2)           # Remove by value
+numbers.pop()               # Remove from end
+numbers.pop(0)              # Remove at index
+numbers.clear()             # Empty list
+numbers.contain("C", "found")     # Membership verify
+numbers.len()               # Length property
+numbers[0]  # First element
+numbers[-1]  # Last element
 ```
 
 **Sets** - Unordered, unique elements:
 
 ```gul
-let labels = @set{"a", "b"}  # Immutable
-var tags = @set{"rust", "python"}  # Mutable
+let tags = @set{"a", "b"}
+var tags = @set{"a", "b"}
 
-tags.add("go")  # Add unique element
-tags.remove("rust")  # Remove element
-"rust" in tags  # Membership check
+# Methods
+tags.add("c")             # Add element
+tag.contain("C", found")  # Membership verify
+tags.remove("b")          # Remove element
+tags.clear()              # Empty set
+tag.len()                 # Length property
 ```
 
 **Dictionaries** - Ordered key-value pairs, unique keys:
@@ -202,6 +180,14 @@ tags.remove("rust")  # Remove element
 ```gul
 let config = @dict{host: "localhost", port: 8080}  # Immutable
 var cfg = @dict{host: "localhost", port: 8080}  # Mutable
+
+# Methods
+config.contain("port", "found")     # Membership verify
+config.len()                # Length property
+
+# Access
+cfg[key]  # By identifier
+cfg["key"]  # By string
 
 # Insertion methods (maintains order)
 cfg.insertbefore(position, key: value)  # Insert at position/default begin
@@ -215,9 +201,6 @@ cfg.remove(position)  # By position
 cfg.remove(key)  # By key
 cfg.remove(key: value)  # By key-value pair
 
-# Access
-cfg[key]  # By identifier
-cfg["key"]  # By string
 ```
 
 #### Type Annotations
@@ -244,7 +227,7 @@ result = "now a string"  # OK with 'any' type
 | Float | `@flt/@float(...)` | `@flt(3.14)` or `@float(3.14)` |
 | Boolean | `@bool(...)` | `@bool(true)` |
 | List | `@list[...]` | `@list[1, 2, 3]` |
-| Tuple | `@tuple(...)` | `@tuple(1, 2)` |
+| Tuple | `(...)` | `(1, 2)` (MVP: treated as immutable List) |
 | Set | `@set{...}` | `@set{1, 2, 3}` |
 | Dict | `@dict{...}` | `@dict{key: val}` |
 
@@ -259,11 +242,13 @@ result = "now a string"  # OK with 'any' type
 ### Basic Functions
 
 ```gul
-fn add(a: int, b: int) -> int:
+@fn add(a: int, b: int) -> int:
     return a + b
+# @fn @int(add((a, b), (a + b)))
 
-fn greet(name: str) -> str:
+@fn greet(name: str) -> str:
     return "Hello, " + name
+# @fn @str(greet((name), ("Hello, " + name)))
 
 # Call functions
 let sum = add(5, 3)
@@ -283,7 +268,7 @@ let result = double(5)  # 10
 ### Async Functions
 
 ```gul
-async fetch_data(url: str) -> dict:
+@async fetch_data(url: str) -> dict:
     let response = await http.get(url)
     return response.json()
 
@@ -360,6 +345,7 @@ loop:
 match value:
     1 => print("One")
     2 => print("Two")
+    val => print("Captured value: " + val)
     _ => print("Other")
 
 # Match with result
@@ -369,10 +355,6 @@ let description = match status_code:
     500 => "Server Error"
     _ => "Unknown"
 ```
-
-**See Also**: [Control Flow Guide](../book/01_basics.md#control-flow)
-
----
 
 ## Modules and Imports
 
@@ -509,16 +491,16 @@ mn:
 
 ## Async Programming
 
-**Keywords**: async, await, concurrency, futures, tasks
+**Keywords**: @async, await, concurrency, futures, tasks
 
 ### Async Functions
 
 ```gul
-async fetch_user(id: int) -> dict:
+@async fetch_user(id: int) -> dict:
     let response = await http.get(f"https://api.com/users/{id}")
     return response.json()
 
-async main():
+@async main():
     let user = await fetch_user(123)
     print("User:", user.name)
 
@@ -529,7 +511,7 @@ mn:
 ### Parallel Execution
 
 ```gul
-async fetch_all():
+@async fetch_all():
     let [user1, user2, user3] = await parallel([
         fetch_user(1),
         fetch_user(2),
@@ -558,22 +540,24 @@ async fetch_all():
 
 ```gul
 # Borrow (read-only reference)
-fn read_data(data: borrow @list):
+@fn read_data(data: borrow @list):
     print(data[0])  # Can only read
-
+# @fn @read(read_data((data: borrow @list), print(data[0])))
 # Mutable reference
-fn modify_data(data: ref @list):
+@fn modify_data(data: ref @list):
     data.append(10)  # Can modify
+# @fn @ref(modify_data((data: ref @list), data.append(10)))
 
 # Move ownership
-fn consume_data(data: move @list):
+@fn consume_data(data: move @list):
     # Takes full ownership
     # Original variable becomes invalid
-
+# @fn @move(consume_data((data: move @list), data.append(10)))
 # Keep (make a copy)
-fn keep_data(data: kept @list):
+@fn keep_data(data: kept @list):
     # Creates a copy
     # Original remains valid
+# @fn @keep(keep_data((data: kept @list), data.append(10)))
 ```
 
 ### Example
@@ -627,7 +611,7 @@ finally:
 ### Result Type (Rust-style)
 
 ```gul
-fn divide(a: int, b: int) -> Result<int, str>:
+@fn divide(a: int, b: int) -> Result<int, str>:
     if b == 0:
         return Err("Division by zero")
     return Ok(a / b)
@@ -641,13 +625,11 @@ mn:
 ### Error Propagation
 
 ```gul
-async fetch_and_process() -> Result<dict, str>:
+@async fetch_and_process() -> Result<dict, str>:
     let data = await fetch_data()?  # ? propagates errors
     let processed = process(data)?
     return Ok(processed)
 ```
-
-**See Also**: [Error Handling Guide](../book/04_advanced.md#error-handling)
 
 ---
 
@@ -685,10 +667,6 @@ let data = json.parse(response.body)
 let result = math.sqrt(16)  # 4.0
 let angle = math.sin(math.PI / 2)  # 1.0
 ```
-
-**See Also**: [Standard Library API](../docs/api/standard-library.md), [Package Catalog](package-catalog.md)
-
----
 
 ## Toolchain
 
@@ -747,10 +725,6 @@ gul-mcp auto all  # All checks
 gul-mcp tui     # Terminal UI
 gul-mcp webui   # Web interface
 ```
-
-**See Also**: [MCP Quickstart](../docs/guides/MCP_QUICKSTART.md), [Toolchain Guide](../docs/api/compiler.md)
-
----
 
 ## FAQ and Troubleshooting
 
@@ -824,7 +798,7 @@ mn:
     print(data)
 
 # Option 2: Async main
-async main():
+@async main():
     let data = await fetch_data()
     print(data)
 
@@ -865,7 +839,7 @@ mn:
 ### Current (v3.2)
 
 ```
-let, var, fn, async, await, mn, @imp
+let, var, @fn, @async, await, mn, @imp
 if, elif, else, for, while, loop, break, continue, return
 try, catch, finally, throw
 match, struct, enum
@@ -895,10 +869,10 @@ var y = 20      # Mutable
 @list[1,2,3]    @dict{k: v}      @tuple(1,2)
 
 # Functions
-fn add(a, b):
+@fn add(a, b):
     return a + b
 
-async fetch(url):
+@async fetch(url):
     return await http.get(url)
 
 # Control Flow
@@ -930,3 +904,33 @@ match value:
 mn:
     print("Hello!")
 ```
+
+---
+
+## Testing & Verification
+
+### Test Files
+
+GUL includes comprehensive test suites:
+
+| Location | Description |
+|----------|-------------|
+| `compilers/shared/tests/` | Cross-compiler tests |
+| `compilers/nightly/tests/` | Nightly feature tests |
+
+### Running Tests
+
+```bash
+# Nightly test suite
+cd compilers/nightly
+python3 tests/run_tests.py
+
+# Single test
+./target/release/gulc test.gul -o test && ./test
+```
+
+### CI/CD
+
+See `.github/workflows/ci.yml` for automated testing.
+
+**Full Documentation**: [testfiles.md](../testfiles.md)

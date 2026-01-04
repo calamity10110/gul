@@ -1,0 +1,62 @@
+fn main():
+    print("--- Ownership Parsing Test ---")
+    let x: int = 10
+    
+    # Test valid syntax for ownership keywords
+    test_move(x)
+    test_borrow(x)
+    test_ref(x)
+    test_kept(x)
+    
+    print("--- Function Args Test ---")
+    let f = 10.5
+    test_float(f)
+    
+    print("--- Typed Args Test ---")
+    # This verifies that x (int) is passed correctly to int arg
+    # And f (float) to float arg
+    test_mixed(x, f)
+
+fn test_move(val: move int):
+    print("Move:")
+    print(val)
+
+fn test_borrow(val: borrow int):
+    print("Borrow:")
+    print(val)
+
+fn test_ref(val: ref int):
+    print("Ref:")
+    print(val)
+
+fn test_kept(val: kept int):
+    print("Kept:")
+    print(val)
+    
+fn test_float(val: float):
+    print("Float:")
+    print(val)
+
+fn test_mixed(i: int, f: float):
+    print("Mixed:")
+    print(i)
+    # print(f) # Printf float issue might still persist if not fully fixed in IR for all callers? 
+    # But we implemented gul_print_float call in print().
+    print(f)
+    
+# EXPECT: --- Ownership Parsing Test ---
+# EXPECT: Move:
+# EXPECT: 10
+# EXPECT: Borrow:
+# EXPECT: 10
+# EXPECT: Ref:
+# EXPECT: 10
+# EXPECT: Kept:
+# EXPECT: 10
+# EXPECT: --- Function Args Test ---
+# EXPECT: Float:
+# EXPECT: 10.500000
+# EXPECT: --- Typed Args Test ---
+# EXPECT: Mixed:
+# EXPECT: 10
+# EXPECT: 10.500000

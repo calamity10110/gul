@@ -1,0 +1,20 @@
+fn main():
+    var d = @dict{
+        "a": 1
+    }
+    
+    print(d["a"])
+    
+    d.add("b", 2)
+    print(d["b"])
+    
+    d.add("c", 3)
+    print(d["c"])
+    
+    # Check len
+    print(d.len) # Should be 3 pairs
+
+# EXPECT: 1
+# EXPECT: 2
+# EXPECT: 3
+# EXPECT: 3

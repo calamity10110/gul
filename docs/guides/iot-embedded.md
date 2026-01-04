@@ -22,17 +22,17 @@ GUL supports:
 ### ESP32 Blink LED
 
 ```gul
-import std.embedded.gpio
-import std.time
+@imp std.embedded.gpio
+@imp std.time
 
 let LED_PIN = 2
 
 mn:
     # Configure GPIO
-    led = gpio.Pin(LED_PIN, mode=gpio.OUTPUT)
+    let led = gpio.Pin(LED_PIN, mode=gpio.OUTPUT)
 
     # Blink loop
-    while True:
+    while true:
         led.high()
         time.sleep_ms(1000)
         led.low()
@@ -42,15 +42,15 @@ mn:
 ### Reading Sensors
 
 ```gul
-import std.embedded.sensors
+@imp std.embedded.sensors
 
 # Temperature sensor (DHT22)
-dht = sensors.DHT22(pin=4)
+let dht = sensors.DHT22(pin=4)
 
-main:
-    while True:
-        temp = dht.read_temperature()
-        humidity = dht.read_humidity()
+mn:
+    while true:
+        let temp = dht.read_temperature()
+        let humidity = dht.read_humidity()
 
         print(f"Temperature: {temp}°C")
         print(f"Humidity: {humidity}%")
@@ -63,67 +63,67 @@ main:
 ### WiFi Connection
 
 ```gul
-import std.embedded.wifi
+@imp std.embedded.wifi
 
-wifi = wifi.WiFi()
+let wifi_client = wifi.WiFi()
 
-main:
+mn:
     # Connect to network
-    wifi.connect(
+    wifi_client.connect(
         ssid=env("WIFI_SSID"),
         password=env("WIFI_PASSWORD")
     )
 
-    if wifi.is_connected():
-        print(f"Connected! IP: {wifi.ip_address()}")
+    if wifi_client.is_connected():
+        print(f"Connected! IP: {wifi_client.ip_address()}")
 ```
 
 ### MQTT Messaging
 
 ```gul
-import std.embedded.mqtt
+@imp std.embedded.mqtt
 
-mqtt = mqtt.Client(
+let mqtt_client = mqtt.Client(
     broker="mqtt.example.com",
     port=1883,
     client_id="my-device"
 )
 
-@mqtt.on_connect
-fn on_connect():
+@mqtt_client.on_connect
+@fn on_connect():
     print("Connected to MQTT broker")
-    mqtt.subscribe("sensors/temperature")
+    mqtt_client.subscribe("sensors/temperature")
 
-@mqtt.on_message
-fn on_message(topic, payload):
+@mqtt_client.on_message
+@fn on_message(topic, payload):
     print(f"{topic}: {payload}")
 
-main:
-    mqtt.connect()
+mn:
+    mqtt_client.connect()
 
     # Publish sensor data
-    while True:
-        temp = read_temperature()
-        mqtt.publish("sensors/temp", temp)
+    while true:
+        let temp = read_temperature()
+        mqtt_client.publish("sensors/temp", temp)
         time.sleep(60)
 ```
 
 ### HTTP API Integration
 
 ```gul
-import std.http
-import std.embedded.sensors
+@imp std.http
+@imp std.embedded.sensors
 
-main:
+mn:
     # Read sensor
-    dht = sensors.DHT22(pin=4)
-    temp = dht.read_temperature()
+    let dht = sensors.DHT22(pin=4)
+    let temp = dht.read_temperature()
 
     # Send to cloud
-    response = http.post("https://api.example.com/data", json={
-        "device_id": "esp32-001",
-        "temperature": temp,
-        "timestamp": time.now()
+    let response = http.post("https://api.example.com/data", json=@dict{
+        device_id: "esp32-001",
+        temperature: temp,
+        timestamp: time.now()
     })
 
     print(f"Sent: {response.status_code}")
@@ -132,38 +132,38 @@ main:
 ## 🎯 Complete IoT Project
 
 ```gul
-import std.embedded.gpio
-import std.embedded.sensors
-import std.embedded.wifi
-import std.embedded.mqtt
+@imp std.embedded.gpio
+@imp std.embedded.sensors
+@imp std.embedded.wifi
+@imp std.embedded.mqtt
 
 # Configuration
-LED_PIN = 2
-DHT_PIN = 4
-MQTT_BROKER = "mqtt.example.com"
+let LED_PIN = 2
+let DHT_PIN = 4
+let MQTT_BROKER = "mqtt.example.com"
 
-main:
+mn:
     # Setup hardware
-    led = gpio.Pin(LED_PIN, mode=gpio.OUTPUT)
-    dht = sensors.DHT22(pin=DHT_PIN)
+    let led = gpio.Pin(LED_PIN, mode=gpio.OUTPUT)
+    let dht_sensor = sensors.DHT22(pin=DHT_PIN)
 
     # Connect WiFi
-    wifi = wifi.WiFi()
-    wifi.connect(env("WIFI_SSID"), env("WIFI_PASSWORD"))
+    let wifi_conn = wifi.WiFi()
+    wifi_conn.connect(env("WIFI_SSID"), env("WIFI_PASSWORD"))
 
     #Connect MQTT
-    mqtt = mqtt.Client(broker=MQTT_BROKER)
-    mqtt.connect()
+    let mqtt_conn = mqtt.Client(broker=MQTT_BROKER)
+    mqtt_conn.connect()
 
     # Main loop
-    while True:
+    while true:
         # Read sensors
-        temp = dht.read_temperature()
-        humidity = dht.read_humidity()
+        let temp = dht_sensor.read_temperature()
+        let humidity = dht_sensor.read_humidity()
 
         # Publish data
-        mqtt.publish("sensors/temperature", temp)
-        mqtt.publish("sensors/humidity", humidity)
+        mqtt_conn.publish("sensors/temperature", temp)
+        mqtt_conn.publish("sensors/humidity", humidity)
 
         # Blink LED to indicate activity
         led.high()

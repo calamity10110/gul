@@ -26,26 +26,27 @@ The GUL type system provides:
 
 ```gul
 # Signed integers
-i8: int8 = -128
-i16: int16 = -32768
-i32: int32 = -2147483648
-i64: int64 = -9223372036854775808
-int: int = -42          # Platform-dependent (i32 or i64)
+# Signed integers
+let i8 = @int8(-128)
+let i16 = @int16(-32768)
+let i32 = @int32(-2147483648)
+let i64 = @int64(-9223372036854775808)
+let val = @int(-42)          # Platform-dependent (i64)
 
 # Unsigned integers
-u8: uint8 = 255
-u16: uint16 = 65535
-u32: uint32 = 4294967295
-u64: uint64 = 18446744073709551615
-uint: uint = 42         # Platform-dependent (u32 or u64)
+let u8 = @uint8(255)
+let u16 = @uint16(65535)
+let u32 = @uint32(4294967295)
+let u64 = @uint64(18446744073709551615)
+let uval = @uint(42)         # Platform-dependent
 ```
 
 ### Floating-Point Types
 
 ```gul
-f32: float32 = 3.14
-f64: float64 = 2.718281828
-float: float = 1.23     # Defaults to float64
+let f32 = @float32(3.14)
+let f64 = @float64(2.718281828)
+let f = @float(1.23)     # Defaults to float64
 ```
 
 ### Boolean Type
@@ -58,19 +59,19 @@ is_active: bool = False
 ### Character and String Types
 
 ```gul
-ch: char = 'A'
-name: str = "GUL"
-multiline: str = """
+let ch = @char('A')
+let name = @str("GUL")
+let multiline = @str("""
     Multi-line
     string
-    """
+    """)
 ```
 
 ### Unit Type
 
 ```gul
 # The unit type () represents no value
-fn do_something():
+@fn do_something():
     print("Done")
     # Implicitly returns ()
 ```
@@ -81,8 +82,8 @@ fn do_something():
 
 ```gul
 # Fixed-size ordered collections
-point: (int, int) = (10, 20)
-person: (str, int, bool) = ("Alice", 30, True)
+let point = (10, 20)
+let person = ("Alice", 30, true)
 
 # Accessing tuple elements
 x = point.0  # 10
@@ -96,17 +97,17 @@ y = point.1  # 20
 
 ```gul
 # Dynamic arrays
-numbers: vec[int] = vec[1, 2, 3, 4, 5]
-names: vec[str] = vec["Alice", "Bob", "Charlie"]
+let numbers = @list[1, 2, 3, 4, 5]
+let names = @list["Alice", "Bob", "Charlie"]
 
 # Type inference
-auto_typed = vec[1, 2, 3]  # vec[int]
+let auto_typed = @list[1, 2, 3]  # vec[int]
 
 # Nested lists
-matrix: vec[vec[int]] = vec[
-    vec[1, 2, 3],
-    vec[4, 5, 6],
-    vec[7, 8, 9]
+let matrix = @list[
+    @list[1, 2, 3],
+    @list[4, 5, 6],
+    @list[7, 8, 9]
 ]
 ```
 
@@ -150,8 +151,8 @@ struct Person:
     email: str
 
 # Creating instances
-p = Point { x: 10, y: 20 }
-person = Person {
+let p = Point { x: 10, y: 20 }
+let person = Person {
     name: "Alice",
     age: 30,
     email: "alice@example.com"
@@ -185,15 +186,15 @@ marker = Marker
 struct Container[T]:
     value: T
 
-    fn new(val: T): Container[T]:
+    @fn new(val: T) -> Container[T]:
         return Container { value: val }
 
-    fn get(self): T:
+    @fn get(self) -> T:
         return self.value
 
 # Usage
-int_container = Container[int].new(42)
-str_container = Container[str].new("hello")
+let int_container = Container[int].new(42)
+let str_container = Container[str].new("hello")
 ```
 
 ## 🔀 Enums
@@ -228,14 +229,15 @@ enum Option[T]:
     None
 
 # Using Option
-fn find_user(id: int): Option[User]:
+# Using Option
+@fn find_user(id: int) -> Option[User]:
     if user_exists(id):
         return Option.Some(get_user(id))
     else:
         return Option.None
 
 # Using Result
-fn divide(a: float, b: float): Result[float, str]:
+@fn divide(a: float, b: float) -> Result[float, str]:
     if b == 0:
         return Result.Err("Division by zero")
     else:
@@ -322,7 +324,8 @@ fn identity[T](x: T): T:
     return x
 
 # Multiple type parameters
-fn pair[A, B](a: A, b: B): (A, B):
+# Multiple type parameters
+@fn pair[A, B](a: A, b: B) -> (A, B):
     return (a, b)
 
 # Generic with constraints
@@ -371,8 +374,8 @@ enum Tree[T]:
 
 ```gul
 trait Drawable:
-    fn draw(self): void
-    fn area(self): float
+    @fn draw(self)
+    @fn area(self) -> float
 
 trait Comparable:
     fn compare(self, other: Self): int
@@ -388,10 +391,10 @@ struct Circle:
     radius: float
 
 impl Drawable for Circle:
-    fn draw(self):
+    @fn draw(self):
         print(f"Drawing circle with radius {self.radius}")
 
-    fn area(self): float:
+    @fn area(self) -> float:
         return 3.14159 * self.radius ** 2
 
 struct Rectangle:
@@ -435,17 +438,17 @@ impl[T] Container[T] for Vec[T]:
 
 ```gul
 # Function with trait bounds
-fn print_all[T: Display](items: vec[T]):
+@fn print_all[T: Display](items: list[T]):
     for item in items:
         print(item.to_string())
 
 # Multiple trait bounds
-fn process[T: Display + Comparable](value: T):
+@fn process[T: Display + Comparable](value: T):
     print(value.to_string())
     # Can also call compare()
 
 # Where clauses for complex bounds
-fn complex_function[T, U](a: T, b: U): void
+@fn complex_function[T, U](a: T, b: U): void
 where
     T: Display + Comparable,
     U: Container[T]:

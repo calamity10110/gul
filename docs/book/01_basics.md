@@ -33,15 +33,6 @@ var count = 0
 count = count + 1
 ```
 
-### 3. Quick Mutable Syntax (`?`)
-
-For rapid scripting, GUL provides a shorthand `?` prefix.
-
-```gul
-?score = 100    # Equivalent to: var score = 100
-score += 50
-```
-
 ### 4. Shadowing
 
 You can redeclare a variable with the same name. This is called "shadowing" and is useful for type conversions.
@@ -59,6 +50,7 @@ let x = x.to_int()  # x is now an int. The string is dropped.
 - **`float`**: 64-bit floating point (`3.14`).
 - **`bool`**: Boolean (`true`, `false`).
 - **`str`**: UTF-8 String ("Hello").
+- **F-String**: Interpolated String (`f"Val: {x}"`).
 - **`char`**: Single Unicode character ('A').
 
 ### Compound Types
@@ -66,21 +58,23 @@ let x = x.to_int()  # x is now an int. The string is dropped.
 - **Tuple**: Fixed-size group of mixed types.
 
     ```gul
-    let cords: (int, int) = (10, 20)
-    let (x, y) = cords  # Destructuring
+    let cords = (10, 20)
+    print(cords[0]) # 10
     ```
 
 - **List**: Growable array of same type.
 
     ```gul
-    let numbers: list<int> = [1, 2, 3]
-    numbers.push(4)
+    let numbers = @list[1, 2, 3]
+    # numbers.push(4) # Lists are immutable by default
+    var mut_nums = @list[1, 2, 3]
+    mut_nums.add(4)
     ```
 
 - **Map**: Key-Value dictionary.
 
     ```gul
-    let ages: map<str, int> = {"Alice": 30, "Bob": 25}
+    let ages = @dict{"Alice": 30, "Bob": 25}
     ```
 
 ## Operators
@@ -91,10 +85,10 @@ let x = x.to_int()  # x is now an int. The string is dropped.
 
 ### Logical
 
-`and`, `or`, `not` (Python-style keywords).
+`&&`, `||`, `!`.
 
 ```gul
-if x > 0 and x < 10:
+if x > 0 && x < 10:
     pass
 ```
 
@@ -119,9 +113,9 @@ GUL has powerful pattern matching.
 ```gul
 let x = 1
 match x:
-    1 => println("One")
-    2 => println("Two")
-    _ => println("Other")
+    1 => print("One")
+    2 => print("Two")
+    _ => print("Other")
 ```
 
 ### Loops
@@ -149,6 +143,6 @@ Iterate over collections or ranges.
 
 ```gul
 for i in range(0, 5):
-    println(i)  
+    print(i)  
 # Prints 0, 1, 2, 3, 4
 ```

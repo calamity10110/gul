@@ -83,15 +83,14 @@ postgres = []
 sqlite = []
 
 [workspace]
-members = ["gul_compiler","packages/*/*"]
+members = [
+  "compilers/stable",
+  "compilers/nightly",
+  "packages/*/*"
+]
 exclude = [
   "packages/*/src",
   "packages/*/tests",
   "packages/*/examples",
   "packages/*/benches",
-  "packages/algo",           # Category folders that aren't packages
-  "packages/devtools",
-  "packages/infrastructure",
-  # Add generic exclude for non-package categories if possible?
-  # Cargo doesn't support wildcards in exclude for directories? It does.
 ]

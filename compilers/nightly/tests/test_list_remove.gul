@@ -1,0 +1,41 @@
+fn main():
+    let l = [10, 20, 30, 40]
+    
+    # Remove 20 (middle)
+    var success = l.remove(20)
+    print(success) # true
+    print(l.len) # 3
+    print(l[1]) # 30
+    
+    # Remove 10 (first)
+    l.remove(10) 
+    print(l[0]) # 30
+    
+    # Remove 40 (last)
+    l.remove(40)
+    print(l.len) # 1
+    print(l[0]) # 30
+    
+    # Remove non-existent
+    success = l.remove(99)
+    print(success) # false
+    print(l.len) # 1
+    
+    # Test clear
+    l.push(50)
+    l.push(60)
+    print(l.len) # 3
+    
+    l.clear()
+    print(l.len) # 0
+
+# EXPECT: true
+# EXPECT: 3
+# EXPECT: 30
+# EXPECT: 30
+# EXPECT: 1
+# EXPECT: 30
+# EXPECT: false
+# EXPECT: 1
+# EXPECT: 3
+# EXPECT: 0

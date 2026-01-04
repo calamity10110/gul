@@ -13,16 +13,15 @@ The `std.filesystem` module provides comprehensive file and directory operations
 ### Reading Files
 
 ```gul
-import std.filesystem as fs
-
+@imp std.fs
 # Read entire file as string
-content = fs.read_text("data.txt")
+let content = fs.read_text("data.txt")
 
 # Read as bytes
 bytes = fs.read_bytes("image.png")
 
 # Read lines
-lines = fs.read_lines("data.csv")
+let lines = fs.read_lines("data.csv")
 for line in lines:
     print(line)
 
@@ -54,14 +53,14 @@ if fs.exists("data.txt"):
     print("File exists")
 
 # Get file size
-size = fs.size("data.txt")
+let size = fs.size("data.txt")
 
 # Get modification time
-mtime = fs.modified_time("data.txt")
+let mtime = fs.modified_time("data.txt")
 
 # Check if path is file or directory
-is_file = fs.is_file("data.txt")
-is_dir = fs.is_directory("folder")
+let is_file = fs.is_file("data.txt")
+let is_dir = fs.is_directory("folder")
 ```
 
 ## 📂 Directory Operations
@@ -80,7 +79,7 @@ fs.create_dir_all("path/to/nested/folder")
 
 ```gul
 # List all items
-items = fs.list_dir("folder")
+let items = fs.list_dir("folder")
 
 # List files only
 files = fs.list_files("folder")
@@ -143,20 +142,20 @@ is_abs = path.is_absolute("/absolute/path")
 ### File Watching
 
 ```gul
-import std.filesystem.watch
+@imp std.filesystem.watch
 
-watcher = watch.FileWatcher("folder")
+let watcher = watch.FileWatcher("folder")
 
 @watcher.on_create
-fn on_create(path):
+@fn on_create(path):
     print(f"Created: {path}")
 
 @watcher.on_modify
-fn on_modify(path):
+@fn on_modify(path):
     print(f"Modified: {path}")
 
 @watcher.on_delete
-fn on_delete(path):
+@fn on_delete(path):
     print(f"Deleted: {path}")
 
 watcher.start()

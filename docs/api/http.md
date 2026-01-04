@@ -24,13 +24,13 @@ The `std.http` module provides comprehensive HTTP client and server capabilities
 ```gul
 import std.http
 
-server = http.Server(
-    host: str = "0.0.0.0",
-    port: int = 8080,
-    workers: int = 4,
-    backlog: int = 128,
-    keep_alive: bool = True,
-    timeout: duration = duration.seconds(30)
+let server = http.Server(
+    host="0.0.0.0",
+    port=8080,
+    workers=4,
+    backlog=128,
+    keep_alive=true,
+    timeout=duration.seconds(30)
 )
 ```
 
@@ -51,16 +51,16 @@ server = http.Server(
 **Example:**
 
 ```gul
-server = http.Server(port=8080)
+let server = http.Server(port=8080)
 
 @server.get("/")
-fn home(request):
+@fn home(request) -> str:
     return "Welcome!"
 
 @server.post("/api/users")
-fn create_user(request):
-    data = request.json()
-    user = database.create_user(data)
+@fn create_user(request) -> dict:
+    let data = request.json()
+    let user = database.create_user(data)
     return http.json_response(user, status=201)
 
 server.start()
@@ -73,12 +73,12 @@ server.start()
 ```gul
 import std.http
 
-client = http.Client(
-    timeout: duration = duration.seconds(30),
-    follow_redirects: bool = True,
-    max_redirects: int = 10,
-    verify_ssl: bool = True,
-    user_agent: str = "GUL HTTP Client/0.13.0"
+let client = http.Client(
+    timeout=duration.seconds(30),
+    follow_redirects=true,
+    max_redirects=10,
+    verify_ssl=true,
+    user_agent="GUL HTTP Client/0.13.0"
 )
 ```
 
@@ -162,22 +162,22 @@ struct Request:
 
 ```gul
 @server.post("/api/submit")
-fn handle_request(request):
+@fn handle_request(request) -> http.Response:
     # Access request properties
-    method = request.method
-    path = request.path
+    let method = request.method
+    let path = request.path
 
     # Get query parameters
-    page = request.query.get("page", type=int, default=1)
+    let page = request.query.get("page", type=int, default=1)
 
     # Get headers
-    auth = request.headers.get("Authorization")
+    let auth = request.headers.get("Authorization")
 
     # Parse JSON body
-    data = request.json()
+    let data = request.json()
 
     # Get cookies
-    session = request.cookies.get("session_id")
+    let session = request.cookies.get("session_id")
 
     return http.Response(body="Received!")
 ```

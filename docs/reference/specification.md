@@ -156,8 +156,8 @@ The lexer produces keywords, identifiers, literals, operators, delimiters, and s
 **Primary Keywords:**
 
 - `let`, `var` (Variables)
-- `fn`, `async`, `return`, `await` (Functions)
-- `mn` (Entry point)
+- `@fn`, `@async`, `return`, `await` (Functions)
+- `mn:` (Entry point)
 - `struct`, `enum` (Types)
 - `if`, `elif`, `else`, `match` (Conditional)
 - `for`, `while`, `loop`, `break`, `continue` (Loops)
@@ -209,30 +209,83 @@ f"formatted {var}"
 
 ### 4.2 Collection Types
 
-**Lists (4-D Support):**
+**Lists (Dynamic Arrays):**
 
 ```gul
-let numbers = @list[1, 2, 3]
-let matrix = @list[[1, 2], [3, 4]]
+let numbers = @list[1, 2, 3]        # Literal immutable
+var numbers = @list[1, 2, 3]        # Literal mutable
+let matrix = @list[[1, 2], [3, 4]]  # Multi-dimensional immutable
+var matrix = @list[[1, 2], [3, 4]]  # Multi-dimensional mutable
+
+# Methods
+# Methods
+numbers.insertbefore(99) # Insert at begin
+numbers.insertbefore(0, 99) # Insert at index, count from begin
+numbers.insertafter(0, 99) # Insert at index, count from end 
+numbers.insertafter(99) # insert to end
+numbers.remove(2)           # Remove by value
+numbers.pop()               # Remove from end
+numbers.pop(0)              # Remove at index
+numbers.clear()             # Empty list
+numbers.contains("C")       # Membership verify
+numbers.len()               # Length property
+numbers[0]  # First element
+numbers[-1]  # Last element
 ```
 
-**Dictionaries:**
+**Dictionaries (Key-Value Maps):**
 
 ```gul
-let config = @dict{host: "localhost", port: 8080}
+let config = @dict{host: "localhost", port: 8080}  # Immutable
+var cfg = @dict{host: "localhost", port: 8080}  # Mutable
+
+# Methods
+# Methods
+config.contains("port")     # Membership verify
+config.len()                # Length property
+
+# Access
+cfg[key]  # By identifier
+cfg["key"]  # By string
+
+# Insertion methods (maintains order)
+cfg.insertbefore(position, key: value)  # Insert at position/default begin
+cfg.insertbefore(target_key, key: value)  # Insert before key
+cfg.insertafter(key: value)  # Insert at end (default)
+cfg.insertafter(target_key, key: value)  # Insert after key
+cfg.add(key: value)  # Append at end
+
+# Removal
+cfg.remove(position)  # By position
+cfg.remove(key)  # By key
+cfg.remove(key: value)  # By key-value pair
+
 ```
 
-**Sets:**
+**Sets (Unique Collections):**
 
 ```gul
 let tags = @set{"a", "b"}
+var tags = @set{"a", "b"}
+
+# Methods
+# Methods
+tags.add("c")             # Add element
+tags.contains("C")        # Membership verify
+tags.remove("b")          # Remove element
+tags.clear()              # Empty set
+tags.len()                # Length property
 ```
 
 ### 4.3 Type Annotations
 
 ```gul
-let name: str = "Alice"
-var count: int = 0
+let name = "Alice" # Inferred as String
+let name = @str("Alice") # Explicit String with @str
+let name: str = "Alice" # Explicit String with type annotation
+let x = 10         # Inferred as float
+var count: int = 0 # Explicit Int with type annotation
+let tags = @int(24) # Explicit Int with @int
 ```
 
 ### 4.4 Type Inference
@@ -240,8 +293,17 @@ var count: int = 0
 GUL infers types where possible:
 
 ```gul
-let x = 10         # Inferred as int
+let x = 10         # Inferred as float
 let name = "Alice" # Inferred as str
+```
+
+### 4.5 Type Coercion
+
+```gul
+let x = 10         # float
+var y = "20"       # str
+let z = x + y      # type mismatch error
+let z = x + @flt(y) # convert y to float and match
 ```
 
 ---
@@ -254,19 +316,28 @@ GUL uses a move-by-default system for non-primitive types, ensuring memory safet
 
 ### 5.2 Ownership Modes
 
-- **`borrow`**: Read-only reference (default for reading).
-- **`ref`**: Mutable reference.
-- **`move`**: Transfer ownership.
-- **`kept`**: Create a copy.
+- **`borrow`**: not transfer ownership, immutable Read-only copy (default for reading).
+- **`ref`**: not transfer ownership, mutable copy.
+- **`move`**: transfer ownership, mutable.
+- **`kept`**: transfer ownership, Immutable.
 
 ### 5.3 Examples
 
 ```gul
-fn process(data: borrow @list):
+@fn  process(data: borrow @list):
+    # 'data' is not owned here, caller keeps it
     print(data[0])
 
-fn consume(data: move @list):
+@fn  consume(data: move @list):
     # 'data' is owned here, caller loses it
+
+@fn  consume(data: ref @list):
+    # 'data' is copied here, caller keeps it
+    data.push(4)
+
+@fn  consume(data: kept @list):
+    # 'data' is copied here, caller loses it
+    data.push(4)
 ```
 
 ### 5.4 Move Semantics
@@ -275,7 +346,7 @@ Assignment transfers ownership for non-copy types:
 
 ```gul
 let list1 = @list[1, 2, 3]
-let list2 = list1  # list1 is now invalid (moved)
+let list2 = list1  # list1 is now invalid (removed from memory)
 ```
 
 ---
@@ -353,7 +424,20 @@ while count < 10:
 ```gul
 match value:
     1 => print("One")
+    "hello" => print("Greeting")
+    val => print("Captured value: " + val)
     _ => print("Other")
+```
+
+**Variable Binding:**
+
+Identifiers in match arms bind the matched value to a new variable, inheriting the type (Float, Int, String, etc.).
+
+```gul
+let x = 3.14
+match x:
+    3.14 => print("Pi")
+    other => print("Not Pi: " + other) // other is float
 ```
 
 ### 8.2 Imports
@@ -369,3 +453,32 @@ match value:
 mn:
     print("Start")
 ```
+
+---
+
+## 9. Testing & Verification
+
+### 9.1 Test File Location
+
+| Path | Description |
+|------|-------------|
+| `compilers/shared/tests/` | Cross-compiler compatibility tests |
+| `compilers/nightly/tests/` | Nightly-specific feature tests |
+
+### 9.2 Running Tests
+
+```bash
+# Run nightly test suite
+cd compilers/nightly && python3 tests/run_tests.py
+
+# Run specific test
+./target/release/gulc tests/test_control_flow.gul -o test && ./test
+```
+
+### 9.3 CI/CD
+
+Automated testing via GitHub Actions:
+
+- `.github/workflows/ci.yml` - Main compiler tests
+
+See [testfiles.md](../testfiles.md) for complete test documentation.

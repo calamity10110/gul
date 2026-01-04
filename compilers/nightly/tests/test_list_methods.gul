@@ -1,0 +1,11 @@
+fn main():
+    var arr = @list[10, 20]
+    print(arr.len)
+    
+    arr.push(30)
+    print(arr.len)
+    print(arr[2])
+
+# EXPECT: 2
+# EXPECT: 3
+# EXPECT: 30

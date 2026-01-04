@@ -117,7 +117,7 @@ let active = @bool(true)
 ```gul
 # Explicit collection types
 let numbers = @list[1, 2, 3, 4, 5]
-let point = @tuple(10, 20)
+let point = (10, 20)
 let tags = @set{"rust", "python", "js"}
 let user = @dict{name: "Bob", age: 25}
 ```
@@ -126,10 +126,10 @@ let user = @dict{name: "Bob", age: 25}
 
 ```gul
 # Return type with @ prefix
-fn @int add(a, b):
+@fn add(a, b) -> int:
     return a + b
 
-fn @str greet(name):
+@fn greet(name) -> str:
     return "Hello, " + name
 ```
 
@@ -137,10 +137,10 @@ fn @str greet(name):
 
 ```gul
 struct User:
-    name: @str
-    age: @int
+    name: str
+    age: int
 
-    fn @str display(self):
+    @fn display(self) -> str:
         return self.name + " (" + str(self.age) + ")"
 ```
 
@@ -200,7 +200,7 @@ gul-mcp schedule list
 ```gul
 @imp std.http
 
-fn @dict handle_request(req):
+@fn handle_request(req) -> dict:
     return @dict{status: "ok", data: "Hello!"}
 
 mn:
@@ -244,9 +244,9 @@ model.train(data, labels, epochs=10)
 
 ## Community
 
-- **GitHub**: https://github.com/calamity10110/gul
-- **Documentation**: https://github.com/calamity10110/gul/tree/master/docs
-- **Examples**: https://github.com/calamity10110/gul/tree/master/examples
+- **GitHub**: <https://github.com/calamity10110/gul>
+- **Documentation**: <https://github.com/calamity10110/gul/tree/master/docs>
+- **Examples**: <https://github.com/calamity10110/gul/tree/master/examples>
 
 ---
 

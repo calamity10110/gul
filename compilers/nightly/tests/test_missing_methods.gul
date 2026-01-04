@@ -1,0 +1,68 @@
+fn main():
+    # LIST TESTS
+    print("--- List ---")
+    var l = @list[1, 2]
+    
+    # insertbefore(val) -> prepend
+    l.insertbefore(0) 
+    print(l[0]) 
+    
+    # insertafter(val) -> append
+    l.insertafter(3)
+    print(l[3])
+    
+    # insertafter(idx, val) -> insert at idx+1
+    l.insertafter(0, 99) # after 0 (val 0) -> becomes index 1
+    print(l[1]) 
+    
+    print(l.len()) # Method call
+    
+    print(l.contains(99))
+    print(l.contains(88))
+    
+    # SET TESTS
+    print("--- Set ---")
+    var s = @set{"a", "b"}
+    print(s.contains("a"))
+    print(s.contains("c"))
+    s.remove("a")
+    print(s.contains("a"))
+    print(s.len())
+    s.clear()
+    print(s.len())
+    
+    # DICT TESTS
+    print("--- Dict ---")
+    var d = @dict{
+        "k1": 10,
+        "k2": 20
+    }
+    print(d.len())
+    print(d.contains("k1"))
+    
+    d.remove("k1")
+    print(d.contains("k1"))
+    print(d.len())
+    
+    d.clear()
+    print(d.len())
+
+# EXPECT: --- List ---
+# EXPECT: 0
+# EXPECT: 3
+# EXPECT: 99
+# EXPECT: 5
+# EXPECT: true
+# EXPECT: false
+# EXPECT: --- Set ---
+# EXPECT: true
+# EXPECT: false
+# EXPECT: false
+# EXPECT: 1
+# EXPECT: 0
+# EXPECT: --- Dict ---
+# EXPECT: 2
+# EXPECT: true
+# EXPECT: false
+# EXPECT: 1
+# EXPECT: 0

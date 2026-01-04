@@ -1,0 +1,19 @@
+# GUL Collections Test
+# Tests List operations
+
+fn main():
+    # List
+    let nums = [1, 2, 3, 4, 5]
+    print(nums.len)
+    print(nums[0])
+    
+    # List push
+    var items = [10, 20]
+    items.push(30)
+    print(items.len)
+    print(items[2])
+
+# EXPECT: 5
+# EXPECT: 1
+# EXPECT: 3
+# EXPECT: 30

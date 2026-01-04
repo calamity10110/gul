@@ -570,6 +570,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1505bd5d3d116872e7271a6d4e16d81d0c8570876c8de68093a09ac269d8aac0"
 
 [[package]]
+name = "auto_impl"
+version = "1.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ffdcb70bdbc4d478427380519163274ac86e52916e10f0a8889adf0f96d3fee7"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.111",
+]
+
+[[package]]
 name = "autocfg"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2792,6 +2803,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "dashmap"
+version = "5.5.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "978747c1d849a7d2ee5e8adc0159961c48fb7e5db2f06af6723b80123bb53856"
+dependencies = [
+ "cfg-if",
+ "hashbrown 0.14.5",
+ "lock_api",
+ "once_cell",
+ "parking_lot_core",
+]
+
+[[package]]
 name = "dasp_sample"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4745,6 +4769,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "gul-algorithms"
+version = "0.1.0"
+
+[[package]]
 name = "gul-api-gateway"
 version = "0.1.0"
 dependencies = [
@@ -4878,24 +4906,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "gul-compiler"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "clap",
- "colored",
- "cranelift",
- "cranelift-jit",
- "cranelift-module",
- "cranelift-object",
- "criterion",
- "serde",
- "serde_json",
- "target-lexicon",
- "thiserror 1.0.69",
-]
-
-[[package]]
 name = "gul-compress"
 version = "0.1.0"
 
@@ -4968,6 +4978,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "gul-devtools"
+version = "0.1.0"
+dependencies = [
+ "tower-lsp",
+]
+
+[[package]]
 name = "gul-display"
 version = "0.1.0"
 dependencies = [
@@ -4985,6 +5002,18 @@ version = "0.1.0"
 dependencies = [
  "tokio",
  "trust-dns-resolver",
+]
+
+[[package]]
+name = "gul-docgen"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "regex",
+ "serde",
+ "toml 0.8.23",
+ "walkdir",
 ]
 
 [[package]]
@@ -5301,6 +5330,15 @@ name = "gul-regex"
 version = "0.1.0"
 
 [[package]]
+name = "gul-registry"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "tokio",
+ "uuid 1.19.0",
+]
+
+[[package]]
 name = "gul-repl"
 version = "0.1.0"
 dependencies = [
@@ -5556,6 +5594,36 @@ version = "0.1.0"
 [[package]]
 name = "gul-yaml"
 version = "0.1.0"
+
+[[package]]
+name = "gul_nightly"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "colored",
+ "cranelift",
+ "cranelift-jit",
+ "cranelift-module",
+ "cranelift-object",
+ "criterion",
+ "serde",
+ "serde_json",
+ "target-lexicon",
+ "thiserror 1.0.69",
+]
+
+[[package]]
+name = "gul_stable"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "cranelift",
+ "cranelift-module",
+ "cranelift-object",
+ "target-lexicon",
+ "thiserror 1.0.69",
+]
 
 [[package]]
 name = "h2"
@@ -7059,6 +7127,19 @@ name = "lru-slab"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "112b39cec0b298b6c1999fee3e31427f74f676e4cb9879ed1a121b43661a4154"
+
+[[package]]
+name = "lsp-types"
+version = "0.94.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c66bfd44a06ae10647fe3f8214762e9369fd4248df1350924b4ef9e770a85ea1"
+dependencies = [
+ "bitflags 1.3.2",
+ "serde",
+ "serde_json",
+ "serde_repr",
+ "url",
+]
 
 [[package]]
 name = "mach"
@@ -9775,6 +9856,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde_repr"
+version = "0.1.20"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "175ee3e80ae9982737ca543e96133087cbd9a485eecc3bc4de9c1a37b47ea59c"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.111",
+]
+
+[[package]]
 name = "serde_spanned"
 version = "0.6.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -11269,6 +11361,40 @@ name = "tower-layer"
 version = "0.3.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "121c2a6cda46980bb0fcd1647ffaf6cd3fc79a013de288782836f6df9c48780e"
+
+[[package]]
+name = "tower-lsp"
+version = "0.19.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9b38fb0e6ce037835174256518aace3ca621c4f96383c56bb846cfc11b341910"
+dependencies = [
+ "async-trait",
+ "auto_impl",
+ "bytes",
+ "dashmap",
+ "futures",
+ "httparse",
+ "lsp-types",
+ "memchr",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tokio-util",
+ "tower 0.4.13",
+ "tower-lsp-macros",
+ "tracing",
+]
+
+[[package]]
+name = "tower-lsp-macros"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "34723c06344244474fdde365b76aebef8050bf6be61a935b91ee9ff7c4e91157"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
+]
 
 [[package]]
 name = "tower-service"

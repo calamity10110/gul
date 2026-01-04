@@ -66,19 +66,19 @@ let e = math.E
 @imp std.http
 
 # GET request
-async fetch_data():
+@async fetch_data():
     let response = await http.get("https://api.example.com/data")
     let data = response.json()
     return data
 
 # POST request
-async post_data():
+@async post_data():
     let data = @dict{name: "Alice", age: 30}
     let response = await http.post("https://api.example.com/users", data)
     return response.json()
 
 # Server
-fn @dict handler(request):
+@fn handler(request) -> dict:
     return @dict{status: "ok", message: "Hello!"}
 
 mn:
@@ -299,7 +299,7 @@ async task2():
     return @str("Complete")
 
 # Run concurrently
-async main():
+@async main():
     let results = await async.gather(@list[task1(), task2()])
     print(results)
 
@@ -315,24 +315,24 @@ mn:
 @imp std{io, http, json, db, fs, time}
 
 struct User:
-    id: @int
-    name: @str
-    email: @str
+    id: int
+    name: str
+    email: str
 
-    fn @dict to_dict(self):
+    @fn to_dict(self) -> dict:
         return @dict{
             id: self.id,
             name: self.name,
             email: self.email
         }
 
-async fetch_users():
+@async fetch_users():
     # HTTP request
     let response = await http.get("https://api.example.com/users")
     let data = response.json()
     return data
 
-async save_to_db(users):
+@async save_to_db(users):
     # Database
     let conn = db.connect("postgresql://localhost/app")
 
@@ -342,12 +342,12 @@ async save_to_db(users):
             @list[user["name"], user["email"]]
         )
 
-async save_to_file(users):
+@async save_to_file(users):
     # File system
     let json_data = json.stringify_pretty(users)
     fs.write_file("users.json", json_data)
 
-async main():
+@async main():
     print("Fetching users...")
     let users = await fetch_users()
 

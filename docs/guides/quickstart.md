@@ -101,16 +101,16 @@ mn:
 
 ```gul
 # Simple function
-fn greet(name: str) -> str:
+@fn greet(name: str) -> str:
     return "Hello, " + name
 
 # Typed function
-fn add(a: int, b: int) -> int:
+@fn add(a: int, b: int) -> int:
     return a + b
 
 # Async function
-async fetch_data(url: str) -> dict:
-    response = await http.get(url)
+@async fetch_data(url: str) -> dict:
+    let response = await http.get(url)
     return response.json()
 
 mn:
@@ -125,12 +125,12 @@ mn:
 mn:
     # Lists
     let numbers = @list[1, 2, 3, 4, 5]
-    var items = [1, 2, 3]
+    var items = @list[1, 2, 3]
     items.push(4)
     print(numbers[0])  # 1
 
     # Dictionaries
-    let person = {
+    let person = @dict{
         name: "Bob",
         age: 30,
         city: "NYC"
@@ -226,8 +226,8 @@ gul runtime js "console.log('hello')"
 
 - **mn:** - Main entry point (v3.2)
 - **let/var** - Immutable/mutable variables (v3.2)
-- **fn** - Function declaration
-- **async** - Async functions
+- **@fn** - Function declaration
+- **@async** - Async functions
 - **@imp** - Module imports (v3.2)
 
 ## 📚 Resources

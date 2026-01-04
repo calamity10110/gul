@@ -45,19 +45,19 @@ struct Todo:
     completed: bool
     created_at: datetime
 
-    fn new(id: int, title: str): Todo:
+    @fn new(id: int, title: str) -> Todo:
         return Todo {
             id: id,
             title: title,
-            completed: False,
+            completed: false,
             created_at: datetime.now()
         }
 
-    fn toggle(mut self):
+    @fn toggle(ref self):
         self.completed = !self.completed
 
-    fn display(self): str:
-        status = "✓" if self.completed else " "
+    @fn display(self) -> str:
+        let status = "✓" if self.completed else " "
         return f"[{status}] {self.id}. {self.title}"
 ```
 
@@ -73,10 +73,10 @@ struct Todo:
 Create `src/manager.mn`:
 
 ```gul
-import std.filesystem as fs
+@imp std.filesystem as fs
 
 struct TodoManager:
-    todos: vec[Todo]
+    todos: list[Todo]
     next_id: int
     filename: str
 
@@ -94,7 +94,7 @@ struct TodoManager:
         self.save()
         print(f"Added: {title}")
 
-    fn list_todos(self):
+    @fn list_todos(self):
         if len(self.todos) == 0:
             print("No todos yet!")
             return
@@ -105,8 +105,8 @@ struct TodoManager:
             print(todo.display())
         print("-" * 40)
 
-    fn toggle_todo(mut self, id: int):
-        for mut todo in self.todos:
+    @fn toggle_todo(ref self, id: int):
+        for ref todo in self.todos:
             if todo.id == id:
                 todo.toggle()
                 self.save()
@@ -115,10 +115,10 @@ struct TodoManager:
 
         print(f"Todo {id} not found")
 
-    fn delete_todo(mut self, id: int):
+    @fn delete_todo(ref self, id: int):
         for i in range(len(self.todos)):
             if self.todos[i].id == id:
-                title = self.todos[i].title
+                let title = self.todos[i].title
                 self.todos.remove(i)
                 self.save()
                 print(f"Deleted: {title}")
@@ -126,33 +126,33 @@ struct TodoManager:
 
         print(f"Todo {id} not found")
 
-    fn save(self):
+    @fn save(self):
         # Serialize todos to JSON
-        data = {
-            "next_id": self.next_id,
-            "todos": [
-                {
-                    "id": todo.id,
-                    "title": todo.title,
-                    "completed": todo.completed,
-                    "created_at": todo.created_at.to_string()
+        let data = @dict{
+            next_id: self.next_id,
+            todos: @list[
+                @dict{
+                    id: todo.id,
+                    title: todo.title,
+                    completed: todo.completed,
+                    created_at: todo.created_at.to_string()
                 }
                 for todo in self.todos
             ]
         }
 
-        json_str = json.dumps(data)
+        let json_str = json.dumps(data)
         fs.write_text(self.filename, json_str)
 
-    fn load(mut self):
+    @fn load(ref self):
         if !fs.exists(self.filename):
             return
 
-        json_str = fs.read_text(self.filename)
-        data = json.loads(json_str)
+        let json_str = fs.read_text(self.filename)
+        let data = json.loads(json_str)
 
         self.next_id = data["next_id"]
-        self.todos = [
+        self.todos = @list[
             Todo {
                 id: item["id"],
                 title: item["title"],
@@ -175,9 +175,9 @@ struct TodoManager:
 Create `src/main.mn`:
 
 ```gul
-import std.filesystem as fs
+@imp std.filesystem as fs
 
-fn show_help():
+@fn show_help():
     print("""
     Todo List Manager
 
@@ -190,55 +190,55 @@ fn show_help():
         quit             Exit the program
     """)
 
-main:
+mn:
     print("Welcome to GUL Todo Manager!")
     print("Type 'help' for commands\n")
 
-    manager = TodoManager.new("todos.json")
+    let manager = TodoManager.new("todos.json")
     manager.load()
 
-    while True:
-        input_line = input("> ")
-        parts = input_line.split()
+    while true:
+        let input_line = input("> ")
+        let parts = input_line.split()
 
         if len(parts) == 0:
             continue
 
-        command = parts[0]
+        let command = parts[0]
 
         match command:
-            "add":
+            "add" =>
                 if len(parts) < 2:
                     print("Usage: add <title>")
                 else:
-                    title = " ".join(parts[1:])
+                    let title = " ".join(parts[1:])
                     manager.add_todo(title)
 
-            "list":
+            "list" =>
                 manager.list_todos()
 
-            "toggle":
+            "toggle" =>
                 if len(parts) < 2:
                     print("Usage: toggle <id>")
                 else:
-                    id = int(parts[1])
+                    let id = int(parts[1])
                     manager.toggle_todo(id)
 
-            "delete":
+            "delete" =>
                 if len(parts) < 2:
                     print("Usage: delete <id>")
                 else:
-                    id = int(parts[1])
+                    let id = int(parts[1])
                     manager.delete_todo(id)
 
-            "help":
+            "help" =>
                 show_help()
 
-            "quit":
+            "quit" =>
                 print("Goodbye!")
                 break
 
-            _:
+            _ =>
                 print(f"Unknown command: {command}")
                 print("Type 'help' for available commands")
 ```
@@ -295,15 +295,15 @@ Goodbye!
 Enhance with colors:
 
 ```gul
-import std.terminal
+@imp std.terminal
 
-fn display_colored(self): str:
+@fn display_colored(self) -> str:
     if self.completed:
-        color = terminal.green
-        status = "✓"
+        let color = terminal.green
+        let status = "✓"
     else:
-        color = terminal.yellow
-        status = " "
+        let color = terminal.yellow
+        let status = " "
 
     return color(f"[{status}] {self.id}. {self.title}")
 ```

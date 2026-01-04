@@ -1,0 +1,25 @@
+# GUL Sanity Check Test
+# Tests basic variables, print, and control flow
+
+fn main():
+    let x = 10
+    let name = "GUL"
+    print("Sanity Check passed")
+    print(x)
+    
+    # Test control flow
+    if x > 5:
+        print("x is greater than 5")
+    
+    # Test loop
+    var i = 0
+    while i < 3:
+        print(i)
+        i = i + 1
+
+# EXPECT: Sanity Check passed
+# EXPECT: 10
+# EXPECT: x is greater than 5
+# EXPECT: 0
+# EXPECT: 1
+# EXPECT: 2

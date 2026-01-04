@@ -31,7 +31,7 @@ The most reliable way to verify hardware is to run the examples provided in the 
 To validate the `main.mn` script syntax:
 
 ```bash
-cargo run --bin gul -- build firmware/esp32-s3-amoled/main.mn --target esp32s3
+gul build firmware/esp32-s3-amoled/main.mn --target esp32s3
 ```
 
 *Currently, this command only validates the GUL script and does not produce a flashable binary.*

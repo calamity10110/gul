@@ -11,20 +11,20 @@ The `std.math` and `std.science` modules provide comprehensive mathematical and 
 ## 🔢 Basic Math Operations
 
 ```gul
-import std.math
+@imp std.math
 
 # Constants
-pi = math.PI
-e = math.E
-tau = math.TAU
+let pi = math.PI
+let e = math.E
+let tau = math.TAU
 
 # Basic functions
-abs_val = math.abs(-5)              # 5
-ceil_val = math.ceil(4.2)           # 5
-floor_val = math.floor(4.8)         # 4
-round_val = math.round(4.5)         # 5
-sqrt_val = math.sqrt(16)            # 4.0
-power = math.pow(2, 8)              # 256
+let abs_val = math.abs(-5)              # 5
+let ceil_val = math.ceil(4.2)           # 5
+let floor_val = math.floor(4.8)         # 4
+let round_val = math.round(4.5)         # 5
+let sqrt_val = math.sqrt(16)            # 4.0
+let power = math.pow(2, 8)              # 256
 ```
 
 ## 📐 Trigonometry
@@ -49,14 +49,14 @@ radians = math.radians(180)         # π
 ## 📊 Statistics
 
 ```gul
-import std.stats
+@imp std.stats
 
-data = vec[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+let data = @list[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 # Central tendency
-mean = stats.mean(data)             # 5.5
-median = stats.median(data)         # 5.5
-mode = stats.mode(data)
+let mean = stats.mean(data)             # 5.5
+let median = stats.median(data)         # 5.5
+let mode = stats.mode(data)
 
 # Dispersion
 variance = stats.variance(data)

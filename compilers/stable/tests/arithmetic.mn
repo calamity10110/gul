@@ -1,0 +1,17 @@
+# GUL Stable - Arithmetic Test
+
+mn:
+    let a = 10
+    let b = 3
+    
+    let sum = a + b
+    print(sum)
+    
+    let diff = a - b
+    print(diff)
+    
+    let prod = a * b
+    print(prod)
+    
+    let quot = a / b
+    print(quot)

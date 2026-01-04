@@ -15,13 +15,11 @@ The compiler follows an 8-stage pipeline:
 - Reads `.mn` source files
 - Produces token stream
 - Handles:
-  - Keywords (`def`, `fn`, `asy`, `imp`, `mn`)
-  - Annotations (`@int`, `@asy`, `@ref`, etc.)
-  - Mutability token (`?`)
+  - Keywords (`let`, `var`, `fn`, `async`, `import`)
+  - Annotations (`@int`, `@list`, `@dict`, etc.)
   - Operators (`+`, `-`, `*`, `/`, `^`, etc.)
-  - Scientific units (`m/s`, `m/s^2`, etc.)
-  - UI syntax (`^÷^[...]`)
-  - String literals, numbers, identifiers
+  - F-Strings and String literals
+  - Identifiers and Types
 
 ### STAGE 2 — Parser
 
@@ -29,12 +27,12 @@ The compiler follows an 8-stage pipeline:
 - Produces Abstract Syntax Tree (AST)
 - Validates syntax structure
 - Handles:
-  - Flexible import declarations (brackets, braces, parens)
-  - Definition blocks with mutability (`?`)
-  - Annotated function definitions (`@asy`, `@fn`)
-  - Foreign language blocks (`@cs`)
-  - Main entry points
-  - UI inline syntax
+  - Import declarations (`@imp`)
+  - Variable definitions (`let`/`var`)
+  - Function definitions (`@fn`, `@async`)
+  - Foreign language blocks (`@python`, `@rust`, `@sql`)
+  - Main entry points (`mn:`)
+  - Control flow (`if`, `match`, `for`)
   - Annotation parsing
 
 ### STAGE 3 — AST Builder
@@ -59,8 +57,8 @@ The compiler follows an 8-stage pipeline:
 ### STAGE 5 — Semantic Analyzer
 
 - Type checking (validates `@int`, `@str`, etc.)
-- Ownership validation (`@own`, `@ref`, `@copy`)
-- Mutability validation (checks `?` usage)
+- Ownership validation (`borrow`, `move`, `ref`, `kept`)
+- Mutability validation (`var` vs `let`)
 - Async/await validation
 - Secret leakage detection
 - Dead code detection
@@ -181,27 +179,24 @@ Emits code for multiple targets:
 
 ```bash
 # Compile a project
-ulc build main.mn
+gul build main.mn
 
 # Watch mode
-ulc watch main.mn
-
-# Organize into blocks
-ulc organize main.mn
+gul run --watch main.mn
 
 # Check without building
-ulc check main.mn
+gul check main.mn
 
 # Format code
-ulc fmt main.mn
+gul fmt main.mn
 
 # Run linter
-ulc lint main.mn
+gul lint main.mn
 
 # Target-specific builds
-ulc build --target wasm main.mn
-ulc build --target esp32 main.mn
-ulc build --target linux main.mn
+gul build --target wasm32-unknown-unknown
+gul build --target xtensa-esp32s3-none-elf
+gul build --target x86_64-unknown-linux-gnu
 ```
 
 ## Compiler Configuration

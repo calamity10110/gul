@@ -1,0 +1,54 @@
+fn main():
+    print("--- Match Test ---")
+    
+    # Int Match
+    let x = 10
+    match x:
+        1 => print("One")
+        10 => print("Ten")
+        _ => print("Other")
+        
+    # Float Match
+    let f = 3.14
+    match f:
+        3.14 => print("Pi")
+        _ => print("Not Pi")
+        
+    # String Match
+    let s = "Hello"
+    match s:
+        "World" => print("World")
+        "Hello" => print("Hello")
+        _ => print("Other String")
+        
+    # Variable Binding (Int)
+    match x:
+        val => 
+            print("Captured Int:")
+            print(val)
+        
+    # Variable Binding (Float)
+    match f:
+        pi => 
+            print("Captured Float:")
+            print(pi)
+    
+    # Nested Match?
+    print("Nested:")
+    match x:
+        10 => 
+             match s:
+                 "Hello" => print("Nested Match OK")
+                 _ => print("Nested Fail")
+        _ => print("First Level Fail")
+
+# EXPECT: --- Match Test ---
+# EXPECT: Ten
+# EXPECT: Pi
+# EXPECT: Hello
+# EXPECT: Captured Int:
+# EXPECT: 10
+# EXPECT: Captured Float:
+# EXPECT: 3.140000
+# EXPECT: Nested:
+# EXPECT: Nested Match OK

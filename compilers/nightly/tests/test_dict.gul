@@ -1,0 +1,16 @@
+fn main():
+    let d = @dict{
+        "a": 10,
+        "b": 20
+    }
+    
+    print(d["a"])
+    print(d["b"])
+    print(d["c"]) # Not found -> returns 0 currently
+
+    # Check mixed types if parser supports validation, but runtime doesn't care
+    # d["c"] = 30 # Assignment not supported yet
+
+# EXPECT: 10
+# EXPECT: 20
+# EXPECT: 0

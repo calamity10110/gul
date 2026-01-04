@@ -117,6 +117,8 @@ count = count + 1
 # With type constructors
 let user = @dict{name: "Bob", age: 30}
 let numbers = @list[1, 2, 3, 4, 5]
+let tuple = (1, 2)
+let msg = f"User: {user['name']}"
 ```
 
 ### Functions
@@ -172,10 +174,11 @@ for i in 0..10:
     print(i)
 
 # Match expressions
+# Match expressions
 match status_code:
     200 => print("OK")
     404 => print("Not Found")
-    _ => print("Unknown")
+    code => print("Error: " + code)
 ```
 
 ### Imports

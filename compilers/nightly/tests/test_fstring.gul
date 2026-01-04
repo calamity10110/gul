@@ -1,0 +1,41 @@
+fn main():
+    print("--- F-String Test ---")
+    let x = 10
+    let f = 3.14
+    let name = "World"
+    
+    # Test Int
+    let s1 = f"Hello {x}"
+    print(s1)
+    
+    # Test Float
+    let s2 = f"Pi is {f}"
+    print(s2)
+    
+    # Test String
+    let s3 = f"Hi {name}"
+    print(s3)
+    
+    # Test Mixed
+    let s4 = f"{name} interpolation works with {x} and {f}"
+    print(s4)
+    
+    # Test Empty
+    let empty = f""
+    print("Empty:")
+    print(empty)
+    
+    # Test only expression
+    let expr_only = f"{x}"
+    print("Expr Only:")
+    print(expr_only)
+
+# EXPECT: --- F-String Test ---
+# EXPECT: Hello 10
+# EXPECT: Pi is 3.140000
+# EXPECT: Hi World
+# EXPECT: World interpolation works with 10 and 3.140000
+# EXPECT: Empty:
+# EXPECT: 
+# EXPECT: Expr Only:
+# EXPECT: 10

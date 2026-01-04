@@ -1,0 +1,43 @@
+fn main():
+    print("--- Multi-dimensional List Test ---")
+    
+    # 2D Matrix: [[1, 2], [3, 4]]
+    let row1 = @list[1, 2]
+    let row2 = @list[3, 4]
+    let matrix = @list[row1, row2]
+    
+    print("Matrix Len:")
+    print(matrix.len)
+    
+    print("Row 1 Len:")
+    print(matrix[0].len)
+    
+    print("Element [0][0]:")
+    print(matrix[0][0])
+    
+    print("Element [1][1]:")
+    print(matrix[1][1])
+    
+    # Nested Literal Syntax check
+    let nested = @list[ @list[10, 20], @list[30, 40] ]
+    print("Nested [0][1]:")
+    print(nested[0][1])
+
+    # 3D List
+    let cube = @list[ @list[ @list[100] ] ]
+    print("Cube [0][0][0]:")
+    print(cube[0][0][0])
+    
+# EXPECT: --- Multi-dimensional List Test ---
+# EXPECT: Matrix Len:
+# EXPECT: 2
+# EXPECT: Row 1 Len:
+# EXPECT: 2
+# EXPECT: Element [0][0]:
+# EXPECT: 1
+# EXPECT: Element [1][1]:
+# EXPECT: 4
+# EXPECT: Nested [0][1]:
+# EXPECT: 20
+# EXPECT: Cube [0][0][0]:
+# EXPECT: 100

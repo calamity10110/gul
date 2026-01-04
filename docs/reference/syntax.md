@@ -24,7 +24,7 @@ let pi = 3.14159
 var count = 0
 count = count + 1
 
-var items = [1, 2, 3]
+var items = @list[1, 2, 3]
 items.push(4)
 ```
 
@@ -33,7 +33,7 @@ items.push(4)
 ```gul
 let name: str = "Alice"
 var counter: int = 0
-let data: list = [1, 2, 3]
+let data: list = @list[1, 2, 3]
 ```
 
 ## 2. Functions
@@ -41,10 +41,10 @@ let data: list = [1, 2, 3]
 ### Synchronous Functions
 
 ```gul
-fn greet(name: str) -> str:
+@fn greet(name: str) -> str:
     return "Hello, " + name
 
-fn add(a: int, b: int) -> int:
+@fn add(a: int, b: int) -> int:
     return a + b
 ```
 
@@ -136,23 +136,25 @@ finally:
 ### Primitives
 
 ```gul
-let num: int = 42
-let pi: float = 3.14159
-let name: str = "GUL"
-let active: bool = true
+let num = @int(42)
+let pi = @float(3.14159)
+let name = @str("GUL")
+let active = @bool(true)
+let tuple = (1, 2)
+let fstring = f"Values: {num}, {name}"
 ```
 
 ### Collections
 
 ```gul
-let numbers: list = [1, 2, 3, 4, 5] # Immutable
-var items: list = [1, 2, 3] # Mutable
+let numbers = @list[1, 2, 3, 4, 5] # Immutable
+var items = @list[1, 2, 3] # Mutable
 
-let labels: set = {"a", "b"} # Immutable
-var tags: set = {"rust", "python"} # Mutable
+let labels = @set{"a", "b"} # Immutable
+var tags = @set{"rust", "python"} # Mutable
 
-let user: dict = {name: "Alice", age: 25} # Immutable
-var cfg: dict = {host: "localhost", port: 8080} # Mutable
+let user = @dict{name: "Alice", age: 25} # Immutable
+var cfg = @dict{host: "localhost", port: 8080} # Mutable
 ```
 
 ### Gradual Typing
@@ -168,8 +170,9 @@ result = "now a string"
 
 ```gul
 @python {
-    fn analyze_data(data):
-        import numpy as np
+    import numpy as np
+
+    def analyze_data(data):
         return np.mean(data)
 }
 ```
@@ -232,19 +235,20 @@ comment
 let API_URL = "https://api.example.com"
 var request_count = 0
 
-fn process_data(data: list) -> dict:
-    return {
-        "count": len(data),
-        "sum": sum(data)
+@fn process_data(data: list) -> dict:
+    return @dict{
+        count: len(data),
+        sum: sum(data)
     }
 
-async fetch_api() -> dict:
-    response = await http.get(API_URL)
+@async fetch_api() -> dict:
+    let response = await http.get(API_URL)
     return response.json()
 
 @python {
-    fn analyze(data):
-        import numpy as np
+    import numpy as np
+
+    def analyze(data):
         return float(np.mean(data))
 }
 

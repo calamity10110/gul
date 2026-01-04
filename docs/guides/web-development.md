@@ -26,12 +26,12 @@ GUL provides comprehensive web development capabilities:
 ### Hello World Server
 
 ```gul
-import std.http
+@imp std.http
 
-server = http.Server(port=8080)
+let server = http.Server(port=8080)
 
 @server.route("/")
-fn index(request):
+@fn index(request) -> http.Response:
     return http.Response(
         body="Hello, GUL!",
         content_type="text/plain"
@@ -52,29 +52,29 @@ gul run server.mn
 ### Basic Routes
 
 ```gul
-import std.http
+@imp std.http
 
-server = http.Server(port=8080)
+let server = http.Server(port=8080)
 
 # GET request
 @server.get("/")
-fn home(request):
+@fn home(request) -> str:
     return "<h1>Welcome to GUL!</h1>"
 
 # POST request
 @server.post("/api/users")
-fn create_user(request):
-    user_data = request.json()
+@fn create_user(request) -> http.Response:
+    let user_data = request.json()
     # Process user creation
-    return http.json_response({"status": "created", "id": 123})
+    return http.json_response(@dict{status: "created", id: 123})
 
 # Multiple HTTP methods
-@server.route("/api/resource", methods=["GET", "POST", "PUT"])
-fn handle_resource(request):
+@server.route("/api/resource", methods=@list["GET", "POST", "PUT"])
+@fn handle_resource(request) -> http.Response:
     match request.method:
-        "GET": return get_resource()
-        "POST": return create_resource(request.json())
-        "PUT": return update_resource(request.json())
+        "GET" => return get_resource()
+        "POST" => return create_resource(request.json())
+        "PUT" => return update_resource(request.json())
 ```
 
 ### Path Parameters
@@ -128,18 +128,18 @@ fn list_users(request):
 ```gul
 # Catch-all route
 @server.get("/static/*filepath")
-fn serve_static(request, filepath: str):
+@fn serve_static(request, filepath: str) -> http.Response:
     return http.serve_file(f"public/{filepath}")
 
 # Route groups
 @server.group("/api/v1")
 module api_v1:
     @server.get("/users")
-    fn list_users(request):
+    @fn list_users(request) -> http.Response:
         return http.json_response(get_all_users())
 
     @server.get("/posts")
-    fn list_posts(request):
+    @fn list_posts(request) -> http.Response:
         return http.json_response(get_all_posts())
 ```
 
@@ -148,25 +148,25 @@ module api_v1:
 ### Built-in Middleware
 
 ```gul
-import std.http
-import std.http.middleware
+@imp std.http
+@imp std.http.middleware
 
-server = http.Server(port=8080)
+let server = http.Server(port=8080)
 
 # Logging middleware
 server.use(middleware.logger())
 
 # CORS middleware
 server.use(middleware.cors(
-    allowed_origins=["https://example.com"],
-    allowed_methods=["GET", "POST", "PUT", "DELETE"],
-    allowed_headers=["Content-Type", "Authorization"]
+    allowed_origins=@list["https://example.com"],
+    allowed_methods=@list["GET", "POST", "PUT", "DELETE"],
+    allowed_headers=@list["Content-Type", "Authorization"]
 ))
 
 # Authentication middleware
 server.use(middleware.auth(
     secret_key=env("JWT_SECRET"),
-    exclude_paths=["/", "/login", "/register"]
+    exclude_paths=@list["/", "/login", "/register"]
 ))
 
 # Rate limiting
@@ -224,32 +224,32 @@ fn admin_dashboard(request):
 
 ```gul
 @server.post("/api/submit")
-fn handle_submission(request):
+@fn handle_submission(request) -> http.Response:
     # Get JSON body
-    json_data = request.json()
+    let json_data = request.json()
 
     # Get form data
-    form_data = request.form()
-    name = form_data.get("name")
-    email = form_data.get("email")
+    let form_data = request.form()
+    let name = form_data.get("name")
+    let email = form_data.get("email")
 
     # Get headers
-    auth_header = request.headers.get("Authorization")
-    content_type = request.content_type
+    let auth_header = request.headers.get("Authorization")
+    let content_type = request.content_type
 
     # Get cookies
-    session_id = request.cookies.get("session_id")
+    let session_id = request.cookies.get("session_id")
 
     # Get uploaded files
-    uploaded_file = request.files.get("avatar")
-    if uploaded_file:
-        uploaded_file.save(f"uploads/{uploaded_file.filename}")
+    let uploaded_file = request.files.get("avatar")
+    if uploaded_file.is_some():
+        uploaded_file.unwrap().save(f"uploads/{uploaded_file.unwrap().filename}")
 
     # Get client info
-    client_ip = request.client_ip
-    user_agent = request.user_agent
+    let client_ip = request.client_ip
+    let user_agent = request.user_agent
 
-    return http.json_response({"status": "success"})
+    return http.json_response(@dict{status: "success"})
 ```
 
 ### File Uploads
@@ -458,15 +458,15 @@ fn user_profile(request, user_id: int):
 ### Database Setup
 
 ```gul
-import std.database
-import std.secrets
+@imp std.database
+@imp std.secrets
 
 # Configure database connection
-secret db_url = env("DATABASE_URL")
-db = database.connect(db_url)
+let db_url = secrets.env("DATABASE_URL")
+let db = database.connect(db_url)
 
 # Connection pooling
-db_pool = database.ConnectionPool(
+let db_pool = database.ConnectionPool(
     url=db_url,
     min_connections=5,
     max_connections=20
@@ -520,7 +520,7 @@ fn delete_user(request, id: int):
 ### ORM Pattern
 
 ```gul
-import std.database.orm
+@imp std.database.orm
 
 # Define model
 @orm.model
@@ -533,25 +533,25 @@ struct User:
 
     # Virtual field
     @property
-    fn full_profile(self): dict:
-        return {
-            "id": self.id,
-            "name": self.name,
-            "email": self.email,
-            "member_since": self.created_at
+    @fn full_profile(self) -> dict:
+        return @dict{
+            id: self.id,
+            name: self.name,
+            email: self.email,
+            member_since: self.created_at
         }
 
 # Use ORM
 @server.get("/api/users")
-fn list_users(request):
-    users = User.all()
-    return http.json_response([u.full_profile() for u in users])
+@fn list_users(request) -> http.Response:
+    let users = User.all()
+    return http.json_response(@list[u.full_profile() for u in users])
 
 @server.post("/api/users")
-fn create_user(request):
-    data = request.json()
+@fn create_user(request) -> http.Response:
+    let data = request.json()
 
-    user = User.create(
+    let user = User.create(
         name=data["name"],
         email=data["email"],
         password_hash=hash_password(data["password"])
@@ -565,55 +565,56 @@ fn create_user(request):
 ### JWT Authentication
 
 ```gul
-import std.crypto.jwt
-import std.secrets
+@imp std.crypto.jwt
+@imp std.secrets
 
-secret jwt_secret = env("JWT_SECRET")
+let jwt_secret = secrets.env("JWT_SECRET")
 
 @server.post("/auth/login")
-fn login(request):
-    credentials = request.json()
+@fn login(request) -> http.Response:
+    let credentials = request.json()
 
-    user = database.query_one(
+    let user = database.query_one(
         "SELECT * FROM users WHERE email = ?",
-        [credentials["email"]]
+        @list[credentials["email"]]
     )
 
-    if user and verify_password(credentials["password"], user.password_hash):
+    if user.is_some() && verify_password(credentials["password"], user.unwrap().password_hash):
+        let u = user.unwrap()
         # Generate JWT token
-        token = jwt.encode(
-            payload={
-                "user_id": user.id,
-                "email": user.email,
-                "exp": time.now() + duration.days(7)
+        let token = jwt.encode(
+            payload=@dict{
+                user_id: u.id,
+                email: u.email,
+                exp: time.now() + duration.days(7)
             },
             secret=jwt_secret
         )
 
-        return http.json_response({
-            "token": token,
-            "user": user.profile()
+        return http.json_response(@dict{
+            token: token,
+            user: u.profile()
         })
 
     return http.json_response(
-        {"error": "Invalid credentials"},
+        @dict{error: "Invalid credentials"},
         status=401
     )
 
 @server.get("/api/protected")
 @middleware.require_auth()
-fn protected_route(request):
+@fn protected_route(request) -> http.Response:
     # request.user is populated by auth middleware
-    return http.json_response({
-        "message": f"Hello, {request.user.name}!",
-        "user": request.user
+    return http.json_response(@dict{
+        message: f"Hello, {request.user.name}!",
+        user: request.user
     })
 ```
 
 ### Session Management
 
 ```gul
-import std.http.session
+@imp std.http.session
 
 # Configure sessions
 server.use(middleware.session(
@@ -623,31 +624,32 @@ server.use(middleware.session(
 ))
 
 @server.post("/login")
-fn login(request):
-    credentials = request.form()
-    user = authenticate(credentials)
+@fn login(request) -> http.Response:
+    let credentials = request.form()
+    let user = authenticate(credentials)
 
-    if user:
+    if user.is_some():
         # Store in session
-        request.session["user_id"] = user.id
-        request.session["logged_in"] = True
+        let u = user.unwrap()
+        request.session["user_id"] = u.id
+        request.session["logged_in"] = true
 
         return http.redirect("/dashboard")
 
     return http.redirect("/login?error=1")
 
 @server.get("/dashboard")
-fn dashboard(request):
-    if not request.session.get("logged_in"):
+@fn dashboard(request) -> http.Response:
+    if !request.session.get("logged_in"):
         return http.redirect("/login")
 
-    user_id = request.session.get("user_id")
-    user = database.get_user(user_id)
+    let user_id = request.session.get("user_id")
+    let user = database.get_user(user_id)
 
-    return templates.render("dashboard.html", {"user": user})
+    return templates.render("dashboard.html", @dict{user: user})
 
 @server.post("/logout")
-fn logout(request):
+@fn logout(request) -> http.Response:
     request.session.clear()
     return http.redirect("/")
 ```
@@ -657,27 +659,27 @@ fn logout(request):
 ### WebSocket Server
 
 ```gul
-import std.websocket
+@imp std.websocket
 
-ws_server = websocket.Server()
+let ws_server = websocket.Server()
 
 @ws_server.on_connect
-fn handle_connect(client):
+@fn handle_connect(client):
     print(f"Client connected: {client.id}")
-    client.send({"type": "welcome", "message": "Connected!"})
+    client.send(@dict{type: "welcome", message: "Connected!"})
 
 @ws_server.on_message
-fn handle_message(client, message):
+@fn handle_message(client, message):
     print(f"Received from {client.id}: {message}")
 
     # Echo back
-    client.send({"type": "echo", "data": message})
+    client.send(@dict{type: "echo", data: message})
 
     # Broadcast to all clients
-    ws_server.broadcast({"type": "update", "from": client.id, "data": message})
+    ws_server.broadcast(@dict{type: "update", from: client.id, data: message})
 
 @ws_server.on_disconnect
-fn handle_disconnect(client):
+@fn handle_disconnect(client):
     print(f"Client disconnected: {client.id}")
 
 # Attach to HTTP server
@@ -687,51 +689,51 @@ server.websocket("/ws", ws_server)
 ### Real-time Chat Application
 
 ```gul
-import std.websocket
-import std.database
+@imp std.websocket
+@imp std.database
 
-chat_users = {}  # In-memory user tracking
+let chat_users = @dict{}  # In-memory user tracking
 
 @ws_server.on_connect
-fn user_join(client):
-    chat_users[client.id] = {
-        "id": client.id,
-        "joined_at": time.now()
+@fn user_join(client):
+    chat_users[client.id] = @dict{
+        id: client.id,
+        joined_at: time.now()
     }
 
     # Notify all users
-    ws_server.broadcast({
-        "type": "user_joined",
-        "user_id": client.id,
-        "total_users": len(chat_users)
+    ws_server.broadcast(@dict{
+        type: "user_joined",
+        user_id: client.id,
+        total_users: len(chat_users)
     })
 
 @ws_server.on_message
-fn handle_chat_message(client, message):
+@fn handle_chat_message(client, message):
     # Save to database
-    db.insert("messages", {
-        "user_id": message.get("user_id"),
-        "content": message.get("content"),
-        "created_at": datetime.now()
+    db.insert("messages", @dict{
+        user_id: message.get("user_id"),
+        content: message.get("content"),
+        created_at: datetime.now()
     })
 
     # Broadcast to all users
-    ws_server.broadcast({
-        "type": "new_message",
-        "user_id": message["user_id"],
-        "content": message["content"],
-        "timestamp": time.now()
+    ws_server.broadcast(@dict{
+        type: "new_message",
+        user_id: message["user_id"],
+        content: message["content"],
+        timestamp: time.now()
     })
 
 @ws_server.on_disconnect
-fn user_leave(client):
-    if client.id in chat_users:
-        del chat_users[client.id]
+@fn user_leave(client):
+    if chat_users.contains(client.id):
+        chat_users.remove(client.id)
 
-    ws_server.broadcast({
-        "type": "user_left",
-        "user_id": client.id,
-        "total_users": len(chat_users)
+    ws_server.broadcast(@dict{
+        type: "user_left",
+        user_id: client.id,
+        total_users: len(chat_users)
     })
 ```
 
@@ -740,16 +742,16 @@ fn user_leave(client):
 ### Complete REST API with Database
 
 ```gul
-import std.http
-import std.database
-import std.secrets
+@imp std.http
+@imp std.database
+@imp std.secrets
 
 # Configuration
-secret db_url = env("DATABASE_URL")
-db = database.connect(db_url)
+let db_url = secrets.env("DATABASE_URL")
+let db = database.connect(db_url)
 
 # Initialize server
-server = http.Server(port=8080)
+let server = http.Server(port=8080)
 
 # Middleware
 server.use(middleware.logger())
@@ -758,22 +760,22 @@ server.use(middleware.json_parser())
 
 # Routes
 @server.get("/")
-fn home(request):
-    return http.json_response({
-        "app": "GUL Blog API",
-        "version": "1.0.0",
-        "endpoints": {
-            "posts": "/api/posts",
-            "users": "/api/users"
+@fn home(request) -> http.Response:
+    return http.json_response(@dict{
+        app: "GUL Blog API",
+        version: "1.0.0",
+        endpoints: @dict{
+            posts: "/api/posts",
+            users: "/api/users"
         }
     })
 
 @server.get("/api/posts")
-fn list_posts(request):
-    page = request.query.get("page", type=int, default=1)
-    per_page = 10
+@fn list_posts(request) -> http.Response:
+    let page = request.query.get("page", type=int, default=1)
+    let per_page = 10
 
-    posts = db.query(
+    let posts = db.query(
         """
         SELECT p.*, u.name as author_name
         FROM posts p
@@ -781,18 +783,18 @@ fn list_posts(request):
         ORDER BY p.created_at DESC
         LIMIT ? OFFSET ?
         """,
-        [per_page, (page - 1) * per_page]
+        @list[per_page, (page - 1) * per_page]
     )
 
-    total = db.count("posts")
+    let total = db.count("posts")
 
-    return http.json_response({
-        "posts": posts,
-        "pagination": {
-            "page": page,
-            "per_page": per_page,
-            "total": total,
-            "pages": (total + per_page - 1) // per_page
+    return http.json_response(@dict{
+        posts: posts,
+        pagination: @dict{
+            page: page,
+            per_page: per_page,
+            total: total,
+            pages: (total + per_page - 1) // per_page
         }
     })
 

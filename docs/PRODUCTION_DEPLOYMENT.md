@@ -38,7 +38,7 @@ WORKDIR /app
 COPY . .
 
 # Build the GUL application
-RUN cargo build --release
+RUN gul build --release
 
 # Runtime image
 FROM debian:bookworm-slim

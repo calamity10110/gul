@@ -1,0 +1,22 @@
+fn main():
+    var arr = @list[10, 20, 30, 40]
+    
+    # Pop last -> 40
+    let last = arr.pop()
+    print(last)
+    print(arr.len)
+    
+    # Pop index 1 (20) -> [10, 30]
+    let mid = arr.pop(1)
+    print(mid)
+    
+    print(arr[0])
+    print(arr[1])
+    print(arr.len)
+    
+# EXPECT: 40
+# EXPECT: 3
+# EXPECT: 20
+# EXPECT: 10
+# EXPECT: 30
+# EXPECT: 2

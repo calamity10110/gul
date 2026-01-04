@@ -13,7 +13,7 @@ The language supports seamless integration with multiple programming languages t
 ### Syntax
 
 ```
-@cs rust:
+@rust {
     fn add(a: i32, b: i32) -> i32 {
         a + b
     }
@@ -21,6 +21,7 @@ The language supports seamless integration with multiple programming languages t
     fn fast_sum(data: &[i32]) -> i32 {
         data.iter().sum()
     }
+}
 ```
 
 ### Features
@@ -28,23 +29,24 @@ The language supports seamless integration with multiple programming languages t
 - **Zero-copy** data sharing
 - **Native performance**
 - Direct memory access
-- Ownership model compatibility
+- Ownership model compatibility (`borrow`, `move`)
 
 ### Example
 
 ```
 @imp std.io
 
-@cs rust:
+@rust {
     fn process_image(pixels: &mut [u8], width: usize, height: usize) {
         for i in 0..pixels.len() {
             pixels[i] = pixels[i].saturating_add(10);
         }
     }
+}
 
 mn:
     let image = load_image("photo.png")
-    rust.process_image(ref image.pixels, image.width, image.height)
+    rust.process_image(image.pixels, image.width, image.height)
     save_image(image, "output.png")
 ```
 
@@ -53,13 +55,14 @@ mn:
 ### Syntax
 
 ```
-@cs python:
+@python {
     import numpy as np
     import pandas as pd
 
-    fn analyze_data(data):
+    def analyze_data(data):
         df = pd.DataFrame(data)
         return df.describe().to_dict()
+}
 ```
 
 ### Features
@@ -71,16 +74,17 @@ mn:
 ### Example
 
 ```
-@cs python:
+@python {
     import tensorflow as tf
 
-    fn predict(model_path, input_data):
+    def predict(model_path, input_data):
         model = tf.keras.models.load_model(model_path)
         return model.predict(input_data).tolist()
+}
 
-async run_inference():
-    data = load_data("input.csv")
-    result = python.predict("model.h5", data)
+@async run_inference():
+    let data = load_data("input.csv")
+    let result = python.predict("model.h5", data)
     print(result)
 ```
 
@@ -89,15 +93,16 @@ async run_inference():
 ### Syntax
 
 ```
-@cs js:
+@js {
     export function formatDate(timestamp) {
         return new Date(timestamp).toLocaleDateString();
     }
 
     export async function fetchAPI(url) {
         const response = await fetch(url);
-        await response.json();
+        return await response.json();
     }
+}
 ```
 
 ### Features
@@ -110,7 +115,7 @@ async run_inference():
 ### Example
 
 ```
-@cs js:
+@js {
     export function processJSON(data) {
         return data.map(item => ({
             ...item,
@@ -118,10 +123,11 @@ async run_inference():
             timestamp: Date.now()
         }));
     }
+}
 
 mn:
-    data = load_json("data.json")
-    processed = js.processJSON(data)
+    let data = load_json("data.json")
+    let processed = js.processJSON(data)
     save_json(processed, "output.json")
 ```
 
@@ -194,7 +200,7 @@ async mn:
 ### Syntax
 
 ```
-@cs c:
+@c {
     #include <math.h>
 
     double calculate_distance(double x1, double y1, double x2, double y2) {
@@ -206,6 +212,7 @@ async mn:
     int fibonacci(int n) {
         return n <= 1 ? n : fibonacci(n-1) + fibonacci(n-2);
     }
+}
 ```
 
 ### Features
@@ -241,7 +248,7 @@ mn:
 ### Syntax
 
 ```
-@cs sql:
+@sql {
     select
         users.name,
         users.email,
@@ -252,6 +259,7 @@ mn:
     group by users.id
     order by order_count desc
     limit 10;
+}
 ```
 
 ### Features
@@ -292,15 +300,15 @@ mn:
 ### Ownership Rules
 
 ```
-# Pass by reference (zero-copy)
-rust.process(ref data)
-python.analyze(ref data)
+# Pass by reference (borrow)
+rust.process(borrow data)
+python.analyze(borrow data)
 
 # Pass by ownership (move)
-rust.consume(own data)
+rust.consume(move data)
 
 # Pass by copy (explicit)
-js.process(copy data)
+js.process(kept data)
 ```
 
 ### Type Mapping

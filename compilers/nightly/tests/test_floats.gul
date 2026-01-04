@@ -1,0 +1,66 @@
+fn main():
+    print("--- Implicit Float ---")
+    let x = 10  # Inferred as Float
+    print(x)
+    
+    print("--- Explicit Int ---")
+    let y: int = 10 # Explicit int
+    print(y)
+    
+    print("--- Explicit Float ---")
+    let z: float = 10.5
+    print(z)
+
+    print("--- Casts ---")
+    let f1 = @flt(20)
+    print(f1)
+    let i1 = @int(20.9)
+    print(i1)
+
+    print("--- Arithmetic ---")
+    let sum = 2.5 + 2.5
+    print(sum)
+    
+    print("--- Mixed Arithmetic ---")
+    let mix = 5 + 5.5  # 5 is Literal Int (implicitly casted to float by BinaryOp IR)
+    print(mix)
+    
+    # 5 is literal Integer. 2 is literal Integer.
+    # let div = 5 / 2 
+    # BinaryOp(INT, INT) -> INT. So this is integer division = 2.
+    # If standard inferred as float... 5 and 2 are literals.
+    # Semantic analysis leaves them as Integers.
+    # Let analysis sees BinaryOp(Int, Int). ty is None.
+    # Let promotion logic for ty=None: "If Type::Integer ... promote".
+    # But typed_value is BinaryOp.
+    # My semantic logic only promotes "ExpressionKind::Integer" directly.
+    # Or wraps "Call(@flt)" if complex.
+    # So `5/2` which is Int, will be wrapped in `@flt(5/2)`.
+    # `@flt(2)` -> 2.0.
+    # So `let div = 5/2` -> 2.0. Wait. 
+    # 5/2 (integer division) is 2. @flt(2) is 2.0.
+    # If user expects 2.5, they need `5.0 / 2`.
+    
+    print("--- Division ---")
+    let div_int = 5 / 2
+    print(div_int) # Expect 2.0 (promoted result of int div)
+    
+    let div_flt = 5.0 / 2
+    print(div_flt) # Expect 2.5
+    
+# EXPECT: --- Implicit Float ---
+# EXPECT: 10.000000
+# EXPECT: --- Explicit Int ---
+# EXPECT: 10
+# EXPECT: --- Explicit Float ---
+# EXPECT: 10.500000
+# EXPECT: --- Casts ---
+# EXPECT: 20.000000
+# EXPECT: 20
+# EXPECT: --- Arithmetic ---
+# EXPECT: 5.000000
+# EXPECT: --- Mixed Arithmetic ---
+# EXPECT: 10.500000
+# EXPECT: --- Division ---
+# EXPECT: 2.000000
+# EXPECT: 2.500000
