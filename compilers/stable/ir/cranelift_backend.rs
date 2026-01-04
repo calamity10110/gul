@@ -24,6 +24,9 @@ struct GenContext<'a, 'b> {
     var_counter: &'a mut usize,
     printf_id: FuncId,
     gul_print_float_id: FuncId,
+    gul_input_str_id: FuncId,
+    gul_input_int_id: FuncId,
+    gul_input_flt_id: FuncId,
     format_int_id: DataId,
     format_str_id: DataId,
     string_literals: &'a mut HashMap<String, DataId>,
@@ -71,6 +74,24 @@ impl CraneliftBackend {
         let gul_print_float_id = module.declare_function("gul_print_float", Linkage::Import, &sig_pf)
             .map_err(|e| anyhow!("Failed to declare gul_print_float: {}", e))?;
 
+        // Declare gul_input_str() -> i64 (char*)
+        let mut sig_input_str = module.make_signature();
+        sig_input_str.returns.push(AbiParam::new(types::I64));
+        let gul_input_str_id = module.declare_function("gul_input_str", Linkage::Import, &sig_input_str)
+            .map_err(|e| anyhow!("Failed to declare gul_input_str: {}", e))?;
+
+        // Declare gul_input_int() -> i64
+        let mut sig_input_int = module.make_signature();
+        sig_input_int.returns.push(AbiParam::new(types::I64));
+        let gul_input_int_id = module.declare_function("gul_input_int", Linkage::Import, &sig_input_int)
+            .map_err(|e| anyhow!("Failed to declare gul_input_int: {}", e))?;
+
+        // Declare gul_input_flt() -> f64
+        let mut sig_input_flt = module.make_signature();
+        sig_input_flt.returns.push(AbiParam::new(types::F64));
+        let gul_input_flt_id = module.declare_function("gul_input_flt", Linkage::Import, &sig_input_flt)
+            .map_err(|e| anyhow!("Failed to declare gul_input_flt: {}", e))?;
+
         // Declare format strings
         self.data_description.define(b"%ld\n\0".to_vec().into_boxed_slice());
         let format_int_id = module.declare_data("fmt_int", Linkage::Local, true, false)
@@ -96,6 +117,9 @@ impl CraneliftBackend {
             &mut ctx,
             printf_id,
             gul_print_float_id,
+            gul_input_str_id,
+            gul_input_int_id,
+            gul_input_flt_id,
             format_int_id,
             format_str_id,
             &mut string_literals,
@@ -112,6 +136,9 @@ impl CraneliftBackend {
         ctx: &mut codegen::Context,
         printf_id: FuncId,
         gul_print_float_id: FuncId,
+        gul_input_str_id: FuncId,
+        gul_input_int_id: FuncId,
+        gul_input_flt_id: FuncId,
         format_int_id: DataId,
         format_str_id: DataId,
         string_literals: &mut HashMap<String, DataId>,
@@ -141,6 +168,9 @@ impl CraneliftBackend {
                 var_counter: &mut var_counter,
                 printf_id,
                 gul_print_float_id,
+                gul_input_str_id,
+                gul_input_int_id,
+                gul_input_flt_id,
                 format_int_id,
                 format_str_id,
                 string_literals,
@@ -337,6 +367,40 @@ impl CraneliftBackend {
                         
                         let call_result = ctx.builder.ins().call(printf_ref, &[fmt_ptr, arg]);
                         return Ok(ctx.builder.inst_results(call_result)[0]);
+                    }
+                    
+                    // Handle input() - returns string by default, or typed value
+                    if ident.name == "input" {
+                        // Determine which input function to call based on argument
+                        // input() or input(@str) -> gul_input_str
+                        // input(@int) -> gul_input_int  
+                        // input(@flt) -> gul_input_flt
+                        
+                        let input_type = if call.arguments.is_empty() {
+                            "str" // default to string
+                        } else if let Expression::TypeConstructor(tc) = &call.arguments[0] {
+                            tc.type_name.as_str()
+                        } else {
+                            "str"
+                        };
+                        
+                        match input_type {
+                            "int" => {
+                                let func_ref = ctx.module.declare_func_in_func(ctx.gul_input_int_id, ctx.builder.func);
+                                let call_result = ctx.builder.ins().call(func_ref, &[]);
+                                return Ok(ctx.builder.inst_results(call_result)[0]);
+                            }
+                            "flt" | "float" => {
+                                let func_ref = ctx.module.declare_func_in_func(ctx.gul_input_flt_id, ctx.builder.func);
+                                let call_result = ctx.builder.ins().call(func_ref, &[]);
+                                return Ok(ctx.builder.inst_results(call_result)[0]);
+                            }
+                            _ => { // default to string
+                                let func_ref = ctx.module.declare_func_in_func(ctx.gul_input_str_id, ctx.builder.func);
+                                let call_result = ctx.builder.ins().call(func_ref, &[]);
+                                return Ok(ctx.builder.inst_results(call_result)[0]);
+                            }
+                        }
                     }
                 }
                 Ok(ctx.builder.ins().iconst(types::I64, 0))

@@ -106,6 +106,14 @@ pub fn create_analyzer()  ->  SemanticAnalyzer {
         line: 0,
         column: 0,
     });
+    analyzer.current_scope.symbols.insert("input".to_string(), Symbol{
+        name: "input".to_string(),
+        symbol_type: "fn".to_string(),
+        is_mutable: false,
+        is_function: true,
+        line: 0,
+        column: 0,
+    });
     
     return analyzer;
 

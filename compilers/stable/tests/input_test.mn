@@ -1,0 +1,6 @@
+# GUL Input Test
+
+mn:
+    print(123)
+    let x = input()
+    print(456)
