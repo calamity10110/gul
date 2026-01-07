@@ -1,0 +1,7 @@
+# GUL Input Type Constructor Test
+
+mn:
+    print(100)
+    let x = @int(input())
+    print(x)
+    print(200)

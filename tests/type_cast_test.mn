@@ -1,0 +1,15 @@
+# Comprehensive Type Casting Tests for v3.3 Nightly
+
+# Test 1: int to float
+let x = 10
+let y = @flt(x)
+print(y)
+
+# Test 2: direct literal cast
+var z = @flt(10)
+print(z)
+
+# Test 3: float arithmetic after cast
+let a = 5
+let b = @flt(a) + 2.5
+print(b)

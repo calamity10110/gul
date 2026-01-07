@@ -11,14 +11,15 @@ struct Tensor:
     size: int        # Total elements
     
     # Factory functions
-    @extern("gul_tensor_alloc")
-    fn _alloc(size: int) -> int
+    # Factory functions
+    fn _alloc(size: int) -> int:
+        return gul_tensor_alloc(size)
     
-    @extern("gul_tensor_free")
-    fn _free(ptr: int)
+    fn _free(ptr: int):
+        gul_tensor_free(ptr)
     
-    @extern("gul_tensor_fill")
-    fn _fill(ptr: int, size: int, value: flt)
+    fn _fill(ptr: int, size: int, value: flt):
+        gul_tensor_fill(ptr, size, value)
     
     fn new(shape: vec<int>) -> Tensor:
         var size = 1
@@ -50,11 +51,11 @@ struct Tensor:
 # Tensor Operations (Element-wise)
 # ============================================
 
-@extern("gul_tensor_add")
-fn tensor_add(dst: int, a: int, b: int, size: int)
+fn tensor_add(dst: int, a: int, b: int, size: int):
+    gul_tensor_add(dst, a, b, size)
 
-@extern("gul_tensor_mul")  
-fn tensor_mul(dst: int, a: int, b: int, size: int)
+fn tensor_mul(dst: int, a: int, b: int, size: int):
+    gul_tensor_mul(dst, a, b, size)
 
 fn add(a: Tensor, b: Tensor) -> Tensor:
     var result = Tensor::new(a.shape)
@@ -70,8 +71,8 @@ fn mul(a: Tensor, b: Tensor) -> Tensor:
 # Matrix Operations
 # ============================================
 
-@extern("gul_tensor_matmul")
-fn tensor_matmul(c: int, a: int, b: int, m: int, k: int, n: int)
+fn tensor_matmul(c: int, a: int, b: int, m: int, k: int, n: int):
+    gul_tensor_matmul(c, a, b, m, k, n)
 
 fn matmul(a: Tensor, b: Tensor) -> Tensor:
     # a: [m, k], b: [k, n] -> result: [m, n]
@@ -86,11 +87,11 @@ fn matmul(a: Tensor, b: Tensor) -> Tensor:
 # Reduction Operations
 # ============================================
 
-@extern("gul_tensor_sum")
-fn tensor_sum(ptr: int, size: int) -> flt
+fn tensor_sum(ptr: int, size: int) -> flt:
+    return gul_tensor_sum(ptr, size)
 
-@extern("gul_tensor_mean")
-fn tensor_mean(ptr: int, size: int) -> flt
+fn tensor_mean(ptr: int, size: int) -> flt:
+    return gul_tensor_mean(ptr, size)
 
 fn sum(t: Tensor) -> flt:
     return tensor_sum(t.data, t.size)
@@ -102,14 +103,14 @@ fn mean(t: Tensor) -> flt:
 # ML Activation Functions
 # ============================================
 
-@extern("gul_ml_sigmoid")
-fn _sigmoid(x: flt) -> flt
+fn _sigmoid(x: flt) -> flt:
+    return gul_ml_sigmoid(x)
 
-@extern("gul_ml_tanh")
-fn _tanh(x: flt) -> flt
+fn _tanh(x: flt) -> flt:
+    return gul_ml_tanh(x)
 
-@extern("gul_ml_relu")
-fn _relu(x: flt) -> flt
+fn _relu(x: flt) -> flt:
+    return gul_ml_relu(x)
 
 fn sigmoid(t: Tensor) -> Tensor:
     var result = Tensor::new(t.shape)

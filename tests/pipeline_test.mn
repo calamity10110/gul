@@ -1,0 +1,29 @@
+
+@fn double(x: int) -> int:
+    return x * 2
+
+@fn add(a: int, b: int) -> int:
+    return a + b
+
+mn:
+    # Test 1: Simple pipeline
+    let x = 10
+    let res = x |> double
+    if res == 20: 
+        print("Test 1 Passed")
+    else:
+        print("Test 1 Failed")
+
+    # Test 2: Arithmetic precedence (1+2) |> double -> 6
+    let res2 = 1 + 2 |> double
+    if res2 == 6:
+        print("Test 2 Passed")
+    else:
+        print("Test 2 Failed")
+
+    # Test 3: Pipeline with args: 10 |> add(5) -> add(10, 5)
+    let res3 = 10 |> add(5)
+    if res3 == 15:
+        print("Test 3 Passed")
+    else:
+        print("Test 3 Failed")

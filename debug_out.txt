@@ -1,0 +1,396 @@
+warning: profiles for the non root package will be ignored, specify profiles at the workspace root:
+package:   /media/vu/512gb/blob/gul/compilers/stable/Cargo.toml
+workspace: /media/vu/512gb/blob/gul/Cargo.toml
+warning: profiles for the non root package will be ignored, specify profiles at the workspace root:
+package:   /media/vu/512gb/blob/gul/compilers/nightly/Cargo.toml
+workspace: /media/vu/512gb/blob/gul/Cargo.toml
+    Finished `release` profile [optimized] target(s) in 0.40s
+     Running `target/release/gul-compile tests/pipeline_test.mn`
+ENTER compile_file
+  [1/4] Lexing...
+LDEBUG: pos=0 ch="\n" at_line=true
+LDEBUG: pos=1 ch="@" at_line=true
+LDEBUG: pos=4 ch=" " at_line=false
+LDEBUG: pos=5 ch="d" at_line=false
+LDEBUG: pos=11 ch="(" at_line=false
+LDEBUG: pos=12 ch="x" at_line=false
+LDEBUG: pos=13 ch=":" at_line=false
+LDEBUG: pos=14 ch=" " at_line=false
+LDEBUG: pos=15 ch="i" at_line=false
+LDEBUG: pos=18 ch=")" at_line=false
+LDEBUG: pos=19 ch=" " at_line=false
+LDEBUG: pos=20 ch="-" at_line=false
+LDEBUG: pos=22 ch=" " at_line=false
+LDEBUG: pos=23 ch="i" at_line=false
+LDEBUG: pos=26 ch=":" at_line=false
+LDEBUG: pos=27 ch="\n" at_line=false
+LDEBUG: pos=28 ch=" " at_line=true
+LDEBUG: Pushing INDENT 4
+LDEBUG: pos=32 ch="r" at_line=false
+LDEBUG: pos=38 ch=" " at_line=false
+LDEBUG: pos=39 ch="x" at_line=false
+LDEBUG: pos=40 ch=" " at_line=false
+LDEBUG: pos=41 ch="*" at_line=false
+LDEBUG: pos=42 ch=" " at_line=false
+LDEBUG: pos=43 ch="2" at_line=false
+LDEBUG: pos=44 ch="\n" at_line=false
+LDEBUG: pos=45 ch="\n" at_line=true
+LDEBUG: pos=46 ch="@" at_line=true
+LDEBUG: pos=49 ch=" " at_line=false
+LDEBUG: pos=50 ch="a" at_line=false
+LDEBUG: pos=53 ch="(" at_line=false
+LDEBUG: pos=54 ch="a" at_line=false
+LDEBUG: pos=55 ch=":" at_line=false
+LDEBUG: pos=56 ch=" " at_line=false
+LDEBUG: pos=57 ch="i" at_line=false
+LDEBUG: pos=60 ch="," at_line=false
+LDEBUG: pos=61 ch=" " at_line=false
+LDEBUG: pos=62 ch="b" at_line=false
+LDEBUG: pos=63 ch=":" at_line=false
+LDEBUG: pos=64 ch=" " at_line=false
+LDEBUG: pos=65 ch="i" at_line=false
+LDEBUG: pos=68 ch=")" at_line=false
+LDEBUG: pos=69 ch=" " at_line=false
+LDEBUG: pos=70 ch="-" at_line=false
+LDEBUG: pos=72 ch=" " at_line=false
+LDEBUG: pos=73 ch="i" at_line=false
+LDEBUG: pos=76 ch=":" at_line=false
+LDEBUG: pos=77 ch="\n" at_line=false
+LDEBUG: pos=78 ch=" " at_line=true
+LDEBUG: pos=82 ch="r" at_line=false
+LDEBUG: pos=88 ch=" " at_line=false
+LDEBUG: pos=89 ch="a" at_line=false
+LDEBUG: pos=90 ch=" " at_line=false
+LDEBUG: pos=91 ch="+" at_line=false
+LDEBUG: pos=92 ch=" " at_line=false
+LDEBUG: pos=93 ch="b" at_line=false
+LDEBUG: pos=94 ch="\n" at_line=false
+LDEBUG: pos=95 ch="\n" at_line=true
+LDEBUG: pos=96 ch="m" at_line=true
+LDEBUG: pos=98 ch=":" at_line=false
+LDEBUG: pos=99 ch="\n" at_line=false
+LDEBUG: pos=100 ch=" " at_line=true
+LDEBUG: pos=104 ch="#" at_line=false
+LDEBUG: pos=129 ch="\n" at_line=false
+LDEBUG: pos=130 ch=" " at_line=true
+LDEBUG: pos=134 ch="l" at_line=false
+LDEBUG: pos=137 ch=" " at_line=false
+LDEBUG: pos=138 ch="x" at_line=false
+LDEBUG: pos=139 ch=" " at_line=false
+LDEBUG: pos=140 ch="=" at_line=false
+LDEBUG: pos=141 ch=" " at_line=false
+LDEBUG: pos=142 ch="1" at_line=false
+LDEBUG: pos=144 ch="\n" at_line=false
+LDEBUG: pos=145 ch=" " at_line=true
+LDEBUG: pos=149 ch="l" at_line=false
+LDEBUG: pos=152 ch=" " at_line=false
+LDEBUG: pos=153 ch="r" at_line=false
+LDEBUG: pos=156 ch=" " at_line=false
+LDEBUG: pos=157 ch="=" at_line=false
+LDEBUG: pos=158 ch=" " at_line=false
+LDEBUG: pos=159 ch="x" at_line=false
+LDEBUG: pos=160 ch=" " at_line=false
+LDEBUG: pos=161 ch="|" at_line=false
+LDEBUG: pos=163 ch=" " at_line=false
+LDEBUG: pos=164 ch="d" at_line=false
+LDEBUG: pos=170 ch="\n" at_line=false
+LDEBUG: pos=171 ch=" " at_line=true
+LDEBUG: pos=175 ch="i" at_line=false
+LDEBUG: pos=177 ch=" " at_line=false
+LDEBUG: pos=178 ch="r" at_line=false
+LDEBUG: pos=181 ch=" " at_line=false
+LDEBUG: pos=182 ch="=" at_line=false
+LDEBUG: pos=184 ch=" " at_line=false
+LDEBUG: pos=185 ch="2" at_line=false
+LDEBUG: pos=187 ch=":" at_line=false
+LDEBUG: pos=188 ch=" " at_line=false
+LDEBUG: pos=189 ch="\n" at_line=false
+LDEBUG: pos=190 ch=" " at_line=true
+LDEBUG: Pushing INDENT 8
+LDEBUG: pos=198 ch="p" at_line=false
+LDEBUG: pos=203 ch="(" at_line=false
+LDEBUG: pos=204 ch="\"" at_line=false
+LDEBUG: pos=219 ch=")" at_line=false
+LDEBUG: pos=220 ch="\n" at_line=false
+LDEBUG: pos=221 ch=" " at_line=true
+LDEBUG: pos=225 ch="e" at_line=false
+LDEBUG: pos=229 ch=":" at_line=false
+LDEBUG: pos=230 ch="\n" at_line=false
+LDEBUG: pos=231 ch=" " at_line=true
+LDEBUG: Pushing INDENT 8
+LDEBUG: pos=239 ch="p" at_line=false
+LDEBUG: pos=244 ch="(" at_line=false
+LDEBUG: pos=245 ch="\"" at_line=false
+LDEBUG: pos=260 ch=")" at_line=false
+LDEBUG: pos=261 ch="\n" at_line=false
+LDEBUG: pos=262 ch="\n" at_line=true
+LDEBUG: pos=263 ch=" " at_line=true
+LDEBUG: pos=267 ch="#" at_line=false
+LDEBUG: pos=319 ch="\n" at_line=false
+LDEBUG: pos=320 ch=" " at_line=true
+LDEBUG: pos=324 ch="l" at_line=false
+LDEBUG: pos=327 ch=" " at_line=false
+LDEBUG: pos=328 ch="r" at_line=false
+LDEBUG: pos=332 ch=" " at_line=false
+LDEBUG: pos=333 ch="=" at_line=false
+LDEBUG: pos=334 ch=" " at_line=false
+LDEBUG: pos=335 ch="1" at_line=false
+LDEBUG: pos=336 ch=" " at_line=false
+LDEBUG: pos=337 ch="+" at_line=false
+LDEBUG: pos=338 ch=" " at_line=false
+LDEBUG: pos=339 ch="2" at_line=false
+LDEBUG: pos=340 ch=" " at_line=false
+LDEBUG: pos=341 ch="|" at_line=false
+LDEBUG: pos=343 ch=" " at_line=false
+LDEBUG: pos=344 ch="d" at_line=false
+LDEBUG: pos=350 ch="\n" at_line=false
+LDEBUG: pos=351 ch=" " at_line=true
+LDEBUG: pos=355 ch="i" at_line=false
+LDEBUG: pos=357 ch=" " at_line=false
+LDEBUG: pos=358 ch="r" at_line=false
+LDEBUG: pos=362 ch=" " at_line=false
+LDEBUG: pos=363 ch="=" at_line=false
+LDEBUG: pos=365 ch=" " at_line=false
+LDEBUG: pos=366 ch="6" at_line=false
+LDEBUG: pos=367 ch=":" at_line=false
+LDEBUG: pos=368 ch="\n" at_line=false
+LDEBUG: pos=369 ch=" " at_line=true
+LDEBUG: Pushing INDENT 8
+LDEBUG: pos=377 ch="p" at_line=false
+LDEBUG: pos=382 ch="(" at_line=false
+LDEBUG: pos=383 ch="\"" at_line=false
+LDEBUG: pos=398 ch=")" at_line=false
+LDEBUG: pos=399 ch="\n" at_line=false
+LDEBUG: pos=400 ch=" " at_line=true
+LDEBUG: pos=404 ch="e" at_line=false
+LDEBUG: pos=408 ch=":" at_line=false
+LDEBUG: pos=409 ch="\n" at_line=false
+LDEBUG: pos=410 ch=" " at_line=true
+LDEBUG: Pushing INDENT 8
+LDEBUG: pos=418 ch="p" at_line=false
+LDEBUG: pos=423 ch="(" at_line=false
+LDEBUG: pos=424 ch="f" at_line=false
+LDEBUG: pos=425 ch="\"" at_line=false
+LDEBUG: pos=448 ch=")" at_line=false
+LDEBUG: pos=449 ch="\n" at_line=false
+LDEBUG: pos=450 ch="\n" at_line=true
+LDEBUG: pos=451 ch=" " at_line=true
+LDEBUG: pos=455 ch="#" at_line=false
+LDEBUG: pos=511 ch="\n" at_line=false
+LDEBUG: pos=512 ch=" " at_line=true
+LDEBUG: pos=516 ch="l" at_line=false
+LDEBUG: pos=519 ch=" " at_line=false
+LDEBUG: pos=520 ch="r" at_line=false
+LDEBUG: pos=524 ch=" " at_line=false
+LDEBUG: pos=525 ch="=" at_line=false
+LDEBUG: pos=526 ch=" " at_line=false
+LDEBUG: pos=527 ch="1" at_line=false
+LDEBUG: pos=529 ch=" " at_line=false
+LDEBUG: pos=530 ch="|" at_line=false
+LDEBUG: pos=532 ch=" " at_line=false
+LDEBUG: pos=533 ch="a" at_line=false
+LDEBUG: pos=536 ch="(" at_line=false
+LDEBUG: pos=537 ch="5" at_line=false
+LDEBUG: pos=538 ch=")" at_line=false
+LDEBUG: pos=539 ch="\n" at_line=false
+LDEBUG: pos=540 ch=" " at_line=true
+LDEBUG: pos=544 ch="i" at_line=false
+LDEBUG: pos=546 ch=" " at_line=false
+LDEBUG: pos=547 ch="r" at_line=false
+LDEBUG: pos=551 ch=" " at_line=false
+LDEBUG: pos=552 ch="=" at_line=false
+LDEBUG: pos=554 ch=" " at_line=false
+LDEBUG: pos=555 ch="1" at_line=false
+LDEBUG: pos=557 ch=":" at_line=false
+LDEBUG: pos=558 ch="\n" at_line=false
+LDEBUG: pos=559 ch=" " at_line=true
+LDEBUG: Pushing INDENT 8
+LDEBUG: pos=567 ch="p" at_line=false
+LDEBUG: pos=572 ch="(" at_line=false
+LDEBUG: pos=573 ch="\"" at_line=false
+LDEBUG: pos=588 ch=")" at_line=false
+LDEBUG: pos=589 ch="\n" at_line=false
+LDEBUG: pos=590 ch=" " at_line=true
+LDEBUG: pos=594 ch="e" at_line=false
+LDEBUG: pos=598 ch=":" at_line=false
+LDEBUG: pos=599 ch="\n" at_line=false
+LDEBUG: pos=600 ch=" " at_line=true
+LDEBUG: Pushing INDENT 8
+LDEBUG: pos=608 ch="p" at_line=false
+LDEBUG: pos=613 ch="(" at_line=false
+LDEBUG: pos=614 ch="f" at_line=false
+LDEBUG: pos=615 ch="\"" at_line=false
+LDEBUG: pos=638 ch=")" at_line=false
+LDEBUG: pos=639 ch="\n" at_line=false
+    Lexed 152 tokens
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Fn, value: "@fn", line: 1, column: 1 }
+Token { token_type: Identifier, value: "double", line: 1, column: 1 }
+Token { token_type: LeftParen, value: "(", line: 1, column: 1 }
+Token { token_type: Identifier, value: "x", line: 1, column: 1 }
+Token { token_type: Colon, value: ":", line: 1, column: 1 }
+Token { token_type: Identifier, value: "int", line: 1, column: 1 }
+Token { token_type: RightParen, value: ")", line: 1, column: 1 }
+Token { token_type: Arrow, value: "->", line: 1, column: 1 }
+Token { token_type: Identifier, value: "int", line: 1, column: 1 }
+Token { token_type: Colon, value: ":", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Indent, value: "", line: 1, column: 1 }
+Token { token_type: Return, value: "return", line: 1, column: 1 }
+Token { token_type: Identifier, value: "x", line: 1, column: 1 }
+Token { token_type: Star, value: "*", line: 1, column: 1 }
+Token { token_type: Integer, value: "2", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Fn, value: "@fn", line: 1, column: 1 }
+Token { token_type: Identifier, value: "add", line: 1, column: 1 }
+Token { token_type: LeftParen, value: "(", line: 1, column: 1 }
+Token { token_type: Identifier, value: "a", line: 1, column: 1 }
+Token { token_type: Colon, value: ":", line: 1, column: 1 }
+Token { token_type: Identifier, value: "int", line: 1, column: 1 }
+Token { token_type: Comma, value: ",", line: 1, column: 1 }
+Token { token_type: Identifier, value: "b", line: 1, column: 1 }
+Token { token_type: Colon, value: ":", line: 1, column: 1 }
+Token { token_type: Identifier, value: "int", line: 1, column: 1 }
+Token { token_type: RightParen, value: ")", line: 1, column: 1 }
+Token { token_type: Arrow, value: "->", line: 1, column: 1 }
+Token { token_type: Identifier, value: "int", line: 1, column: 1 }
+Token { token_type: Colon, value: ":", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Return, value: "return", line: 1, column: 1 }
+Token { token_type: Identifier, value: "a", line: 1, column: 1 }
+Token { token_type: Plus, value: "+", line: 1, column: 1 }
+Token { token_type: Identifier, value: "b", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Mn, value: "mn", line: 1, column: 1 }
+Token { token_type: Colon, value: ":", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Let, value: "let", line: 1, column: 1 }
+Token { token_type: Identifier, value: "x", line: 1, column: 1 }
+Token { token_type: Equal, value: "=", line: 1, column: 1 }
+Token { token_type: Integer, value: "10", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Let, value: "let", line: 1, column: 1 }
+Token { token_type: Identifier, value: "res", line: 1, column: 1 }
+Token { token_type: Equal, value: "=", line: 1, column: 1 }
+Token { token_type: Identifier, value: "x", line: 1, column: 1 }
+Token { token_type: Pipeline, value: "|>", line: 1, column: 1 }
+Token { token_type: Identifier, value: "double", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: If, value: "if", line: 1, column: 1 }
+Token { token_type: Identifier, value: "res", line: 1, column: 1 }
+Token { token_type: EqualEqual, value: "==", line: 1, column: 1 }
+Token { token_type: Integer, value: "20", line: 1, column: 1 }
+Token { token_type: Colon, value: ":", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Indent, value: "", line: 1, column: 1 }
+Token { token_type: Identifier, value: "print", line: 1, column: 1 }
+Token { token_type: LeftParen, value: "(", line: 1, column: 1 }
+Token { token_type: String, value: "Test 1 Passed", line: 1, column: 1 }
+Token { token_type: RightParen, value: ")", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Dedent, value: "", line: 1, column: 1 }
+Token { token_type: Else, value: "else", line: 1, column: 1 }
+Token { token_type: Colon, value: ":", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Indent, value: "", line: 1, column: 1 }
+Token { token_type: Identifier, value: "print", line: 1, column: 1 }
+Token { token_type: LeftParen, value: "(", line: 1, column: 1 }
+Token { token_type: String, value: "Test 1 Failed", line: 1, column: 1 }
+Token { token_type: RightParen, value: ")", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Dedent, value: "", line: 1, column: 1 }
+Token { token_type: Let, value: "let", line: 1, column: 1 }
+Token { token_type: Identifier, value: "res2", line: 1, column: 1 }
+Token { token_type: Equal, value: "=", line: 1, column: 1 }
+Token { token_type: Integer, value: "1", line: 1, column: 1 }
+Token { token_type: Plus, value: "+", line: 1, column: 1 }
+Token { token_type: Integer, value: "2", line: 1, column: 1 }
+Token { token_type: Pipeline, value: "|>", line: 1, column: 1 }
+Token { token_type: Identifier, value: "double", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: If, value: "if", line: 1, column: 1 }
+Token { token_type: Identifier, value: "res2", line: 1, column: 1 }
+Token { token_type: EqualEqual, value: "==", line: 1, column: 1 }
+Token { token_type: Integer, value: "6", line: 1, column: 1 }
+Token { token_type: Colon, value: ":", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Indent, value: "", line: 1, column: 1 }
+Token { token_type: Identifier, value: "print", line: 1, column: 1 }
+Token { token_type: LeftParen, value: "(", line: 1, column: 1 }
+Token { token_type: String, value: "Test 2 Passed", line: 1, column: 1 }
+Token { token_type: RightParen, value: ")", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Dedent, value: "", line: 1, column: 1 }
+Token { token_type: Else, value: "else", line: 1, column: 1 }
+Token { token_type: Colon, value: ":", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Indent, value: "", line: 1, column: 1 }
+Token { token_type: Identifier, value: "print", line: 1, column: 1 }
+Token { token_type: LeftParen, value: "(", line: 1, column: 1 }
+Token { token_type: Identifier, value: "f", line: 1, column: 1 }
+Token { token_type: String, value: "Test 2 Failed: {res2}", line: 1, column: 1 }
+Token { token_type: RightParen, value: ")", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Dedent, value: "", line: 1, column: 1 }
+Token { token_type: Let, value: "let", line: 1, column: 1 }
+Token { token_type: Identifier, value: "res3", line: 1, column: 1 }
+Token { token_type: Equal, value: "=", line: 1, column: 1 }
+Token { token_type: Integer, value: "10", line: 1, column: 1 }
+Token { token_type: Pipeline, value: "|>", line: 1, column: 1 }
+Token { token_type: Identifier, value: "add", line: 1, column: 1 }
+Token { token_type: LeftParen, value: "(", line: 1, column: 1 }
+Token { token_type: Integer, value: "5", line: 1, column: 1 }
+Token { token_type: RightParen, value: ")", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: If, value: "if", line: 1, column: 1 }
+Token { token_type: Identifier, value: "res3", line: 1, column: 1 }
+Token { token_type: EqualEqual, value: "==", line: 1, column: 1 }
+Token { token_type: Integer, value: "15", line: 1, column: 1 }
+Token { token_type: Colon, value: ":", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Indent, value: "", line: 1, column: 1 }
+Token { token_type: Identifier, value: "print", line: 1, column: 1 }
+Token { token_type: LeftParen, value: "(", line: 1, column: 1 }
+Token { token_type: String, value: "Test 3 Passed", line: 1, column: 1 }
+Token { token_type: RightParen, value: ")", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Dedent, value: "", line: 1, column: 1 }
+Token { token_type: Else, value: "else", line: 1, column: 1 }
+Token { token_type: Colon, value: ":", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Indent, value: "", line: 1, column: 1 }
+Token { token_type: Identifier, value: "print", line: 1, column: 1 }
+Token { token_type: LeftParen, value: "(", line: 1, column: 1 }
+Token { token_type: Identifier, value: "f", line: 1, column: 1 }
+Token { token_type: String, value: "Test 3 Failed: {res3}", line: 1, column: 1 }
+Token { token_type: RightParen, value: ")", line: 1, column: 1 }
+Token { token_type: Newline, value: "\n", line: 1, column: 1 }
+Token { token_type: Dedent, value: "", line: 1, column: 1 }
+Token { token_type: Dedent, value: "", line: 1, column: 1 }
+Token { token_type: Eof, value: "", line: 1, column: 1 }
+  [2/4] Parsing...
+    Parser: parse_program start
+Parse error: Expected indented block for function body
+Parse error: Expected ':' after if condition
+Parse error: Expected indented block
+Parse error: Expected ':' after if condition
+Parse error: Expected indented block
+Parse error: Expected ')'
+Parse error: Expected ':' after if condition
+Parse error: Expected indented block
+Parse error: Expected ')'
+Semantic error at 1:1: Undefined variable 'f'
+Semantic error at 1:1: Undefined variable 'f'
+Compilation failed!
+DEBUG: Result fields available? (Check interpreter debug)
+DEBUG: errors var type: Vec<String>
+Errors list length: 2
+  Semantic error at 1:1: Undefined variable 'f'
+  Semantic error at 1:1: Undefined variable 'f'

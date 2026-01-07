@@ -8,6 +8,7 @@ use std::collections::HashMap;
 pub enum Precedence {
     NoPrec,
     Assignment,
+    Pipeline, // |>
     Or,
     And,
     Comparison,
@@ -17,7 +18,7 @@ pub enum Precedence {
     Range,
     Prefix,
     Call,
-    Pipeline, // |>
+    // Pipeline, // Moved up
     Index,
     Unpack,
 
@@ -158,6 +159,100 @@ impl Parser {
             // Skip whitespace tokens and try again
             return self.parse_prefix();
         }
+        else if t_type == TokenType::Await {
+             // Await expression: await future
+             let await_token = self.advance(); // consume await
+             let right = self.parse_expression(Precedence::Prefix);
+             return Expression::Await(AwaitExpr{
+                 node: create_node(await_token.line, await_token.column), 
+                 value: Box::new(right)
+             });
+        }
+        else if t_type == TokenType::AtTabl {
+             return self.parse_tabl_literal();
+        }
+        // Handle type constructor tokens as identifiers for backend processing
+        else if t_type == TokenType::AtInt {
+             return Expression::Identifier(IdentifierExpr{node: ASTNode{line: 1, column: 1}, name: "@int".to_string()});
+        }
+        else if t_type == TokenType::AtFloat {
+             return Expression::Identifier(IdentifierExpr{node: ASTNode{line: 1, column: 1}, name: "@float".to_string()});
+        }
+        else if t_type == TokenType::AtStr {
+             return Expression::Identifier(IdentifierExpr{node: ASTNode{line: 1, column: 1}, name: "@str".to_string()});
+        }
+        else if t_type == TokenType::AtBool {
+             return Expression::Identifier(IdentifierExpr{node: ASTNode{line: 1, column: 1}, name: "@bool".to_string()});
+        }
+        else if t_type == TokenType::AtList {
+             // @list[1, 2, 3] syntax
+             if self.current().token_type == TokenType::LeftBracket {
+                 self.advance(); // consume '['
+                 let mut elements = vec![];
+                 while self.current().token_type != TokenType::RightBracket && self.current().token_type != TokenType::Eof {
+                     elements.push(self.parse_expression(Precedence::NoPrec));
+                     if !self.match_token(TokenType::Comma) {
+                         break;
+                     }
+                 }
+                 self.expect(TokenType::RightBracket, "Expected ']' after list elements".to_string());
+                 return Expression::List(ListExpr{node: ASTNode{line: 1, column: 1}, elements: elements});
+             }
+             return Expression::Identifier(IdentifierExpr{node: ASTNode{line: 1, column: 1}, name: "@list".to_string()});
+        }
+        else if t_type == TokenType::AtDict {
+             // @dict{key: value, ...} syntax
+             if self.current().token_type == TokenType::LeftBrace {
+                 self.advance(); // consume '{'
+                 self.skip_newlines();
+                 let mut pairs = vec![];
+                 while self.current().token_type != TokenType::RightBrace && self.current().token_type != TokenType::Eof {
+                     // Parse key
+                     let key = if self.current().token_type == TokenType::Identifier {
+                         let key_token = self.advance();
+                         Expression::Literal(LiteralExpr{node: ASTNode{line: 1, column: 1}, value: key_token.value, value_type: TokenType::String})
+                     } else {
+                         self.parse_expression(Precedence::NoPrec)
+                     };
+                     self.expect(TokenType::Colon, "Expected ':' after dict key".to_string());
+                     let value = self.parse_expression(Precedence::NoPrec);
+                     pairs.push((key, value));
+                     if !self.match_token(TokenType::Comma) {
+                         self.skip_newlines();
+                         if self.current().token_type != TokenType::RightBrace {
+                             continue;
+                         }
+                         break;
+                     }
+                     self.skip_newlines();
+                 }
+                 self.expect(TokenType::RightBrace, "Expected '}' after dict entries".to_string());
+                 return Expression::Dict(DictExpr{node: ASTNode{line: 1, column: 1}, pairs: pairs});
+             }
+             return Expression::Identifier(IdentifierExpr{node: ASTNode{line: 1, column: 1}, name: "@dict".to_string()});
+        }
+        else if t_type == TokenType::AtSet {
+             // @set{1, 2, 3} syntax
+             if self.current().token_type == TokenType::LeftBrace {
+                 self.advance(); // consume '{'
+                 let mut elements = vec![];
+                 while self.current().token_type != TokenType::RightBrace && self.current().token_type != TokenType::Eof {
+                     elements.push(self.parse_expression(Precedence::NoPrec));
+                     if !self.match_token(TokenType::Comma) {
+                         break;
+                     }
+                 }
+                 self.expect(TokenType::RightBrace, "Expected '}' after set elements".to_string());
+                 return Expression::Set(SetExpr{node: ASTNode{line: 1, column: 1}, elements: elements});
+             }
+             return Expression::Identifier(IdentifierExpr{node: ASTNode{line: 1, column: 1}, name: "@set".to_string()});
+        }
+        else if t_type == TokenType::AtTensor {
+             return Expression::Identifier(IdentifierExpr{node: ASTNode{line: 1, column: 1}, name: "@tensor".to_string()});
+        }
+        else if t_type == TokenType::AtTuple {
+             return Expression::Identifier(IdentifierExpr{node: ASTNode{line: 1, column: 1}, name: "@tuple".to_string()});
+        }
         return Expression::Literal(LiteralExpr{node: ASTNode{line: 1, column: 1}, value: "None".to_string(), value_type: TokenType::NoneLiteral});
 
     }
@@ -204,6 +299,55 @@ impl Parser {
             }
             self.expect(TokenType::RightParen, "Expected ')'".to_string());
             return Expression::Call(CallExpr{node: ASTNode{line: 1, column: 1}, callee: Box::new(left), arguments: args, keyword_args: HashMap::new()});
+        }
+        else if token.token_type == TokenType::Dot {
+            // Attribute access or method call: obj.attr or obj.method(args)
+            let attr_token = self.expect(TokenType::Identifier, "Expected attribute name after '.'".to_string());
+            let attr_name = attr_token.value;
+            
+            // Check if this is a method call (followed by parentheses)
+            if self.current().token_type == TokenType::LeftParen {
+                self.advance(); // consume '('
+                let mut args = vec![];
+                if self.current().token_type != TokenType::RightParen {
+                    args.push(self.parse_expression(Precedence::NoPrec));
+                    while self.match_token(TokenType::Comma) {
+                        args.push(self.parse_expression(Precedence::NoPrec));
+                    }
+                }
+                self.expect(TokenType::RightParen, "Expected ')' after method arguments".to_string());
+                
+                // Create a method call expression
+                // Transform obj.method(args) into a Call with Attribute as callee
+                let attr_expr = Expression::Attribute(AttributeExpr{
+                    node: ASTNode{line: 1, column: 1},
+                    object: Box::new(left),
+                    attribute: attr_name
+                });
+                return Expression::Call(CallExpr{
+                    node: ASTNode{line: 1, column: 1},
+                    callee: Box::new(attr_expr),
+                    arguments: args,
+                    keyword_args: HashMap::new()
+                });
+            } else {
+                // Just attribute access
+                return Expression::Attribute(AttributeExpr{
+                    node: ASTNode{line: 1, column: 1},
+                    object: Box::new(left),
+                    attribute: attr_name
+                });
+            }
+        }
+        else if token.token_type == TokenType::LeftBracket {
+            // Index access: obj[index]
+            let index = self.parse_expression(Precedence::NoPrec);
+            self.expect(TokenType::RightBracket, "Expected ']' after index".to_string());
+            return Expression::Index(IndexExpr{
+                node: ASTNode{line: 1, column: 1},
+                object: Box::new(left),
+                index: Box::new(index)
+            });
         }
         return left;
 
@@ -299,12 +443,17 @@ impl Parser {
         let token = self.current();
 
         match token.token_type {
-            // Declarations (TODO)
+            // Check for decorators (Identifier starting with @)
+            TokenType::Identifier if token.value.starts_with("@") => {
+                 return self.parse_decorated_declaration();
+            },
+            
+            // Declarations
             TokenType::Let => return self.parse_let_statement(),
             TokenType::Var => return self.parse_var_statement(),
-            TokenType::Fn => return self.parse_function_declaration(),
+            TokenType::Fn => return self.parse_function_declaration(vec![]), // Function declarations without decorators
             // TokenType.Async => return self.parse_async_function_declaration()
-            // TokenType.Struct => return self.parse_struct_declaration()
+            TokenType::Struct => return self.parse_struct_declaration(),
             // TokenType.Enum => return self.parse_enum_declaration()
 
             // Control flow
@@ -320,16 +469,16 @@ impl Parser {
             TokenType::Return => return self.parse_return_statement(),
 
             // Error handling
-            // TokenType.Try => return self.parse_try_statement()
+            TokenType::Try => return self.parse_try_statement(),
 
-            // Imports
+            // Imports: @imp is a single token type usually
             TokenType::AtImp => return self.parse_import(),
 
-            // Foreign code
-            // TokenType.AtPython => return self.parse_foreign_block("python")
-            // TokenType.AtRust => return self.parse_foreign_block("rust")
-            // TokenType.AtJs => return self.parse_foreign_block("js")
-            // TokenType.AtSql => return self.parse_foreign_block("sql")
+            // Foreign code: specific tokens
+            TokenType::AtPython => return self.parse_foreign_block("python"),
+            TokenType::AtRust => return self.parse_foreign_block("rust"),
+            TokenType::AtJs => return self.parse_foreign_block("js"),
+            TokenType::AtSql => return self.parse_foreign_block("sql"),
 
             _ =>
                 // Try parsing as expression statement or assignment
@@ -385,9 +534,42 @@ impl Parser {
         });
 
     }
-    pub fn parse_function_declaration(&mut self)  ->  Statement {
+    pub fn parse_decorated_declaration(&mut self) -> Statement {
+        // Parse declaration preceded by decorators
+        let mut decorators = vec![];
+        
+        // In current lexer, @name is tokenized as Identifier(value="@name") unless it's a specific keyword.
+        // So we look for Identifiers starting with @.
+        while self.current().token_type == TokenType::Identifier && self.current().value.starts_with("@") {
+            let token = self.advance();
+            decorators.push(token.value);
+            self.skip_newlines(); 
+        }
+        
+        // Now expect a function declaration (or potentially others later)
+        if self.match_token(TokenType::Fn) {
+             return self.parse_function_declaration(decorators);
+        } else if self.current().token_type == TokenType::Fn {
+             return self.parse_function_declaration(decorators);
+        } else {
+             // If we consumed decorators but didn't find a function, it's an error (or a standalone statement?)
+             // For now, error.
+             if !decorators.is_empty() {
+                 println!("Parse Error: Expected declaration after decorators");
+             }
+             // Fallback or re-dispatch? 
+             // If no decorators were found, we shouldn't be here really, but the match arm calls this for 'At'.
+             // Wait, the match arm in parse_statement calls this for 'TokenType::At'.
+             // But we just established 'At' doesn't exist.
+             // We need to fix parse_statement too!
+             
+             return Statement::PassStmt(PassStmt{node: create_node(0,0)}); 
+        }
+    }
+
+    pub fn parse_function_declaration(&mut self, decorators: Vec<String>)  ->  Statement {
         // Parse function: fn add(a, b) -> int: ...// 
-        let fn_token = self.advance();
+        let fn_token = self.advance(); // Consumes 'fn'
 
         // Optional return type annotation before name
         let mut return_type = "".to_string();
@@ -432,7 +614,7 @@ impl Parser {
             parameters: parameters,
             return_type: return_type,
             body: body,
-            decorators: vec![],
+            decorators: decorators,
         });
 
     }
@@ -559,6 +741,119 @@ impl Parser {
         });
 
     }
+    pub fn parse_tabl_literal(&mut self) -> Expression {
+        // @tabl { (col1, col2): row1: {1, 2} }
+        // Note: @tabl token was already consumed by parse_prefix
+        let mut is_sparse = false;
+        
+        if self.current().token_type == TokenType::Identifier && self.current().value == "sparse".to_string() {
+             is_sparse = true;
+             self.advance();
+        }
+
+        self.expect(TokenType::LeftBrace, "Expected '{' for table".to_string());
+        self.skip_newlines();
+        
+        // Columns: (c1, c2):
+        self.expect(TokenType::LeftParen, "Expected '(' for columns".to_string());
+        let mut columns = vec![];
+        while !self.match_token(TokenType::RightParen) {
+            let col = self.expect(TokenType::Identifier, "Expected column name".to_string());
+            columns.push(col.value);
+            if !self.match_token(TokenType::Comma) {
+                 if self.current().token_type != TokenType::RightParen {
+                      // Skip if not comma and not paren
+                 }
+            }
+        }
+        self.expect(TokenType::Colon, "Expected ':' after columns".to_string());
+        self.skip_newlines();
+
+        // Rows
+        let mut rows = vec![];
+        while self.current().token_type != TokenType::RightBrace && self.current().token_type != TokenType::Eof {
+             if self.current().token_type == TokenType::Newline {
+                 self.advance();
+                 continue;
+             }
+             if self.current().token_type == TokenType::Dedent {
+                 self.advance();
+                 continue;
+             }
+             
+             let row_name = self.expect(TokenType::Identifier, "Expected row name".to_string());
+             self.expect(TokenType::Colon, "Expected ':'".to_string());
+             self.expect(TokenType::LeftBrace, "Expected '{'".to_string());
+             let mut values = vec![];
+             while self.current().token_type != TokenType::RightBrace && self.current().token_type != TokenType::Eof {
+                  values.push(self.parse_expression(Precedence::NoPrec));
+                  if !self.match_token(TokenType::Comma) {
+                       break;
+                  }
+             }
+             self.expect(TokenType::RightBrace, "Expected '}'".to_string());
+             rows.push(TableRow{name: row_name.value, values: values});
+             
+             self.match_token(TokenType::Comma);
+             self.skip_newlines();
+        }
+        self.match_token(TokenType::RightBrace);
+
+        return Expression::Table(TableExpr{
+             node: create_node(1, 1),
+             columns: columns,
+             rows: rows,
+             is_sparse: is_sparse
+        });
+    }
+
+    pub fn parse_try_statement(&mut self) -> Statement {
+         // try: block catch e: block finally: block
+         let try_token = self.advance(); // consume try
+         self.expect(TokenType::Colon, "Expected ':' after try".to_string());
+         self.skip_newlines();
+         self.expect(TokenType::Indent, "Expected indented block for try".to_string());
+         let try_body = self.parse_block();
+         
+         let mut catch_clauses = vec![];
+         let mut finally_body = vec![];
+         
+         // Catch clauses
+         while self.match_token(TokenType::Catch) {
+              let mut var_name = "e".to_string();
+              let mut exc_type = "Exception".to_string();
+              
+              if self.current().token_type == TokenType::Identifier {
+                   var_name = self.advance().value;
+              }
+              
+              self.expect(TokenType::Colon, "Expected ':' after catch".to_string());
+              self.skip_newlines();
+              self.expect(TokenType::Indent, "Expected indented block for catch".to_string());
+              let catch_body = self.parse_block();
+              
+              catch_clauses.push(CatchClause{
+                  exception_type: exc_type,
+                  variable_name: var_name,
+                  body: catch_body
+              });
+         }
+         
+         // Finally
+         if self.match_token(TokenType::Finally) {
+              self.expect(TokenType::Colon, "Expected ':' after finally".to_string());
+              self.skip_newlines();
+              self.expect(TokenType::Indent, "Expected indented block for finally".to_string());
+              finally_body = self.parse_block();
+         }
+         
+         return Statement::TryStmt(TryStmt{
+             node: create_node(try_token.line, try_token.column),
+             try_body: try_body,
+             catch_clauses: catch_clauses,
+             finally_body: finally_body
+         });
+    }
     pub fn parse_for_statement(&mut self)  ->  Statement {
         // Parse for loop: for x in items:// 
         let for_token = self.advance();
@@ -659,5 +954,100 @@ impl Parser {
         while self.current_pos < (self.tokens).len() && self.tokens[self.current_pos].token_type == TokenType::Newline {
             self.advance();
         }
+    }
+
+    pub fn parse_struct_declaration(&mut self) -> Statement {
+        // Parse struct: struct Point:
+        //     x: int
+        //     y: int
+        //     fn new(): ...
+        let struct_token = self.advance();
+        let name_token = self.expect(TokenType::Identifier, "Expected struct name".to_string());
+        let name = name_token.value;
+        
+        self.expect(TokenType::Colon, "Expected ':' after struct name".to_string());
+        self.skip_newlines();
+        self.expect(TokenType::Indent, "Expected indented block for struct body".to_string());
+        
+        let mut fields = vec![];
+        let mut methods = vec![];
+        
+        while !self.is_at_end() && self.current().token_type != TokenType::Dedent {
+            self.skip_newlines();
+            if self.current().token_type == TokenType::Dedent {
+                break;
+            }
+            
+            // Check for method (fn)
+            if self.current().token_type == TokenType::Fn {
+                let func_stmt = self.parse_function_declaration(vec![]);
+                if let Statement::FunctionDecl(decl) = func_stmt {
+                    methods.push(decl);
+                }
+            } else if self.current().token_type == TokenType::Identifier {
+                // Parse field: name: type
+                let field_name = self.advance().value;
+                self.expect(TokenType::Colon, "Expected ':' after field name".to_string());
+                let field_type = self.expect(TokenType::Identifier, "Expected field type".to_string());
+                
+                fields.push(StructField {
+                    name: field_name,
+                    type_annotation: field_type.value,
+                });
+            } else {
+                // Skip invalid token or error
+                // For robustness, maybe just error?
+                // self.advance();
+                // But let's error to be strict
+                 // self.error("Expected field or method declaration in struct".to_string());
+                 // Since error panic? No.
+                 // Just break loop or advance.
+                 self.advance();
+            }
+        }
+        self.match_token(TokenType::Dedent);
+        
+        return Statement::StructDecl(StructDecl{
+            node: create_node(struct_token.line, struct_token.column),
+            name: name,
+            fields: fields,
+            methods: methods,
+        });
+    }
+
+    pub fn parse_foreign_block(&mut self, lang: &str) -> Statement {
+        // Parse foreign block: @python: ...
+        let token = self.advance(); // The @python token
+        
+        self.expect(TokenType::Colon, "Expected ':' after foreign block tag".to_string());
+        self.skip_newlines();
+        
+        self.expect(TokenType::Indent, "Expected indented block".to_string());
+        let mut code = "".to_string();
+        // Consume everything until Dedent?
+        // Note: Lexer likely produces tokens for content? 
+        // If content is pure text, Lexer might fail?
+        // We assume Lexer tokenizes content as Identifiers/Symbols/Literals.
+        // Reconstructing source is hard without raw text.
+        // For now, we stub by consuming tokens.
+        while !self.is_at_end() && self.current().token_type != TokenType::Dedent {
+             // Append token value? Spaces lost?
+             if self.current().token_type == TokenType::String {
+                 code.push_str(&self.current().value);
+             } else if self.current().token_type == TokenType::Identifier {
+                 code.push_str(&self.current().value);
+                 code.push(' ');
+             } else {
+                 code.push_str(" "); // Placeholder
+             }
+             self.advance();
+        }
+        self.match_token(TokenType::Dedent);
+        
+        return Statement::ForeignCodeBlock(ForeignCodeBlock{
+            node: create_node(token.line, token.column),
+            language: lang.to_string(),
+            code: code,
+        });
     }
 }

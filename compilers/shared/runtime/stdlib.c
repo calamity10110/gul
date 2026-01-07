@@ -2,6 +2,7 @@
 // Shared between gul_stable and gul_nightly compilers
 // Linked with compiled GUL programs via cc
 
+#include <math.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -96,6 +97,234 @@ int64_t gul_input_str() {
 
   return (int64_t)buffer;
 }
+// ============================================================================
+// Auto-Differentiation (Tape / Wengert List)
+// ============================================================================
+
+#define MAX_TAPE_NODES 10000
+
+typedef enum {
+  OP_NONE,
+  OP_ADD,
+  OP_SUB,
+  OP_MUL,
+  OP_DIV,
+  OP_SIN,
+  OP_COS,
+  OP_EXP,
+  OP_LOG,
+  OP_POW
+} OpType;
+
+typedef struct {
+  OpType op;
+  double value;
+  double grad;
+  int parents[2]; // Indices into tape, -1 if leaf/none
+  int computed;   // For topological sort/visitation if needed
+} Node;
+
+typedef struct {
+  Node nodes[MAX_TAPE_NODES];
+  int count;
+  int active;
+} Tape;
+
+Tape global_tape = {.count = 0, .active = 0};
+
+// Reset and enable tape
+void gul_autograd_begin() {
+  global_tape.count = 0;
+  global_tape.active = 1;
+  // node 0 can be null/unused or just start from 0
+}
+
+// Disable tape
+void gul_autograd_end() { global_tape.active = 0; }
+
+// Helper to add node
+int tape_add_node(OpType op, double val, int p1, int p2) {
+  if (!global_tape.active)
+    return -1;
+  if (global_tape.count >= MAX_TAPE_NODES) {
+    fprintf(stderr, "GUL Runtime: Autograd tape overflow\n");
+    return -1; // Fail gracefully-ish?
+  }
+  int idx = global_tape.count++;
+  Node *n = &global_tape.nodes[idx];
+  n->op = op;
+  n->value = val;
+  n->grad = 0.0;
+  n->parents[0] = p1;
+  n->parents[1] = p2;
+  return idx;
+}
+
+// Primitives wrappers that record checking global_tape.active
+// These are what the builtins will call if simple scalar AD is used.
+// For tensors, we'd need similar logic but with tensor pointers.
+
+double gul_grad_add(double a, double b, int ia, int ib) {
+  double res = a + b;
+  return res;
+  // Wait, we need to return the index if we are tracking indices?
+  // The current GUL runtime passes values, not node indices.
+  // This implies immediate mode AD requires value objects (structs) to hold
+  // indices. Since GUL variables are just values (f64), we can't easily attach
+  // gradients to them without changing the memory model of a 'float' to be a
+  // struct { val, index }.
+  //
+  // ALTERNATIVE: The "Tape" just records operations on *values*?
+  // No, Wengert lists need to identify which implementation variable
+  // corresponds to which node.
+  //
+  // Given GUL's current stage (bare primitives), true AD requires wrapping
+  // floats in a struct. We can't do that easily without changing the compiler
+  // to emit struct usage for floats inside @grad blocks.
+  //
+  // COMPROMISE for Milestone 4:
+  // We implement the Runtime Metadata part mainly for TENSORS (which are
+  // pointers/structs). For Scalars, unless we boxed them, we can't track them.
+  //
+  // Let's assume this AD system is primarily for TENSORS or specific `Var`
+  // objects. But the user example verifying `sin(x)` implies scalars.
+  //
+  // If we want scalar AD, we need a `GradientVar` struct.
+  // Let's implement `gul_backward()` which assumes the last node is the loss.
+}
+
+// Scalar AD Helper
+// Wrapper for a scalar that is tracked on the tape
+typedef struct {
+  double value;
+  int index; // Index in the tape
+} ScalarVar;
+
+// Constructor
+int64_t gul_make_var(double val) {
+  ScalarVar *v = malloc(sizeof(ScalarVar));
+  if (!v) {
+    fprintf(stderr, "GUL Runtime: Out of memory in gul_make_var\n");
+    exit(1);
+  }
+  if (global_tape.active) {
+    v->index = tape_add_node(OP_NONE, val, -1, -1);
+  } else {
+    v->index = -1;
+  }
+  v->value = val;
+  return (int64_t)v;
+}
+
+// Get value
+double gul_var_val(int64_t handle) {
+  if (!handle)
+    return 0.0;
+  return ((ScalarVar *)handle)->value;
+}
+
+// Get grad
+double gul_var_grad(int64_t handle) {
+  if (!handle)
+    return 0.0;
+  ScalarVar *v = (ScalarVar *)handle;
+  if (v->index >= 0 && v->index < global_tape.count) {
+    return global_tape.nodes[v->index].grad;
+  }
+  return 0.0;
+}
+
+// Operations
+int64_t gul_var_add(int64_t a_ptr, int64_t b_ptr) {
+  ScalarVar *a = (ScalarVar *)a_ptr;
+  ScalarVar *b = (ScalarVar *)b_ptr;
+  double val = a->value + b->value;
+
+  ScalarVar *res = (ScalarVar *)gul_make_var(val);
+  if (global_tape.active && a->index >= 0 && b->index >= 0) {
+    ((ScalarVar *)res)->index = tape_add_node(OP_ADD, val, a->index, b->index);
+  }
+  return (int64_t)res;
+}
+
+int64_t gul_var_mul(int64_t a_ptr, int64_t b_ptr) {
+  ScalarVar *a = (ScalarVar *)a_ptr;
+  ScalarVar *b = (ScalarVar *)b_ptr;
+  double val = a->value * b->value;
+
+  ScalarVar *res = (ScalarVar *)gul_make_var(val);
+  if (global_tape.active && a->index >= 0 && b->index >= 0) {
+    ((ScalarVar *)res)->index = tape_add_node(OP_MUL, val, a->index, b->index);
+  }
+  return (int64_t)res;
+}
+
+int64_t gul_var_sin(int64_t a_ptr) {
+  ScalarVar *a = (ScalarVar *)a_ptr;
+  double val = sin(a->value);
+
+  ScalarVar *res = (ScalarVar *)gul_make_var(val);
+  if (global_tape.active && a->index >= 0) {
+    ((ScalarVar *)res)->index = tape_add_node(OP_SIN, val, a->index, -1);
+  }
+  return (int64_t)res;
+}
+
+void gul_run_backward(int root_idx);
+
+void gul_backward(int64_t root_ptr) {
+  ScalarVar *root = (ScalarVar *)root_ptr;
+  if (root && root->index >= 0) {
+    gul_run_backward(root->index);
+  }
+}
+
+// For now, let's implement the Tape for potential future use or for Tensor AD
+// where we *do* have handles (int64_t pointers).
+
+void gul_run_backward(int root_idx) {
+  if (root_idx < 0 || root_idx >= global_tape.count)
+    return;
+
+  global_tape.nodes[root_idx].grad = 1.0;
+
+  for (int i = root_idx; i >= 0; i--) {
+    Node *n = &global_tape.nodes[i];
+    if (n->grad == 0.0)
+      continue;
+
+    double g = n->grad;
+    int p1 = n->parents[0];
+    int p2 = n->parents[1];
+
+    switch (n->op) {
+    case OP_ADD:
+      if (p1 >= 0)
+        global_tape.nodes[p1].grad += g;
+      if (p2 >= 0)
+        global_tape.nodes[p2].grad += g;
+      break;
+    case OP_MUL:
+      // z = x * y
+      // dx = y * dz
+      if (p1 >= 0)
+        global_tape.nodes[p1].grad +=
+            g * (p2 >= 0 ? global_tape.nodes[p2].value
+                         : 0.0); // Wait, need value of p2
+      if (p2 >= 0)
+        global_tape.nodes[p2].grad +=
+            g * (p1 >= 0 ? global_tape.nodes[p1].value : 0.0);
+      break;
+    case OP_SIN:
+      // z = sin(x) -> dz/dx = cos(x)
+      if (p1 >= 0)
+        global_tape.nodes[p1].grad += g * cos(global_tape.nodes[p1].value);
+      break;
+    default:
+      break;
+    }
+  }
+}
 
 // Read integer from stdin
 int64_t gul_input_int() {
@@ -123,6 +352,42 @@ double gul_input_flt() {
   while ((c = getchar()) != '\n' && c != EOF)
     ;
   return value;
+}
+
+// ============================================================================
+// File I/O Operations (for data loading)
+// ============================================================================
+
+// Open file
+int64_t gul_file_open(int64_t path_ptr, int64_t mode_ptr) {
+  const char *path = (const char *)path_ptr;
+  const char *mode = (const char *)mode_ptr;
+  FILE *f = fopen(path, mode);
+  if (!f)
+    return 0;
+  return (int64_t)f;
+}
+
+// Close file
+void gul_file_close(int64_t file_ptr) {
+  if (file_ptr)
+    fclose((FILE *)file_ptr);
+}
+
+// Read line from file
+int64_t gul_file_read_line(int64_t file_ptr) {
+  if (!file_ptr)
+    return 0;
+  char *buffer = malloc(4096); // 4KB support for now
+  if (fgets(buffer, 4096, (FILE *)file_ptr)) {
+    // Remove trailing newline
+    size_t len = strlen(buffer);
+    if (len > 0 && buffer[len - 1] == '\n')
+      buffer[len - 1] = '\0';
+    return (int64_t)buffer;
+  }
+  free(buffer);
+  return 0; // EOF or error
 }
 
 // ============================================================================
@@ -388,3 +653,466 @@ void gul_tensor_mul_simd(int64_t dst, int64_t a, int64_t b, int64_t size) {
     d[i] = x[i] * y[i];
   }
 }
+
+// ============================================================================
+// String Utilities
+// ============================================================================
+
+// String Length
+int64_t gul_string_len(int64_t s_ptr) {
+  char *s = (char *)s_ptr;
+  if (!s)
+    return 0;
+  return (int64_t)strlen(s);
+}
+
+// Substring
+int64_t gul_string_substr(int64_t s_ptr, int64_t start, int64_t length) {
+  char *s = (char *)s_ptr;
+  if (!s)
+    return (int64_t)"";
+
+  size_t full_len = strlen(s);
+  if (start < 0 || start >= full_len)
+    return (int64_t)"";
+
+  size_t actual_len = length;
+  if (start + length > full_len) {
+    actual_len = full_len - start;
+  }
+
+  char *res = malloc(actual_len + 1);
+  if (!res) {
+    fprintf(stderr, "GUL Runtime: Out of memory in substr\n");
+    exit(1);
+  }
+
+  strncpy(res, s + start, actual_len);
+  res[actual_len] = '\0';
+  return (int64_t)res;
+}
+
+// Char at index (returns string of length 1)
+int64_t gul_string_get(int64_t s_ptr, int64_t index) {
+  return gul_string_substr(s_ptr, index, 1);
+}
+
+// Foreign Code Execution Stub
+void gul_exec_foreign(int64_t lang_ptr, int64_t code_ptr) {
+  char *lang = (char *)lang_ptr;
+  char *code = (char *)code_ptr;
+  if (!lang || !code)
+    return;
+
+  printf("--- Executing Foreign Code [%s] ---\n", lang);
+  // In future: spawn process or use FFI
+  // For now, just simulate execution via shell for verification
+  if (strcmp(lang, "python") == 0) {
+    char cmd[1024];
+    // Only run if simple?
+    snprintf(cmd, 1024, "python3 -c \"%s\"", code);
+    printf("Running: %s\n", cmd);
+    int res = system(cmd);
+    if (res != 0)
+      printf("Foreign code failed code: %d\n", res);
+  } else {
+    printf("%s\n", code);
+  }
+  printf("--- End Foreign Code ---\n");
+}
+
+// ============================================================================
+// Table Operations (GUL v4.0)
+// ============================================================================
+
+typedef struct {
+  char *name;
+  double *values; // Assumes numeric for v3.3 strictness
+} GulTableRow;
+
+typedef struct {
+  int col_count;
+  int row_count;
+  char **column_names;
+  GulTableRow *rows;
+} GulTable;
+
+int64_t gul_table_alloc(int64_t col_count, int64_t row_count) {
+  GulTable *t = (GulTable *)malloc(sizeof(GulTable));
+  if (!t) exit(1);
+  t->col_count = col_count;
+  t->row_count = row_count;
+  t->column_names = (char **)malloc(col_count * sizeof(char *));
+  t->rows = (GulTableRow *)malloc(row_count * sizeof(GulTableRow));
+  if (!t->column_names || !t->rows) exit(1);
+  return (int64_t)t;
+}
+
+void gul_table_set_col_name(int64_t table_ptr, int64_t idx, int64_t name_ptr) {
+  GulTable *t = (GulTable *)table_ptr;
+  if (idx >= 0 && idx < t->col_count) {
+    t->column_names[idx] = strdup((char *)name_ptr);
+  }
+}
+
+void gul_table_set_row(int64_t table_ptr, int64_t idx, int64_t name_ptr, int64_t values_ptr) {
+  GulTable *t = (GulTable *)table_ptr;
+  if (idx >= 0 && idx < t->row_count) {
+    t->rows[idx].name = strdup((char *)name_ptr);
+    t->rows[idx].values = (double *)values_ptr;
+  }
+}
+
+int64_t gul_table_get_cell(int64_t table_ptr, int64_t row_idx, int64_t col_idx) {
+  GulTable *t = (GulTable *)table_ptr;
+  if (row_idx >= 0 && row_idx < t->row_count && col_idx >= 0 && col_idx < t->col_count) {
+    double val = t->rows[row_idx].values[col_idx];
+    // Return as int64 representation of the double bits
+    int64_t *ptr = (int64_t*)&val;
+    return *ptr;
+  }
+  return 0;
+}
+
+void gul_table_free(int64_t table_ptr) {
+  GulTable *t = (GulTable *)table_ptr;
+  if (!t) return;
+  for (int i = 0; i < t->col_count; i++) {
+    free(t->column_names[i]);
+  }
+  free(t->column_names);
+  for (int i = 0; i < t->row_count; i++) {
+    free(t->rows[i].name);
+    free(t->rows[i].values);
+  }
+  free(t->rows);
+  free(t);
+}
+
+// ============================================================================
+// List Collection (GUL v3.3)
+// ============================================================================
+
+typedef struct {
+  int64_t *data;
+  int64_t len;
+  int64_t capacity;
+} GulList;
+
+int64_t gul_list_alloc(int64_t initial_capacity) {
+  GulList *list = (GulList *)malloc(sizeof(GulList));
+  if (!list) exit(1);
+  list->capacity = initial_capacity > 0 ? initial_capacity : 8;
+  list->len = 0;
+  list->data = (int64_t *)malloc(list->capacity * sizeof(int64_t));
+  if (!list->data) exit(1);
+  return (int64_t)list;
+}
+
+void gul_list_free(int64_t list_ptr) {
+  GulList *list = (GulList *)list_ptr;
+  if (list) {
+    free(list->data);
+    free(list);
+  }
+}
+
+int64_t gul_list_len(int64_t list_ptr) {
+  GulList *list = (GulList *)list_ptr;
+  return list ? list->len : 0;
+}
+
+void gul_list_push(int64_t list_ptr, int64_t value) {
+  GulList *list = (GulList *)list_ptr;
+  if (!list) return;
+  if (list->len >= list->capacity) {
+    list->capacity *= 2;
+    list->data = (int64_t *)realloc(list->data, list->capacity * sizeof(int64_t));
+    if (!list->data) exit(1);
+  }
+  list->data[list->len++] = value;
+}
+
+int64_t gul_list_pop(int64_t list_ptr) {
+  GulList *list = (GulList *)list_ptr;
+  if (!list || list->len == 0) return 0;
+  return list->data[--list->len];
+}
+
+int64_t gul_list_get(int64_t list_ptr, int64_t idx) {
+  GulList *list = (GulList *)list_ptr;
+  if (!list || idx < 0 || idx >= list->len) return 0;
+  return list->data[idx];
+}
+
+void gul_list_set(int64_t list_ptr, int64_t idx, int64_t value) {
+  GulList *list = (GulList *)list_ptr;
+  if (!list || idx < 0 || idx >= list->len) return;
+  list->data[idx] = value;
+}
+
+void gul_list_clear(int64_t list_ptr) {
+  GulList *list = (GulList *)list_ptr;
+  if (list) list->len = 0;
+}
+
+int64_t gul_list_contains(int64_t list_ptr, int64_t value) {
+  GulList *list = (GulList *)list_ptr;
+  if (!list) return 0;
+  for (int64_t i = 0; i < list->len; i++) {
+    if (list->data[i] == value) return 1;
+  }
+  return 0;
+}
+
+void gul_list_insert_before(int64_t list_ptr, int64_t idx, int64_t value) {
+  GulList *list = (GulList *)list_ptr;
+  if (!list || idx < 0 || idx > list->len) return;
+  if (list->len >= list->capacity) {
+    list->capacity *= 2;
+    list->data = (int64_t *)realloc(list->data, list->capacity * sizeof(int64_t));
+  }
+  memmove(&list->data[idx+1], &list->data[idx], (list->len - idx) * sizeof(int64_t));
+  list->data[idx] = value;
+  list->len++;
+}
+
+void gul_list_insert_after(int64_t list_ptr, int64_t idx, int64_t value) {
+  gul_list_insert_before(list_ptr, idx + 1, value);
+}
+
+void gul_list_remove(int64_t list_ptr, int64_t idx) {
+  GulList *list = (GulList *)list_ptr;
+  if (!list || idx < 0 || idx >= list->len) return;
+  memmove(&list->data[idx], &list->data[idx+1], (list->len - idx - 1) * sizeof(int64_t));
+  list->len--;
+}
+
+// ============================================================================
+// Dict Collection (GUL v3.3) - Simple hash map
+// ============================================================================
+
+typedef struct {
+  char *key;
+  int64_t value;
+  int used;
+} GulDictEntry;
+
+typedef struct {
+  GulDictEntry *entries;
+  int64_t capacity;
+  int64_t len;
+} GulDict;
+
+static uint64_t dict_hash(const char *key) {
+  uint64_t h = 5381;
+  while (*key) {
+    h = ((h << 5) + h) + *key++;
+  }
+  return h;
+}
+
+int64_t gul_dict_alloc(int64_t capacity) {
+  GulDict *dict = (GulDict *)malloc(sizeof(GulDict));
+  if (!dict) exit(1);
+  dict->capacity = capacity > 0 ? capacity : 16;
+  dict->len = 0;
+  dict->entries = (GulDictEntry *)calloc(dict->capacity, sizeof(GulDictEntry));
+  if (!dict->entries) exit(1);
+  return (int64_t)dict;
+}
+
+void gul_dict_free(int64_t dict_ptr) {
+  GulDict *dict = (GulDict *)dict_ptr;
+  if (dict) {
+    for (int64_t i = 0; i < dict->capacity; i++) {
+      if (dict->entries[i].used) free(dict->entries[i].key);
+    }
+    free(dict->entries);
+    free(dict);
+  }
+}
+
+int64_t gul_dict_len(int64_t dict_ptr) {
+  GulDict *dict = (GulDict *)dict_ptr;
+  return dict ? dict->len : 0;
+}
+
+void gul_dict_set(int64_t dict_ptr, int64_t key_ptr, int64_t value) {
+  GulDict *dict = (GulDict *)dict_ptr;
+  if (!dict) return;
+  char *key = (char *)key_ptr;
+  uint64_t h = dict_hash(key) % dict->capacity;
+  
+  for (int64_t i = 0; i < dict->capacity; i++) {
+    int64_t idx = (h + i) % dict->capacity;
+    if (!dict->entries[idx].used) {
+      dict->entries[idx].key = strdup(key);
+      dict->entries[idx].value = value;
+      dict->entries[idx].used = 1;
+      dict->len++;
+      return;
+    }
+    if (strcmp(dict->entries[idx].key, key) == 0) {
+      dict->entries[idx].value = value;
+      return;
+    }
+  }
+}
+
+int64_t gul_dict_get(int64_t dict_ptr, int64_t key_ptr) {
+  GulDict *dict = (GulDict *)dict_ptr;
+  if (!dict) return 0;
+  char *key = (char *)key_ptr;
+  uint64_t h = dict_hash(key) % dict->capacity;
+  
+  for (int64_t i = 0; i < dict->capacity; i++) {
+    int64_t idx = (h + i) % dict->capacity;
+    if (!dict->entries[idx].used) return 0;
+    if (strcmp(dict->entries[idx].key, key) == 0) {
+      return dict->entries[idx].value;
+    }
+  }
+  return 0;
+}
+
+int64_t gul_dict_contains(int64_t dict_ptr, int64_t key_ptr) {
+  GulDict *dict = (GulDict *)dict_ptr;
+  if (!dict) return 0;
+  char *key = (char *)key_ptr;
+  uint64_t h = dict_hash(key) % dict->capacity;
+  
+  for (int64_t i = 0; i < dict->capacity; i++) {
+    int64_t idx = (h + i) % dict->capacity;
+    if (!dict->entries[idx].used) return 0;
+    if (strcmp(dict->entries[idx].key, key) == 0) return 1;
+  }
+  return 0;
+}
+
+void gul_dict_remove(int64_t dict_ptr, int64_t key_ptr) {
+  GulDict *dict = (GulDict *)dict_ptr;
+  if (!dict) return;
+  char *key = (char *)key_ptr;
+  uint64_t h = dict_hash(key) % dict->capacity;
+  
+  for (int64_t i = 0; i < dict->capacity; i++) {
+    int64_t idx = (h + i) % dict->capacity;
+    if (!dict->entries[idx].used) return;
+    if (strcmp(dict->entries[idx].key, key) == 0) {
+      free(dict->entries[idx].key);
+      dict->entries[idx].used = 0;
+      dict->len--;
+      return;
+    }
+  }
+}
+
+void gul_dict_clear(int64_t dict_ptr) {
+  GulDict *dict = (GulDict *)dict_ptr;
+  if (!dict) return;
+  for (int64_t i = 0; i < dict->capacity; i++) {
+    if (dict->entries[i].used) {
+      free(dict->entries[i].key);
+      dict->entries[i].used = 0;
+    }
+  }
+  dict->len = 0;
+}
+
+// ============================================================================
+// Set Collection (GUL v3.3) - Simple hash set
+// ============================================================================
+
+typedef struct {
+  int64_t *values;
+  int *used;
+  int64_t capacity;
+  int64_t len;
+} GulSet;
+
+int64_t gul_set_alloc(int64_t capacity) {
+  GulSet *set = (GulSet *)malloc(sizeof(GulSet));
+  if (!set) exit(1);
+  set->capacity = capacity > 0 ? capacity : 16;
+  set->len = 0;
+  set->values = (int64_t *)malloc(set->capacity * sizeof(int64_t));
+  set->used = (int *)calloc(set->capacity, sizeof(int));
+  if (!set->values || !set->used) exit(1);
+  return (int64_t)set;
+}
+
+void gul_set_free(int64_t set_ptr) {
+  GulSet *set = (GulSet *)set_ptr;
+  if (set) {
+    free(set->values);
+    free(set->used);
+    free(set);
+  }
+}
+
+int64_t gul_set_len(int64_t set_ptr) {
+  GulSet *set = (GulSet *)set_ptr;
+  return set ? set->len : 0;
+}
+
+void gul_set_add(int64_t set_ptr, int64_t value) {
+  GulSet *set = (GulSet *)set_ptr;
+  if (!set) return;
+  uint64_t h = (uint64_t)value % set->capacity;
+  
+  for (int64_t i = 0; i < set->capacity; i++) {
+    int64_t idx = (h + i) % set->capacity;
+    if (!set->used[idx]) {
+      set->values[idx] = value;
+      set->used[idx] = 1;
+      set->len++;
+      return;
+    }
+    if (set->values[idx] == value) return; // Already exists
+  }
+}
+
+int64_t gul_set_contains(int64_t set_ptr, int64_t value) {
+  GulSet *set = (GulSet *)set_ptr;
+  if (!set) return 0;
+  uint64_t h = (uint64_t)value % set->capacity;
+  
+  for (int64_t i = 0; i < set->capacity; i++) {
+    int64_t idx = (h + i) % set->capacity;
+    if (!set->used[idx]) return 0;
+    if (set->values[idx] == value) return 1;
+  }
+  return 0;
+}
+
+void gul_set_remove(int64_t set_ptr, int64_t value) {
+  GulSet *set = (GulSet *)set_ptr;
+  if (!set) return;
+  uint64_t h = (uint64_t)value % set->capacity;
+  
+  for (int64_t i = 0; i < set->capacity; i++) {
+    int64_t idx = (h + i) % set->capacity;
+    if (!set->used[idx]) return;
+    if (set->values[idx] == value) {
+      set->used[idx] = 0;
+      set->len--;
+      return;
+    }
+  }
+}
+
+void gul_set_clear(int64_t set_ptr) {
+  GulSet *set = (GulSet *)set_ptr;
+  if (!set) return;
+  memset(set->used, 0, set->capacity * sizeof(int));
+  set->len = 0;
+}
+
+// ============================================================================
+// Memory Allocation
+// ============================================================================
+
+int64_t gul_malloc(int64_t size) { return (int64_t)malloc(size); }
+void gul_free(int64_t ptr) { free((void*)ptr); }
+

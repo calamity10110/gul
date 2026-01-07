@@ -1,0 +1,30 @@
+
+struct Point:
+    x: int
+    y: int
+    z: int
+
+fn main():
+    print("Testing Structs...")
+    var p = Point()
+    
+    print("Pointer allocated.")
+    p.x = 10
+    p.y = 20
+    p.z = 30
+    
+    print("Values set.")
+    print(p.x)
+    print(p.y)
+    print(p.z)
+    
+    if p.x + p.y == p.z:
+        print("Logic Valid")
+    else:
+        print("Logic Failed")
+
+    print("Testing Foreign Block...")
+    @python:
+        import sys
+        print(f"Python says Hello from {sys.platform}")
+

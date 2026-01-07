@@ -37,13 +37,13 @@ fn cube(x): x * x * x
 # Trigonometry (Single-line)
 # ============================================
 
-fn sin(x): _native_sin(x)
-fn cos(x): _native_cos(x)
-fn tan(x): _native_tan(x)
-fn asin(x): _native_asin(x)
-fn acos(x): _native_acos(x)
-fn atan(x): _native_atan(x)
-fn atan2(y, x): _native_atan2(y, x)
+fn sin(x): gul_math_sin(x)
+fn cos(x): gul_math_cos(x)
+fn tan(x): gul_math_tan(x)
+fn asin(x): gul_math_asin(x)
+fn acos(x): gul_math_acos(x)
+fn atan(x): gul_math_atan(x)
+fn atan2(y, x): gul_math_atan2(y, x)
 
 # Hyperbolic
 fn sinh(x): (exp(x) - exp(-x)) / 2
@@ -58,10 +58,10 @@ fn degrees(rad): rad * 180 / PI
 # Exponential and Logarithmic
 # ============================================
 
-fn exp(x): E ^ x
-fn log(x): _native_ln(x)
-fn log10(x): log(x) / log(10)
-fn log2(x): log(x) / log(2)
+fn exp(x): gul_math_exp(x)
+fn log(x): gul_math_log(x)
+fn log10(x): gul_math_log10(x)
+fn log2(x): gul_math_log2(x)
 fn log_base(x, base): log(x) / log(base)
 
 # ============================================
@@ -201,13 +201,5 @@ fn normalize(v):
 # Native Implementation
 # ============================================
 
-@rust {
-    fn _native_sin(x: f64) -> f64 { x.sin() }
-    fn _native_cos(x: f64) -> f64 { x.cos() }
-    fn _native_tan(x: f64) -> f64 { x.tan() }
-    fn _native_asin(x: f64) -> f64 { x.asin() }
-    fn _native_acos(x: f64) -> f64 { x.acos() }
-    fn _native_atan(x: f64) -> f64 { x.atan() }
-    fn _native_atan2(y: f64, x: f64) -> f64 { y.atan2(x) }
-    fn _native_ln(x: f64) -> f64 { x.ln() }
-}
+# Native implementation provided by compiler builtins
+# (gul_math_sin, etc.)

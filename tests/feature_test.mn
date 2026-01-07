@@ -1,0 +1,26 @@
+# Feature Tests: Collection Syntax, Method Calls, Type Inference
+
+# Test 1: @list literal syntax
+let nums = @list[1, 2, 3, 4, 5]
+print(nums)
+
+# Test 2: @dict literal syntax  
+let config = @dict{host: "localhost", port: 8080}
+print(config)
+
+# Test 3: @set literal syntax
+let unique = @set{1, 2, 3}
+print(unique)
+
+# Test 4: Method call syntax (parsed correctly)
+# Note: These parse but may not execute without runtime support
+# var items = @list[10, 20, 30]
+# items.push(40)
+
+# Test 5: Index access
+let arr = @list[100, 200, 300]
+print(arr)
+
+# Test 6: @tabl with new syntax
+let data = @tabl { (a, b): row1: {1, 2} }
+print(data)

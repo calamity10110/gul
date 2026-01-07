@@ -109,27 +109,28 @@ tags.len()                # Length property
 let config = @dict{host: "localhost", port: 8080}  # Immutable
 var cfg = @dict{host: "localhost", port: 8080}  # Mutable
 
+# Access
+cfg["host"] or cfg.host
+
 # Methods
-# Methods
-config.contains("port")     # Membership verify
-config.len()                # Length property
+cfg.insert("key", "value")
+cfg.remove("key")
+cfg.get("key")
+```
+
+### Tables (@tabl)
+
+```gul
+# Table with named columns and rows
+let data = @tabl {
+    (name, age, score):
+    alice: {"Alice", 30, 95.5}
+    bob:   {"Bob", 25, 88.0}
+}
 
 # Access
-cfg[key]  # By identifier
-cfg["key"]  # By string
-
-# Insertion methods (maintains order)
-cfg.insertbefore(position, key: value)  # Insert at position/default begin
-cfg.insertbefore(target_key, key: value)  # Insert before key
-cfg.insertafter(key: value)  # Insert at end (default)
-cfg.insertafter(target_key, key: value)  # Insert after key
-cfg.add(key: value)  # Append at end
-
-# Removal
-cfg.remove(position)  # By position
-cfg.remove(key)  # By key
-cfg.remove(key: value)  # By key-value pair
-
+data.col_count
+data.row_count
 ```
 
 ---

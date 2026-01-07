@@ -1,0 +1,6 @@
+# Method Call Syntax Test
+
+# Test method call parsing (obj.method(args))
+let x = 10
+let result = x.to_string()
+print(result)

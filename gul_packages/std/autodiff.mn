@@ -1,0 +1,92 @@
+# GUL Auto-Differentiation Library
+# Tape-based reverse-mode automatic differentiation
+
+# ============================================
+# Core Autodiff Types
+# ============================================
+
+struct Node:
+    id: int
+    val: flt
+    grad: flt
+    op: str
+    parents: vec<int> # IDs of parent nodes
+    
+    fn new(id: int, val: flt, op: str = "var") -> Node:
+        return Node { 
+            id: id, 
+            val: val, 
+            grad: 0.0, 
+            op: op, 
+            parents: [] 
+        }
+
+struct Tape:
+    nodes: vec<Node>
+    curr_id: int
+    
+    fn new() -> Tape:
+        return Tape { nodes: [], curr_id: 0 }
+    
+    fn variable(var self, val: flt) -> int:
+        let id = self.curr_id
+        self.nodes.push(Node::new(id, val))
+        self.curr_id = self.curr_id + 1
+        return id
+        
+    fn operation(var self, op: str, val: flt, parents: vec<int>) -> int:
+        let id = self.curr_id
+        var node = Node::new(id, val, op)
+        node.parents = parents
+        self.nodes.push(node)
+        self.curr_id = self.curr_id + 1
+        return id
+        
+    fn backward(var self, target_id: int):
+        # Initialize target gradient
+        self.nodes[target_id].grad = 1.0
+        
+        # Traverse backwards
+        var i = self.nodes.len() - 1
+        while i >= 0:
+            let node = self.nodes[i]
+            let grad = node.grad
+            
+            if grad != 0.0:
+                # Distribute gradient to parents based on op
+                # This requires a big match statement for ops
+                match node.op:
+                    "add" =>
+                        for pid in node.parents:
+                            self.nodes[pid].grad = self.nodes[pid].grad + grad
+                    "mul" =>
+                        let p1 = node.parents[0]
+                        let p2 = node.parents[1]
+                        self.nodes[p1].grad = self.nodes[p1].grad + grad * self.nodes[p2].val
+                        self.nodes[p2].grad = self.nodes[p2].grad + grad * self.nodes[p1].val
+                    "pow" =>
+                        let base_id = node.parents[0]
+                        let exp = self.nodes[node.parents[1]].val # Treat exp as constant for now
+                        let base_val = self.nodes[base_id].val
+                        # derivative of x^n is n * x^(n-1)
+                        self.nodes[base_id].grad = self.nodes[base_id].grad + grad * exp * (base_val ^ (exp - 1.0))
+                    # ... other ops
+            i = i - 1
+
+# ============================================
+# Value Wrapper (for user API)
+# ============================================
+
+# Note: This requires global state for the tape which is tricky in GUL
+# Ideally passed context or thread-local storage
+
+struct Value:
+    id: int
+    val: flt
+    # tape: ref Tape 
+    
+    fn add(self, other: Value) -> Value:
+        # Pushes 'add' op to tape
+        # Returns new Value
+        return Value { id: 0, val: self.val + other.val }
+        

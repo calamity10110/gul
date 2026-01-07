@@ -1,0 +1,3 @@
+# Simple integer test
+let x = 10
+print(x)

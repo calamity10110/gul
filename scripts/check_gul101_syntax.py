@@ -61,6 +61,15 @@ VALID_PATTERNS = [
     r'var\s+\w+\s*=\s*@\w+\(',     # var name = @type(value)
     r'var\s+\w+\s*=',               # var name = value
     
+    # Decorators
+    r'@grad\s*',                    # Autograd decorator
+    
+    # Autograd Builtins
+    r'gul_autograd_begin\(',
+    r'gul_make_var\(',
+    r'gul_backward\(',
+    r'gul_print_float\(',
+    
     # Functions
     r'fn\s+\w+\s*[\(\[\{]',         # fn name(...)
     r'async\s+\w+\s*[\(\[\{]',      # async name(...)

@@ -1,5 +1,5 @@
 # Example: ML Model Training
-use std::ml
+@imp std.ml
 
 mn:
     print("--- Machine Learning Example ---")

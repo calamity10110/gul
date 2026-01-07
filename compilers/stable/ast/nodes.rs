@@ -20,7 +20,7 @@ pub enum ExprType {
     IntegerLiteral, FloatLiteral, StringLiteral, BooleanLiteral, NoneLiteral,
     ListLiteral, TupleLiteral, SetLiteral, DictLiteral,
     Identifier, BinaryOp, UnaryOp, Call, Index, Attribute,
-    Lambda, MatchExpr, TypeConstructor, Grouped,
+    Lambda, MatchExpr, TypeConstructor, Grouped, Await, Table,
 
 }
 #[derive(Debug, Clone, PartialEq)]
@@ -47,11 +47,38 @@ pub enum Expression {
     Dict(DictExpr),
     Lambda(LambdaExpr),
     Match(MatchExpr),
-    TypeConstructor(TypeConstructorExpr),
+    TypeConstructor(TypeConstructorExpr), // @int(), @float()
     Grouped(GroupedExpr),
+    Await(AwaitExpr),
+    Table(TableExpr),
+
+}
+
+impl Expression {
+    pub fn get_node(&self) -> ASTNode {
+        match self {
+            Expression::Literal(e) => e.node.clone(),
+            Expression::Identifier(e) => e.node.clone(),
+            Expression::BinaryOp(e) => e.node.clone(),
+            Expression::UnaryOp(e) => e.node.clone(),
+            Expression::Call(e) => e.node.clone(),
+            Expression::Index(e) => e.node.clone(),
+            Expression::Attribute(e) => e.node.clone(),
+            Expression::List(e) => e.node.clone(),
+            Expression::Tuple(e) => e.node.clone(),
+            Expression::Set(e) => e.node.clone(),
+            Expression::Dict(e) => e.node.clone(),
+            Expression::Lambda(e) => e.node.clone(),
+            Expression::Match(e) => e.node.clone(),
+            Expression::TypeConstructor(e) => e.node.clone(),
+            Expression::Grouped(e) => e.node.clone(),
+            Expression::Await(e) => e.node.clone(),
+            Expression::Table(e) => e.node.clone(),
+        }
+    }
+}
 
 // Statement Enum
-}
 #[derive(Debug, Clone, PartialEq)]
 pub enum Statement {
     LetDecl(LetStmt),
@@ -382,6 +409,26 @@ pub struct ExpressionStmt {
 #[derive(Debug, Clone, PartialEq)]
 pub struct PassStmt {
     pub node: ASTNode,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct AwaitExpr {
+    pub node: ASTNode,
+    pub value: Box<Expression>,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct TableExpr {
+    pub node: ASTNode,
+    pub columns: Vec<String>,
+    pub rows: Vec<TableRow>,
+    pub is_sparse: bool,
+
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct TableRow {
+    pub name: String,
+    pub values: Vec<Expression>,
 
 }
 #[derive(Debug, Clone, PartialEq)]

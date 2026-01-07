@@ -8,7 +8,8 @@
 |---------|--------|--------------|
 | v3.0 | Released | New syntax (`@fn`, `mn:`, `@imp`), pipeline operator `|>` |
 | v3.1 | Released | Collections API (List, Set, Dict), f-strings, match |
-| v3.2 | Current | Ownership semantics, Cranelift codegen, tuple support |
+| v3.2 | Released | Ownership semantics, Cranelift codegen, tuple support |
+| v3.3 | Current | Tables (`@tabl`), Borrow Checker, Collection literals (`@list[...]`) |
 
 ---
 

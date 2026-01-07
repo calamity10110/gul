@@ -1,0 +1,7 @@
+# GUL Stable - Sanity Check Test
+# Uses mn: syntax for stable compiler
+
+mn:
+    let x = 10
+    print(x)
+    print(42)

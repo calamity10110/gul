@@ -1,0 +1,5 @@
+mn:
+    let t = @tabl {
+        (col1, col2):
+        row1: {1, 2}
+    }

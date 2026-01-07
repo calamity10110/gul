@@ -5,6 +5,13 @@ use std::collections::{HashMap, HashSet};
 use crate::ast::nodes::*;
 use crate::lexer::token::*;
 
+// Method Signature for type checking
+#[derive(Debug, Clone, PartialEq)]
+pub struct MethodSignature {
+    pub params: Vec<String>, // Parameter types
+    pub return_type: String,
+}
+
 // Symbol table for scope management
 #[derive(Debug, Clone, PartialEq)]
 pub struct Symbol {
@@ -12,9 +19,12 @@ pub struct Symbol {
     pub symbol_type: String,
     pub is_mutable: bool,
     pub is_function: bool,
+    pub signature: Option<MethodSignature>, // Added signature
+    pub ownership_mode: String, // "owned", "borrow", "ref", "move", "kept"
+    pub is_borrowed: bool, // Currently borrowed
+    pub borrow_count: usize, // Number of active borrows
     pub line: usize,
     pub column: usize,
-
 }
 #[derive(Debug, Clone, PartialEq)]
 pub struct Scope {
@@ -51,9 +61,93 @@ impl Scope {
     pub fn exists_in_current(&self, name: String)  ->  bool {
         // Check if symbol exists in current scope only// 
         return self.symbols.contains_key(&name);
-
-// Semantic analyzer
     }
+    
+    // Borrow checker methods
+    pub fn borrow(&mut self, name: String) -> Result<(), String> {
+        // Create an immutable borrow of a symbol
+        if let Some(symbol) = self.symbols.get_mut(&name) {
+            if symbol.ownership_mode == "move" {
+                return Err(format!("Cannot borrow '{}': value has been moved", name));
+            }
+            symbol.borrow_count += 1;
+            symbol.is_borrowed = true;
+            Ok(())
+        } else if let Some(ref mut parent) = self.parent {
+            parent.borrow(name)
+        } else {
+            Err(format!("Cannot borrow '{}': not found", name))
+        }
+    }
+    
+    pub fn borrow_mut(&mut self, name: String) -> Result<(), String> {
+        // Create a mutable borrow of a symbol
+        if let Some(symbol) = self.symbols.get_mut(&name) {
+            if symbol.ownership_mode == "move" {
+                return Err(format!("Cannot mutably borrow '{}': value has been moved", name));
+            }
+            if symbol.is_borrowed || symbol.borrow_count > 0 {
+                return Err(format!("Cannot mutably borrow '{}': already borrowed", name));
+            }
+            if !symbol.is_mutable {
+                return Err(format!("Cannot mutably borrow '{}': not declared as 'var'", name));
+            }
+            symbol.is_borrowed = true;
+            symbol.ownership_mode = "ref".to_string();
+            Ok(())
+        } else if let Some(ref mut parent) = self.parent {
+            parent.borrow_mut(name)
+        } else {
+            Err(format!("Cannot mutably borrow '{}': not found", name))
+        }
+    }
+    
+    pub fn release_borrow(&mut self, name: String) {
+        // Release a borrow
+        if let Some(symbol) = self.symbols.get_mut(&name) {
+            if symbol.borrow_count > 0 {
+                symbol.borrow_count -= 1;
+            }
+            if symbol.borrow_count == 0 {
+                symbol.is_borrowed = false;
+                if symbol.ownership_mode == "ref" {
+                    symbol.ownership_mode = "owned".to_string();
+                }
+            }
+        } else if let Some(ref mut parent) = self.parent {
+            parent.release_borrow(name);
+        }
+    }
+    
+    pub fn mark_moved(&mut self, name: String) -> Result<(), String> {
+        // Mark a symbol as moved (ownership transferred)
+        if let Some(symbol) = self.symbols.get_mut(&name) {
+            if symbol.is_borrowed || symbol.borrow_count > 0 {
+                return Err(format!("Cannot move '{}': currently borrowed", name));
+            }
+            symbol.ownership_mode = "move".to_string();
+            Ok(())
+        } else if let Some(ref mut parent) = self.parent {
+            parent.mark_moved(name)
+        } else {
+            Err(format!("Cannot move '{}': not found", name))
+        }
+    }
+    
+    pub fn check_use_after_move(&self, name: &String) -> Result<(), String> {
+        // Check if a symbol has been moved
+        if let Some(symbol) = self.symbols.get(name) {
+            if symbol.ownership_mode == "move" {
+                return Err(format!("Use of moved value: '{}'", name));
+            }
+            Ok(())
+        } else if let Some(ref parent) = self.parent {
+            parent.check_use_after_move(name)
+        } else {
+            Ok(()) // Not found in scope, let other checks handle it
+        }
+    }
+// Semantic analyzer
 }
 #[derive(Debug, Clone, PartialEq)]
 pub struct SemanticAnalyzer {
@@ -71,6 +165,10 @@ pub fn create_analyzer()  ->  SemanticAnalyzer {
         symbol_type: "fn".to_string(),
         is_mutable: false,
         is_function: true,
+        signature: Some(MethodSignature{ params: vec!["any".to_string()], return_type: "void".to_string() }),
+        ownership_mode: "owned".to_string(),
+        is_borrowed: false,
+        borrow_count: 0,
         line: 0,
         column: 0,
     });
@@ -79,6 +177,10 @@ pub fn create_analyzer()  ->  SemanticAnalyzer {
         symbol_type: "fn".to_string(),
         is_mutable: false,
         is_function: true,
+        signature: Some(MethodSignature{ params: vec!["any".to_string()], return_type: "void".to_string() }),
+        ownership_mode: "owned".to_string(),
+        is_borrowed: false,
+        borrow_count: 0,
         line: 0,
         column: 0,
     });
@@ -87,6 +189,10 @@ pub fn create_analyzer()  ->  SemanticAnalyzer {
         symbol_type: "fn".to_string(),
         is_mutable: false,
         is_function: true,
+        signature: Some(MethodSignature{ params: vec!["any".to_string()], return_type: "str".to_string() }),
+        ownership_mode: "owned".to_string(),
+        is_borrowed: false,
+        borrow_count: 0,
         line: 0,
         column: 0,
     });
@@ -95,6 +201,10 @@ pub fn create_analyzer()  ->  SemanticAnalyzer {
         symbol_type: "fn".to_string(),
         is_mutable: false,
         is_function: true,
+        signature: Some(MethodSignature{ params: vec!["any".to_string()], return_type: "int".to_string() }),
+        ownership_mode: "owned".to_string(),
+        is_borrowed: false,
+        borrow_count: 0,
         line: 0,
         column: 0,
     });
@@ -103,6 +213,10 @@ pub fn create_analyzer()  ->  SemanticAnalyzer {
         symbol_type: "fn".to_string(),
         is_mutable: false,
         is_function: true,
+        signature: Some(MethodSignature{ params: vec!["any".to_string()], return_type: "int".to_string() }),
+        ownership_mode: "owned".to_string(),
+        is_borrowed: false,
+        borrow_count: 0,
         line: 0,
         column: 0,
     });
@@ -111,8 +225,110 @@ pub fn create_analyzer()  ->  SemanticAnalyzer {
         symbol_type: "fn".to_string(),
         is_mutable: false,
         is_function: true,
+        signature: Some(MethodSignature{ params: vec![], return_type: "str".to_string() }),
+        ownership_mode: "owned".to_string(),
+        is_borrowed: false,
+        borrow_count: 0,
         line: 0,
         column: 0,
+    });
+
+    // Math Builtins
+    let math_funcs = vec![
+        "_native_sin", "_native_cos", "_native_tan", "_native_asin", "_native_acos", "_native_atan", "_native_atan2",
+        "_native_exp", "_native_ln", "_native_log10", "_native_log2", "_native_pow", "_native_sqrt", "_native_cbrt",
+        "gul_math_sin", "gul_math_cos", "gul_math_tan", "gul_math_exp", "gul_math_log", "gul_math_sqrt", "gul_math_pow",
+        "gul_math_floor", "gul_math_ceil", "gul_math_round", "gul_math_trunc", "gul_math_abs", "gul_math_min", "gul_math_max",
+        "gul_print_float",
+    ];
+    for f in math_funcs {
+        analyzer.current_scope.symbols.insert(f.to_string(), Symbol{
+            name: f.to_string(), 
+            symbol_type: "fn".to_string(), 
+            is_mutable: false, 
+            is_function: true, 
+            signature: Some(MethodSignature{ params: vec!["float".to_string()], return_type: "float".to_string() }),
+            ownership_mode: "owned".to_string(),
+            is_borrowed: false,
+            borrow_count: 0,
+            line: 0, 
+            column: 0
+        });
+    }
+
+    // Tensor & ML Builtins
+    let tensor_funcs = vec![
+        "gul_tensor_alloc", "gul_tensor_free", "gul_tensor_fill", 
+        "gul_tensor_add", "gul_tensor_mul", "gul_tensor_matmul", 
+        "gul_tensor_sum", "gul_tensor_mean",
+        "gul_ml_sigmoid", "gul_ml_tanh", "gul_ml_relu",
+        "gul_file_open", "gul_file_close",        "gul_file_read_line",
+        // String
+        "gul_string_len",
+        "gul_string_substr",
+        "gul_string_get",
+        "gul_malloc"
+    ];
+    for f in tensor_funcs {
+        analyzer.current_scope.symbols.insert(f.to_string(), Symbol{
+            name: f.to_string(), 
+            symbol_type: "fn".to_string(), 
+            is_mutable: false, 
+            is_function: true, 
+            signature: Some(MethodSignature{ params: vec!["any".to_string()], return_type: "any".to_string() }), // Generic signature for now
+            ownership_mode: "owned".to_string(),
+            is_borrowed: false,
+            borrow_count: 0,
+            line: 0, 
+            column: 0
+        });
+    }
+
+    // Autograd Builtins (Specific Signatures)
+    analyzer.current_scope.symbols.insert("gul_autograd_begin".to_string(), Symbol{
+        name: "gul_autograd_begin".to_string(), symbol_type: "fn".to_string(), is_mutable: false, is_function: true,
+        signature: Some(MethodSignature{ params: vec![], return_type: "void".to_string() }), 
+        ownership_mode: "owned".to_string(), is_borrowed: false, borrow_count: 0, line: 0, column: 0
+    });
+    analyzer.current_scope.symbols.insert("gul_autograd_end".to_string(), Symbol{
+        name: "gul_autograd_end".to_string(), symbol_type: "fn".to_string(), is_mutable: false, is_function: true,
+        signature: Some(MethodSignature{ params: vec![], return_type: "void".to_string() }), 
+        ownership_mode: "owned".to_string(), is_borrowed: false, borrow_count: 0, line: 0, column: 0
+    });
+    analyzer.current_scope.symbols.insert("gul_make_var".to_string(), Symbol{
+        name: "gul_make_var".to_string(), symbol_type: "fn".to_string(), is_mutable: false, is_function: true,
+        signature: Some(MethodSignature{ params: vec!["float".to_string()], return_type: "any".to_string() }), 
+        ownership_mode: "owned".to_string(), is_borrowed: false, borrow_count: 0, line: 0, column: 0
+    });
+    analyzer.current_scope.symbols.insert("gul_var_val".to_string(), Symbol{
+        name: "gul_var_val".to_string(), symbol_type: "fn".to_string(), is_mutable: false, is_function: true,
+        signature: Some(MethodSignature{ params: vec!["any".to_string()], return_type: "float".to_string() }), 
+        ownership_mode: "owned".to_string(), is_borrowed: false, borrow_count: 0, line: 0, column: 0
+    });
+    analyzer.current_scope.symbols.insert("gul_var_grad".to_string(), Symbol{
+        name: "gul_var_grad".to_string(), symbol_type: "fn".to_string(), is_mutable: false, is_function: true,
+        signature: Some(MethodSignature{ params: vec!["any".to_string()], return_type: "float".to_string() }), 
+        ownership_mode: "owned".to_string(), is_borrowed: false, borrow_count: 0, line: 0, column: 0
+    });
+    analyzer.current_scope.symbols.insert("gul_var_add".to_string(), Symbol{
+        name: "gul_var_add".to_string(), symbol_type: "fn".to_string(), is_mutable: false, is_function: true,
+        signature: Some(MethodSignature{ params: vec!["any".to_string(), "any".to_string()], return_type: "any".to_string() }), 
+        ownership_mode: "owned".to_string(), is_borrowed: false, borrow_count: 0, line: 0, column: 0
+    });
+    analyzer.current_scope.symbols.insert("gul_var_mul".to_string(), Symbol{
+        name: "gul_var_mul".to_string(), symbol_type: "fn".to_string(), is_mutable: false, is_function: true,
+        signature: Some(MethodSignature{ params: vec!["any".to_string(), "any".to_string()], return_type: "any".to_string() }), 
+        ownership_mode: "owned".to_string(), is_borrowed: false, borrow_count: 0, line: 0, column: 0
+    });
+    analyzer.current_scope.symbols.insert("gul_var_sin".to_string(), Symbol{
+        name: "gul_var_sin".to_string(), symbol_type: "fn".to_string(), is_mutable: false, is_function: true,
+        signature: Some(MethodSignature{ params: vec!["any".to_string()], return_type: "any".to_string() }), 
+        ownership_mode: "owned".to_string(), is_borrowed: false, borrow_count: 0, line: 0, column: 0
+    });
+    analyzer.current_scope.symbols.insert("gul_backward".to_string(), Symbol{
+        name: "gul_backward".to_string(), symbol_type: "fn".to_string(), is_mutable: false, is_function: true,
+        signature: Some(MethodSignature{ params: vec!["any".to_string()], return_type: "void".to_string() }), 
+        ownership_mode: "owned".to_string(), is_borrowed: false, borrow_count: 0, line: 0, column: 0
     });
     
     return analyzer;
@@ -183,6 +399,8 @@ impl SemanticAnalyzer {
             Statement::AssignmentStmt(s) => self.analyze_assignment(s),
             Statement::ExpressionStmt(s) => self.analyze_expression_stmt(s),
             Statement::ImportStmt(s) => self.analyze_import(s),
+            Statement::StructDecl(s) => self.analyze_struct_decl(s),
+            Statement::ForeignCodeBlock(s) => self.analyze_foreign_block(s),
             _ => {}
 
         }
@@ -210,6 +428,10 @@ impl SemanticAnalyzer {
             symbol_type: if !stmt.type_annotation.is_empty() { stmt.type_annotation.clone() } else { value_type },
             is_mutable: false,
             is_function: false,
+            signature: None,
+            ownership_mode: "owned".to_string(),
+            is_borrowed: false,
+            borrow_count: 0,
             line: stmt.node.line,
             column: stmt.node.column,
         },
@@ -236,6 +458,10 @@ impl SemanticAnalyzer {
             symbol_type: if !stmt.type_annotation.is_empty() { stmt.type_annotation.clone() } else { value_type },
             is_mutable: true,
             is_function: false,
+            signature: None,
+            ownership_mode: "owned".to_string(),
+            is_borrowed: false,
+            borrow_count: 0,
             line: stmt.node.line,
             column: stmt.node.column,
         },
@@ -249,11 +475,22 @@ impl SemanticAnalyzer {
 
         // Define function symbol in current scope
         }
+        // Create signature
+        let mut param_types = vec![];
+        for param in &stmt.parameters {
+            param_types.push(if param.type_annotation.is_empty() { "any".to_string() } else { param.type_annotation.clone() });
+        }
+        let return_type = if stmt.return_type.is_empty() { "void".to_string() } else { stmt.return_type.clone() };
+
         self.current_scope.define(stmt.name.clone(), Symbol{
             name: stmt.name.clone(),
             symbol_type: "function".to_string(),
             is_mutable: false,
             is_function: true,
+            signature: Some(MethodSignature{ params: param_types, return_type: return_type }),
+            ownership_mode: "owned".to_string(),
+            is_borrowed: false,
+            borrow_count: 0,
             line: stmt.node.line,
             column: stmt.node.column,
         },
@@ -269,6 +506,10 @@ impl SemanticAnalyzer {
                 symbol_type: if param.type_annotation.is_empty() { "any".to_string() } else { param.type_annotation.clone() },
                 is_mutable: false,
                 is_function: false,
+                signature: None,
+                ownership_mode: "owned".to_string(),
+                is_borrowed: false,
+                borrow_count: 0,
                 line: stmt.node.line,
                 column: stmt.node.column,
             },
@@ -336,12 +577,27 @@ impl SemanticAnalyzer {
 
         self.enter_scope();
 
-        // Define loop variable
+        // Define loop variable with inferred element type
+        let element_type = if iterable_type.starts_with("list<") {
+            // Extract element type from list<T>
+            iterable_type.trim_start_matches("list<").trim_end_matches(">").to_string()
+        } else if iterable_type.starts_with("set<") {
+            iterable_type.trim_start_matches("set<").trim_end_matches(">").to_string()
+        } else if iterable_type == "str" || iterable_type == "string" {
+            "str".to_string() // Iterating over string yields characters as strings
+        } else {
+            "any".to_string() // Fallback for unknown iterables
+        };
+        
         self.current_scope.define(stmt.variable.clone(), Symbol{
             name: stmt.variable.clone(),
-            symbol_type: "any".to_string(), // TODO: infer from iterable type
+            symbol_type: element_type,
             is_mutable: false,
             is_function: false,
+            signature: None,
+            ownership_mode: "owned".to_string(),
+            is_borrowed: false,
+            borrow_count: 0,
             line: stmt.node.line,
             column: stmt.node.column,
         },
@@ -366,7 +622,13 @@ impl SemanticAnalyzer {
         let target_type = self.analyze_expression(&stmt.target);
         let value_type = self.analyze_expression(&stmt.value);
 
-        // TODO: Add type compatibility check between target_type and value_type
+        // Check type compatibility between target and value
+        if !target_type.is_empty() && !value_type.is_empty() && target_type != "any" && value_type != "any" {
+            if !self.types_compatible(target_type.clone(), value_type.clone()) {
+                self.error(format!("Type mismatch in assignment: cannot assign {} to {}", value_type, target_type),
+                    stmt.node.line, stmt.node.column);
+            }
+        }
 
         // If target is an identifier, check mutability
         if let Expression::Identifier(ident) = &stmt.target {
@@ -391,15 +653,35 @@ impl SemanticAnalyzer {
 
     }
     pub fn analyze_import(&mut self, stmt: &ImportStmt) {
-        // Analyze import statement// 
-        // pass // For now, just note that it exists
-        // TODO: Validate module exists
+        // Analyze import statement
+        // Validate against known standard library modules
+        let std_libs = vec!["std", "math", "io", "tensor", "simd", "flow", "alloc", "data", "ml"]; // simplified list
+        
+        if stmt.module_path.is_empty() {
+             self.error("Empty module path".to_string(), stmt.node.line, stmt.node.column);
+             return;
+        }
 
+        let root = &stmt.module_path[0];
+        // Allow 'std' or specific known roots
+        if root == "std" {
+             if stmt.module_path.len() > 1 {
+                 let sub = &stmt.module_path[1];
+                 if !std_libs.contains(&sub.as_str()) && sub != "box" && sub != "rc" && sub != "arc" && sub != "refcell" && sub != "sync" && sub != "mem" && sub != "thread" {
+                      // Warn only for now as we might add more std libs
+                      // self.warn(format!("Unknown standard library module 'std.{}'", sub), stmt.node.line, stmt.node.column);
+                 }
+             }
+        } else if root.starts_with('@') {
+             // Foreign imports or decorators, ignore
+        } else {
+             // Local import check (stub)
+        }
+    }
     // ========================================
     // EXPRESSION ANALYSIS
     // ========================================
 
-    }
     pub fn analyze_expression(&mut self, expr: &Expression)  ->  String {
         // Analyze an expression && return its type// 
         match expr {
@@ -421,6 +703,8 @@ impl SemanticAnalyzer {
             Expression::Set(e) => self.analyze_set_literal(e),
             Expression::Dict(e) => self.analyze_dict_literal(e),
             Expression::TypeConstructor(e) => self.analyze_type_constructor(e),
+            Expression::Table(e) => self.analyze_table_literal(e),
+            Expression::Await(e) => self.analyze_await_expression(e),
             _ => "any".to_string(),
 
         }
@@ -442,10 +726,14 @@ impl SemanticAnalyzer {
             }
             self.error(format!("Undefined variable '{}'", expr.name), expr.node.line, expr.node.column);
             return "any".to_string();
-
         }
+        
+        // Borrow checking: check for use after move
+        if let Err(e) = self.current_scope.check_use_after_move(&expr.name) {
+            self.error(e, expr.node.line, expr.node.column);
+        }
+        
         return symbol_opt.unwrap().symbol_type;
-
     }
     pub fn analyze_binary_op(&mut self, expr: &BinaryOpExpr)  ->  String {
         // Analyze binary operation// 
@@ -461,8 +749,14 @@ impl SemanticAnalyzer {
             if left_type == "int".to_string() && right_type == "int".to_string() {
                 return "int".to_string();
             }
-            else if left_type == "float".to_string() || right_type == "float".to_string() {
+            else if left_type == "float".to_string() && right_type == "float".to_string() {
                 return "float".to_string();
+            }
+            else if (left_type == "int".to_string() && right_type == "float".to_string()) ||
+                    (left_type == "float".to_string() && right_type == "int".to_string()) {
+                self.error(format!("Type mismatch: binary op {:?} requires same types (got {} and {}). Use explicit cast.", 
+                    expr.operator, left_type, right_type), expr.node.line, expr.node.column);
+                return "any".to_string(); // Poison
             }
             else {
                 return "any".to_string();
@@ -504,17 +798,47 @@ impl SemanticAnalyzer {
         }
     }
     pub fn analyze_call(&mut self, expr: &CallExpr)  ->  String {
-        // Analyze function call// 
+        // Analyze function call
         // Analyze callee
         let callee_type = self.analyze_expression(&expr.callee);
+        
+        let mut return_type = "any".to_string();
+        
+        // Helper to check signature if available
+        if let Expression::Identifier(ident) = &*expr.callee {
+             if let Some(symbol) = self.current_scope.resolve(ident.name.clone()) {
+                 if let Some(sig) = symbol.signature {
+                     return_type = sig.return_type.clone();
+                     
+                     // Check arg count
+                     if sig.params.len() != expr.arguments.len() {
+                         self.error(format!("Function '{}' expects {} arguments, got {}", 
+                             ident.name, sig.params.len(), expr.arguments.len()), 
+                             expr.node.line, expr.node.column);
+                     } else {
+                         // Check arg types
+                         for (i, arg) in expr.arguments.iter().enumerate() {
+                             let arg_type = self.analyze_expression(arg);
+                             let expected_type = &sig.params[i];
+                             
+                             if !self.types_compatible(expected_type.clone(), arg_type.clone()) {
+                                 let node = arg.get_node();
+                                 self.error(format!("Argument {} of '{}' mismatch: expected {}, got {}", 
+                                     i+1, ident.name, expected_type, arg_type), 
+                                     node.line, node.column);
+                             }
+                         }
+                         return return_type; // Use helper return
+                     }
+                 }
+             }
+        }
 
-        // Analyze arguments
+        // Fallback if no signature check happened (still analyze args)
         for arg in &expr.arguments {
             self.analyze_expression(arg);
-
-        // TODO: Check function signature matches
         }
-        return "any".to_string(); // Unknown return type for now
+        return return_type; 
 
     }
     pub fn analyze_index(&mut self, expr: &IndexExpr)  ->  String {
@@ -522,7 +846,19 @@ impl SemanticAnalyzer {
         let object_type = self.analyze_expression(&expr.object);
         let index_type = self.analyze_expression(&expr.index);
 
-        // TODO: Better type inference
+        // Infer element type from collection type
+        if object_type.starts_with("list<") {
+            return object_type.trim_start_matches("list<").trim_end_matches(">").to_string();
+        } else if object_type.starts_with("dict<") {
+            // dict<K,V> - indexing returns V
+            if let Some(comma_pos) = object_type.find(',') {
+                return object_type[comma_pos+1..].trim_end_matches(">").trim().to_string();
+            }
+        } else if object_type == "str" || object_type == "string" {
+            return "str".to_string(); // String indexing returns character
+        } else if object_type == "table" {
+            return "float".to_string(); // Table cells are floats
+        }
         return "any".to_string();
 
     }
@@ -530,7 +866,14 @@ impl SemanticAnalyzer {
         // Analyze attribute access// 
         let object_type = self.analyze_expression(&expr.object);
 
-        // TODO: Check if attribute exists on type
+        // Check if attribute exists - for now, return any for unknown types
+        // Known struct types would be looked up in a type registry
+        if object_type == "table" {
+            // Table has known attributes
+            if expr.attribute == "col_count" || expr.attribute == "row_count" {
+                return "int".to_string();
+            }
+        }
         return "any".to_string();
 
     }
@@ -571,24 +914,105 @@ impl SemanticAnalyzer {
         // Analyze type constructor// 
         self.analyze_expression(&expr.argument);
         return expr.type_name.clone();
+    }
+
+    pub fn analyze_table_literal(&mut self, expr: &TableExpr) -> String {
+        // Analyze table literal
+        // Validate columns
+        let col_count = expr.columns.len();
+        
+        // Validate rows
+        for row in &expr.rows {
+            if row.values.len() != col_count {
+                 self.error(format!("Row '{}' has {} values, expected {} (columns)", 
+                     row.name, row.values.len(), col_count), 
+                     expr.node.line, expr.node.column);
+            }
+            for val in &row.values {
+                self.analyze_expression(val);
+            }
+        }
+        return "table".to_string();
+    }
+
+    pub fn analyze_await_expression(&mut self, expr: &AwaitExpr) -> String {
+        // Analyze await <expr>
+        let val_type = self.analyze_expression(&expr.value);
+        // Check if val_type is awaitable (Future, Promise, async return)
+        if val_type.starts_with("Future<") {
+            // Unwrap Future<T> to T
+            return val_type.trim_start_matches("Future<").trim_end_matches(">").to_string();
+        } else if val_type.starts_with("Promise<") {
+            return val_type.trim_start_matches("Promise<").trim_end_matches(">").to_string();
+        }
+        // For other types, await just returns the value (simplified)
+        return val_type;
+    }
 
     // ========================================
     // HELPER METHODS
     // ========================================
 
-    }
     pub fn types_compatible(&self, expected: String, actual: String)  ->  bool {
-        // Check if two types are compatible// 
+        // Check if two types are compatible
         if expected == actual {
             return true;
         }
         if expected == "any".to_string() || actual == "any".to_string() {
             return true;
-        // TODO: Add more sophisticated type checking
         }
+        
+        // Allow float to accept int (widening) if desired, or keep strict. 
+        // GUL spec implies explicit casting, but for builtins we might want flexibility.
+        // For now, keep strict but allow aliases if we had them.
+        
         return false;
-
+    }
 // Public API
+    pub fn analyze_struct_decl(&mut self, stmt: &StructDecl) {
+        // Analyze struct declaration
+        if self.current_scope.exists_in_current(stmt.name.clone()) {
+            self.error(format!("Struct '{}' already defined", stmt.name), stmt.node.line, stmt.node.column);
+        }
+        
+        // Define struct symbol
+        self.current_scope.define(stmt.name.clone(), Symbol{
+            name: stmt.name.clone(),
+            symbol_type: "struct".to_string(), 
+            is_mutable: false,
+            is_function: false,
+            signature: None,
+            ownership_mode: "owned".to_string(),
+            is_borrowed: false,
+            borrow_count: 0,
+            line: stmt.node.line,
+            column: stmt.node.column,
+        });
+        
+        // Enter struct scope (namespace for methods)
+        self.enter_scope();
+        
+        // Analyze fields
+        for field in &stmt.fields {
+            // Check if type exists?
+            // For now just accept type annotation string
+        }
+        
+        // Analyze methods
+        for method in &stmt.methods {
+            self.analyze_function_decl(method);
+        }
+        
+        self.exit_scope();
+    }
+
+    pub fn analyze_foreign_block(&mut self, stmt: &ForeignCodeBlock) {
+        // Analyze foreign code block
+        // Mostly opaque to analyzer, just pass.
+        let valid_langs = vec!["python", "rust", "js", "sql"];
+        if !valid_langs.contains(&stmt.language.as_str()) {
+            self.warn(format!("Unknown foreign language '{}'", stmt.language), stmt.node.line, stmt.node.column);
+        }
     }
 }
 pub fn analyze_semantics(program: Program)  ->  Vec<String> {

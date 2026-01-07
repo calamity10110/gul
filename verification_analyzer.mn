@@ -1,0 +1,20 @@
+
+# Test 1: Function Signature Mismatch (Argument Count)
+fn test_arg_count():
+    print("Test 1") 
+    # print expects 1 arg, but we give 2? Wait, print is generic "any" in spec but I defined it as 1 arg "any".
+    # Update: print in GUL usually takes multiple args but my analyzer def says 1 arg "any".
+    # Let's test math function which is strict.
+    let x = gul_math_sin(1.0, 2.0) # Should error: expects 1 arg
+
+# Test 2: Function Signature Mismatch (Type)
+fn test_arg_type():
+    print("Test 2")
+    let y = gul_math_sin("hello") # Should error: expects float
+
+# Test 3: Import Validation
+@imp std.unknown_module # Should warn/error
+
+mn:
+    test_arg_count()
+    test_arg_type()

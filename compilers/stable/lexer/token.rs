@@ -61,6 +61,10 @@ pub enum TokenType {
 
     // ML decorators
     AtGrad, // @grad
+    
+    // v4.0 New Features
+    AtTabl, // @tabl
+    Await, // await keyword (as specific token if needed, or matched as keyword)
 
     // Ownership modes
     Borrow,
@@ -247,6 +251,9 @@ pub fn get_keyword_type(word: String)  ->  TokenType {
     else if word == "finally".to_string() {
         return TokenType::Finally;
     }
+    else if word == "await".to_string() {
+        return TokenType::Await;
+    }
     else if word == "mn".to_string() {
         return TokenType::Mn;
     }
@@ -320,6 +327,9 @@ pub fn get_type_constructor_type(text: String)  ->  TokenType {
     else if suffix == "tensor".to_string() {
         return TokenType::AtTensor;
     }
+    else if suffix == "tabl".to_string() {
+        return TokenType::AtTabl;
+    }
     return TokenType::Error;
 
 }
@@ -356,6 +366,9 @@ pub fn get_decorator_type(text: String)  ->  TokenType {
     }
     else if suffix == "grad".to_string() {
         return TokenType::AtGrad;
+    }
+    else if suffix == "fn".to_string() {
+        return TokenType::Fn;
     }
     return TokenType::Error;
 

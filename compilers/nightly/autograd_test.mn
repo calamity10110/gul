@@ -1,0 +1,18 @@
+fn loss_function(x):
+    gul_autograd_begin()
+    let a = gul_make_var(x)
+    let b = gul_make_var(2.0)
+    let c = gul_var_mul(a, b) # c = x * 2
+    gul_backward(c)
+    let grad = gul_var_grad(a) # dc/dx = 2
+    gul_autograd_end()
+    return grad
+
+mn:
+    let val = 3.0
+    let g = loss_function(val)
+    print("Gradient (expected 2.0):")
+    # gul_print_float(g) # Compiler thinks 'g' is void? Type inference might be weak on C-call boundaries without hints?
+    # Let's try direct print or cast
+    print(g) 
+

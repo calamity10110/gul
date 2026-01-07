@@ -1,0 +1,24 @@
+# Type Casting Tests
+
+# Test 1: int to float via variable
+let x = 10
+let y = @flt(x)
+print(y)
+
+# Test 2: direct float cast
+var z = @flt(10)
+print(z)
+
+# Test 3: float to int
+let f = 10.7
+let i = @int(f)
+print(i)
+
+# Test 4: float arithmetic after cast
+let a = 5
+let b = @flt(a) + 2.5
+print(b)
+
+# Test 5: int operations after cast
+let c = @int(7.9)
+print(c)

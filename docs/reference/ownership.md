@@ -1,10 +1,8 @@
-# Ownership
+# Ownership Model Deep Dive
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2026-01-04
 
 ---
-
-# Ownership Model Deep Dive
 
 GUL implements a sophisticated ownership model that ensures memory safety while providing flexibility for different programming patterns. This guide explores the ownership system in detail.
 
@@ -30,8 +28,8 @@ GUL follows three fundamental ownership rules:
 ```gul
 # Ownership example
 mn:
-    x = "Hello"          # x owns the string
-    y = x                # ownership transfers to y
+    let x = "Hello"          # x owns the string
+    let y = x                # ownership transfers to y
     # print(x)           # Error: x no longer owns the value
     print(y)             # OK: y owns the value
 ```
@@ -39,12 +37,12 @@ mn:
 ### Ownership Transfer (Move Semantics)
 
 ```gul
-fn take_ownership(s: str):
+@fn take_ownership(s: str):
     print(s)             # s owns the string here
     # s is dropped when function ends
 
 mn:
-    text = "GUL"
+    let text = "GUL"
     take_ownership(text) # ownership moves to function parameter
     # print(text)        # Error: text no longer owns the value
 ```
@@ -70,7 +68,7 @@ mn:
     s += suffix          # Can modify borrowed value
 
 mn:
-    var text = "Hello"
+    let text = "Hello"
     append_text(ref text, ", World!")
     print(text)          # Output: "Hello, World!"
 ```
@@ -79,7 +77,7 @@ mn:
 
 ```gul
 mn:
-    var x = @list[1, 2, 3]
+    let x = @list[1, 2, 3]
 
     # Multiple immutable borrows allowed
     let r1 = borrow x
@@ -107,10 +105,10 @@ Small, fixed-size values are stored on the stack:
 
 ```gul
 # Stack-allocated values
-x: int = 42
-y: float = 3.14
-z: bool = True
-point = (10, 20)         # Tuple on stack
+let x: int = 42
+let y: float = 3.14
+let z: bool = true
+let point = (10, 20)         # Tuple on stack
 ```
 
 ### Heap Values
@@ -119,9 +117,9 @@ Larger or dynamically-sized values use the heap:
 
 ```gul
 # Heap-allocated values
-vec = vec[1, 2, 3, 4, 5]
-map = map{"key": "value"}
-text = "A longer string that needs heap allocation"
+let list = @list[1, 2, 3, 4, 5]
+let map = @dict{"key": "value"}
+let text = "A longer string that needs heap allocation"
 ```
 
 ### Copy Types
@@ -130,14 +128,12 @@ Some types implement `Copy` trait and can be copied instead of moved:
 
 ```gul
 # Types that implement Copy
-x: int = 42
-y = x                    # x is copied, not moved
-print(x, y)              # Both valid: Output: 42 42
-
-# Copy types in GUL:
 # - int, float, bool
 # - char
 # - Tuples of Copy types
+let x: int = 42
+let y = x                    # x is copied, not moved
+print(x, y)              # Both valid: Output: 42 42
 ```
 
 ### Clone
@@ -176,7 +172,7 @@ For complex reference patterns, GUL uses lifetime annotations:
 
 ```gul
 # Lifetime annotation syntax
-fn longest<'a>(x: &'a str, y: &'a str): &'a str:
+@fn longest<'a>(x: &'a str, y: &'a str) -> &'a str:
     if len(x) > len(y):
         return x
     else:
@@ -198,14 +194,15 @@ struct TextAnalyzer:
 
 mn:
     let content = "Hello world from GUL"
-    let analyzer = TextAnalyzer { text: borrow content }
+    # Struct Initialization
+    let analyzer = TextAnalyzer(content) # Assuming positional constructor
     print(analyzer.word_count())
 ```
 
 ### Multiple Lifetimes
 
 ```gul
-fn first_word<'a, 'b>(s1: &'a str, s2: &'b str): &'a str:
+@fn first_word<'a, 'b>(s1: &'a str, s2: &'b str) -> &'a str:
     return s1.split()[0]
 
 # Different lifetimes for different parameters
@@ -217,11 +214,11 @@ GUL automatically infers lifetimes in simple cases:
 
 ```gul
 # Explicit lifetimes
-fn first<'a>(s: &'a str): &'a str:
+@fn first<'a>(s: &'a str) -> &'a str:
     return s.split()[0]
 
 # Implicit (lifetime elision)
-fn first(s: &str): &str:
+@fn first(s: &str) -> &str:
     return s.split()[0]
 ```
 
@@ -242,13 +239,13 @@ print(*boxed)            # Dereference to access value
 For multiple ownership scenarios:
 
 ```gul
-import std.rc
+@imp std.rc
 
 # Shared ownership with reference counting
-data = vec[1, 2, 3]
-owner1 = Rc.new(data)
-owner2 = owner1.clone()  # Increment ref count
-owner3 = owner1.clone()  # Increment ref count
+let data = @list[1, 2, 3]
+let owner1 = Rc.new(data)
+let owner2 = owner1.clone()  # Increment ref count
+let owner3 = owner1.clone()  # Increment ref count
 
 print(Rc.strong_count(owner1))  # Output: 3
 ```
@@ -258,19 +255,19 @@ print(Rc.strong_count(owner1))  # Output: 3
 Thread-safe reference counting:
 
 ```gul
-import std.arc
-import std.thread
+@imp std.arc
+@imp std.thread
 
 # Shared data across threads
-shared_data = Arc.new(vec[1, 2, 3, 4, 5])
+let shared_data = Arc.new(@list[1, 2, 3, 4, 5])
 
-fn process_data(data: Arc[vec[int]]):
+@fn process_data(data: Arc[@list[int]]):
     for item in *data:
         print(item)
 
 # Clone Arc for each thread
-thread1 = thread.spawn(|| process_data(shared_data.clone()))
-thread2 = thread.spawn(|| process_data(shared_data.clone()))
+let thread1 = thread.spawn(|| process_data(shared_data.clone()))
+let thread2 = thread.spawn(|| process_data(shared_data.clone()))
 
 thread1.join()
 thread2.join()
@@ -281,12 +278,12 @@ thread2.join()
 Allows mutation through immutable references:
 
 ```gul
-import std.refcell
+@imp std.refcell
 
 # Interior mutability pattern
-counter = RefCell.new(0)
+let counter = RefCell.new(0)
 
-fn increment(r: &RefCell[int]):
+@fn increment(r: &RefCell[int]):
     var value = r.borrow_mut()
     *value += 1
 
@@ -298,23 +295,23 @@ print(*counter.borrow())  # Output: 2
 ### Combining Smart Pointers
 
 ```gul
-import std.rc
-import std.refcell
+@imp std.rc
+@imp std.refcell
 
 # Rc + RefCell for shared mutable state
-shared_state = Rc.new(RefCell.new(map{
+let shared_state = Rc.new(RefCell.new(@dict{
     "count": 0,
     "total": 0
 }))
 
 # Multiple owners can mutate
-fn update_stats(state: Rc[RefCell[map]]):
+@fn update_stats(state: Rc[RefCell[@dict]]):
     var s = state.borrow_mut()
     s["count"] += 1
     s["total"] += 100
 
-state1 = shared_state.clone()
-state2 = shared_state.clone()
+let state1 = shared_state.clone()
+let state2 = shared_state.clone()
 
 update_stats(state1)
 update_stats(state2)
@@ -331,11 +328,11 @@ print(*shared_state.borrow())  # {"count": 2, "total": 200}
 # Sync: Can share references between threads
 
 # Types implementing Send can be moved to threads
-fn spawn<T: Send>(f: fn(): T):
+@fn spawn<T: Send>(f: @fn() -> T):
     thread.spawn(f)
 
 # Types implementing Sync can be accessed from multiple threads
-fn share<T: Sync>(value: &T):
+@fn share<T: Sync>(value: &T):
     # Can safely share reference
     pass
 ```
@@ -343,20 +340,20 @@ fn share<T: Sync>(value: &T):
 ### Mutex for Shared Mutable State
 
 ```gul
-import std.sync.mutex
+@imp std.sync.mutex
 
 # Thread-safe mutable state
-counter = Mutex.new(0)
+let counter = Mutex.new(0)
 
-fn increment_counter(m: &Mutex[int]):
+@fn increment_counter(m: &Mutex[int]):
     var guard = m.lock()
     *guard += 1
     # Lock automatically released when guard goes out of scope
 
 # Use across threads
-threads = []
-for i in range(10):
-    t = thread.spawn(|| increment_counter(&counter))
+let threads = @list[]
+for i in 0..10:
+    let t = thread.spawn(|| increment_counter(&counter))
     threads.push(t)
 
 for t in threads:
@@ -368,19 +365,19 @@ print(*counter.lock())  # Output: 10
 ### RwLock (Read-Write Lock)
 
 ```gul
-import std.sync.rwlock
+@imp std.sync.rwlock
 
 # Multiple readers, single writer
-data = RwLock.new(map{"key": "value"})
+let data = RwLock.new(@dict{"key": "value"})
 
 # Multiple reads simultaneously
-fn read_data(lock: &RwLock[map]):
-    guard = lock.read()
+@fn read_data(lock: &RwLock[@dict]):
+    let guard = lock.read()
     print(guard["key"])
 
 # Single write
-fn write_data(lock: &RwLock[map]):
-    var guard = lock.write()
+@fn write_data(lock: &RwLock[@dict]):
+    let guard = lock.write()
     guard["key"] = "new value"
 ```
 
@@ -393,20 +390,20 @@ struct FileHandler:
     path: str
     handle: File
 
-    fn new(path: str): FileHandler:
+    @fn new(path: str) -> FileHandler:
         return FileHandler {
             path: path,
             handle: File.open(path)
         }
 
     # Drop automatically called when out of scope
-    fn drop(self):
+    @fn drop(self):
         print(f"Closing file: {self.path}")
         self.handle.close()
 
 mn:
     {
-        file = FileHandler.new("data.txt")
+        let file = FileHandler.new("data.txt")
         # Use file...
     }  # file.drop() called here automatically
 ```
@@ -414,10 +411,10 @@ mn:
 ### Manual Drop
 
 ```gul
-import std.mem
+@imp std.mem
 
 mn:
-    resource = allocate_resource()
+    let resource = allocate_resource()
 
     # Use resource...
 
@@ -425,7 +422,6 @@ mn:
     mem.drop(resource)
 
     # resource is now invalid
-}
 ```
 
 ## 💡 Advanced Patterns
@@ -435,25 +431,25 @@ mn:
 ```gul
 struct QueryBuilder:
     table: str
-    conditions: vec[str]
+    conditions: @list[str]
     order_by: str?
 
-    fn new(table: str): QueryBuilder:
+    @fn new(table: str) -> QueryBuilder:
         return QueryBuilder {
             table: table,
-            conditions: vec[],
+            conditions: @list[],
             order_by: None
         }
 
-    fn where(mut self, condition: str): QueryBuilder:
+    @fn where(mut self, condition: str) -> QueryBuilder:
         self.conditions.push(condition)
         return self
 
-    fn order(mut self, column: str): QueryBuilder:
+    @fn order(mut self, column: str) -> QueryBuilder:
         self.order_by = Some(column)
         return self
 
-    fn build(self): str:
+    @fn build(self) -> str:
         var query = f"SELECT * FROM {self.table}"
 
         if len(self.conditions) > 0:
@@ -465,7 +461,7 @@ struct QueryBuilder:
         return query
 
 # Usage with method chaining
-query = QueryBuilder.new("users")
+let query = QueryBuilder.new("users")
     .where("age > 18")
     .where("active = true")
     .order("created_at")
@@ -484,38 +480,38 @@ query = QueryBuilder.new("users")
 
 # Pattern matching with ownership
 match find_user(42):
-    Some(user):
+    Some(user) =>:
         process_user(user)  # user owned here
-    None:
+    None =>:
         print("User not found")
 
 # Result type
-fn parse_config(path: str): Result[Config, Error]:
+@fn parse_config(path: str) -> Result[Config, Error]:
     try:
-        content = File.read(path)
-        config = parse(content)
+        let content = File.read(path)
+        let config = parse(content)
         return Ok(config)
     catch e:
         return Err(e)
 
 # Handle Result with ownership
 match parse_config("config.json"):
-    Ok(config):
+    Ok(config) =>:
         use_config(config)  # config owned here
-    Err(error):
+    Err(error) =>:
         handle_error(error)
 ```
 
 ### Custom Drop Implementation
 
 ```gul
-import std.mem
+@imp std.mem
 
 struct DatabaseConnection:
     url: str
     pool: ConnectionPool
 
-    fn drop(self):
+    @fn drop(self):
         # Custom cleanup logic
         print("Closing database connections")
         self.pool.close_all()
@@ -527,15 +523,15 @@ struct DatabaseConnection:
 ### Ownership Diagnostics
 
 ```gul
-import std.mem
+@imp std.mem
 
-fn debug_ownership():
-    x = vec[1, 2, 3]
+@fn debug_ownership():
+    let x = @list[1, 2, 3]
 
     # Check if value is moved
     print(mem.is_owned(x))  # true
 
-    y = x
+    let y = x
     # print(mem.is_owned(x))  # Error: x moved
     print(mem.is_owned(y))  # true
 
@@ -549,10 +545,9 @@ GUL provides helpful error messages:
 
 ```gul
 mn:
-    x = "hello"
-    y = x
+    let x = "hello"
+    let y = x
     print(x)
-}
 
 # Error message:
 # Error: value used after move
@@ -572,12 +567,12 @@ mn:
 
 ```gul
 # ❌ Bad: Unnecessary ownership transfer
-@fn process(data: list[int]):
+@fn process(data: @list[int]):
     for item in data:
         print(item)
 
 # ✅ Good: Borrow instead
-@fn process(data: borrow list[int]):
+@fn process(data: borrow @list[int]):
     for item in data:
         print(item)
 ```
@@ -586,13 +581,13 @@ mn:
 
 ```gul
 # ❌ Bad: Excessive cloning
-fn expensive_clone(data: vec[LargeStruct]):
-    copy1 = data.clone()
-    copy2 = data.clone()
-    copy3 = data.clone()
+@fn expensive_clone(data: @list[LargeStruct]):
+    let copy1 = data.clone()
+    let copy2 = data.clone()
+    let copy3 = data.clone()
 
 # ✅ Good: Use references
-fn efficient_borrows(data: &vec[LargeStruct]):
+@fn efficient_borrows(data: &@list[LargeStruct]):
     process_ref1(data)
     process_ref2(data)
     process_ref3(data)
@@ -606,7 +601,7 @@ struct Parser<'a>:
     input: &'a str
     position: int
 
-    fn parse(self): Result[Token<'a>, Error]:
+    @fn parse(self) -> Result[Token<'a>, Error]:
         # Token borrows from input
         ...
 ```
@@ -615,11 +610,11 @@ struct Parser<'a>:
 
 ```gul
 # ✅ Good: Use Rc for shared ownership
-import std.rc
+@imp std.rc
 
-shared_data = Rc.new(expensive_resource())
-consumer1 = Consumer.new(shared_data.clone())
-consumer2 = Consumer.new(shared_data.clone())
+let shared_data = Rc.new(expensive_resource())
+let consumer1 = Consumer.new(shared_data.clone())
+let consumer2 = Consumer.new(shared_data.clone())
 ```
 
 ## 📖 See Also
@@ -630,6 +625,6 @@ consumer2 = Consumer.new(shared_data.clone())
 
 ---
 
-**Last Updated**: 2025-12-28  
-**Version: 0.13.0  
+**Last Updated**: 2026-01-04
+**Version**: 0.13.0
 **License**: MIT

@@ -1,0 +1,9 @@
+@fn run() -> int:
+    let l = [1, 2, 3]
+    let d = {"a": 1, "b": 2}
+    print(l)
+    print(l[0])
+    return 0
+
+mn:
+    run()

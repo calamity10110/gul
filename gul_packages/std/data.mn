@@ -1,37 +1,160 @@
-# Data Science Module for GUL
-# Ported from NumPy / Pandas
+# GUL Data Science Module
+# DataFrame and Series implementation (Pandas-like)
 
-module numpy:
-    struct Array:
-        data: vec<float>
-        shape: vec<int>
-        
-        fn new(data: vec<float>) -> Array:
-            return Array { data, shape: [data.len()] }
-            
-        fn mean(self) -> float:
-            sum = 0.0
-            for x in self.data:
-                sum = sum + x
-            return sum / self.data.len().to_float()
-            
-        fn sum(self) -> float:
-            # mock sum
-            return 0.0
+@imp std.tensor
+@imp std.alloc
 
-module pandas:
-    struct Series:
-        name: string
-        data: vec<any>
+# ============================================
+# File I/O Bindings
+# ============================================
+
+@extern("gul_file_open")
+fn _fopen(path: str, mode: str) -> int
+
+@extern("gul_file_close")
+fn _fclose(file: int)
+
+@extern("gul_file_read_line")
+fn _readline(file: int) -> str
+
+# ============================================
+# Series - 1D Labeled Data
+# ============================================
+
+struct Series:
+    name: str
+    data: vec<any>
+    
+    fn new(name: str, data: vec<any>) -> Series:
+        return Series { name: name, data: data }
         
-    struct DataFrame:
-        columns: map<string, Series>
+    fn len(self) -> int:
+        return len(self.data)
         
-        fn new(data: map<string, vec<any>>) -> DataFrame:
-            return DataFrame { columns: {} }
+    fn get(self, idx: int) -> any:
+        return self.data[idx]
+
+# ============================================
+# DataFrame - 2D Labeled Data Structure
+# ============================================
+
+struct DataFrame:
+    columns: map<str, Series>
+    index: vec<any>
+    shape: vec<int>
+    
+    fn new() -> DataFrame:
+        return DataFrame { 
+            columns: {}, 
+            index: [],
+            shape: [0, 0]
+        }
+    
+    # Create from dict of lists
+    fn from_dict(data: map<str, vec<any>>) -> DataFrame:
+        var df = DataFrame::new()
+        var num_rows = 0
+        var first = true
+        
+        for name, values in data:
+             if first:
+                 num_rows = len(values)
+                 first = false
+             else:
+                 if len(values) != num_rows:
+                     print("Error: Column lengths mismatch")
+                     return df
+             
+             df.columns[name] = Series::new(name, values)
+        
+        # Create default index
+        for i in range(num_rows):
+            df.index.push(i)
             
-        fn head(self, n: int = 5):
-            print("Showing top " + n.to_string() + " rows")
+        df.shape = [num_rows, len(df.columns)]
+        return df
+
+
+
+    fn head(self, n: int = 5):
+        print(" DataFrame head (" + n.to_string() + " rows)")
+        var count = 0
+        for i in self.index:
+            if count >= n: break
             
-        fn describe(self):
-            print("DataFrame stats...")
+            var row_str = i.to_string() + " | "
+            for name, series in self.columns:
+                row_str = row_str + series.data[i].to_string() + "\t"
+            print(row_str)
+            count = count + 1
+            
+    fn describe(self):
+        print("DataFrame Summary:")
+        print("Rows: " + self.shape[0].to_string())
+        print("Cols: " + self.shape[1].to_string())
+        for name, series in self.columns:
+            print("- " + name)
+
+    fn split(s: str, delim: str) -> vec<str>:
+        var result = []
+        let n = gul_string_len(s)
+        var start = 0
+        for i in range(n):
+            let c = gul_string_get(s, i)
+            if c == delim:
+                let sub = gul_string_substr(s, start, i - start)
+                result.push(sub)
+                start = i + 1
+        # Last part
+        if start < n:
+            result.push(gul_string_substr(s, start, n - start))
+        elif start == n:
+             # Trailing empty string if delim is last char? Or ignore.
+             # Python split behavior: "a," -> ["a", ""]
+             result.push("")
+        return result
+
+    # Read CSV file
+    fn read_csv(path: str) -> DataFrame:
+        var file = _fopen(path, "r")
+        if file == 0:
+            print("Error: Could not open file " + path)
+            return DataFrame::new()
+            
+        var df = DataFrame::new()
+        
+        # Read header
+        let header_line = _readline(file)
+        if gul_string_len(header_line) == 0:
+             return df
+             
+        let headers = split(header_line, ",")
+        
+        # Init columns
+        for h in headers:
+            df.columns[h] = Series::new(h, [])
+            
+        # Read rows
+        var row_idx = 0
+        while true:
+            let line = _readline(file)
+            if gul_string_len(line) == 0:
+                break
+            
+            let values = split(line, ",")
+            if len(values) != len(headers):
+                 print("Warning: Row length mismatch")
+                 continue
+                 
+            for i in range(len(headers)):
+                let col_name = headers[i]
+                # Try parsing float/int? For now store as string or rely on implicit types
+                # Using 'any' vector.
+                df.columns[col_name].data.push(values[i])
+            
+            df.index.push(row_idx)
+            row_idx = row_idx + 1
+        
+        df.shape = [row_idx, len(headers)]
+        _fclose(file)
+        return df

@@ -1,7 +1,7 @@
 # GUL Tensor Operations Test
 # Tests basic tensor functionality
 
-use std::tensor
+@imp std.tensor
 
 mn:
     print("=== Tensor Test ===")

@@ -1,0 +1,25 @@
+@async fn fetch_data():
+    return @dict{data: 1}
+
+mn:
+    # Test Table
+    let t = @tabl {
+        (col1, col2):
+        row1: {1, 2},
+        row2: {3, 4}
+    }
+
+    # Test Try/Catch
+    try:
+        print("Try block")
+        let x = 1 / 0
+    catch e:
+        print("Caught error")
+    finally:
+        print("Cleanup")
+
+    # Test Await
+    # Note: await is only valid in async functions usually, but parser allows it as expression
+    # depending on semantic analysis. For parser test, this is fine.
+    # We'll wrap in async function if needed, but parser usually context-free.
+    pass

@@ -46,7 +46,7 @@ GUL aims to be a "universal" language, suitable for:
 
 - **Readability First**: Syntax should be obvious and clean
 - **Safety by Default**: Memory safety without GC pause times
-- **Interoperability**: Seamless integration with existing ecosystems (Python, Rust, C, JavaScript)
+- **Interoperability**: Seamless integration with existing ecosystems (Python, Rust, C, JavaScript, SQL)
 - **Performance**: Native compilation for maximum speed
 - **Simplicity**: Python-like syntax with Rust-like safety
 
@@ -150,7 +150,7 @@ The lexer produces keywords, identifiers, literals, operators, delimiters, and s
 **Primary Keywords:**
 
 - `let`, `var` (Variables)
-- `@fn`, `@async`, `return`, `await` (Functions)
+- `@fn`, `return`, `@async`, `await` (Functions)
 - `mn:` (Entry point)
 - `struct`, `enum` (Types)
 - `if`, `elif`, `else`, `match` (Conditional)
@@ -185,7 +185,7 @@ f"formatted {var}"
 **Collection Literals:**
 
 ```gul
-(1, 2)              # Tuple
+(1, 2)              # Set
 [1, 2, 3]           # List
 {key: value}        # Dictionary
 ```
@@ -211,8 +211,7 @@ var numbers = @list[1, 2, 3]        # Literal mutable
 let matrix = @list[[1, 2], [3, 4]]  # Multi-dimensional immutable
 var matrix = @list[[1, 2], [3, 4]]  # Multi-dimensional mutable
 
-# Methods
-# Methods
+#### Methods
 numbers.insertbefore(99) # Insert at begin
 numbers.insertbefore(0, 99) # Insert at index, count from begin
 numbers.insertafter(0, 99) # Insert at index, count from end 
@@ -233,24 +232,22 @@ numbers[-1]  # Last element
 let config = @dict{host: "localhost", port: 8080}  # Immutable
 var cfg = @dict{host: "localhost", port: 8080}  # Mutable
 
-#/ Methods
+#### Methods
 config.contains("port")     # Membership verify
 config.len()                # Length property
-
-#/ Access
-name[key]  # By identifier
+config[key]  # access by identifier
 config(host)
-name["key"]  # By string
+config["key"]  # access by string
 config("host")
 
-#/ Insertion methods (maintains order)
+#### Insertion methods (maintains order)
 cfg.insertbefore(position, key: value)  # Insert at position/default begin
 cfg.insertbefore(target_key, key: value)  # Insert before key
 cfg.insertafter(key: value)  # Insert at end (default)
 cfg.insertafter(target_key, key: value)  # Insert after key
 cfg.add(key: value)  # Append at end
 
-#/ Removal
+#### Removal
 cfg.remove(position)  # By position
 cfg.remove(key)  # By key
 cfg.remove(key: value)  # By key-value pair
@@ -263,8 +260,7 @@ cfg.remove(key: value)  # By key-value pair
 let tags = @set{"a", "b"}
 var tags = @set{"a", "b"}
 
-# Methods
-# Methods
+#### Methods
 tags.add("c")             # Add element
 tags.contains("C")        # Membership verify
 tags.remove("b")          # Remove element
@@ -312,26 +308,24 @@ GUL uses a move-by-default system for non-primitive types, ensuring memory safet
 ### 5.2 Ownership Modes
 
 - **`borrow`**: not transfer ownership, immutable Read-only copy (default for reading).
+- **`kept`**: transfer ownership to downstream, Immutable Read-only data.
 - **`ref`**: not transfer ownership, mutable copy.
-- **`move`**: transfer ownership, mutable.
-- **`kept`**: transfer ownership, Immutable.
+- **`move`**: transfer ownership to downstream, mutable data.
 
 ### 5.3 Examples
 
 ```gul
 @fn  process(data: borrow @list):
-    # 'data' is not owned here, caller keeps it
+    #/ immutable 'data' is not owned by process here, upstream caller keeps it
     print(data[0])
-
-@fn  consume(data: move @list):
-    # 'data' is owned here, caller loses it
-
-@fn  consume(data: ref @list):
-    # 'data' is copied here, caller keeps it
-    data.push(4)
-
 @fn  consume(data: kept @list):
-    # 'data' is copied here, caller loses it
+    #/ immutable 'data' is copied here, downstream caller owns it
+    data.push(4)
+@fn  consume(data: ref @list):
+    #/ mutable 'data' is copied here, downstream caller owns it
+    data.push(4)
+@fn  consume(data: move @list):
+    #/ mutable 'data' is owned by consume here, upstream caller loses it
     data.push(4)
 ```
 
@@ -433,6 +427,13 @@ let x = 3.14
 match x:
     3.14 => print("Pi")
     other => print("Not Pi: " + other) // other is float
+```
+
+Pipeline Operator (|>)
+
+```gul
+let x = 3.14
+x |> print
 ```
 
 ### 8.2 Imports

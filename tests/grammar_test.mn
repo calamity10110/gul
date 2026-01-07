@@ -1,0 +1,26 @@
+# Grammar Compatibility Tests for v3.3
+# Testing strict literal parsing
+
+# Integer literals
+let i1 = 42
+let i2 = -10
+let i3 = 0
+
+# Float literals  
+let f1 = 3.14
+let f2 = -2.5
+let f3 = 0.0
+
+# String literals
+let s1 = "hello"
+let s2 = "world"
+
+# Boolean literals
+let b1 = true
+let b2 = false
+
+# Print tests
+print(i1)
+print(f1)
+print(s1)
+print(b1)

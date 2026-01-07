@@ -34,6 +34,7 @@ GUL is a modern, multi-paradigm programming language that combines the best feat
 - ✅ **Async/Await**: Built-in cooperative multitasking
 - ✅ **Pattern Matching**: Rust-style match expressions
 - ✅ **Foreign Code**: Embed Python, Rust, JavaScript, SQL directly
+- ✅ **Auto-Differentiation**: Built-in gradient tracking with `@grad`
 
 ### Ecosystem
 
@@ -228,6 +229,22 @@ match status_code:
 @sql {
     SELECT * FROM users WHERE age > 18
 }
+```
+
+### Auto-Differentiation
+
+Built-in support for gradient computation:
+
+```gul
+fn loss(x, y):
+    gul_autograd_begin()
+    let a = gul_make_var(x)
+    let b = gul_make_var(y)
+    let z = gul_var_mul(a, b) # z = x * y
+    gul_backward(z)
+    let grad_x = gul_var_grad(a) # dy/dx
+    gul_autograd_end()
+    return grad_x
 ```
 
 ---
