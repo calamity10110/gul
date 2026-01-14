@@ -21,7 +21,7 @@ Tests that should pass on **both** `gul_stable` and `gul_nightly`.
 Basic compilation verification.
 
 ```gul
-fn main():
+@fn mn:
     let x = 10
     print("Sanity Check passed")
     print(x)
@@ -145,7 +145,7 @@ jobs:
 ### Test File Format
 
 ```gul
-fn main():
+@fn mn:
     # Test code here
     print(result)
 

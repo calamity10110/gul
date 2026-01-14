@@ -3,6 +3,9 @@
     let d = {"a": 1, "b": 2}
     print(l)
     print(l[0])
+    
+    print(d)
+    print(d["a"])
     return 0
 
 mn:

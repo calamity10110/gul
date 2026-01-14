@@ -1,6 +1,6 @@
 # Ownership Model Deep Dive
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2026-01-04
+**Version**: 0.14.0-dev | **Syntax**: v3.2 | **Updated**: 2026-01-04
 
 ---
 
@@ -626,5 +626,5 @@ let consumer2 = Consumer.new(shared_data.clone())
 ---
 
 **Last Updated**: 2026-01-04
-**Version**: 0.13.0
+**Version**: 0.14.0-dev
 **License**: MIT

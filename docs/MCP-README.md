@@ -1,6 +1,6 @@
 # GUL Documentation
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **MCP**: Enabled
+**Version**: 0.14.0-dev | **Syntax**: v3.2 | **MCP**: Enabled
 
 ---
 
@@ -153,7 +153,7 @@ struct User:
 }
 
 @rust {
-    fn fast_calc(x: i64) -> i64 {
+   @fn fast_calc(x: i64) -> i64 {
         x * x
     }
 }
@@ -250,7 +250,7 @@ model.train(data, labels, epochs=10)
 
 ---
 
-**Last Updated**: 2025-12-28  
-**Version**: 0.13.0  
+**Last Updated**: 2026-01-08  
+**Version**: 0.14.0-dev  
 **Syntax**: v3.2  
 **Status**: Production Ready ✅

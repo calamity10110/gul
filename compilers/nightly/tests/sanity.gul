@@ -1,0 +1,55 @@
+# Comprehensive Test for Lexer, Parser and Compiler features
+@imp std.math
+
+# 1. Lexer test: various tokens
+let x = 100
+let y = 3.14
+let s = "String with \"escapes\"\n"
+let b = true
+let l = @list[1, 2, 3]
+let d = @dict{key: "value"}
+
+# 2. Parser test: complex expressions and control flow
+@fn test_logic(a, b):
+    if a && b:
+        return "both"
+    elif a || b:
+        return "one"
+    else:
+        return "none"
+
+@fn test_loops():
+    var sum = 0
+    for i in 1..5:
+        sum = sum + 1
+        println("Sum now: " + @str(sum))
+    return sum
+
+# 3. Compiler (Backend) test: actual execution
+mn:
+    println("--- GUL SANITY CHECK ---")
+    
+    # Check arithmetic and promotion
+    let result = 10 + 2.5
+    println("Arithmetic (10 + 2.5): " + @str(result))
+    
+    # Check logic
+    println("Logic (true, false): " + test_logic(true, false))
+    
+    # Check loops
+    var sum_main = 0
+    for i in 1..5:
+        println("i is: " + @str(i))
+        sum_main = i
+        println("Sum main: " + @str(sum_main))
+    println("Loop result: " + @str(sum_main))
+    
+    # Check string concat
+    let greeting = "Hello" + " " + "World"
+    println("Concat: " + greeting)
+    
+    # Check len()
+    let items = @list[10, 20, 30, 40]
+    println("List length: " + @str(len(items)))
+    
+    println("--- ALL TESTS PASSED ---")

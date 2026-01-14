@@ -41,6 +41,7 @@ pub enum Token {
     Global, // @global
     Static, // @static
     Local,  // @local
+    Parallel, // parallel keyword
 
     // New keywords (v3.0)
     Let, // let (immutable, replaces const/def)
@@ -58,6 +59,10 @@ pub enum Token {
     Borrow,  // borrow<T> - mutable access, no move
     TakeOwn, // take - ownership transfer
     Gives,   // gives - ownership via copy
+
+    // v3.2 Keywords
+    AlsoFor,   // also_for (parallel for)
+    AlsoWhile, // also_while (parallel while)
 
     // Literals
     Integer(i64),
@@ -97,6 +102,7 @@ pub enum Token {
     Colon,
     Dot,
     Arrow,
+    FatArrow, // =>
 
     // UI Syntax
     UiSprite(String),
@@ -300,8 +306,12 @@ impl Lexer {
                             self.advance();
                         }
                         '/' => {
-                            tokens.push(Token::Slash);
-                            self.advance();
+                            if self.peek(1) == Some('/') {
+                                self.skip_comment();
+                            } else {
+                                tokens.push(Token::Slash);
+                                self.advance();
+                            }
                         }
                         '%' => {
                             tokens.push(Token::Percent);
@@ -350,6 +360,10 @@ impl Lexer {
                         '=' => {
                             if self.peek(1) == Some('=') {
                                 tokens.push(Token::EqualEqual);
+                                self.advance();
+                                self.advance();
+                            } else if self.peek(1) == Some('>') {
+                                tokens.push(Token::FatArrow);
                                 self.advance();
                                 self.advance();
                             } else {
@@ -547,15 +561,16 @@ impl Lexer {
         // Check for keywords first - v2.0 keywords take priority
         let token = match value.as_str() {
             // v3.0 keywords (highest priority)
-            "let" => Token::Let,
+            "const" => Token::Let, // const is now the keyword for immutable (was let)
+            "let" => {
+                 eprintln!("Warning: 'let' is deprecated, use 'const' instead");
+                 Token::Let
+            },
             "var" => Token::Var,
 
             // v2.0 keywords (primary)
             "import" | "use" => Token::Import,
-            "const" => {
-                eprintln!("Warning: 'const' is deprecated, use 'let' instead");
-                Token::Const
-            }
+            // "const" removed from here as it's now v3.0 primary
             "mut" => {
                 eprintln!("Warning: 'mut' is deprecated, use 'var' instead");
                 Token::Mut
@@ -573,6 +588,9 @@ impl Lexer {
             "global" => Token::Global,
             "static" => Token::Static,
             "local" => Token::Local,
+            "parallel" => Token::Parallel,
+            "also_for" => Token::AlsoFor,
+            "also_while" => Token::AlsoWhile,
 
             // Legacy keywords (backward compatibility with warnings)
             "imp" => {

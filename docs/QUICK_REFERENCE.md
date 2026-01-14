@@ -1,6 +1,6 @@
 # GUL v3.2 Quick Reference
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-30
+**Version**: 0.14.0-dev | **Syntax**: v3.2 | **Updated**: 2026-01-08
 
 ---
 
@@ -13,7 +13,8 @@
 5. [Structs](#structs)
 6. [Control Flow](#control-flow)
 7. [Foreign Code](#foreign-code)
-8. [MCP Commands](#mcp-commands)
+8. [Autograd](#autograd)
+9. [MCP Commands](#mcp-commands)
 
 ---
 
@@ -29,6 +30,9 @@ let age = @int(30)            # Integer
 let score = @float(95.5)      # Float also accepts @flt(95)
 let active = @bool(true)      # Boolean
 let tuple = (1, 2)            # Tuple (treated as List)
+
+// C-Style comments supported (v3.2)
+# Legacy comments also supported
 ```
 
 ### String Interpolation
@@ -83,7 +87,8 @@ numbers.pop()               # Remove from end
 numbers.pop(0)              # Remove at index
 numbers.clear()             # Empty list
 numbers.contains("C")       # Membership verify
-numbers.len()               # Length property
+len(numbers)               # Length (Builtin)
+numbers.len()               # Length (Method)
 numbers[0]  # First element
 numbers[-1]  # Last element
 ```
@@ -100,7 +105,8 @@ tags.add("c")             # Add element
 tags.contains("C")        # Membership verify
 tags.remove("b")          # Remove element
 tags.clear()              # Empty set
-tags.len()                # Length property
+len(tags)                 # Length (Builtin)
+tags.len()                # Length (Method)
 ```
 
 ### Dictionaries
@@ -116,6 +122,8 @@ cfg["host"] or cfg.host
 cfg.insert("key", "value")
 cfg.remove("key")
 cfg.get("key")
+len(cfg)                  # Length (Builtin)
+cfg.len()                 # Length (Method)
 ```
 
 ### Tables (@tabl)
@@ -143,8 +151,8 @@ data.row_count
 @fn  greet(name: str) -> str:
     return "Hello, " + name
 
-@fn  add(a: int, b: int) -> int:
-    return a + b
+@fn  add(a: int, b: int)(res):
+    res = a + b
 
 @fn  process(data: borrow list, config: move dict):
     # Ownership: borrow (read-only), move (consume)
@@ -161,9 +169,9 @@ let add = (a, b) => a + b
 ### Async Functions
 
 ```gul
-@async fetch_data(url: str) -> dict:
-    let response = await http.get(url)
-    return response.json()
+# Async shortcut (v3.2)
+async fetch_data(url: str)(res):
+    res = await http.get(url)
 ```
 
 ### Input/Output
@@ -211,11 +219,12 @@ else:
 while count < 10:
     count = count + 1
 
-for item in items:
-    print(item)
-
 for i in 0..10:
     print(i)
+
+# Parallel (also_for, also_while)
+also_for i in 0..10:
+    process(i)
 ```
 
 ### Match
@@ -263,6 +272,34 @@ let result = python.mean
 @sql {
     SELECT * FROM users
 }
+```
+
+---
+
+---
+
+## Autograd
+
+Automatic differentiation support for machine learning.
+
+```gul
+@fn train():
+    autograd_begin()
+    
+    let x = make_var(10.0)
+    let y = make_var(20.0)
+    let z = var_add(x, y)
+    
+    # Forward pass value
+    print(var_val(z)) # 30.0
+    
+    # Backward pass
+    backward(z)
+    
+    # Get gradients
+    print(var_grad(x)) # 1.0
+    
+    autograd_end()
 ```
 
 ---

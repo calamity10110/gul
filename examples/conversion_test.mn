@@ -1,0 +1,15 @@
+@fn run() -> int:
+    print("Testing Auto-Conversion")
+    
+    let x: str = 123
+    print(x)
+    
+    let y: str = 45.67
+    print(y)
+    
+    print("Conversion complete")
+    
+    return 0
+
+mn:
+    run()

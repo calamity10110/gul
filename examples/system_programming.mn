@@ -1,0 +1,147 @@
+# GUL System Programming - File System Simulator
+# Category: Systems / OS Operations
+
+@fn allocate_memory(size: int) -> int:
+    print("Allocating memory:")
+    print(size)
+    
+    # Simulate memory address
+    let address = size * 1000
+    return address
+
+@fn free_memory(address: int) -> int:
+    print("Freeing memory at:")
+    print(address)
+    return 0
+
+@fn create_file(file_id: int, size: int) -> int:
+    print("Creating file ID:")
+    print(file_id)
+    print("Size:")
+    print(size)
+    
+    let mem_addr = allocate_memory(size)
+    return mem_addr
+
+@fn read_file(file_id: int, offset: int, length: int) -> int:
+    print("Reading file ID:")
+    print(file_id)
+    print("Offset:")
+    print(offset)
+    print("Length:")
+    print(length)
+    
+    # Simulate bytes read
+    return length
+
+@fn write_file(file_id: int, offset: int, data: int) -> int:
+    print("Writing to file ID:")
+    print(file_id)
+    print("At offset:")
+    print(offset)
+    print("Data:")
+    print(data)
+    
+    return offset + 1
+
+@fn delete_file(file_id: int, mem_addr: int) -> int:
+    print("Deleting file ID:")
+    print(file_id)
+    
+    let freed = free_memory(mem_addr)
+    return 0
+
+@fn list_directory() -> int:
+    print("Listing directory contents:")
+    
+    # Simulate 5 files
+    let file_count = 5
+    let i = 1
+    
+    while i <= file_count:
+        print("File:")
+        print(i)
+        i = i + 1
+    
+    return file_count
+
+@fn get_file_info(file_id: int) -> int:
+    # Simulate file metadata
+    let size = file_id * 1024
+    let created_time = 1000000 + file_id
+    let modified_time = created_time + 86400
+    
+    print("File size:")
+    print(size)
+    print("Created:")
+    print(created_time)
+    print("Modified:")
+    print(modified_time)
+    
+    return size
+
+@fn calculate_disk_usage() -> int:
+    let used_space = 0
+    let i = 1
+    
+    while i <= 10:
+        let file_size = i * 100
+        used_space = used_space + file_size
+        i = i + 1
+    
+    let total_space = 10000
+    let free_space = total_space - used_space
+    let usage_percent = (used_space * 100) / total_space
+    
+    print("Used space:")
+    print(used_space)
+    print("Free space:")
+    print(free_space)
+    print("Usage percent:")
+    print(usage_percent)
+    
+    return usage_percent
+
+@fn run_filesystem_ops() -> int:
+    print("=== FILE SYSTEM OPERATIONS ===")
+    
+    # Create files
+    print("--- CREATE FILES ---")
+    let file1_addr = create_file(1, 1024)
+    let file2_addr = create_file(2, 2048)
+    let file3_addr = create_file(3, 512)
+    
+    # Read file
+    print("--- READ FILE ---")
+    let bytes_read = read_file(1, 0, 100)
+    print("Bytes read:")
+    print(bytes_read)
+    
+    # Write file
+    print("--- WRITE FILE ---")
+    let bytes_written = write_file(1, 100, 42)
+    
+    # List directory
+    print("--- LIST DIRECTORY ---")
+    let file_count = list_directory()
+    print("Total files:")
+    print(file_count)
+    
+    # Get file info
+    print("--- FILE INFO ---")
+    let size = get_file_info(1)
+    
+    # Disk usage
+    print("--- DISK USAGE ---")
+    let usage = calculate_disk_usage()
+    
+    # Delete file
+    print("--- DELETE FILE ---")
+    let deleted = delete_file(3, file3_addr)
+    
+    print("=== FILESYSTEM OPS COMPLETE ===")
+    
+    return 0
+
+mn:
+    run_filesystem_ops()

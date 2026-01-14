@@ -53,5 +53,5 @@ You can also use the `@ai` decorator for quick LLM integration.
 
 ```gul
 @ai(model="gpt-4")
-fn summarize(text: str) -> str
+@fn summarize(text: str) -> str
 ```

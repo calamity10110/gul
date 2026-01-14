@@ -5,7 +5,7 @@ import sys
 
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 # Adjust path to where binary is (workspace root target)
-COMPILER = os.path.abspath(os.path.join(TEST_DIR, "../../target/debug/gulc"))
+COMPILER = os.path.abspath(os.path.join(TEST_DIR, "../../../target/debug/gul-compile"))
 
 def run_test(file_path):
     print(f"Running {os.path.basename(file_path)}...")

@@ -1,0 +1,15 @@
+@fn add(a: int, b: int) -> int:
+    return a + b
+
+@fn multiply(a: int, b: int) -> int:
+    return a * b
+
+@fn test_arithmetic() -> int:
+    let x = add(5, 3)
+    let y = multiply(4, 2)
+    let z = add(x, y)
+    print(z)
+    return z
+
+mn:
+    test_arithmetic()

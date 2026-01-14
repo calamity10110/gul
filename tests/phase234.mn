@@ -1,0 +1,9 @@
+@fn test_channel() -> int:
+    print("Testing Channel")
+    let ch = @chan(10)
+    print("Channel created")
+    return 0
+
+mn:
+    test_channel()
+    print("Phase 2-4 Code Generation Complete")

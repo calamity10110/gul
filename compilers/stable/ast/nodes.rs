@@ -20,7 +20,7 @@ pub enum ExprType {
     IntegerLiteral, FloatLiteral, StringLiteral, BooleanLiteral, NoneLiteral,
     ListLiteral, TupleLiteral, SetLiteral, DictLiteral,
     Identifier, BinaryOp, UnaryOp, Call, Index, Attribute,
-    Lambda, MatchExpr, TypeConstructor, Grouped, Await, Table,
+    Lambda, MatchExpr, TypeConstructor, Grouped, Await, Table, DataFrame,
 
 }
 #[derive(Debug, Clone, PartialEq)]
@@ -51,6 +51,7 @@ pub enum Expression {
     Grouped(GroupedExpr),
     Await(AwaitExpr),
     Table(TableExpr),
+    DataFrame(DataFrameExpr),
 
 }
 
@@ -74,6 +75,7 @@ impl Expression {
             Expression::Grouped(e) => e.node.clone(),
             Expression::Await(e) => e.node.clone(),
             Expression::Table(e) => e.node.clone(),
+            Expression::DataFrame(e) => e.node.clone(),
         }
     }
 }
@@ -245,6 +247,7 @@ pub struct LetStmt {
     pub name: String,
     pub type_annotation: String,
     pub value: Expression,
+    pub decorators: Vec<String>,
 
 }
 #[derive(Debug, Clone, PartialEq)]
@@ -253,6 +256,7 @@ pub struct VarStmt {
     pub name: String,
     pub type_annotation: String,
     pub value: Expression,
+    pub decorators: Vec<String>,
 
 }
 #[derive(Debug, Clone, PartialEq)]
@@ -332,6 +336,7 @@ pub struct ForStmt {
     pub variable: String,
     pub iterable: Expression,
     pub body: Vec<Statement>,
+    pub is_parallel: bool,
 
 }
 #[derive(Debug, Clone, PartialEq)]
@@ -423,7 +428,13 @@ pub struct TableExpr {
     pub columns: Vec<String>,
     pub rows: Vec<TableRow>,
     pub is_sparse: bool,
+}
 
+#[derive(Debug, Clone, PartialEq)]
+pub struct DataFrameExpr {
+    pub node: ASTNode,
+    pub columns: Vec<String>,
+    pub data: std::collections::HashMap<String, Vec<Expression>>,
 }
 #[derive(Debug, Clone, PartialEq)]
 pub struct TableRow {
@@ -435,6 +446,7 @@ pub struct TableRow {
 pub struct Program {
     pub statements: Vec<Statement>,
     pub imports: Vec<ImportStmt>,
+    pub functions: Vec<FunctionDecl>,
     pub main_entry: Vec<Statement>,
 
 }

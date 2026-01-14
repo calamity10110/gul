@@ -1,0 +1,18 @@
+fn run():
+    let s: str = 123
+    print(s)
+    
+    let f: str = 45.67
+    print(f)
+    
+    let b: bool = "true"
+    if b:
+        print("Boolean conversion works")
+    
+    let b2: bool = "false"
+    if b2:
+        print("This should not print")
+    else:
+        print("False conversion works")
+
+run()

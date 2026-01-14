@@ -5,6 +5,47 @@ All notable changes to GUL will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.14.0-dev / v3.2.0] - 2026-01-07
+
+### Added - Advanced Features (Phases 2-4)
+
+**Data-Flow & Concurrency:**
+
+- Channel operations: `@chan(capacity)` with runtime support
+- Flow variables: `@flow var` decorator (parsing)
+- Parallel processing: `parallel for` construct (parsing)
+- Runtime: `gul_chan_create`, `send`, `recv`, `len`, `close`
+
+**Data Analysis:**
+
+- DataFrame: `@frame{columns: ..., data: ...}` with columnar storage
+- Runtime: `gul_frame_create`, `filter`, `get_column`, `set_cell`, etc.
+
+**Machine Learning:**
+
+- Tensor types with N-dimensional support
+- Tensor operations: `create`, `zeros`, `ones`, `add`, `mul`, `matmul`, `reshape`
+- Gradient tracking: `gul_grad_tensor_*` functions
+
+**Core Improvements:**
+
+- Auto literal conversion: Int/Float → Str, Str → Bool
+- Type-aware collection indexing with smart dispatch
+- Enhanced type inference in backend
+- Complete COMMAND_REFERENCE.md documentation
+
+### Changed
+
+- Runtime library: Expanded to ~1.5k lines (+414 lines)
+- Backend: Variables now track types `(Variable, String)`
+- Compiler sync: nightly and stable now identical
+
+### Fixed
+
+- Duplicate tensor function definitions removed
+- Print statement type detection improved
+- Collection type inference corrected
+
 ## [Unreleased]
 
 ### Added

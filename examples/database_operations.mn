@@ -1,0 +1,112 @@
+# GUL Database Operations - User Management System
+# Category: Database / CRUD Operations
+
+@fn create_user(id: int, name_score: int) -> int:
+    # Simulate user creation
+    print("Creating user ID:")
+    print(id)
+    return id
+
+@fn read_user(id: int) -> int:
+    # Simulate reading user
+    print("Reading user ID:")
+    print(id)
+    
+    # Return simulated user data
+    return id * 100
+
+@fn update_user(id: int, new_score: int) -> int:
+    # Simulate user update
+    print("Updating user ID:")
+    print(id)
+    print("New score:")
+    print(new_score)
+    
+    return new_score
+
+@fn delete_user(id: int) -> int:
+    # Simulate user deletion
+    print("Deleting user ID:")
+    print(id)
+    return 0
+
+@fn batch_create_users() -> int:
+    let count = 0
+    let i = 1
+    
+    while i <= 10:
+        let user_id = create_user(i, i * 10)
+        count = count + 1
+        i = i + 1
+    
+    return count
+
+@fn search_users(min_score: int, max_score: int) -> int:
+    print("Searching users with score range:")
+    print(min_score)
+    print(max_score)
+    
+    # Simulate finding 5 users
+    return 5
+
+@fn aggregate_statistics() -> int:
+    # Simulate user statistics
+    let total_users = 100
+    let active_users = 75
+    let inactive_users = 25
+    
+    let active_percentage = (active_users * 100) / total_users
+    
+    print("Total users:")
+    print(total_users)
+    print("Active users:")
+    print(active_users)
+    print("Active percentage:")
+    print(active_percentage)
+    
+    return total_users
+
+@fn run_database_tests() -> int:
+    print("=== DATABASE OPERATIONS ===")
+    
+    # CREATE
+    print("--- CREATE ---")
+    let user1 = create_user(1, 100)
+    let user2 = create_user(2, 200)
+    let user3 = create_user(3, 150)
+    
+    # READ
+    print("--- READ ---")
+    let data1 = read_user(1)
+    print(data1)
+    
+    # UPDATE
+    print("--- UPDATE ---")
+    let updated = update_user(2, 250)
+    
+    # BATCH CREATE
+    print("--- BATCH CREATE ---")
+    let batch_count = batch_create_users()
+    print("Created:")
+    print(batch_count)
+    
+    # SEARCH
+    print("--- SEARCH ---")
+    let found = search_users(100, 200)
+    print("Found:")
+    print(found)
+    
+    # STATISTICS
+    print("--- STATISTICS ---")
+    let stats = aggregate_statistics()
+    
+    # DELETE
+    print("--- DELETE ---")
+    let deleted = delete_user(3)
+    
+    print("=== DATABASE TESTS COMPLETE ===")
+    
+    return 0
+
+mn:
+    run_database_tests()

@@ -1,0 +1,27 @@
+@imp std.io
+
+@fn calculate(x, y)(result):
+    result = x + y
+
+@fn square(x) => x * x
+
+fn main():
+    @const a = 10
+    @const b = 20
+    @const res = calculate(a, b)
+    println("Sum: " + @str(res))
+    
+    @const sq = square(5)
+    println("Square: " + @str(sq))
+    
+    also_for i in [1, 2, 3]:
+        println("Parallel: " + @str(i))
+        
+    @var count = 0
+    also_while count < 3:
+        println("While Parallel: " + @str(count))
+        count = count + 1
+        
+    println("Done")
+    
+main()

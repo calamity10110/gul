@@ -1,6 +1,6 @@
 # Data Analysis
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+**Version**: 0.14.0-dev | **Syntax**: v3.2 | **Updated**: 2026-01-08
 
 ---
 
@@ -174,6 +174,6 @@ mn:
 
 ---
 
-**Last Updated**: 2025-12-28  
-**Version: 0.13.0  
+**Last Updated**: 2026-01-08  
+**Version**: 0.14.0-dev  
 **License**: MIT

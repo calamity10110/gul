@@ -1,0 +1,6 @@
+
+mn:
+    print("Testing Parallel For")
+    parallel for i in range(10):
+        print("Parallel Exec:", i)
+    print("Parallel Done")

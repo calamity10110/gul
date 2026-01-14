@@ -1,6 +1,6 @@
 # Syntax
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+**Version**: 0.14.0-dev | **Syntax**: v3.2 | **Updated**: 2026-01-08
 
 ---
 
@@ -41,19 +41,19 @@ let data: list = @list[1, 2, 3]
 ### Synchronous Functions
 
 ```gul
-@fn greet(name: str) -> str:
-    return "Hello, " + name
+@fn greet(name: str)(res):
+    res = "Hello, " + name
 
-@fn add(a: int, b: int) -> int:
-    return a + b
+@fn add(a: int, b: int)(res):
+    res = a + b
 ```
 
 ### Async Functions
 
 ```gul
-async fetch_data(url: str) -> dict:
-    response = await http.get(url)
-    return response.json()
+# Async shortcut (no 'fn' keyword)
+async fetch_data(url: str)(res):
+    res = await http.get(url)
 ```
 
 ## 3. Main Entry Point
@@ -109,6 +109,13 @@ for item in items:
 ```gul
 while count < 10:
     count = count + 1
+
+# Parallel Loops
+also_for i in 0..10:
+    print(i)
+
+also_while condition:
+    step()
 ```
 
 ### Loop
@@ -181,7 +188,7 @@ result = "now a string"
 
 ```gul
 @rust {
-    fn fast_compute(n: i32) -> i32 {
+   @fn fast_compute(n: i32) -> i32 {
         n * n
     }
 }
@@ -198,7 +205,8 @@ result = "now a string"
 ## 9. Comments
 
 ```gul
-# Single line comment
+# Single line comment (Python style)
+// Single line comment (C-style, v3.2+)
 
 #[
 Multi-line
@@ -259,24 +267,19 @@ mn:
     var stats = process_data(data)
     print("Stats:", stats)
 
-    var avg = analyze(data)
+    @const avg = analyze(data)
     print("Average:", avg)
 ```
 
 ## v3.2 Keywords
 
-**Variables**: `let`, `var`
-
-**Functions**: `fn`, `async`
-
+**Variables**: `let`, `var`, `@const`, `@var`
+**Functions**: `@fn`, `@async`, `async`
 **Entry**: `mn:`
-
 **Imports**: `@imp`
-
 **Foreign**: `@python`, `@rust`, `@sql`
-
-**Control**: `if`, `elif`, `else`, `for`, `while`, `loop`, `in`, `break`, `continue`, `return`
-
+**Autograd**: `autograd_begin`, `autograd_end`, `make_var`, `backward`
+**Control**: `if`, `elif`, `else`, `for`, `while`, `also_for`, `also_while`, `loop`, `in`, `break`, `continue`, `return`
 **Error**: `try`, `catch`, `finally`, `throw`, `await`
 
 ## File Extension
@@ -286,4 +289,4 @@ Use `.mn` for all GUL files.
 ---
 
 **Version**: v3.2 (Enforced)  
-**Last Updated**: 2025-12-28
+**Last Updated**: 2026-01-08

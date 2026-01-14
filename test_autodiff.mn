@@ -1,0 +1,9 @@
+mn:
+    println("Testing Auto-Differentiation x^2")
+    @const f = (x) => x * x
+    @const res = grad(f, 3)
+    println("Grad x^2 at 3: " + @str(res))
+    if res == 6.0:
+        println("Verified x^2")
+    else:
+        println("Failed x^2 verification")

@@ -1,6 +1,6 @@
 # Scientific Computing
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+**Version**: 0.14.0-dev | **Syntax**: v3.2 | **Updated**: 2026-01-08
 
 ---
 
@@ -46,7 +46,7 @@ x = la.solve(A, b)
 import std.science.ode
 
 # Define ODE: dy/dt = -k*y
-fn exponential_decay(t, y, k):
+@fn exponential_decay(t, y, k):
     return -k * y
 
 # Solve ODE
@@ -137,7 +137,7 @@ labels = kmeans.fit_predict(data)
 import std.random
 import std.math
 
-fn estimate_pi(n_samples: int): float:
+@fn estimate_pi(n_samples: int): float:
     inside_circle = 0
 
     for i in range(n_samples):
@@ -180,7 +180,7 @@ import std.science.ode
 import std.plot
 
 # Logistic growth model
-fn logistic_growth(t, y, r, K):
+@fn logistic_growth(t, y, r, K):
     P = y[0]
     dP_dt = r * P * (1 - P / K)
     return [dP_dt]
@@ -220,7 +220,7 @@ main:
 import std.science.optimize
 
 # Minimize function
-fn rosenbrock(x):
+@fn rosenbrock(x):
     return (1 - x[0])**2 + 100*(x[1] - x[0]**2)**2
 
 result = optimize.minimize(
@@ -252,6 +252,6 @@ peaks = fft.find_peaks(power_spectrum)
 
 ---
 
-**Last Updated**: 2025-12-28  
-**Version: 0.13.0  
+**Last Updated**: 2026-01-08  
+**Version**: 0.14.0-dev  
 **License**: MIT

@@ -1,0 +1,201 @@
+# Edge Case Testing - Comprehensive Test Suite
+# Tests boundary conditions, edge cases, and error handling
+
+@fn test_integer_bounds() -> int:
+    print("=== INTEGER BOUNDS ===")
+    
+    # Zero
+    let zero = 0
+    print(zero)
+    
+    # Negative
+    let neg = -100
+    print(neg)
+    
+    # Large positive
+    let large = 999999
+    print(large)
+    
+    # Division by different numbers
+    let div_result = 100 / 2
+    print(div_result)
+    
+    return 0
+
+@fn test_edge_arithmetic() -> int:
+    print("=== EDGE ARITHMETIC ===")
+    
+    # Division
+    let a = 10
+    let b = 3
+    let div = a / b
+    print(div)
+    
+    # Modulo
+    let mod = a % b
+    print(mod)
+    
+    # Multiplication overflow prevention
+    let mul = 1000 * 500
+    print(mul)
+    
+    # Subtraction to negative
+    let sub = 5 - 10
+    print(sub)
+    
+    return 0
+
+@fn test_boolean_edge_cases() -> int:
+    print("=== BOOLEAN EDGE CASES ===")
+    
+    # Zero as false
+    let val = 0
+    if val == 0:
+        print(1)
+    
+    # Non-zero as true
+    let val2 = 5
+    if val2 != 0:
+        print(1)
+    
+    # Negative numbers
+    let val3 = -5
+    if val3 < 0:
+        print(1)
+    
+    # Equality
+    let a = 10
+    let b = 10
+    if a == b:
+        print(1)
+    
+    return 0
+
+@fn test_loop_edge_cases() -> int:
+    print("=== LOOP EDGE CASES ===")
+    
+    # Empty loop (immediate false)
+    let i = 10
+    while i < 5:
+        print(999)
+        i = i + 1
+    
+    # Single iteration
+    let j = 0
+    while j < 1:
+        print(j)
+        j = j + 1
+    
+    # Multiple iterations
+    let k = 0
+    while k < 5:
+        print(k)
+        k = k + 1
+    
+    return 0
+
+@fn test_function_edge_cases() -> int:
+    print("=== FUNCTION EDGE CASES ===")
+    
+    # Function with zero
+    let result1 = add_numbers(0, 0)
+    print(result1)
+    
+    # Function with negative
+    let result2 = add_numbers(-5, 10)
+    print(result2)
+    
+    # Chain function calls
+    let result3 = add_numbers(1, 2)
+    let result4 = add_numbers(result3, 3)
+    print(result4)
+    
+    return 0
+
+@fn add_numbers(a: int, b: int) -> int:
+    return a + b
+
+@fn test_conditional_edge_cases() -> int:
+    print("=== CONDITIONAL EDGE CASES ===")
+    
+    # Nested if
+    let x = 10
+    if x > 5:
+        if x < 15:
+            print(1)
+    
+    # If-else chain
+    let y = 7
+    if y < 5:
+        print(0)
+    if y >= 5:
+        if y < 10:
+            print(1)
+    if y >= 10:
+        print(2)
+    
+    # Boundary conditions
+    let z = 0
+    if z >= 0:
+        print(1)
+    
+    return 0
+
+@fn test_data_structures() -> int:
+    print("=== DATA STRUCTURES ===")
+    
+    # Empty list
+    let empty = []
+    print("Empty list created")
+    
+    # Single element
+    let single = [42]
+    print(single[0])
+    
+    # Multiple elements
+    let multi = [1, 2, 3, 4, 5]
+    print(multi[0])
+    print(multi[4])
+    
+    # Dictionary
+    let dict = {"a": 1, "b": 2}
+    print(dict["a"])
+    print(dict["b"])
+    
+    return 0
+
+@fn test_string_operations() -> int:
+    print("=== STRING OPERATIONS ===")
+    
+    # Auto-conversion integer to string
+    let num: str = 42
+    print(num)
+    
+    # Auto-conversion float to string
+    let flt: str = 123
+    print(flt)
+    
+    # String literals
+    print("Hello")
+    print("World")
+    
+    return 0
+
+@fn run_all_edge_tests() -> int:
+    print("=== COMPREHENSIVE EDGE CASE TESTING ===")
+    
+    let t1 = test_integer_bounds()
+    let t2 = test_edge_arithmetic()
+    let t3 = test_boolean_edge_cases()
+    let t4 = test_loop_edge_cases()
+    let t5 = test_function_edge_cases()
+    let t6 = test_conditional_edge_cases()
+    let t7 = test_data_structures()
+    let t8 = test_string_operations()
+    
+    print("=== ALL EDGE TESTS COMPLETE ===")
+    
+    return 0
+
+mn:
+    run_all_edge_tests()

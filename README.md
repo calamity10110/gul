@@ -2,7 +2,7 @@
 
 **_A modern, multi-paradigm programming language designed for everyone_**
 
-Version: **0.13.0** | Syntax: **v3.2** | Status: **Production Ready**
+Version: **0.14.0-dev** | Syntax: **v3.2** | Status: **Feature Complete**
 
 [![Rust](https://img.shields.io/badge/rust-1.70%2B-orange.svg)](https://www.rust-lang.org)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -28,13 +28,14 @@ GUL is a modern, multi-paradigm programming language that combines the best feat
 
 ### Language Features
 
-- ✅ **v3.2 Syntax**: Modern `let`/`var` keywords with `@` type constructors
+- ✅ **v3.2 Syntax**: Modern `const`/`var` keywords with `@` type constructors
 - ✅ **Gradual Typing**: Optional type annotations with inference
 - ✅ **Ownership System**: `borrow`, `ref`, `move`, `kept` modes
 - ✅ **Async/Await**: Built-in cooperative multitasking
 - ✅ **Pattern Matching**: Rust-style match expressions
 - ✅ **Foreign Code**: Embed Python, Rust, JavaScript, SQL directly
 - ✅ **Auto-Differentiation**: Built-in gradient tracking with `@grad`
+- ✅ **C-Style Comments**: Support for `//` single-line comments
 
 ### Ecosystem
 
@@ -90,11 +91,11 @@ gul run hello.mn
 ```gul
 @imp std.io
 
-fn greet(name: str) -> str:
-    return "Hello, " + name
+@fn greet(name: str)(res):
+    res = "Hello, " + name
 
 mn:
-    let message = greet("World")
+    @const message = greet("World")
     print(message)
 ```
 
@@ -108,34 +109,33 @@ mn:
 
 ```gul
 # Immutable variables (default)
-let name = "Alice"
-let age = 25
+const name = "Alice"
+const age = 25
 
 # Mutable variables
 var count = 0
 count = count + 1
 
 # With type constructors
-let user = @dict{name: "Bob", age: 30}
-let numbers = @list[1, 2, 3, 4, 5]
-let tuple = (1, 2)
-let msg = f"User: {user['name']}"
+const user = @dict{name: "Bob", age: 30}
+const numbers = @list[1, 2, 3, 4, 5]
+const tuple = (1, 2)
+const msg = f"User: {user['name']}"
 ```
 
 ### Functions
 
 ```gul
-# Regular function
-fn add(a: int, b: int) -> int:
-    return a + b
+# Regular function with explicit output
+@fn add(a: int, b: int)(res):
+    res = a + b
 
-# Async function
-async fetch_data(url: str) -> dict:
-    let response = await http.get(url)
-    return response.json()
+# Async shortcut (no 'fn' keyword)
+async fetch_data(url: str)(data):
+    data = await http.get(url)
 
-# Arrow function
-let double = (x) => x * 2
+# Arrow function with @const
+@const double = (x) => x * 2
 ```
 
 ### Structs
@@ -150,7 +150,7 @@ struct User:
         return "Hello, " + self.name
 
 # Create instance
-let user = User{
+const user = User{
     name: "Alice",
     email: "alice@example.com",
     age: 25
@@ -236,15 +236,12 @@ match status_code:
 Built-in support for gradient computation:
 
 ```gul
-fn loss(x, y):
-    gul_autograd_begin()
-    let a = gul_make_var(x)
-    let b = gul_make_var(y)
-    let z = gul_var_mul(a, b) # z = x * y
+@fn loss(x, y)(grad_x):
+    @const a = gul_make_var(x)
+    @const b = gul_make_var(y)
+    @const z = gul_var_mul(a, b) # z = x * y
     gul_backward(z)
-    let grad_x = gul_var_grad(a) # dy/dx
-    gul_autograd_end()
-    return grad_x
+    grad_x = gul_var_grad(a) # dy/dx
 ```
 
 ---
@@ -644,7 +641,7 @@ Control hardware directly:
 @imp embedded.gpio
 
 mn:
-    let led = gpio.pin(2, OUTPUT)
+    const led = gpio.pin(2, OUTPUT)
     
     loop:
         led.toggle()
@@ -700,6 +697,7 @@ MIT License - See [LICENSE](LICENSE) for details.
 
 - 📖 [The GUL Book](docs/book/)
 - 📝 [Quick Reference](docs/QUICK_REFERENCE.md)
+- 🎯 [Command Reference](COMMAND_REFERENCE.md)
 - 📚 [Knowledgebase](docs/reference/knowledgebase.md)  
 - 🔍 [Language Specification](docs/reference/specification.md)
 

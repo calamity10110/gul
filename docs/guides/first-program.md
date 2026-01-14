@@ -1,6 +1,6 @@
 # First Program
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+**Version**: 0.14.0-dev | **Syntax**: v3.2 | **Updated**: 2026-01-08
 
 ---
 
@@ -80,14 +80,14 @@ struct TodoManager:
     next_id: int
     filename: str
 
-    fn new(filename: str): TodoManager:
+   @fn new(filename: str): TodoManager:
         return TodoManager {
-            todos: vec[],
+            todos: @list[],
             next_id: 1,
             filename: filename
         }
 
-    fn add_todo(mut self, title: str):
+   @fn add_todo(mut self, title: str):
         todo = Todo.new(self.next_id, title)
         self.todos.push(todo)
         self.next_id += 1
@@ -165,7 +165,7 @@ struct TodoManager:
 
 **Concepts:**
 
-- **vec**: Dynamic array
+- **@list**: Dynamic array
 - **List comprehension**: `[... for item in items]`
 - **JSON serialization**: Convert structs to/from JSON
 - **File I/O**: Reading and writing files
@@ -321,7 +321,7 @@ gul build --release
 ## 🎓 What You've Learned
 
 ✅ **Structs**: Custom data types with methods  
-✅ **Vectors**: Dynamic arrays  
+✅ **@list**: Dynamic arrays  
 ✅ **File I/O**: Reading and writing files  
 ✅ **JSON**: Serialization and deserialization  
 ✅ **Pattern Matching**: Clean conditional logic  
@@ -358,6 +358,6 @@ gul build --release
 
 ---
 
-**Last Updated**: 2025-12-28  
-**Version: 0.13.0  
+**Last Updated**: 2026-01-08  
+**Version**: 0.14.0-dev  
 **License**: MIT

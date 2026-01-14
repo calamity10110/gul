@@ -1,0 +1,18 @@
+@imp std.io
+@imp ui
+
+// Test 1: Async without 'fn' and with outputs
+async calculate_async(x, y)(result):
+    result = x + y
+    return result
+
+// Test 2: UI component with properties
+@ui button{text: "Click Me", color: "blue"}
+
+fn main():
+    @const res = await calculate_async(10, 20)
+    println("Async Res: " + @str(res))
+    
+    println("Advanced Features Verified")
+
+main()

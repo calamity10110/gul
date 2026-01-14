@@ -1,0 +1,45 @@
+# GUL Data Analysis - Simplified (Non-recursive)
+# Category: Data Science
+
+@fn analyze_sales_data() -> int:
+    print("=== SALES ANALYTICS ===")
+    
+    # Q1-Q4 sales
+    let q1 = 100
+    let q2 = 150
+    let q3 = 200
+    let q4 = 180
+    
+    # Total annual sales
+    let total = q1 + q2 + q3 + q4
+    print("Total Sales:")
+    print(total)
+    
+    # Average
+    let avg = total / 4
+    print("Average:")
+    print(avg)
+    
+    # Revenue calculation
+    let units = 1000
+    let price = 25
+    let revenue = units * price
+    print("Revenue:")
+    print(revenue)
+    
+    # Cost and profit
+    let cost_per_unit = 15
+    let total_cost = units * cost_per_unit
+    let profit = revenue - total_cost
+    print("Profit:")
+    print(profit)
+    
+    # ROI percentage
+    let roi = (profit * 100) / total_cost
+    print("ROI %:")
+    print(roi)
+    
+    return profit
+
+mn:
+    analyze_sales_data()

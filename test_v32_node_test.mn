@@ -1,0 +1,12 @@
+@fn ProcessData(input_val)(output_val):
+    output_val = input_val * 2
+
+fn main():
+    @const p = ProcessData
+    println("Input 1 Name: " + p.input_1.input_val)
+    println("Output 1 Name: " + p.output_1)
+    
+    @const result = p(10)
+    println("Result: " + @str(result))
+
+main()

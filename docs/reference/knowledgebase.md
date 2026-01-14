@@ -1,6 +1,6 @@
 # GUL Language Knowledgebase
 
-**Version**: 0.13.0 | **Syntax**: v3.2 |
+**Version**: 0.14.0-dev | **Syntax**: v3.2 | **Updated**: 2026-01-08
 
 ## Quick Start
 
@@ -18,11 +18,11 @@ mn:
 ```gul
 @imp std.io
 
-@fn greet(name: str) -> str:
-    return "Hello, " + name
-# @fn @str(greet(name,("Hello, " + name)))
+@fn greet(name: str)(res):
+    res = "Hello, " + name
+
 mn:
-    let message = greet("World")
+    @const message = greet("World")
     print(message)
 ```
 
@@ -76,7 +76,8 @@ GUL (GUL Universal Language) is a modern, multi-paradigm programming language th
 ### Comments
 
 ```gul
-# Single line comment
+# Single line comment (Python style)
+// Single line comment (C-style, v3.2+)
 
 #[
 Multi-line
@@ -86,14 +87,15 @@ comment
 
 ### Keywords
 
-**Variables**: `let` (immutable), `var` (mutable)  
-**Functions**: `@fn`, `@async`, `return`  
+**Variables**: `let` (immutable), `var` (mutable), `@const`, `@var`
+**Functions**: `@fn`, `@async`, `async`, `return`  
 **Entry Point**: `mn:`  
-**Control Flow**: `if`, `elif`, `else`, `for`, `while`, `loop`, `break`, `continue`, `match`  
+**Control Flow**: `if`, `elif`, `else`, `for`, `while`, `also_for`, `also_while`, `loop`, `break`, `continue`, `match`  
 **Error Handling**: `try`, `catch`, `finally`, `throw`  
 **Imports**: `@imp`  
 **Foreign Code**: `@python`, `@rust`, `@sql`, `@js`  
-**Async**: `@async`, `await`  
+**Autograd**: `autograd_begin`, `make_var`, `backward`, `var_add`  
+**Async**: `async`, `await`  
 
 ### Operators
 
@@ -154,7 +156,8 @@ numbers.pop()               # Remove from end
 numbers.pop(0)              # Remove at index
 numbers.clear()             # Empty list
 numbers.contain("C", "found")     # Membership verify
-numbers.len()               # Length property
+numbers.len()               # Length (Method)
+len(numbers)               # Length (Builtin)
 numbers[0]  # First element
 numbers[-1]  # Last element
 ```
@@ -170,7 +173,8 @@ tags.add("c")             # Add element
 tag.contain("C", found")  # Membership verify
 tags.remove("b")          # Remove element
 tags.clear()              # Empty set
-tag.len()                 # Length property
+tag.len()                 # Length (Method)
+len(tag)                  # Length (Builtin)
 ```
 
 **Dictionaries** - Ordered key-value pairs, unique keys:
@@ -181,7 +185,8 @@ var cfg = @dict{host: "localhost", port: 8080}  # Mutable
 
 # Methods
 config.contain("port", "found")     # Membership verify
-config.len()                # Length property
+config.len()                # Length (Method)
+len(config)                 # Length (Builtin)
 
 # Access
 cfg[key]  # By identifier
@@ -240,13 +245,11 @@ result = "now a string"  # OK with 'any' type
 ### Basic Functions
 
 ```gul
-@fn add(a: int, b: int) -> int:
-    return a + b
-# @fn @int(add((a, b), (a + b)))
+@fn add(a: int, b: int)(res):
+    res = a + b
 
-@fn greet(name: str) -> str:
-    return "Hello, " + name
-# @fn @str(greet((name), ("Hello, " + name)))
+@fn greet(name: str)(res):
+    res = "Hello, " + name
 
 # Call functions
 let sum = add(5, 3)
@@ -266,13 +269,13 @@ let result = double(5)  # 10
 ### Async Functions
 
 ```gul
-@async fetch_data(url: str) -> dict:
-    let response = await http.get(url)
-    return response.json()
+# Async shortcut (no 'fn' keyword)
+async fetch_data(url: str)(res):
+    res = await http.get(url)
 
 # Call async function
 mn:
-    let data = await fetch_data("https://api.example.com")
+    @const data = await fetch_data("https://api.example.com")
     print(data)
 ### Function Features
 
@@ -436,7 +439,7 @@ mn:
 
 ```gul
 @rust {
-    fn fast_fibonacci(n: u64) -> u64 {
+   @fn fast_fibonacci(n: u64) -> u64 {
         if n <= 1 { return n; }
         let mut a = 0;
         let mut b = 1;
@@ -492,11 +495,10 @@ mn:
 ### Async Function
 
 ```gul
-@async fetch_user(id: int) -> dict:
-    let response = await http.get(f"https://api.com/users/{id}")
-    return response.json()
+async fetch_user(id: int)(res):
+    res = await http.get(f"https://api.com/users/{id}")
 
-@async main():
+async main():
     let user = await fetch_user(123)
     print("User:", user.name)
 
@@ -606,10 +608,10 @@ finally:
 ### Result Type (Rust-style)
 
 ```gul
-@fn divide(a: int, b: int) -> Result<int, str>:
+@fn divide(a: int, b: int)(res)(err):
     if b == 0:
-        return Err("Division by zero")
-    return Ok(a / b)
+        err = "Division by zero"
+    res = a / b
 
 mn:
     match divide(10, 2):
@@ -793,7 +795,7 @@ mn:
     print(data)
 
 # Option 2: Async main
-@async main():
+@@async main():
     let data = await fetch_data()
     print(data)
 

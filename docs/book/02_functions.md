@@ -18,7 +18,7 @@ Values are returned using `return`. If no return type is specified, it returns `
 
 ## Async Functions
 
-GUL has first-class support for concurrency via `asy` (async) and `await`.
+GUL has first-class support for concurrency via `@async` and `await`.
 
 ```gul
 @async fetch_url(url: str) -> str:
@@ -73,3 +73,12 @@ close_file(move file)
 
 # file.read()  <-- Error! file has been moved.
 ```
+
+## Built-in Functions
+
+GUL includes many global built-in functions that don't require imports:
+
+- `print(...)`, `println(...)`: Output to console.
+- `input(...)`: Get user input.
+- `len(obj)`: Get length of lists, strings, or dicts.
+- `autograd_begin()`, `make_var(v)`: Machine learning primitives.

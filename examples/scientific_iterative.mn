@@ -1,0 +1,108 @@
+# GUL Scientific Computing - Iterative Algorithms
+# Category: Numerical Methods
+
+@fn compute_factorial_iterative(n: int) -> int:
+    let result = 1
+    let i = 2
+    
+    while i <= n:
+        result = result * i
+        i = i + 1
+    
+    return result
+
+@fn compute_fibonacci_iterative(n: int) -> int:
+    if n <= 1:
+        return n
+    
+    let a = 0
+    let b = 1
+    let i = 2
+    
+    while i <= n:
+        let temp = a + b
+        a = b
+        b = temp
+        i = i + 1
+    
+    return b
+
+@fn compute_power_iterative(base: int, exp: int) -> int:
+    let result = 1
+    let i = 0
+    
+    while i < exp:
+        result = result * base
+        i = i + 1
+    
+    return result
+
+@fn compute_gcd_iterative(a: int, b: int) -> int:
+    while b != 0:
+        let temp = b
+        b = a % b
+        a = temp
+    
+    return a
+
+@fn sum_of_squares(n: int) -> int:
+    let sum = 0
+    let i = 1
+    
+    while i <= n:
+        sum = sum + (i * i)
+        i = i + 1
+    
+    return sum
+
+@fn run_math_tests() -> int:
+    print("=== MATHEMATICAL ALGORITHMS ===")
+    
+    print("Factorial(5):")
+    let fact = compute_factorial_iterative(5)
+    print(fact)
+    
+    print("Fibonacci(10):")
+    let fib = compute_fibonacci_iterative(10)
+    print(fib)
+    
+    print("Power(2, 10):")
+    let pow_result = compute_power_iterative(2, 10)
+    print(pow_result)
+    
+    print("GCD(48, 18):")
+    let gcd_result = compute_gcd_iterative(48, 18)
+    print(gcd_result)
+    
+    print("Sum of Squares(10):")
+    let sq_sum = sum_of_squares(10)
+    print(sq_sum)
+    
+    # Matrix operations
+    print("Matrix 2x2 multiply:")
+    let a11 = 1
+    let a12 = 2
+    let a21 = 3
+    let a22 = 4
+    
+    let b11 = 5
+    let b12 = 6
+    let b21 = 7
+    let b22 = 8
+    
+    let c11 = (a11 * b11) + (a12 * b21)
+    let c12 = (a11 * b12) + (a12 * b22)
+    let c21 = (a21 * b11) + (a22 * b21)
+    let c22 = (a21 * b12) + (a22 * b22)
+    
+    print(c11)
+    print(c12)
+    print(c21)
+    print(c22)
+    
+    print("=== TESTS COMPLETE ===")
+    
+    return 0
+
+mn:
+    run_math_tests()

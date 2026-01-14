@@ -105,10 +105,10 @@ impl SemanticAnalyzer {
 
     fn analyze_statement(&mut self, statement: &Statement) {
         match statement {
-            Statement::Import(module) => {
-                // Module validation would check against available modules
-                // For now, we accept all imports
-                let _ = module;
+            Statement::Import(modules) => {
+                for module in modules {
+                   let _ = module;
+                }
             }
             Statement::GlobalDef { name, value, .. } => {
                 let value_type = self.infer_type(value);
@@ -173,6 +173,7 @@ impl SemanticAnalyzer {
             Statement::Function {
                 name,
                 params,
+                outputs,
                 body,
                 is_async,
             } => {
@@ -181,15 +182,30 @@ impl SemanticAnalyzer {
                 self.current_function_is_async = *is_async;
 
                 // Define parameters
-                for param in params {
+                for (param_name, _ty) in params {
                     let symbol = Symbol {
-                        name: param.clone(),
-                        symbol_type: Type::Unknown,
+                        name: param_name.clone(),
+                        symbol_type: Type::Unknown, // Ideally convert ty to semantic::Type
                         is_mutable: true,
                         ownership: Ownership::Own,
                     };
-                    if let Err(e) = self.symbol_table.define(param.clone(), symbol) {
+                    if let Err(e) = self.symbol_table.define(param_name.clone(), symbol) {
                         self.errors.push(e);
+                    }
+                }
+
+                // Define named outputs in scope (v3.2)
+                for (out_name, _ty) in outputs {
+                    if !out_name.is_empty() {
+                         let symbol = Symbol {
+                             name: out_name.clone(),
+                             symbol_type: Type::Unknown,
+                             is_mutable: true,
+                             ownership: Ownership::Own,
+                         };
+                         if let Err(e) = self.symbol_table.define(out_name.clone(), symbol) {
+                             self.errors.push(e);
+                         }
                     }
                 }
 
@@ -254,6 +270,7 @@ impl SemanticAnalyzer {
                 variable,
                 iterable,
                 body,
+                is_parallel: _,
             } => {
                 let _iter_type = self.infer_type(iterable);
 
@@ -275,7 +292,11 @@ impl SemanticAnalyzer {
                 }
                 self.symbol_table.exit_scope();
             }
-            Statement::While { condition, body } => {
+            Statement::While {
+                condition,
+                body,
+                is_parallel: _,
+            } => {
                 let cond_type = self.infer_type(condition);
                 if cond_type != Type::Bool && cond_type != Type::Unknown {
                     self.errors
@@ -464,6 +485,12 @@ impl SemanticAnalyzer {
                     ));
                 }
                 expected_type // Return the annotated type
+            }
+            Expression::Lambda { params, body } => {
+                // Infer lambda type - simplified
+                // We should ideally push a scope for params
+                let _ = body; // used
+                Type::Function(vec![Type::Any; params.len()], Box::new(Type::Any))
             }
         }
     }

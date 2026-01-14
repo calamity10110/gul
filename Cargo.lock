@@ -4697,7 +4697,7 @@ dependencies = [
 
 [[package]]
 name = "gul"
-version = "0.13.0"
+version = "0.14.0-dev"
 dependencies = [
  "anyhow",
  "axum 0.7.9",
@@ -4719,6 +4719,7 @@ dependencies = [
  "num-traits",
  "rand 0.8.5",
  "ratatui 0.29.0",
+ "rayon",
  "regex",
  "reqwest 0.12.28",
  "rusqlite",

@@ -1,0 +1,84 @@
+// GUL v3.2 Advanced Features Example
+// Tests: Channels, DataFrames, Tensors, Flow Variables, Parallel Processing
+
+fn test_channels():
+    print("=== Testing Channels ===")
+    
+    // Create a buffered channel
+    let ch = @chan<int>(10)
+    
+    // Send values
+    ch.send(1)
+    ch.send(2)
+    ch.send(3)
+    
+    // Receive values
+    print(ch.recv())  // 1
+    print(ch.recv())  // 2
+    print(ch.recv())  // 3
+
+fn test_dataframe():
+    print("=== Testing DataFrame ===")
+    
+    // Create DataFrame
+    let df = @frame{
+        columns: ("name", "age", "city"),
+        data: [
+            ["Alice", 25, "NYC"],
+            ["Bob", 30, "LA"],
+            ["Charlie", 35, "SF"]
+        ]
+    }
+    
+    // Access column
+    let names = df.name
+    print("Names:", names)
+    
+    // Filter
+    let filtered = df.filter(row => row.age > 25)
+    print("Filtered count:", filtered.count())
+
+fn test_tensors():
+    print("=== Testing Tensors ===")
+    
+    // Create tensors
+    let a = @tensor<float>[2, 2]
+    let b = @tensor<float>[2, 2]
+    
+    // Element-wise operations
+    let c = a + b
+    let d = a * b
+    
+    // Matrix multiplication
+    let e = tensor.matmul(a, b)
+    
+    print("Tensor operations complete")
+
+fn test_parallel():
+    print("=== Testing Parallel Processing ===")
+    
+    var sum = 0
+    parallel for i in 0..1000:
+        sum = sum + i
+    
+    print("Parallel sum:", sum)
+
+fn test_flow():
+    print("=== Testing Flow Variables ===")
+    
+    @flow var x = 10
+    @flow var y = x * 2
+    
+    print("Initial y:", y)  // 20
+    
+    x = 20
+    print("Updated y:", y)  // 40 (auto-updated)
+
+mn:
+    test_channels()
+    test_dataframe()
+    test_tensors()
+    test_parallel()
+    test_flow()
+    
+    print("=== All Advanced Features Tested ===")

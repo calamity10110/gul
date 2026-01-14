@@ -17,6 +17,7 @@ pub fn load_std_module(name: &str) -> Option<Value> {
         "embedded.storage" => Some(create_embedded_storage_module()),
         "embedded.micropython" => Some(create_micropython_module()),
         "embedded.arduino" => Some(create_arduino_module()),
+        "ui" => Some(create_ui_module()),
         _ => None,
     }
 }
@@ -84,9 +85,14 @@ fn create_json_module() -> Value {
                             .collect();
                         format!("{{\"_type\": \"{}\", {}}}", name, parts.join(", "))
                     }
-                    Value::Function(params, _) => format!("\"<function({})>\"", params.join(", ")),
+                    Value::Function(params, _, _) => {
+                        let p_names: Vec<String> = params.iter().map(|(n, _)| n.clone()).collect();
+                        format!("\"<function({})>\"", p_names.join(", "))
+                    }
                     Value::NativeFunction(_) => "\"<native_function>\"".to_string(),
+                    Value::Lambda(_, _) => "\"<lambda>\"".to_string(),
                     Value::Any(inner) => stringify_value(inner),
+                    Value::Dual(v, d) => format!("\"Dual({}, grad={})\"", v, d),
                 }
             }
 
@@ -528,4 +534,26 @@ fn create_test_module() -> Value {
     );
 
     Value::Object("std.test".to_string(), module)
+}
+
+fn create_ui_module() -> Value {
+    let mut module = HashMap::new();
+
+    module.insert(
+        "button".to_string(),
+        Value::NativeFunction(|args| {
+            println!("UI: Rendering Button with props: {:?}", args.first());
+            Value::Null
+        }),
+    );
+
+    module.insert(
+        "text".to_string(),
+        Value::NativeFunction(|args| {
+            println!("UI: Rendering Text with props: {:?}", args.first());
+            Value::Null
+        }),
+    );
+
+    Value::Object("ui".to_string(), module)
 }

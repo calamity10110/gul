@@ -1,6 +1,6 @@
 # GUL Standard Library API Reference
 
-**Version: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+**Version**: 0.14.0-dev | **Syntax**: v3.2 | **Updated**: 2026-01-08
 
 Complete reference for GUL's 13 standard library modules with 110+ functions.
 
@@ -31,14 +31,14 @@ Complete reference for GUL's 13 standard library modules with 110+ functions.
 ```gul
 @imp std.io
 
-# Print to console
-io.print("Hello")                    # Simple print
-io.println("With newline")           # Print with newline
-io.printf("Name: %s", name)          # Formatted print
+# Print to console (Core Builtins)
+print("Hello")                       # Simple print (global)
+println("With newline")              # Print with newline (global)
+printf("Name: %s", name)             # Formatted print (global)
 
 # Input
-let name = io.input("Enter name: ")
-let age = io.input_int("Age: ")
+let name = input("Enter name: ")     # Global input
+let age = input_int("Age: ")         # Global int input
 ```
 
 ### `std.math` - Mathematics
@@ -182,7 +182,7 @@ time.sleep(@int(1))              # Sleep 1 second
 time.sleep_ms(@int(500))         # Sleep 500ms
 
 # Parsing
-let date = time.parse("2025-12-28", "%Y-%m-%d")
+let date = time.parse("2026-01-08", "%Y-%m-%d")
 ```
 
 ---
@@ -230,6 +230,9 @@ let top = stack.pop()
 let map = collections.HashMap()
 map.set("key", "value")
 let val = map.get("key")
+
+# Common builtins for collections
+let length = len(map)                # Get size of any collection
 ```
 
 ---
@@ -299,7 +302,7 @@ async task2():
     return @str("Complete")
 
 # Run concurrently
-@async main():
+@@async main():
     let results = await async.gather(@list[task1(), task2()])
     print(results)
 
@@ -347,7 +350,7 @@ struct User:
     let json_data = json.stringify_pretty(users)
     fs.write_file("users.json", json_data)
 
-@async main():
+@@async main():
     print("Fetching users...")
     let users = await fetch_users()
 
@@ -396,6 +399,6 @@ mn:
 
 ---
 
-**Last Updated**: 2025-12-28  
-**Version: 0.13.0  
+**Last Updated**: 2026-01-08  
+**Version**: 0.14.0-dev  
 **Syntax**: v3.2

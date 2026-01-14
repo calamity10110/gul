@@ -118,7 +118,8 @@ impl Parser {
         loop {
             if self.current_pos >= (self.tokens).len() - 1 { break }
             let tok = self.tokens[self.current_pos].clone();
-            let prec = get_precedence(tok.token_type);
+            let prec = get_precedence(tok.token_type.clone());
+            println!("DEBUG: token={:?} prec={:?} min={:?}", tok.token_type, prec, min_precedence);
             if prec <= min_precedence { break }
             left = self.parse_infix(left, prec);
         }
@@ -144,7 +145,55 @@ impl Parser {
             return Expression::Literal(LiteralExpr{node: ASTNode{line: 1, column: 1}, value: "true".to_string(), value_type: TokenType::TrueKeyword});
         }
         else if t_type == TokenType::FalseKeyword {
-            return Expression::Literal(LiteralExpr{node: ASTNode{line: 1, column: 1}, value: "false".to_string(), value_type: TokenType::FalseKeyword});
+             return Expression::Literal(LiteralExpr{node: ASTNode{line: 1, column: 1}, value: "false".to_string(), value_type: TokenType::FalseKeyword});
+        }
+        else if t_type == TokenType::LeftBracket {
+             // List: [1, 2, 3]
+             let mut elements = vec![];
+             while self.current().token_type != TokenType::RightBracket && self.current().token_type != TokenType::Eof {
+                  self.skip_newlines();
+                  if self.current().token_type == TokenType::RightBracket { break; }
+                  elements.push(self.parse_expression(Precedence::NoPrec));
+                  if !self.match_token(TokenType::Comma) {
+                      self.skip_newlines(); 
+                      break; 
+                  }
+                  self.skip_newlines(); 
+             }
+             self.expect(TokenType::RightBracket, "Expected ']'".to_string());
+             return Expression::List(ListExpr{node: ASTNode{line: 1, column: 1}, elements: elements});
+        }
+        else if t_type == TokenType::LeftBrace {
+             // Dict: {k:v} or Set: {v}
+             self.skip_newlines();
+             if self.current().token_type == TokenType::RightBrace {
+                 self.advance(); // consume }
+                 return Expression::Dict(DictExpr{node: ASTNode{line: 1, column: 1}, pairs: vec![]});
+             }
+             let first = self.parse_expression(Precedence::NoPrec);
+             if self.match_token(TokenType::Colon) {
+                 let val = self.parse_expression(Precedence::NoPrec);
+                 let mut pairs = vec![(first, val)];
+                 while self.match_token(TokenType::Comma) {
+                     self.skip_newlines();
+                     if self.current().token_type == TokenType::RightBrace { break; }
+                     let k = self.parse_expression(Precedence::NoPrec);
+                     self.expect(TokenType::Colon, "Expected ':'".to_string());
+                     let v = self.parse_expression(Precedence::NoPrec);
+                     pairs.push((k, v));
+                 }
+                 self.expect(TokenType::RightBrace, "Expected '}'".to_string());
+                 return Expression::Dict(DictExpr{node: ASTNode{line: 1, column: 1}, pairs: pairs});
+             } else {
+                 let mut elements = vec![first];
+                 while self.match_token(TokenType::Comma) {
+                     self.skip_newlines();
+                     if self.current().token_type == TokenType::RightBrace { break; }
+                     elements.push(self.parse_expression(Precedence::NoPrec));
+                 }
+                 self.expect(TokenType::RightBrace, "Expected '}'".to_string());
+                 return Expression::Set(SetExpr{node: ASTNode{line: 1, column: 1}, elements: elements});
+             }
         }
         else if t_type == TokenType::LeftParen {
             let expr = self.parse_expression(Precedence::NoPrec);
@@ -170,6 +219,9 @@ impl Parser {
         }
         else if t_type == TokenType::AtTabl {
              return self.parse_tabl_literal();
+        }
+        else if t_type == TokenType::AtFrame {
+             return self.parse_dataframe_literal();
         }
         // Handle type constructor tokens as identifiers for backend processing
         else if t_type == TokenType::AtInt {
@@ -246,6 +298,54 @@ impl Parser {
                  return Expression::Set(SetExpr{node: ASTNode{line: 1, column: 1}, elements: elements});
              }
              return Expression::Identifier(IdentifierExpr{node: ASTNode{line: 1, column: 1}, name: "@set".to_string()});
+        }
+        else if t_type == TokenType::LeftBracket {
+             // List: [1, 2, 3]
+             let mut elements = vec![];
+             while self.current().token_type != TokenType::RightBracket && self.current().token_type != TokenType::Eof {
+                  self.skip_newlines();
+                  if self.current().token_type == TokenType::RightBracket { break; }
+                  elements.push(self.parse_expression(Precedence::NoPrec));
+                  if !self.match_token(TokenType::Comma) {
+                      self.skip_newlines(); 
+                      break; 
+                  }
+                  self.skip_newlines(); 
+             }
+             self.expect(TokenType::RightBracket, "Expected ']'".to_string());
+             return Expression::List(ListExpr{node: ASTNode{line: 1, column: 1}, elements: elements});
+        }
+        else if t_type == TokenType::LeftBrace {
+             // Dict: {k:v} or Set: {v}
+             self.skip_newlines();
+             if self.current().token_type == TokenType::RightBrace {
+                 self.advance();
+                 return Expression::Dict(DictExpr{node: ASTNode{line: 1, column: 1}, pairs: vec![]});
+             }
+             let first = self.parse_expression(Precedence::NoPrec);
+             if self.match_token(TokenType::Colon) {
+                 let val = self.parse_expression(Precedence::NoPrec);
+                 let mut pairs = vec![(first, val)];
+                 while self.match_token(TokenType::Comma) {
+                     self.skip_newlines();
+                     if self.current().token_type == TokenType::RightBrace { break; }
+                     let k = self.parse_expression(Precedence::NoPrec);
+                     self.expect(TokenType::Colon, "Expected ':'".to_string());
+                     let v = self.parse_expression(Precedence::NoPrec);
+                     pairs.push((k, v));
+                 }
+                 self.expect(TokenType::RightBrace, "Expected '}'".to_string());
+                 return Expression::Dict(DictExpr{node: ASTNode{line: 1, column: 1}, pairs: pairs});
+             } else {
+                 let mut elements = vec![first];
+                 while self.match_token(TokenType::Comma) {
+                     self.skip_newlines();
+                     if self.current().token_type == TokenType::RightBrace { break; }
+                     elements.push(self.parse_expression(Precedence::NoPrec));
+                 }
+                 self.expect(TokenType::RightBrace, "Expected '}'".to_string());
+                 return Expression::Set(SetExpr{node: ASTNode{line: 1, column: 1}, elements: elements});
+             }
         }
         else if t_type == TokenType::AtTensor {
              return Expression::Identifier(IdentifierExpr{node: ASTNode{line: 1, column: 1}, name: "@tensor".to_string()});
@@ -349,6 +449,26 @@ impl Parser {
                 index: Box::new(index)
             });
         }
+        else if token.token_type == TokenType::EqualEqual || token.token_type == TokenType::NotEqual || 
+                token.token_type == TokenType::Less || token.token_type == TokenType::LessEq || 
+                token.token_type == TokenType::Greater || token.token_type == TokenType::GreaterEq {
+            let right = self.parse_expression(precedence);
+            return Expression::BinaryOp(BinaryOpExpr{
+                node: ASTNode{line: 1, column: 1}, 
+                left: Box::new(left), 
+                operator: token.token_type, 
+                right: Box::new(right)
+            });
+        }
+        else if token.token_type == TokenType::Or || token.token_type == TokenType::And {
+             let right = self.parse_expression(precedence);
+             return Expression::BinaryOp(BinaryOpExpr{
+                node: ASTNode{line: 1, column: 1},
+                left: Box::new(left),
+                operator: token.token_type,
+                right: Box::new(right)
+             });
+        }
         return left;
 
     }
@@ -357,6 +477,7 @@ impl Parser {
         let mut statements = vec![];
         let mut imports = vec![];
         let mut main_entry = vec![];
+        let mut functions = vec![];
         println!("{}", "    Parser: parse_program start".to_string());
         
         while self.current_pos < (self.tokens).len() {
@@ -411,10 +532,15 @@ impl Parser {
                 }
             }
             else {
-                statements.push(self.parse_statement());
+                let stmt = self.parse_statement();
+                if let Statement::FunctionDecl(f) = stmt {
+                    functions.push(f);
+                } else {
+                    statements.push(stmt);
+                }
             }
         }
-        return Program{statements: statements, imports: imports, main_entry: main_entry};
+        return Program{statements: statements, imports: imports, functions: functions, main_entry: main_entry};
 
     }
 }
@@ -460,6 +586,8 @@ impl Parser {
             TokenType::If => return self.parse_if_statement(),
             TokenType::While => return self.parse_while_statement(),
             TokenType::For => return self.parse_for_statement(),
+            TokenType::Parallel => return self.parse_parallel_for_statement(),
+            TokenType::AtFlow => return self.parse_flow_declaration(),
             // TokenType.Loop => return self.parse_loop_statement()
             // TokenType.Match => return self.parse_match_statement()
 
@@ -507,6 +635,7 @@ impl Parser {
             name: name,
             type_annotation: type_annotation,
             value: value,
+            decorators: vec![],
         });
 
     }
@@ -531,6 +660,7 @@ impl Parser {
             name: name,
             type_annotation: type_annotation,
             value: value,
+            decorators: vec![],
         });
 
     }
@@ -870,6 +1000,7 @@ impl Parser {
             variable: var_token.value,
             iterable: iterable,
             body: body,
+            is_parallel: false,
         });
 
     }
@@ -1048,6 +1179,70 @@ impl Parser {
             node: create_node(token.line, token.column),
             language: lang.to_string(),
             code: code,
+        });
+    }
+
+    pub fn parse_parallel_for_statement(&mut self) -> Statement {
+        let p_token = self.advance(); // Parallel
+        if self.current().token_type == TokenType::For {
+             let mut stmt = self.parse_for_statement();
+             if let Statement::ForStmt(ref mut f) = stmt {
+                 f.is_parallel = true;
+             }
+             return stmt;
+        } else {
+             self.expect(TokenType::For, "Expected 'for' after 'parallel'".to_string());
+             return Statement::PassStmt(PassStmt{node: create_node(p_token.line, p_token.column)});
+        }
+    }
+
+    pub fn parse_flow_declaration(&mut self) -> Statement {
+         let token = self.advance(); // @flow
+         if self.current().token_type == TokenType::Var {
+             let mut stmt = self.parse_var_statement();
+             if let Statement::VarDecl(ref mut v) = stmt {
+                 v.decorators.push("@flow".to_string());
+             }
+             return stmt;
+         } else {
+             self.expect(TokenType::Var, "Expected 'var' declaration for flow".to_string());
+             return Statement::PassStmt(PassStmt{node: create_node(token.line, token.column)});
+         }
+    }
+
+    pub fn parse_dataframe_literal(&mut self) -> Expression {
+        let token = self.advance(); // @frame
+        self.expect(TokenType::LeftBrace, "Expected '{'".to_string());
+        
+        let mut columns = vec![];
+        let data = std::collections::HashMap::new();
+
+        while self.current().token_type != TokenType::RightBrace && self.current().token_type != TokenType::Eof {
+             let key = self.expect(TokenType::Identifier, "Expected key".to_string());
+             self.expect(TokenType::Colon, "Expected ':'".to_string());
+             
+             if key.value == "columns".to_string() {
+                 self.expect(TokenType::LeftParen, "Expected '('".to_string());
+                 while !self.match_token(TokenType::RightParen) {
+                     if self.current().token_type == TokenType::String {
+                          columns.push(self.advance().value);
+                     } else {
+                          self.advance();
+                     }
+                     self.match_token(TokenType::Comma);
+                 }
+             } else {
+                 self.parse_expression(Precedence::NoPrec); 
+             }
+             self.match_token(TokenType::Comma);
+             self.skip_newlines();
+        }
+        self.expect(TokenType::RightBrace, "Expected '}'".to_string());
+        
+        return Expression::DataFrame(DataFrameExpr{
+            node: create_node(token.line, token.column),
+            columns: columns,
+            data: data,
         });
     }
 }

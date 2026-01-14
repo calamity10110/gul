@@ -1,6 +1,6 @@
 # Web Server
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+**Version**: 0.14.0-dev | **Syntax**: v3.2 | **Updated**: 2026-01-08
 
 ---
 
@@ -115,13 +115,13 @@ import std.secrets
 
 secret jwt_secret = env("JWT_SECRET", default="dev-secret-key")
 
-fn hash_password(password: str): str:
+@fn hash_password(password: str): str:
     return crypto.bcrypt_hash(password)
 
-fn verify_password(password: str, hash: str): bool:
+@fn verify_password(password: str, hash: str): bool:
     return crypto.bcrypt_verify(password, hash)
 
-fn generate_token(user_id: int, username: str): str:
+@fn generate_token(user_id: int, username: str): str:
     payload = {
         "user_id": user_id,
         "username": username,
@@ -130,14 +130,14 @@ fn generate_token(user_id: int, username: str): str:
 
     return jwt.encode(payload, jwt_secret)
 
-fn verify_token(token: str): map?:
+@fn verify_token(token: str): map?:
     try:
         return jwt.decode(token, jwt_secret)
    catch:
         return None
 
-fn require_auth(next_handler):
-    fn handler(request):
+@fn require_auth(next_handler):
+   @fn handler(request):
         auth_header = request.headers.get("Authorization")
 
         if auth_header is None:
@@ -168,9 +168,9 @@ Create `src/routes/users.mn`:
 ```gul
 import std.http
 
-fn register_user_routes(server):
+@fn register_user_routes(server):
     @server.post("/api/register")
-    fn register(request):
+   @fn register(request):
         data = request.json()
 
         # Validation
@@ -201,7 +201,7 @@ fn register_user_routes(server):
         }, status=201)
 
     @server.post("/api/login")
-    fn login(request):
+   @fn login(request):
         data = request.json()
 
         user = User.where(username=data.get("username")).first()
@@ -221,7 +221,7 @@ fn register_user_routes(server):
         })
 
     @server.get("/api/users/{id}")
-    fn get_user(request, id: int):
+   @fn get_user(request, id: int):
         user = User.with("posts").find(id)
 
         if user is None:
@@ -240,7 +240,7 @@ Create `src/routes/posts.mn`:
 
 ```gul
 @server.get("/api/posts")
-fn list_posts(request):
+@fn list_posts(request):
     page = request.query.get("page", type=int, default=1)
     per_page = 10
 
@@ -273,7 +273,7 @@ fn list_posts(request):
     })
 
 @server.get("/api/posts/{id}")
-fn get_post(request, id: int):
+@fn get_post(request, id: int):
     post = Post.with("user", "comments.user").find(id)
 
     if post is None or !post.published:
@@ -301,7 +301,7 @@ fn get_post(request, id: int):
 
 @server.post("/api/posts")
 @require_auth
-fn create_post(request):
+@fn create_post(request):
     data = request.json()
 
     post = Post.create(
@@ -319,7 +319,7 @@ fn create_post(request):
 
 @server.put("/api/posts/{id}")
 @require_auth
-fn update_post(request, id: int):
+@fn update_post(request, id: int):
     post = Post.find(id)
 
     if post is None:
@@ -339,7 +339,7 @@ fn update_post(request, id: int):
 
 @server.delete("/api/posts/{id}")
 @require_auth
-fn delete_post(request, id: int):
+@fn delete_post(request, id: int):
     post = Post.find(id)
 
     if post is None:
@@ -380,7 +380,7 @@ register_post_routes(server)
 
 # Health check
 @server.get("/health")
-fn health_check(request):
+@fn health_check(request):
     return http.json_response({"status": "healthy"})
 
 main:
@@ -446,6 +446,6 @@ curl http://localhost:8080/api/posts
 
 ---
 
-**Last Updated**: 2025-12-28  
-**Version: 0.13.0  
+**Last Updated**: 2026-01-08  
+**Version**: 0.14.0-dev  
 **License**: MIT

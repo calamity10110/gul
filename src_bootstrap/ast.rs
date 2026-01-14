@@ -20,7 +20,7 @@ pub struct Program {
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Statement {
-    Import(String),
+    Import(Vec<String>),
     StructDef {
         name: String,
         fields: Vec<(String, String)>,
@@ -32,7 +32,8 @@ pub enum Statement {
     },
     Function {
         name: String,
-        params: Vec<String>,
+        params: Vec<(String, Option<Type>)>,   // Param name and optional type
+        outputs: Vec<(String, Option<Type>)>,  // Output name and optional type
         body: Vec<Statement>,
         is_async: bool,
     },
@@ -66,10 +67,12 @@ pub enum Statement {
         variable: String,
         iterable: Expression,
         body: Vec<Statement>,
+        is_parallel: bool,
     },
     While {
         condition: Expression,
         body: Vec<Statement>,
+        is_parallel: bool,
     },
     Break,
     Continue,
@@ -100,6 +103,10 @@ pub enum Expression {
     Call {
         function: Box<Expression>,
         args: Vec<Expression>,
+    },
+    Lambda {
+        params: Vec<String>,
+        body: Box<Expression>,
     },
     Await(Box<Expression>),
     UiSprite {

@@ -1,6 +1,6 @@
 # Polyglot Microservices with GUL
 
-**Version**: 0.13.0 | **Syntax**:v3.2 | **Updated**: 2025-12-28
+**Version**: 0.14.0-dev | **Syntax**:v3.2 | **Updated**: 2026-01-08
 
 Build production-grade polyglot microservices architectures with GUL.
 
@@ -76,7 +76,7 @@ message ListUsersRequest {
 struct UserService:
     db_conn: @str
 
-    async fn @dict get_user(self, request):
+    @async @dict get_user(self, request):
         """Get user by ID"""
 
         let conn = postgres.connect(self.db_conn)
@@ -96,7 +96,7 @@ struct UserService:
             created_at: user["created_at"]
         }
 
-    async fn @dict create_user(self, request):
+    @async @dict create_user(self, request):
         """Create new user"""
 
         let conn = postgres.connect(self.db_conn)
@@ -110,7 +110,7 @@ struct UserService:
 
         return await self.get_user(@dict{id: user_id})
 
-    async fn stream_users(self, request):
+    @async stream_users(self, request):
         """Stream users with pagination"""
 
         let conn = postgres.connect(self.db_conn)
@@ -159,7 +159,7 @@ mn:
 ```gul
 @imp gul.grpc
 
-async fn call_user_service():
+@async call_user_service():
     """Call UserService from another microservice"""
 
     # Create gRPC channel
@@ -195,7 +195,7 @@ mn:
 ```gul
 @imp gul.istio
 
-fn configure_istio():
+@fn configure_istio():
     """Configure Istio for microservices"""
 
     # Virtual Service for routing
@@ -260,7 +260,7 @@ fn configure_istio():
 struct CircuitBreaker:
     service_name: @str
 
-    fn configure(self):
+   @fn configure(self):
         """Configure circuit breaker with Envoy"""
 
         let config = envoy.CircuitBreakerConfig{
@@ -293,7 +293,7 @@ struct CircuitBreaker:
 struct ServiceRegistry:
     consul_addr: @str
 
-    async fn register_service(self, name, port, health_check):
+    @async register_service(self, name, port, health_check):
         """Register service with Consul"""
 
         let client = consul.connect(self.consul_addr)
@@ -314,7 +314,7 @@ struct ServiceRegistry:
         await client.agent.service_register(service)
         print("Registered service:", name)
 
-    async fn discover_service(self, name):
+    @async discover_service(self, name):
         """Discover service instances"""
 
         let client = consul.connect(self.consul_addr)
@@ -330,7 +330,7 @@ struct ServiceRegistry:
 
         return instances
 
-    async fn get_kv(self, key):
+    @async get_kv(self, key):
         """Get configuration from KV store"""
 
         let client = consul.connect(self.consul_addr)
@@ -365,7 +365,7 @@ struct DaprService:
     app_id: @str
     dapr_port: @int
 
-    async fn call_service(self, service_id, method, data):
+    @async call_service(self, service_id, method, data):
         """Call another service via Dapr"""
 
         let client = dapr.Client(self.dapr_port)
@@ -378,7 +378,7 @@ struct DaprService:
 
         return response
 
-    async fn publish_event(self, topic, data):
+    @async publish_event(self, topic, data):
         """Publish event to pub/sub"""
 
         let client = dapr.Client(self.dapr_port)
@@ -389,7 +389,7 @@ struct DaprService:
             data=data
         )
 
-    async fn save_state(self, key, value):
+    @async save_state(self, key, value):
         """Save state to state store"""
 
         let client = dapr.Client(self.dapr_port)
@@ -400,7 +400,7 @@ struct DaprService:
             value=value
         )
 
-    async fn get_state(self, key):
+    @async get_state(self, key):
         """Get state from state store"""
 
         let client = dapr.Client(self.dapr_port)
@@ -450,7 +450,7 @@ struct APIGateway:
     consul_addr: @str
     redis_addr: @str
 
-    async fn route_request(self, request):
+    @async route_request(self, request):
         """Route request to appropriate microservice"""
 
         # Extract service from path
@@ -485,7 +485,7 @@ struct APIGateway:
 
         return response
 
-    async fn authenticate(self, request):
+    @async authenticate(self, request):
         """Authenticate request"""
 
         let token = request.headers.get("Authorization")
@@ -520,7 +520,7 @@ struct APIGateway:
 
         return @dict{authenticated: false}
 
-    async fn rate_limit(self, request):
+    @async rate_limit(self, request):
         """Rate limiting"""
 
         let user_id = request.headers.get("X-User-ID")
@@ -545,7 +545,7 @@ mn:
         redis_addr: "redis://localhost:6379"
     }
 
-    async fn handler(request):
+    @async handler(request):
         # Authenticate
         let auth = await gateway.authenticate(request)
         if not auth.authenticated:
@@ -580,7 +580,7 @@ struct OrderSaga:
 
     messaging: @dict
 
-    async fn create_order(self, order_data):
+    @async create_order(self, order_data):
         """Execute saga for order creation"""
 
         let saga = saga.Saga{
@@ -606,7 +606,7 @@ struct OrderSaga:
             print("Saga failed:", error)
             return @dict{success: false, error: str(error)}
 
-    async fn reserve_inventory(self, data):
+    @async reserve_inventory(self, data):
         """Step 1: Reserve inventory"""
         let response = await self.call_service(
             "inventory-service",
@@ -619,7 +619,7 @@ struct OrderSaga:
 
         return @dict{reservation_id: response.reservation_id}
 
-    async fn release_inventory(self, data):
+    @async release_inventory(self, data):
         """Compensation: Release inventory"""
         await self.call_service(
             "inventory-service",
@@ -627,7 +627,7 @@ struct OrderSaga:
             @dict{reservation_id: data.reservation_id}
         )
 
-    async fn process_payment(self, data):
+    @async process_payment(self, data):
         """Step 2: Process payment"""
         let response = await self.call_service(
             "payment-service",
@@ -643,7 +643,7 @@ struct OrderSaga:
 
         return @dict{transaction_id: response.transaction_id}
 
-    async fn refund_payment(self, data):
+    @async refund_payment(self, data):
         """Compensation: Refund payment"""
         await self.call_service(
             "payment-service",
@@ -651,7 +651,7 @@ struct OrderSaga:
             @dict{transaction_id: data.transaction_id}
         )
 
-    async fn call_service(self, service, method, data):
+    @async call_service(self, service, method, data):
         """Call service via message queue"""
         let nats_client = nats.connect(self.messaging.url)
 
@@ -688,7 +688,7 @@ mn:
 ```gul
 struct HealthCheck:
 
-    async fn @dict check(self):
+    @async @dict check(self):
         """Comprehensive health check"""
 
         let checks = @dict{
@@ -704,7 +704,7 @@ struct HealthCheck:
             checks: checks
         }
 
-    async fn @bool check_database(self):
+    @async @bool check_database(self):
         try:
             let conn = postgres.connect("postgresql://localhost/db")
             await conn.query("SELECT 1")
@@ -718,10 +718,10 @@ struct HealthCheck:
 ```gul
 @imp gul.jaeger
 
-fn trace_request(fn):
+@fn trace_request(fn):
     """Decorator for distributed tracing"""
 
-    async fn wrapped(*args, **kwargs):
+    @async wrapped(*args, **kwargs):
         # Start span
         let tracer = jaeger.get_tracer()
         let span = tracer.start_span("request")
@@ -754,7 +754,7 @@ struct mTLS:
     key_path: @str
     ca_path: @str
 
-    fn configure_client(self):
+   @fn configure_client(self):
         """Configure mTLS for client"""
 
         return grpc.ChannelCredentials{
@@ -774,6 +774,6 @@ struct mTLS:
 
 ---
 
-**Last Updated**: 2025-12-28  
-**Version**: 0.13.0  
+**Last Updated**: 2026-01-08  
+**Version**: 0.14.0-dev  
 **Status**: Production Ready

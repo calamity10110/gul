@@ -1,6 +1,6 @@
 # Integration
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+**Version**: 0.14.0-dev | **Syntax**: v3.2 | **Updated**: 2026-01-08
 
 ---
 
@@ -14,11 +14,11 @@ The language supports seamless integration with multiple programming languages t
 
 ```
 @rust {
-    fn add(a: i32, b: i32) -> i32 {
+   @fn add(a: i32, b: i32) -> i32 {
         a + b
     }
 
-    fn fast_sum(data: &[i32]) -> i32 {
+   @fn fast_sum(data: &[i32]) -> i32 {
         data.iter().sum()
     }
 }
@@ -37,7 +37,7 @@ The language supports seamless integration with multiple programming languages t
 @imp std.io
 
 @rust {
-    fn process_image(pixels: &mut [u8], width: usize, height: usize) {
+   @fn process_image(pixels: &mut [u8], width: usize, height: usize) {
         for i in 0..pixels.len() {
             pixels[i] = pixels[i].saturating_add(10);
         }
@@ -184,7 +184,7 @@ mn:
         };
     }
 
-async mn:
+@async main():
     config = {
         apiKey: secret.API_KEY,
         endpoint: "https://api.example.com",

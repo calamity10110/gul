@@ -1,0 +1,14 @@
+
+mn:
+    print("Testing Foreign Code")
+    
+    @python {
+import sys
+print("Hello from Python", end="")
+    }
+    
+    @rust {
+fn main() {
+    println!("Hello from Rust");
+}
+    }

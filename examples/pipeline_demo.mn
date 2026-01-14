@@ -1,0 +1,11 @@
+@fn run() -> int:
+    let double = (x) => x * 2
+    let addten = (x) => x + 10
+    
+    let result = 5 |> double |> addten
+    print(result)
+    
+    return 0
+
+mn:
+    run()

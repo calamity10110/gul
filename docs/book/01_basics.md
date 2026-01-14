@@ -69,6 +69,7 @@ let x = x.to_int()  # x is now an int. The string is dropped.
     # numbers.push(4) # Lists are immutable by default
     var mut_nums = @list[1, 2, 3]
     mut_nums.add(4)
+    print(len(mut_nums)) # 4
     ```
 
 - **Map**: Key-Value dictionary.
@@ -142,7 +143,10 @@ while count < 10:
 Iterate over collections or ranges.
 
 ```gul
-for i in range(0, 5):
-    print(i)  
-# Prints 0, 1, 2, 3, 4
+let items = @list["a", "b", "c"]
+for item in items:
+    print(item)
+
+for i in 0..5:
+    print(i)  # Includes 0, 1, 2, 3, 4
 ```

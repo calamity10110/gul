@@ -21,7 +21,7 @@ pub struct CraneliftBackend {
 struct GenContext<'a, 'b> {
     builder: &'a mut FunctionBuilder<'b>,
     module: &'a mut ObjectModule,
-    variables: &'a mut HashMap<String, Variable>, // name -> variable reference
+    variables: &'a mut HashMap<String, (Variable, String)>, // name -> (variable reference, type)
     var_counter: &'a mut usize,
     printf_id: FuncId,
     gul_print_float_id: FuncId,
@@ -38,12 +38,16 @@ struct GenContext<'a, 'b> {
     gul_dict_set_id: FuncId,
     gul_set_alloc_id: FuncId,
     gul_set_add_id: FuncId,
+    gul_list_get_id: FuncId,
+    gul_dict_get_id: FuncId,
+    gul_int_to_string_id: FuncId,
+    gul_float_to_string_id: FuncId,
     format_int_id: DataId,
     format_str_id: DataId,
     string_literals: &'a mut HashMap<String, DataId>,
     data_description: &'a mut DataDescription,
     builtins: HashMap<String, FuncId>,
-    // functions: &'a HashMap<String, FuncId>, // Removed to fix error
+    functions: &'a HashMap<String, FuncId>,
     struct_layouts: &'a mut HashMap<String, HashMap<String, usize>>,
     current_func_name: String,
 }
@@ -173,6 +177,14 @@ impl CraneliftBackend {
         sig_list_push.params.push(AbiParam::new(types::I64));
         let gul_list_push_id = module.declare_function("gul_list_push", Linkage::Import, &sig_list_push)
             .map_err(|e| anyhow!("Failed to declare gul_list_push: {}", e))?;
+        
+        // Declare gul_list_get(list_ptr, index) -> value
+        let mut sig_list_get = module.make_signature();
+        sig_list_get.params.push(AbiParam::new(types::I64)); // list_ptr
+        sig_list_get.params.push(AbiParam::new(types::I64)); // index
+        sig_list_get.returns.push(AbiParam::new(types::I64)); // value
+        let gul_list_get_id = module.declare_function("gul_list_get", Linkage::Import, &sig_list_get)
+            .map_err(|e| anyhow!("Failed to declare gul_list_get: {}", e))?;
 
         // Declare gul_dict_alloc(capacity) -> dict_ptr
         let mut sig_dict_alloc = module.make_signature();
@@ -188,6 +200,28 @@ impl CraneliftBackend {
         sig_dict_set.params.push(AbiParam::new(types::I64));
         let gul_dict_set_id = module.declare_function("gul_dict_set", Linkage::Import, &sig_dict_set)
             .map_err(|e| anyhow!("Failed to declare gul_dict_set: {}", e))?;
+
+        // Declare gul_dict_get(dict_ptr, key_ptr) -> value
+        let mut sig_dict_get = module.make_signature();
+        sig_dict_get.params.push(AbiParam::new(types::I64)); // dict_ptr
+        sig_dict_get.params.push(AbiParam::new(types::I64)); // key_ptr
+        sig_dict_get.returns.push(AbiParam::new(types::I64)); // value
+        let gul_dict_get_id = module.declare_function("gul_dict_get", Linkage::Import, &sig_dict_get)
+            .map_err(|e| anyhow!("Failed to declare gul_dict_get: {}", e))?;
+
+        // gul_int_to_string(int) -> str
+        let mut sig_int_to_str = module.make_signature();
+        sig_int_to_str.params.push(AbiParam::new(types::I64));
+        sig_int_to_str.returns.push(AbiParam::new(types::I64));
+        let gul_int_to_string_id = module.declare_function("gul_int_to_string", Linkage::Import, &sig_int_to_str)
+            .map_err(|e| anyhow!("Failed to declare gul_int_to_string: {}", e))?;
+
+        // gul_float_to_string(float) -> str
+        let mut sig_flt_to_str = module.make_signature();
+        sig_flt_to_str.params.push(AbiParam::new(types::F64));
+        sig_flt_to_str.returns.push(AbiParam::new(types::I64));
+        let gul_float_to_string_id = module.declare_function("gul_float_to_string", Linkage::Import, &sig_flt_to_str)
+            .map_err(|e| anyhow!("Failed to declare gul_float_to_string: {}", e))?;
 
         // Declare gul_set_alloc(capacity) -> set_ptr
         let mut sig_set_alloc = module.make_signature();
@@ -317,6 +351,78 @@ impl CraneliftBackend {
              builtins.insert(name.to_string(), fid);
         }
 
+        let mut functions = HashMap::new();
+        // 1. Declare all user functions
+        for func in &program.functions {
+            let mut sig = module.make_signature();
+            // Params
+            for param in &func.parameters {
+                // Map GUL types to Cranelift types. Default I64 for now unless inferred?
+                // AST Parameter has type_annotation: Option<String>.
+                let ty = if !param.type_annotation.is_empty() {
+                    let t = &param.type_annotation;
+                    if t == "int" { types::I64 }
+                    else if t == "float" { types::F64 }
+                    else if t == "str" { types::I64 } // pointer
+                    else { types::I64 }
+                } else {
+                    types::I64
+                };
+                sig.params.push(AbiParam::new(ty));
+            }
+            // Return type
+            if !func.return_type.is_empty() {
+                 let ret_type = &func.return_type;
+                 let ty = if ret_type == "int" { types::I64 }
+                    else if ret_type == "float" { types::F64 }
+                    else if ret_type == "str" { types::I64 }
+                    else { types::I64 };
+                 sig.returns.push(AbiParam::new(ty));
+            } else {
+                 // Void return? Or default 0?
+                 sig.returns.push(AbiParam::new(types::I64)); // Default return 0
+            }
+            
+            let func_id = module.declare_function(&func.name, Linkage::Local, &sig)
+                .map_err(|e| anyhow!("Failed to declare function {}: {}", func.name, e))?;
+            functions.insert(func.name.clone(), func_id);
+        }
+
+        // 2. Generate all user functions
+        for func_def in &program.functions {
+             let mut sub_ctx = codegen::Context::new();
+             sub_ctx.func.signature = module.make_signature(); // Initialize signature container
+             self.generate_function(
+                func_def,
+                &mut module,
+                &mut sub_ctx,
+                printf_id,
+                gul_print_float_id,
+                gul_input_str_id,
+                gul_input_int_id,
+                gul_input_flt_id,
+                gul_table_alloc_id,
+                gul_table_set_col_name_id,
+                gul_table_set_row_id,
+                gul_malloc_id,
+                gul_list_alloc_id,
+                gul_list_push_id,
+                gul_dict_alloc_id,
+                gul_dict_set_id,
+                gul_set_alloc_id,
+                gul_set_add_id,
+                gul_list_get_id,
+                gul_dict_get_id,
+                gul_int_to_string_id,
+                gul_float_to_string_id,
+                format_int_id,
+                format_str_id,
+                &mut string_literals,
+                builtins.clone(),
+                &functions,
+            )?;
+        }
+
         // Generate main function from program's main_entry and statements
         self.generate_main(
             program,
@@ -337,10 +443,15 @@ impl CraneliftBackend {
             gul_dict_set_id,
             gul_set_alloc_id,
             gul_set_add_id,
+            gul_list_get_id,
+            gul_dict_get_id,
+            gul_int_to_string_id,
+            gul_float_to_string_id,
             format_int_id,
             format_str_id,
             &mut string_literals,
             builtins,
+            &functions,
         )?;
         
         let product = module.finish();
@@ -367,10 +478,15 @@ impl CraneliftBackend {
         gul_dict_set_id: FuncId,
         gul_set_alloc_id: FuncId,
         gul_set_add_id: FuncId,
+        gul_list_get_id: FuncId,
+        gul_dict_get_id: FuncId,
+        gul_int_to_string_id: FuncId,
+        gul_float_to_string_id: FuncId,
         format_int_id: DataId,
         format_str_id: DataId,
         string_literals: &mut HashMap<String, DataId>,
         builtins: HashMap<String, FuncId>,
+        functions: &HashMap<String, FuncId>,
     ) -> Result<()> {
         // Create main function signature
         let mut sig = module.make_signature();
@@ -386,7 +502,7 @@ impl CraneliftBackend {
         builder.switch_to_block(entry_block);
         builder.seal_block(entry_block);
         
-        let mut variables = HashMap::new();
+        let mut variables: HashMap<String, (Variable, String)> = HashMap::new();
         let mut struct_layouts = HashMap::new();
         let mut var_counter = 0;
         
@@ -395,18 +511,6 @@ impl CraneliftBackend {
                 builder: &mut builder,
                 module,
                 variables: &mut variables,
-                // functions: &self.functions, // Assuming this exists or passed? 
-                // Wait, GenContext def has functions: HashMap...
-                // In generate_main arguments, builtins is passed. 
-                // functions is field of self?
-                // Let's check GenContext definition in file.
-                // Assuming I need to match GenContext struct def.
-                // Re-reading file lines 17-30 to double check fields.
-                // variables, builtins, struct_layouts.
-                // functions was listed in my REPLACEMENT in Step 3120?
-                // Yes: pub functions: HashMap<String, FuncId>
-                builtins: builtins,
-                struct_layouts: &mut struct_layouts,
                 var_counter: &mut var_counter,
                 printf_id,
                 gul_print_float_id,
@@ -423,13 +527,20 @@ impl CraneliftBackend {
                 gul_dict_set_id,
                 gul_set_alloc_id,
                 gul_set_add_id,
+                gul_list_get_id,
+                gul_dict_get_id,
+                gul_int_to_string_id,
+                gul_float_to_string_id,
                 format_int_id,
                 format_str_id,
                 string_literals,
                 data_description: &mut self.data_description,
+                builtins,
+                functions,
+                struct_layouts: &mut struct_layouts,
                 current_func_name: "main".to_string(),
             };
-
+            
             // Generate code for main_entry statements
             for stmt in &program.main_entry {
                 Self::generate_statement(stmt, &mut gen_ctx)?;
@@ -441,12 +552,13 @@ impl CraneliftBackend {
             }
             
             // Return 0
-            let zero = gen_ctx.builder.ins().iconst(types::I32, 0);
-            gen_ctx.builder.ins().return_(&[zero]);
+            if !gen_ctx.builder.is_unreachable() {
+                 let zero = gen_ctx.builder.ins().iconst(types::I32, 0);
+                 gen_ctx.builder.ins().return_(&[zero]);
+            }
         }
         
         builder.finalize();
-        
         module.define_function(func_id, ctx)
             .map_err(|e| anyhow!("Failed to define main: {}", e))?;
         module.clear_context(ctx);
@@ -454,31 +566,282 @@ impl CraneliftBackend {
         Ok(())
     }
 
+    fn generate_function(
+        &mut self,
+        func_def: &FunctionDecl,
+        module: &mut ObjectModule,
+        ctx: &mut codegen::Context,
+        printf_id: FuncId,
+        gul_print_float_id: FuncId,
+        gul_input_str_id: FuncId,
+        gul_input_int_id: FuncId,
+        gul_input_flt_id: FuncId,
+        gul_table_alloc_id: FuncId,
+        gul_table_set_col_name_id: FuncId,
+        gul_table_set_row_id: FuncId,
+        gul_malloc_id: FuncId,
+        gul_list_alloc_id: FuncId,
+        gul_list_push_id: FuncId,
+        gul_dict_alloc_id: FuncId,
+        gul_dict_set_id: FuncId,
+        gul_set_alloc_id: FuncId,
+        gul_set_add_id: FuncId,
+        gul_list_get_id: FuncId,
+        gul_dict_get_id: FuncId,
+        gul_int_to_string_id: FuncId,
+        gul_float_to_string_id: FuncId,
+        format_int_id: DataId,
+        format_str_id: DataId,
+        string_literals: &mut HashMap<String, DataId>,
+        builtins: HashMap<String, FuncId>,
+        functions: &HashMap<String, FuncId>,
+    ) -> Result<()> {
+        ctx.clear();
+        let func_id = *functions.get(&func_def.name).ok_or(anyhow!("Function ID not found"))?;
+        
+        // Setup signature from Definition
+        let mut sig = module.make_signature();
+        
+        for param in &func_def.parameters {
+             let ty = if !param.type_annotation.is_empty() {
+                    let t = &param.type_annotation;
+                    if t == "int" { types::I64 }
+                    else if t == "float" { types::F64 }
+                    else if t == "str" { types::I64 } 
+                    else { types::I64 }
+                } else { types::I64 };
+             sig.params.push(AbiParam::new(ty));
+        }
+        
+        if !func_def.return_type.is_empty() {
+             let ret_type = &func_def.return_type;
+             let ty = if ret_type == "int" { types::I64 }
+                else if ret_type == "float" { types::F64 }
+                else if ret_type == "str" { types::I64 }
+                else { types::I64 };
+             sig.returns.push(AbiParam::new(ty));
+        } else {
+             sig.returns.push(AbiParam::new(types::I64));
+        }
+        
+        ctx.func.signature = sig;
+
+        let mut builder_context = FunctionBuilderContext::new();
+        let mut builder = FunctionBuilder::new(&mut ctx.func, &mut builder_context);
+        let entry_block = builder.create_block();
+        builder.append_block_params_for_function_params(entry_block);
+        
+        builder.switch_to_block(entry_block);
+        // Workaround: Manually append block if switch_to_block failed to do so (bug in builder interaction?)
+        if builder.func.layout.blocks().count() == 0 {
+             builder.func.layout.append_block(entry_block);
+        }
+        builder.seal_block(entry_block);
+        
+        let mut variables = HashMap::new();
+        let mut struct_layouts = HashMap::new();
+        let mut var_counter = 0;
+        
+        {
+            let mut gen_ctx = GenContext {
+                builder: &mut builder,
+                module,
+                variables: &mut variables,
+                var_counter: &mut var_counter,
+                printf_id,
+                gul_print_float_id,
+                gul_input_str_id,
+                gul_input_int_id,
+                gul_input_flt_id,
+                gul_table_alloc_id,
+                gul_table_set_col_name_id,
+                gul_table_set_row_id,
+                gul_malloc_id,
+                gul_list_alloc_id,
+                gul_list_push_id,
+                gul_dict_alloc_id,
+                gul_dict_set_id,
+                gul_set_alloc_id,
+                gul_set_add_id,
+                gul_list_get_id,
+                gul_dict_get_id,
+                gul_int_to_string_id,
+                gul_float_to_string_id,
+                format_int_id,
+                format_str_id,
+                string_literals,
+                data_description: &mut self.data_description,
+                builtins,
+                functions,
+                struct_layouts: &mut struct_layouts,
+                current_func_name: func_def.name.clone(),
+            };
+            
+            // Register params as variables
+            for (i, param) in func_def.parameters.iter().enumerate() {
+                let val = gen_ctx.builder.block_params(entry_block)[i];
+                let var = Variable::new(*gen_ctx.var_counter); 
+                *gen_ctx.var_counter += 1;
+                gen_ctx.builder.declare_var(var, gen_ctx.builder.func.dfg.value_type(val));
+                gen_ctx.builder.def_var(var, val);
+                
+                // Determine param type
+                let type_name = if !param.type_annotation.is_empty() { param.type_annotation.clone() } else { "int".to_string() };
+                gen_ctx.variables.insert(param.name.clone(), (var, type_name));
+            }
+            
+            // Generate statements
+            for stmt in &func_def.body {
+                Self::generate_statement(stmt, &mut gen_ctx)?;
+            }
+            
+            // Make sure block is terminated
+            let current_block = gen_ctx.builder.current_block().unwrap();
+            let is_terminated = if let Some(last_inst) = gen_ctx.builder.func.layout.last_inst(current_block) {
+                 gen_ctx.builder.func.dfg.insts[last_inst].opcode().is_terminator()
+            } else { false };
+            
+            if !is_terminated {
+                 // Add default ret 0
+                 let zero = gen_ctx.builder.ins().iconst(types::I64, 0);
+                 gen_ctx.builder.ins().return_(&[zero]);
+            }
+        }
+        
+        builder.finalize();
+        module.define_function(func_id, ctx)
+            .map_err(|e| anyhow!("Failed to define function {}: {}", func_def.name, e))?;
+        module.clear_context(ctx);
+        Ok(())
+    }
+
+
+
+    fn infer_expression_type(expr: &Expression, ctx: &GenContext) -> String {
+        match expr {
+            Expression::Literal(lit) => match lit.value_type {
+                TokenType::Integer => "int".to_string(),
+                TokenType::Float => "float".to_string(),
+                TokenType::String => "str".to_string(),
+                TokenType::TrueKeyword | TokenType::FalseKeyword => "bool".to_string(),
+                _ => "unknown".to_string(),
+            },
+            Expression::Identifier(ident) => {
+                if let Some((_, type_name)) = ctx.variables.get(&ident.name) {
+                    type_name.clone()
+                } else {
+                    "unknown".to_string()
+                }
+            },
+            Expression::TypeConstructor(tc) => tc.type_name.clone().trim_start_matches('@').to_string(),
+            Expression::List(_) => "list".to_string(),
+            Expression::Dict(_) => "dict".to_string(),
+            Expression::Set(_) => "set".to_string(),
+            Expression::Table(_) => "table".to_string(),
+            Expression::DataFrame(_) => "dataframe".to_string(),
+            _ => "unknown".to_string(),
+        }
+    }
+
     fn generate_statement(stmt: &Statement, ctx: &mut GenContext) -> Result<()> {
         match stmt {
             Statement::LetDecl(let_stmt) => {
-                let val = Self::generate_expression(&let_stmt.value, ctx)?;
+                let mut val = Self::generate_expression(&let_stmt.value, ctx)?;
+                
+                // Auto conversion
+                if !let_stmt.type_annotation.is_empty() {
+                     let expected = &let_stmt.type_annotation;
+                     let actual = Self::infer_expression_type(&let_stmt.value, ctx);
+                     
+                     if expected == "str" {
+                         if actual == "int" {
+                             let func_ref = ctx.module.declare_func_in_func(ctx.gul_int_to_string_id, ctx.builder.func);
+                             let call_res = ctx.builder.ins().call(func_ref, &[val]);
+                             val = ctx.builder.inst_results(call_res)[0];
+                         } else if actual == "float" {
+                             let func_ref = ctx.module.declare_func_in_func(ctx.gul_float_to_string_id, ctx.builder.func);
+                             // Need value to be F64 for float_to_string, but val might be I64 if it's unknown?
+                             // infer says "float". Literal float gives F64.
+                             let call_res = ctx.builder.ins().call(func_ref, &[val]);
+                             val = ctx.builder.inst_results(call_res)[0];
+                         }
+                     }
+                     if expected == "bool" && actual == "str" {
+                         let mut sig = ctx.module.make_signature();
+                         sig.params.push(AbiParam::new(types::I64));
+                         sig.returns.push(AbiParam::new(types::I64)); 
+                         let fid = ctx.module.declare_function("gul_str_to_bool", Linkage::Import, &sig)?;
+                         let func_ref = ctx.module.declare_func_in_func(fid, ctx.builder.func);
+                         let call_res = ctx.builder.ins().call(func_ref, &[val]);
+                         val = ctx.builder.inst_results(call_res)[0];
+                     }
+                }
+                
                 let var_type = ctx.builder.func.dfg.value_type(val); // Infer type from value
                 let var = Variable::new(*ctx.var_counter);
                 *ctx.var_counter += 1;
                 ctx.builder.declare_var(var, var_type);
                 ctx.builder.def_var(var, val);
-                ctx.variables.insert(let_stmt.name.clone(), var);
+                let val_type_inferred = Self::infer_expression_type(&let_stmt.value, ctx);
+                let type_name = if !let_stmt.type_annotation.is_empty() { 
+                    let_stmt.type_annotation.clone() 
+                } else if val_type_inferred != "unknown" { 
+                    val_type_inferred 
+                } else { 
+                    "int".to_string() 
+                };
+                ctx.variables.insert(let_stmt.name.clone(), (var, type_name));
             }
             Statement::VarDecl(var_stmt) => {
-                let val = Self::generate_expression(&var_stmt.value, ctx)?;
+                let mut val = Self::generate_expression(&var_stmt.value, ctx)?;
+
+                // Auto conversion
+                if !var_stmt.type_annotation.is_empty() {
+                     let expected = &var_stmt.type_annotation;
+                     let actual = Self::infer_expression_type(&var_stmt.value, ctx);
+                     
+                     if expected == "str" {
+                         if actual == "int" {
+                             let func_ref = ctx.module.declare_func_in_func(ctx.gul_int_to_string_id, ctx.builder.func);
+                             let call_res = ctx.builder.ins().call(func_ref, &[val]);
+                             val = ctx.builder.inst_results(call_res)[0];
+                         } else if actual == "float" {
+                             let func_ref = ctx.module.declare_func_in_func(ctx.gul_float_to_string_id, ctx.builder.func);
+                             let call_res = ctx.builder.ins().call(func_ref, &[val]);
+                             val = ctx.builder.inst_results(call_res)[0];
+                         }
+                     }
+                     if expected == "bool" && actual == "str" {
+                         let mut sig = ctx.module.make_signature();
+                         sig.params.push(AbiParam::new(types::I64));
+                         sig.returns.push(AbiParam::new(types::I64));
+                         let fid = ctx.module.declare_function("gul_str_to_bool", Linkage::Import, &sig)?;
+                         let func_ref = ctx.module.declare_func_in_func(fid, ctx.builder.func);
+                         let call_res = ctx.builder.ins().call(func_ref, &[val]);
+                         val = ctx.builder.inst_results(call_res)[0];
+                     }
+                }
+
                 let var_type = ctx.builder.func.dfg.value_type(val); // Infer type from value
                 let var = Variable::new(*ctx.var_counter);
                 *ctx.var_counter += 1;
                 ctx.builder.declare_var(var, var_type);
                 ctx.builder.def_var(var, val);
-                ctx.variables.insert(var_stmt.name.clone(), var);
+                let val_type_inferred = Self::infer_expression_type(&var_stmt.value, ctx);
+                let type_name = if !var_stmt.type_annotation.is_empty() { 
+                    var_stmt.type_annotation.clone() 
+                } else if val_type_inferred != "unknown" { 
+                    val_type_inferred 
+                } else { 
+                    "int".to_string() 
+                };
+                ctx.variables.insert(var_stmt.name.clone(), (var, type_name));
             }
             Statement::AssignmentStmt(assign) => {
                 let val = Self::generate_expression(&assign.value, ctx)?;
                 match &assign.target {
                     Expression::Identifier(ident) => {
-                        if let Some(var) = ctx.variables.get(&ident.name) {
+                        if let Some((var, _)) = ctx.variables.get(&ident.name) {
                             ctx.builder.def_var(*var, val);
                         }
                     }
@@ -575,10 +938,18 @@ impl CraneliftBackend {
                      ctx.builder.ins().call(func_ref, &[lang_val, code_val]);
                  }
             }
+            Statement::ReturnStmt(ret) => {
+                 if let Some(val_expr) = &ret.value {
+                     let val = Self::generate_expression(val_expr, ctx)?;
+                     ctx.builder.ins().return_(&[val]);
+                 } else {
+                     ctx.builder.ins().return_(&[]);
+                 }
+            }
             Statement::ImportStmt(_) => {
                 // Ignore imports in codegen (handled by analyzer/linker?)
             }
-            _ => {} // Skip unsupported statements for now
+            _ => { println!("DEBUG: Skipped stmt {:?}", stmt); } // Skip unsupported statements for now
         }
         Ok(())
     }
@@ -626,7 +997,7 @@ impl CraneliftBackend {
                 }
             }
             Expression::Identifier(ident) => {
-                if let Some(var) = ctx.variables.get(&ident.name) {
+                if let Some((var, _)) = ctx.variables.get(&ident.name) {
                     Ok(ctx.builder.use_var(*var))
                 } else {
                     Ok(ctx.builder.ins().iconst(types::I64, 0))
@@ -703,6 +1074,25 @@ impl CraneliftBackend {
                 } else {
                     Ok(ctx.builder.ins().iconst(types::I64, 0))
                 }
+
+            }
+            Expression::Index(idx_expr) => {
+                let obj_val = Self::generate_expression(&idx_expr.object, ctx)?;
+                let idx_val = Self::generate_expression(&idx_expr.index, ctx)?;
+                
+                // Dispatch based on type
+                let obj_type = Self::infer_expression_type(&idx_expr.object, ctx);
+                
+                if obj_type == "dict" {
+                    let func_ref = ctx.module.declare_func_in_func(ctx.gul_dict_get_id, ctx.builder.func);
+                    let call_result = ctx.builder.ins().call(func_ref, &[obj_val, idx_val]);
+                    Ok(ctx.builder.inst_results(call_result)[0])
+                } else {
+                    let func_ref = ctx.module.declare_func_in_func(ctx.gul_list_get_id, ctx.builder.func);
+                    let call_result = ctx.builder.ins().call(func_ref, &[obj_val, idx_val]);
+                    Ok(ctx.builder.inst_results(call_result)[0])
+                }
+
             }
             Expression::Call(call) => {
                 // Check for Struct Constructor
@@ -732,13 +1122,11 @@ impl CraneliftBackend {
                              return Ok(ctx.builder.inst_results(call_result)[0]);
                         } 
                         
-                        // Check if argument is a string literal (rudimentary check on AST node)
-                        let is_str_literal = match &call.arguments[0] {
-                            Expression::Literal(l) => l.value_type == TokenType::String,
-                            _ => false,
-                        };
+                        // Use infer_expression_type to check if argument matches string
+                        let arg_type = Self::infer_expression_type(&call.arguments[0], ctx);
+                        let is_str = arg_type == "str"; 
 
-                        if is_str_literal {
+                        if is_str {
                              let printf_ref = ctx.module.declare_func_in_func(ctx.printf_id, ctx.builder.func);
                              let fmt_id = ctx.format_str_id; 
                              let fmt_val = ctx.module.declare_data_in_func(fmt_id, ctx.builder.func);
@@ -763,6 +1151,21 @@ impl CraneliftBackend {
                          return Ok(ctx.builder.inst_results(call_result)[0]);
                     }
                     
+                    if let Some(fid) = ctx.functions.get(&ident.name) {
+                        let func_ref = ctx.module.declare_func_in_func(*fid, ctx.builder.func);
+                        let mut args = vec![];
+                        for arg_expr in &call.arguments {
+                             args.push(Self::generate_expression(arg_expr, ctx)?);
+                        }
+                        let call_result = ctx.builder.ins().call(func_ref, &args);
+                        let results = ctx.builder.inst_results(call_result);
+                        if !results.is_empty() {
+                            return Ok(results[0]);
+                        } else {
+                            return Ok(ctx.builder.ins().iconst(types::I64, 0));
+                        }
+                    }
+
                     if let Some(fid) = ctx.builtins.get(&ident.name) {
                         let func_ref = ctx.module.declare_func_in_func(*fid, ctx.builder.func);
                         let mut args = vec![];
@@ -887,6 +1290,16 @@ impl CraneliftBackend {
                 // Actual Casting Logic
                 let inner_val = Self::generate_expression(&tc.argument, ctx)?;
                 match tc.type_name.as_str() {
+                    "@chan" => {
+                        // @chan(capacity) -> gul_chan_create
+                        let mut sig = ctx.module.make_signature();
+                        sig.params.push(AbiParam::new(types::I64));
+                        sig.returns.push(AbiParam::new(types::I64));
+                        let func_id = ctx.module.declare_function("gul_chan_create", Linkage::Import, &sig)?;
+                        let func_ref = ctx.module.declare_func_in_func(func_id, ctx.builder.func);
+                        let call_result = ctx.builder.ins().call(func_ref, &[inner_val]);
+                        Ok(ctx.builder.inst_results(call_result)[0])
+                    }
                     "flt" | "float" => {
                          // Cast to f64 (assume from i64)
                          Ok(ctx.builder.ins().fcvt_from_sint(types::F64, inner_val))
@@ -1014,7 +1427,44 @@ impl CraneliftBackend {
                 
                 Ok(set_ptr)
             }
+            // Handle DataFrame literal: @frame{...}
+            Expression::DataFrame(df_expr) => {
+                // Create DataFrame with columns
+                let n_cols = df_expr.columns.len() as i64;
+                let n_rows = 0; // Start with 0 rows
+                
+                let rows_val = ctx.builder.ins().iconst(types::I64, n_rows);
+                let cols_val = ctx.builder.ins().iconst(types::I64, n_cols);
+                
+                // Declare and call gul_frame_create
+                let mut sig = ctx.module.make_signature();
+                sig.params.push(AbiParam::new(types::I64));
+                sig.params.push(AbiParam::new(types::I64));
+                sig.returns.push(AbiParam::new(types::I64));
+                let func_id = ctx.module.declare_function("gul_frame_create", Linkage::Import, &sig)?;
+                let func_ref = ctx.module.declare_func_in_func(func_id, ctx.builder.func);
+                
+                let call_result = ctx.builder.ins().call(func_ref, &[rows_val, cols_val]);
+                let df_ptr = ctx.builder.inst_results(call_result)[0];
+                
+                // Set column names
+                let mut set_col_sig = ctx.module.make_signature();
+                set_col_sig.params.push(AbiParam::new(types::I64)); // df_ptr
+                set_col_sig.params.push(AbiParam::new(types::I64)); // col_idx
+                set_col_sig.params.push(AbiParam::new(types::I64)); // name_ptr
+                let set_col_id = ctx.module.declare_function("gul_frame_set_column_name", Linkage::Import, &set_col_sig)?;
+                let set_col_ref = ctx.module.declare_func_in_func(set_col_id, ctx.builder.func);
+                
+                for (i, col_name) in df_expr.columns.iter().enumerate() {
+                    let idx_val = ctx.builder.ins().iconst(types::I64, i as i64);
+                    let name_val = Self::generate_string_literal(col_name, ctx)?;
+                    ctx.builder.ins().call(set_col_ref, &[df_ptr, idx_val, name_val]);
+                }
+                
+                Ok(df_ptr)
+            }
             _ => Ok(ctx.builder.ins().iconst(types::I64, 0))
         }
     }
+
 }

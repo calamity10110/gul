@@ -64,6 +64,10 @@ pub enum TokenType {
     
     // v4.0 New Features
     AtTabl, // @tabl
+    AtFlow, // @flow
+    AtChan, // @chan
+    AtFrame, // @frame
+    Parallel, // parallel keyword
     Await, // await keyword (as specific token if needed, or matched as keyword)
 
     // Ownership modes
@@ -254,6 +258,9 @@ pub fn get_keyword_type(word: String)  ->  TokenType {
     else if word == "await".to_string() {
         return TokenType::Await;
     }
+    else if word == "parallel".to_string() {
+        return TokenType::Parallel;
+    }
     else if word == "mn".to_string() {
         return TokenType::Mn;
     }
@@ -297,9 +304,11 @@ pub fn get_type_constructor_type(text: String)  ->  TokenType {
     // Check for @ prefix (byte 64)
     if text.len() < 2 || text.as_bytes()[0] != 64 {
         return TokenType::Error;
-
     }
     let suffix = &text[1..];
+    if suffix == "chan".to_string() {
+         return TokenType::AtChan;
+    }
     if suffix == "int".to_string() {
         return TokenType::AtInt;
     }
@@ -366,6 +375,12 @@ pub fn get_decorator_type(text: String)  ->  TokenType {
     }
     else if suffix == "grad".to_string() {
         return TokenType::AtGrad;
+    }
+    else if suffix == "flow".to_string() {
+        return TokenType::AtFlow;
+    }
+    else if suffix == "frame".to_string() {
+        return TokenType::AtFrame;
     }
     else if suffix == "fn".to_string() {
         return TokenType::Fn;

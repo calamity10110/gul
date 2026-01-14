@@ -1,6 +1,6 @@
 # Web Development
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+**Version**: 0.14.0-dev | **Syntax**: v3.2 | **Updated**: 2026-01-08
 
 ---
 
@@ -82,19 +82,19 @@ let server = http.Server(port=8080)
 ```gul
 # Named parameters
 @server.get("/users/{user_id}")
-fn get_user(request, user_id: int):
+@fn get_user(request, user_id: int):
     user = database.get_user(user_id)
     return http.json_response(user)
 
 # Multiple parameters
 @server.get("/posts/{post_id}/comments/{comment_id}")
-fn get_comment(request, post_id: int, comment_id: int):
+@fn get_comment(request, post_id: int, comment_id: int):
     comment = database.get_comment(post_id, comment_id)
     return http.json_response(comment)
 
 # Optional parameters
 @server.get("/search/{query?}")
-fn search(request, query: str? = None):
+@fn search(request, query: str? = None):
     if query is None:
         return http.json_response([])
     results = perform_search(query)
@@ -105,7 +105,7 @@ fn search(request, query: str? = None):
 
 ```gul
 @server.get("/api/users")
-fn list_users(request):
+@fn list_users(request):
     # Access query parameters
     page = request.query.get("page", type=int, default=1)
     limit = request.query.get("limit", type=int, default=10)
@@ -184,8 +184,8 @@ server.use(middleware.compress())
 ```gul
 import std.http
 
-fn request_timer_middleware(next_handler):
-    fn handler(request):
+@fn request_timer_middleware(next_handler):
+   @fn handler(request):
         start_time = time.now()
 
         # Call next middleware/handler
@@ -212,7 +212,7 @@ server.use(request_timer_middleware)
 @server.get("/admin/dashboard")
 @middleware.require_auth()
 @middleware.require_role("admin")
-fn admin_dashboard(request):
+@fn admin_dashboard(request):
     return render_template("admin/dashboard.html", {
         "user": request.user
     })
@@ -256,7 +256,7 @@ fn admin_dashboard(request):
 
 ```gul
 @server.post("/upload")
-fn handle_upload(request):
+@fn handle_upload(request):
     file = request.files.get("document")
 
     if not file:
@@ -294,7 +294,7 @@ fn handle_upload(request):
 
 ```gul
 @server.get("/api/data")
-fn get_data(request):
+@fn get_data(request):
     data = {
         "users": get_users(),
         "posts": get_posts(),
@@ -314,7 +314,7 @@ fn get_data(request):
 
 ```gul
 @server.get("/page")
-fn render_page(request):
+@fn render_page(request):
     html = """
         <!DOCTYPE html>
         <html>
@@ -330,7 +330,7 @@ fn render_page(request):
 
 ```gul
 @server.get("/download/{file_id}")
-fn download_file(request, file_id: int):
+@fn download_file(request, file_id: int):
     file_info = database.get_file(file_id)
 
     return http.file_download(
@@ -344,11 +344,11 @@ fn download_file(request, file_id: int):
 
 ```gul
 @server.get("/old-page")
-fn redirect_old(request):
+@fn redirect_old(request):
     return http.redirect("/new-page", permanent=True)
 
 @server.post("/login")
-fn login(request):
+@fn login(request):
     credentials = request.form()
     if authenticate(credentials):
         return http.redirect("/dashboard")
@@ -360,8 +360,8 @@ fn login(request):
 
 ```gul
 @server.get("/stream")
-fn stream_data(request):
-    fn generate_data():
+@fn stream_data(request):
+   @fn generate_data():
         for i in range(100):
             yield f"data: {i}\n\n"
             time.sleep(0.1)
@@ -383,7 +383,7 @@ import std.http.templates
 templates = templates.Engine(directory="templates/")
 
 @server.get("/profile/{user_id}")
-fn user_profile(request, user_id: int):
+@fn user_profile(request, user_id: int):
     user = database.get_user(user_id)
     posts = database.get_user_posts(user_id)
 
@@ -477,19 +477,19 @@ let db_pool = database.ConnectionPool(
 
 ```gul
 @server.get("/api/users")
-fn list_users(request):
+@fn list_users(request):
     users = db.query("SELECT * FROM users")
     return http.json_response(users)
 
 @server.get("/api/users/{id}")
-fn get_user(request, id: int):
+@fn get_user(request, id: int):
     user = db.query_one("SELECT * FROM users WHERE id = ?", [id])
     if user is None:
         return http.json_response({"error": "Not found"}, status=404)
     return http.json_response(user)
 
 @server.post("/api/users")
-fn create_user(request):
+@fn create_user(request):
     data = request.json()
 
     user_id = db.insert("users", {
@@ -501,7 +501,7 @@ fn create_user(request):
     return http.json_response({"id": user_id}, status=201)
 
 @server.put("/api/users/{id}")
-fn update_user(request, id: int):
+@fn update_user(request, id: int):
     data = request.json()
 
     db.update("users", {
@@ -512,7 +512,7 @@ fn update_user(request, id: int):
     return http.json_response({"status": "updated"})
 
 @server.delete("/api/users/{id}")
-fn delete_user(request, id: int):
+@fn delete_user(request, id: int):
     db.delete("users", where={"id": id})
     return http.Response(status=204)
 ```
@@ -799,7 +799,7 @@ server.use(middleware.json_parser())
     })
 
 @server.get("/api/posts/{id}")
-fn get_post(request, id: int):
+@fn get_post(request, id: int):
     post = db.query_one(
         """
         SELECT p.*, u.name as author_name
@@ -817,7 +817,7 @@ fn get_post(request, id: int):
 
 @server.post("/api/posts")
 @middleware.require_auth()
-fn create_post(request):
+@fn create_post(request):
     data = request.json()
 
     # Validation
@@ -841,7 +841,7 @@ fn create_post(request):
 
 @server.put("/api/posts/{id}")
 @middleware.require_auth()
-fn update_post(request, id: int):
+@fn update_post(request, id: int):
     post = db.query_one("SELECT * FROM posts WHERE id = ?", [id])
 
     if post is None:
@@ -862,7 +862,7 @@ fn update_post(request, id: int):
 
 @server.delete("/api/posts/{id}")
 @middleware.require_auth()
-fn delete_post(request, id: int):
+@fn delete_post(request, id: int):
     post = db.query_one("SELECT * FROM posts WHERE id = ?", [id])
 
     if post is None:
@@ -889,6 +889,6 @@ server.start()
 
 ---
 
-**Last Updated**: 2025-12-28  
-**Version: 0.13.0  
+**Last Updated**: 2026-01-08  
+**Version**: 0.14.0-dev  
 **License**: MIT

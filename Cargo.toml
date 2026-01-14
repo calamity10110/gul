@@ -1,6 +1,6 @@
 [package]
 name = "gul"
-version = "0.13.0"
+version = "0.14.0-dev"
 edition = "2021"
 authors = ["GUL Team <team@gul-lang.org>"]
 description = "GUL (GUL Universal Language) - A universal programming language with multi-language integration, flexible imports, and comprehensive annotations"
@@ -21,6 +21,7 @@ name = "gul_lang"
 path = "src_bootstrap/lib.rs"
 
 [dependencies]
+rayon = "1.10"
 clap = { version = "4.5", features = ["derive"] }
 gul-repl = { path = "packages/devtools/gul-repl" }
 serde = { version = "1.0", features = ["derive"] }

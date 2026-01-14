@@ -1,6 +1,6 @@
 # Secrets
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+**Version**: 0.14.0-dev | **Syntax**: v3.2 | **Updated**: 2026-01-08
 
 ---
 
@@ -223,7 +223,7 @@ secret db_password = vault.read("secret/data/database/password")
 # Write secret to Vault
 vault.write("secret/data/api/key", {
     "key": "sk-1234567890",
-    "created": "2025-12-28"
+    "created": "2026-01-08"
 })
 
 # Dynamic database credentials
@@ -315,7 +315,7 @@ decrypted = crypto.aes_decrypt(encrypted_data, master_key)
 import std.secrets
 
 # Secrets are automatically scrubbed from memory when no longer needed
-fn process_payment(secret card_number: str):
+@fn process_payment(secret card_number: str):
     # card_number is secured in memory
     payment_processor.charge(card_number, amount)
     # card_number is automatically zeroed out after function returns
@@ -360,7 +360,7 @@ rotation_policy = rotation.Policy({
 secrets.register_rotation(rotation_policy)
 
 # Rotation function
-fn rotate_db_password(old_password: str): str:
+@fn rotate_db_password(old_password: str): str:
     new_password = generate_secure_password(length=32)
 
     # Update database
@@ -393,7 +393,7 @@ secrets.configure_audit({
 
 # Access secrets (automatically logged)
 secret api_key = secrets.get("API_KEY")
-# Logs: {"timestamp": "2025-12-28T13:45:00Z", "secret": "API_KEY", "action": "read", "user": "app", "result": "success"}
+# Logs: {"timestamp": "2026-01-08T13:45:00Z", "secret": "API_KEY", "action": "read", "user": "app", "result": "success"}
 ```
 
 ### Query Audit Logs
@@ -482,7 +482,7 @@ import std.testing
 import std.secrets
 
 @test
-fn test_api_integration():
+@fn test_api_integration():
     # Use test secrets
     testing.mock_secret("API_KEY", "test-key-12345")
 
@@ -571,7 +571,7 @@ db = database.connect(
 server = http.Server(port=8080)
 
 @server.route("/api/payment")
-fn process_payment(request):
+@fn process_payment(request):
     # Use Stripe secret
     stripe.charge(
         api_key=api_keys["stripe"],
@@ -588,6 +588,6 @@ fn process_payment(request):
 
 ---
 
-**Last Updated**: 2025-12-28  
-**Version: 0.13.0  
+**Last Updated**: 2026-01-08  
+**Version**: 0.14.0-dev  
 **License**: MIT

@@ -1,6 +1,6 @@
 # Types
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+**Version**: 0.14.0-dev | **Syntax**: v3.2 | **Updated**: 2026-01-08
 
 ---
 
@@ -253,7 +253,7 @@ enum Message:
     Write(str)
     ChangeColor(int, int, int)
 
-fn handle_message(msg: Message):
+@fn handle_message(msg: Message):
     match msg:
         Message.Quit:
             print("Quitting...")
@@ -304,7 +304,7 @@ result = get_user(42)?.get_email()?.validate()
 
 ```gul
 # Multiple possible types
-fn process(value: int | str | bool):
+@fn process(value: int | str | bool):
     match type(value):
         int: print(f"Integer: {value}")
         str: print(f"String: {value}")
@@ -320,7 +320,7 @@ type JsonValue = str | int | float | bool | vec[JsonValue] | map[str, JsonValue]
 
 ```gul
 # Single type parameter
-fn identity[T](x: T): T:
+@fn identity[T](x: T): T:
     return x
 
 # Multiple type parameters
@@ -329,7 +329,7 @@ fn identity[T](x: T): T:
     return (a, b)
 
 # Generic with constraints
-fn compare[T: Comparable](a: T, b: T): bool:
+@fn compare[T: Comparable](a: T, b: T): bool:
     return a > b
 
 # Usage
@@ -345,10 +345,10 @@ struct Pair[A, B]:
     first: A
     second: B
 
-    fn new(a: A, b: B): Pair[A, B]:
+   @fn new(a: A, b: B): Pair[A, B]:
         return Pair { first: a, second: b }
 
-    fn swap(self): Pair[B, A]:
+   @fn swap(self): Pair[B, A]:
         return Pair[B, A].new(self.second, self.first)
 
 # Usage
@@ -378,10 +378,10 @@ trait Drawable:
     @fn area(self) -> float
 
 trait Comparable:
-    fn compare(self, other: Self): int
+   @fn compare(self, other: Self): int
 
 trait Display:
-    fn to_string(self): str
+   @fn to_string(self): str
 ```
 
 ### Implementing Traits
@@ -402,10 +402,10 @@ struct Rectangle:
     height: float
 
 impl Drawable for Rectangle:
-    fn draw(self):
+   @fn draw(self):
         print(f"Drawing {self.width}x{self.height} rectangle")
 
-    fn area(self): float:
+   @fn area(self): float:
         return self.width * self.height
 ```
 
@@ -413,24 +413,24 @@ impl Drawable for Rectangle:
 
 ```gul
 trait Container[T]:
-    fn add(mut self, item: T)
-    fn get(self, index: int): Option[T]
-    fn size(self): int
+   @fn add(mut self, item: T)
+   @fn get(self, index: int): Option[T]
+   @fn size(self): int
 
 struct Vec[T]:
     items: vec[T]
 
 impl[T] Container[T] for Vec[T]:
-    fn add(mut self, item: T):
+   @fn add(mut self, item: T):
         self.items.push(item)
 
-    fn get(self, index: int): Option[T]:
+   @fn get(self, index: int): Option[T]:
         if index < len(self.items):
             return Some(self.items[index])
         else:
             return None
 
-    fn size(self): int:
+   @fn size(self): int:
         return len(self.items)
 ```
 
@@ -462,7 +462,7 @@ where
 trait Iterator:
     type Item
 
-    fn next(mut self): Option[Self.Item]
+   @fn next(mut self): Option[Self.Item]
 
 struct VecIterator[T]:
     items: vec[T]
@@ -471,7 +471,7 @@ struct VecIterator[T]:
 impl[T] Iterator for VecIterator[T]:
     type Item = T
 
-    fn next(mut self): Option[T]:
+   @fn next(mut self): Option[T]:
         if self.index < len(self.items):
             result = self.items[self.index]
             self.index += 1
@@ -492,7 +492,7 @@ z = "hello"             # str
 vec = vec[1, 2, 3]      # vec[int]
 
 # Inference from usage
-fn process(x):          # Type inferred from usage
+@fn process(x):          # Type inferred from usage
     return x + 1
 ```
 
@@ -509,7 +509,7 @@ result: Option[str] = None  # None needs type context
 ### Static Type Checking
 
 ```gul
-fn add(a: int, b: int): int:
+@fn add(a: int, b: int): int:
     return a + b
 
 # Type error: cannot pass string to int parameter
@@ -521,7 +521,7 @@ fn add(a: int, b: int): int:
 ```gul
 import std.types
 
-fn process(value: Any):
+@fn process(value: Any):
     if types.is_instance(value, int):
         print(f"Integer: {value}")
     elif types.is_instance(value, str):
@@ -533,7 +533,7 @@ fn process(value: Any):
 ### Type Guards
 
 ```gul
-fn handle_value(value: int | str):
+@fn handle_value(value: int | str):
     if value is int:
         # value is type int here
         print(value + 1)
@@ -554,11 +554,11 @@ struct Validated[T]:
 struct Email
 struct Url
 
-fn validate_email(s: str): Validated[Email]:
+@fn validate_email(s: str): Validated[Email]:
     # Validation logic
     return Validated { value: s }
 
-fn validate_url(s: str): Validated[Url]:
+@fn validate_url(s: str): Validated[Url]:
     # Validation logic
     return Validated { value: s }
 ```
@@ -568,10 +568,10 @@ fn validate_url(s: str): Validated[Url]:
 ```gul
 # Types that abstract over type constructors
 trait Functor[F[_]]:
-    fn map[A, B](fa: F[A], f: fn(A): B): F[B]
+   @fn map[A, B](fa: F[A], f: fn(A): B): F[B]
 
 impl Functor[Option]:
-    fn map[A, B](opt: Option[A], f: fn(A): B): Option[B]:
+   @fn map[A, B](opt: Option[A], f: fn(A): B): Option[B]:
         match opt:
             Some(a): return Some(f(a))
             None: return None
@@ -584,18 +584,18 @@ impl Functor[Option]:
 trait Add[A, B]:
     type Output
 
-    fn add(a: A, b: B): Self.Output
+   @fn add(a: A, b: B): Self.Output
 
 impl Add[int, int]:
     type Output = int
 
-    fn add(a: int, b: int): int:
+   @fn add(a: int, b: int): int:
         return a + b
 
 impl Add[str, str]:
     type Output = str
 
-    fn add(a: str, b: str): str:
+   @fn add(a: str, b: str): str:
         return a + b
 ```
 
@@ -608,7 +608,7 @@ impl Add[str, str]:
 struct Kilometers(float)
 struct Miles(float)
 
-fn convert(km: Kilometers): Miles:
+@fn convert(km: Kilometers): Miles:
     return Miles(km.0 * 0.621371)
 
 # Type error: cannot pass Miles where Kilometers expected
@@ -622,7 +622,7 @@ distance = Kilometers(100)
 struct UserId(int)
 struct ProductId(int)
 
-fn get_user(id: UserId): User:
+@fn get_user(id: UserId): User:
     # Implementation
     pass
 
@@ -660,15 +660,15 @@ int_val: int = f as int  # 3
 
 ```gul
 trait From[T]:
-    fn from(value: T): Self
+   @fn from(value: T): Self
 
 trait Into[T]:
-    fn into(self): T
+   @fn into(self): T
 
 struct UserId(int)
 
 impl From[int] for UserId:
-    fn from(value: int): UserId:
+   @fn from(value: int): UserId:
         return UserId(value)
 
 # Usage
@@ -694,11 +694,11 @@ count: int = 42
 
 ```gul
 # ✅ Good: clear signatures
-fn calculate_total(prices: vec[float], tax_rate: float): float:
+@fn calculate_total(prices: vec[float], tax_rate: float): float:
     # Implementation
 
 # ❌ Bad: unclear types
-fn calculate_total(prices, tax_rate):
+@fn calculate_total(prices, tax_rate):
     # Implementation
 ```
 
@@ -710,7 +710,7 @@ struct Email(str)
 struct Age(int)
 
 # ❌ Bad: primitive obsession
-fn create_user(email: str, age: int):
+@fn create_user(email: str, age: int):
     pass
 ```
 
@@ -718,11 +718,11 @@ fn create_user(email: str, age: int):
 
 ```gul
 # ✅ Good: explicit error handling
-fn find_user(id: int): Option[User]:
+@fn find_user(id: int): Option[User]:
     # Implementation
 
 # ❌ Bad: null confusion
-fn find_user(id: int): User?:
+@fn find_user(id: int): User?:
     # Implementation
 ```
 
@@ -734,6 +734,6 @@ fn find_user(id: int): User?:
 
 ---
 
-**Last Updated**: 2025-12-28  
-**Version: 0.13.0  
+**Last Updated**: 2026-01-08  
+**Version**: 0.14.0-dev  
 **License**: MIT

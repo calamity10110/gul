@@ -1,6 +1,6 @@
 # Installation
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+**Version**: 0.14.0-dev | **Syntax**: v3.2 | **Updated**: 2026-01-08
 
 ---
 
@@ -68,7 +68,7 @@ gul --version
 You should see output like:
 
 ```bash
-gul 0.13.0
+gul 0.14.0-dev
 ```
 
 ### Method 2: Install from Cargo (When Published)
@@ -85,17 +85,17 @@ Pre-built binaries for major platforms will be available from the releases page:
 
 ```bash
 # Linux
-wget https://github.com/gul-lang/gul/releases/download/v0.13.0/gul-linux-x86_64.tar.gz
+wget https://github.com/gul-lang/gul/releases/download/v0.14.0-dev/gul-linux-x86_64.tar.gz
 tar -xzf gul-linux-x86_64.tar.gz
 sudo mv gul /usr/local/bin/
 
 # macOS
-wget https://github.com/gul-lang/gul/releases/download/v0.13.0/gul-macos-x86_64.tar.gz
+wget https://github.com/gul-lang/gul/releases/download/v0.14.0-dev/gul-macos-x86_64.tar.gz
 tar -xzf gul-macos-x86_64.tar.gz
 sudo mv gul /usr/local/bin/
 
 # Windows (using PowerShell)
-Invoke-WebRequest -Uri "https://github.com/gul-lang/gul/releases/download/v0.13.0/gul-windows-x86_64.zip" -OutFile "gul.zip"
+Invoke-WebRequest -Uri "https://github.com/gul-lang/gul/releases/download/v0.14.0-dev/gul-windows-x86_64.zip" -OutFile "gul.zip"
 Expand-Archive -Path gul.zip -DestinationPath C:\Program Files\GUL
 ```
 
@@ -288,7 +288,7 @@ gul completion fish > ~/.config/fish/completions/gul.fish
 Create a simple test file `hello.mn`:
 
 ```gul
-main:
+mn:
     print("Hello, GUL!")
 ```
 
@@ -429,8 +429,8 @@ rm -rf ~/.cache/gul
 
 ---
 
-**Last Updated**: 2025-12-28  
-**Version: 0.13.0  
+**Last Updated**: 2026-01-08  
+**Version**: 0.14.0-dev  
 **License**: MIT
 
 For more information, visit [gul-lang.org](https://gul-lang.org)

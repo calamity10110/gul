@@ -1,0 +1,13 @@
+
+mn:
+    # Test Multi-arg print
+    print("Testing", "Multi-arg", "Print")
+
+    # Test Try/Catch
+    try:
+        print("In Try")
+        throw "Test Error"
+    catch err:
+        print("Caught Error:", err)
+    finally:
+        print("In Finally")

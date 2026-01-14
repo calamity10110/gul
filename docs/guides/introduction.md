@@ -1,6 +1,6 @@
 # Introduction
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+**Version**: 0.14.0-dev | **Syntax**: v3.2 | **Updated**: 2026-01-08
 
 ---
 
@@ -8,7 +8,7 @@
 
 Welcome to GUL (GUL Universal Language)! This guide uses **v3.2 syntax exclusively**.
 
-**Version: 0.13.0 | **Status**: Production Ready
+**Version**: 0.14.0-dev | **Status**: Production Ready
 
 ---
 
@@ -51,7 +51,7 @@ cargo install --path .
 
 ```bash
 gul --version
-# Should output: gul 0.13.0
+# Should output: gul 0.14.0-dev
 ```
 
 ## Your First GUL Program
@@ -97,11 +97,11 @@ count = count + 1
 
 ```gul
 # Simple function
-fn greet(name: str) -> str:
+@fn greet(name: str) -> str:
     return "Hello, " + name
 
 # Typed function
-fn add(a: int, b: int) -> int:
+@fn add(a: int, b: int) -> int:
     return a + b
 
 # Async function
@@ -190,7 +190,7 @@ mn:
     import pandas as pd
     import numpy as np
 
-    fn analyze(filename):
+   @fn analyze(filename):
         df = pd.read_csv(filename)
         return {
             "mean": float(df['value'].mean()),
@@ -268,5 +268,5 @@ gul runtime load-lib <path>
 
 **Happy coding with GUL v3.2!** 🚀
 
-**Last Updated**: 2025-12-28  
-**Version: 0.13.0
+**Last Updated**: 2026-01-08  
+**Version**: 0.14.0-dev

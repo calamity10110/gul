@@ -1,6 +1,6 @@
 # Creating Packages
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+**Version**: 0.14.0-dev | **Syntax**: v3.2 | **Updated**: 2026-01-08
 
 ---
 
@@ -63,23 +63,23 @@ Edit `src/lib.mn`:
 
 ```gul
 # Public API
-export fn greet(name: str): str:
+export@fn greet(name: str): str:
     return f"Hello, {name}!"
 
-export fn add(a: int, b: int): int:
+export@fn add(a: int, b: int): int:
     return a + b
 
 export struct Point:
     x: float
     y: float
 
-    fn distance(self, other: Point): float:
+   @fn distance(self, other: Point): float:
         dx = self.x - other.x
         dy = self.y - other.y
         return math.sqrt(dx ** 2 + dy ** 2)
 
 # Private helper (not exported)
-fn internal_helper():
+@fn internal_helper():
     # Only used within package
     pass
 ```
@@ -92,17 +92,17 @@ Edit `tests/test_lib.mn`:
 import my_package
 
 @test
-fn test_greet():
+@fn test_greet():
     result = my_package.greet("World")
     assert result == "Hello, World!"
 
 @test
-fn test_add():
+@fn test_add():
     assert my_package.add(2, 3) == 5
     assert my_package.add(-1, 1) == 0
 
 @test
-fn test_point_distance():
+@fn test_point_distance():
     p1 = my_package.Point { x: 0.0, y: 0.0 }
     p2 = my_package.Point { x: 3.0, y: 4.0 }
 
@@ -203,7 +203,7 @@ A greeting message string
 message = greet("Alice")
 print(message)  # "Hello, Alice!"
 
-export fn greet(name: str): str:
+export@fn greet(name: str): str:
     return f"Hello, {name}!"
 ````
 
@@ -267,7 +267,7 @@ gul update dependency-name
 
 ```gul
 /// @deprecated Use new_function() instead
-export fn old_function():
+export@fn old_function():
     print("This function is deprecated")
 ```
 
@@ -299,12 +299,12 @@ min_gul_version = "0.12.0"
 
 ```gul
 #[cfg(target_os = "linux")]
-fn linux_specific():
+@fn linux_specific():
     # Linux-only code
     pass
 
 #[cfg(feature = "advanced")]
-export fn advanced_feature():
+export@fn advanced_feature():
     # Optional feature
     pass
 ```
@@ -323,6 +323,6 @@ full = ["basic", "advanced"]
 
 ---
 
-**Last Updated**: 2025-12-28  
-**Version: 0.13.0  
+**Last Updated**: 2026-01-08  
+**Version**: 0.14.0-dev  
 **License**: MIT

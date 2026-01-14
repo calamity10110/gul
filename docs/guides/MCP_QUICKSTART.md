@@ -1,6 +1,6 @@
 # MCP_QUICKSTART
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+**Version**: 0.14.0-dev | **Syntax**: v3.2 | **Updated**: 2026-01-08
 
 ---
 
@@ -100,7 +100,7 @@ Generated:
 ```gul
 @imp python{pandas, numpy}
 
-fn @dict process_csv(filepath):
+@fn @dict process_csv(filepath):
     @python {
         df = pd.read_csv(filepath)
         stats = {
@@ -331,6 +331,6 @@ AI: Optimizes using Rust foreign blocks
 
 ---
 
-**Created**: 2025-12-28  
+**Created**: 2026-01-08  
 **Status**: ✅ Ready to Use  
 **Protocol**: MCP 1.0

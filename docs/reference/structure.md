@@ -1,6 +1,6 @@
 # Structure
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+**Version**: 0.14.0-dev | **Syntax**: v3.2 | **Updated**: 2026-01-08
 
 ---
 
@@ -72,7 +72,7 @@ Blocks are separate files that contain specific types of code. GUL automatically
 │  async fetch_data(url):               │
 │      await http.get(url)     │
 │                                     │
-│  fn process(data):                  │
+│ @fn process(data):                  │
 │      return transform(data)         │
 │                                     │
 │  mn:                         │
@@ -97,7 +97,7 @@ Blocks are separate files that contain specific types of code. GUL automatically
 │  └─ async fetch_data(url): ...        │
 │                                     │
 │  functions.fnc                      │
-│  └─ fn process(data): ...           │
+│  └─@fn process(data): ...           │
 │                                     │
 │  main.mn (cleaned)                  │
 │  └─ mn: ...                  │
@@ -147,7 +147,7 @@ async fetch_users():
     await http.get("/users")
 
 # Sync functions
-fn calculate_total(items):
+@fn calculate_total(items):
     return sum(items)
 
 # Main entry point
@@ -197,7 +197,7 @@ Contains all synchronous functions:
 ```glob
 # functions.fnc - Auto-generated from main.mn
 
-fn calculate_total(items):
+@fn calculate_total(items):
     return sum(items)
 ```
 
@@ -210,11 +210,11 @@ Contains all embedded language blocks:
 
 cs python:
     import numpy as np
-    fn analyze(data):
+   @fn analyze(data):
         return np.mean(data)
 
 cs rust:
-    fn fast_compute(n: u64) -> u64 {
+   @fn fast_compute(n: u64) -> u64 {
         n * n
     }
 ```
@@ -574,7 +574,7 @@ Edit `main.mn`:
 
 def GREETING = "Hello, GUL!"
 
-fn greet(name):
+@fn greet(name):
     return GREETING + " " + name
 
 mn:
@@ -786,15 +786,15 @@ cs python:
     import pandas as pd
     import matplotlib.pyplot as plt
 
-    fn analyze(filename):
+   @fn analyze(filename):
         df = pd.read_csv(filename)
         return df.describe()
 
-    fn plot(data):
+   @fn plot(data):
         plt.plot(data)
         plt.savefig('output.png')
 
-fn load_data():
+@fn load_data():
     return file.read(DATA_FILE)
 
 mn:
@@ -811,7 +811,7 @@ data-analysis/
 ├── imports.imp          # All imports
 ├── definitions.def      # def DATA_FILE = "data.csv"
 ├── custom.cs           # Python code block
-├── functions.fnc       # fn load_data()
+├── functions.fnc       #@fn load_data()
 ├── main.mn             # mn: ...
 └── package.toml
 ```
@@ -831,10 +831,10 @@ iot-controller/
 def LED_PIN = 13
 def BLINK_INTERVAL = 1000  # milliseconds
 
-fn setup_pin(pin):
+@fn setup_pin(pin):
     gpio.set_mode(pin, "output")
 
-fn blink_led(pin, interval):
+@fn blink_led(pin, interval):
     loop:
         gpio.high(pin)
         time.sleep(interval)

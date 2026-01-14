@@ -1,6 +1,6 @@
 # GUL Production Deployment Guide
 
-**Version**: 0.13.0 | **Updated**: 2025-12-28
+**Version**: 0.14.0-dev | **Updated**: 2026-01-08
 
 Complete guide for deploying GUL applications to production.
 
@@ -19,7 +19,7 @@ This guide covers deploying GUL applications as:
 
 ## Prerequisites
 
-- GUL 0.13.0+
+- GUL 0.14.0-dev+
 - Docker 20.10+
 - Kubernetes 1.24+ (optional)
 - Cloud provider account (AWS/GCP/Azure)
@@ -70,7 +70,7 @@ CMD ["serve"]
 
 ```bash
 # Build image
-docker build -t gul-app:0.13.0 .
+docker build -t gul-app:0.14.0-dev .
 
 # Run container
 docker run -d \
@@ -78,7 +78,7 @@ docker run -d \
     -p 8080:8080 \
     -e GUL_ENV=production \
     -e GUL_LOG_LEVEL=info \
-    gul-app:0.13.0
+    gul-app:0.14.0-dev
 
 # View logs
 docker logs -f gul-app
@@ -94,7 +94,7 @@ version: "3.8"
 
 services:
   gul-app:
-    image: gul-app:0.13.0
+    image: gul-app:0.14.0-dev
     build: .
     ports:
       - "8080:8080"
@@ -190,7 +190,7 @@ metadata:
   namespace: gul-production
   labels:
     app: gul
-    version: v0.13.0
+    version: v0.14.0-dev
 spec:
   replicas: 3
   selector:
@@ -200,11 +200,11 @@ spec:
     metadata:
       labels:
         app: gul
-        version: v0.13.0
+        version: v0.14.0-dev
     spec:
       containers:
         - name: gul
-          image: gul-app:0.13.0
+          image: gul-app:0.14.0-dev
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
@@ -375,8 +375,8 @@ apiVersion: v2
 name: gul
 description: GUL Programming Language Platform
 type: application
-version: 0.13.0
-appVersion: "0.13.0"
+version: 0.14.0-dev
+appVersion: "0.14.0-dev"
 maintainers:
   - name: GUL Team
     email: team@gul-lang.org
@@ -390,7 +390,7 @@ replicaCount: 3
 image:
   repository: gul-app
   pullPolicy: IfNotPresent
-  tag: "0.13.0"
+  tag: "0.14.0-dev"
 
 service:
   type: ClusterIP
@@ -651,5 +651,5 @@ kubectl run -it --rm debug --image=postgres:16 --restart=Never -- \
 ---
 
 **Status**: Production Deployment Guide  
-**For**: GUL 0.13.0+  
-**Updated**: 2025-12-28
+**For**: GUL 0.14.0-dev+  
+**Updated**: 2026-01-08

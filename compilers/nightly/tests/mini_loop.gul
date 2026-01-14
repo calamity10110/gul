@@ -1,0 +1,5 @@
+mn:
+    var j = 1
+    while j < 5:
+        println("j: " + @str(j))
+        j = j + 1

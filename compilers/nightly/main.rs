@@ -145,14 +145,13 @@ pub fn compiler_compile(compiler: Compiler)  ->  CompileResult {
     println!("{}", "  [1/4] Lexing...".to_string());
     let tokens = tokenize(source);
     println!("{}", "    Lexed ".to_string() + &format!("{}", (tokens).len()) + " tokens");
-    
 
 
     println!("{}", "  [2/4] Parsing...".to_string());
     let ast = parse(tokens);
 
     // Check for parser errors (empty main entry and no statements)
-    if ast.statements.is_empty() && ast.main_entry.is_empty() && ast.imports.is_empty() {
+    if ast.statements.is_empty() && ast.main_entry.is_empty() && ast.imports.is_empty() && ast.functions.is_empty() {
         errors.push("Parser error: No valid statements found".to_string());
     }
 
@@ -185,7 +184,7 @@ pub fn compiler_compile(compiler: Compiler)  ->  CompileResult {
             }
             
             // Find stdlib.c path (relative to workspace)
-            let stdlib_path = "compilers/shared/runtime/stdlib.c";
+            let stdlib_path = "../shared/runtime/stdlib.c";
             
             // Link with cc
             println!("{}", "  Linking...".to_string());
@@ -261,29 +260,36 @@ fn main() {
         return;
 
     }
-    let input_file = &args[1];
-
-    // Parse options
-    let mut i = 2;
-    while i < (args).len() {
+    let mut input_file = "".to_string();
+    let mut i = 1;
+    while i < args.len() {
         let arg = &args[i];
         if arg == "-o" {
-            if i + 1 < (args).len() {
+            if i + 1 < args.len() {
                 output_file = &args[i + 1];
-                i = i + 2;
-            }
+                i += 2;
+            } else { i += 1; }
         }
         else if arg == "--verbose" {
             verbose = true;
-            i = i + 1;
+            i += 1;
         }
         else if arg == "--no-semantic" {
             check_semantics = false;
-            i = i + 1;
+            i += 1;
+        }
+        else if !arg.starts_with("-") {
+            input_file = arg.clone();
+            i += 1;
         }
         else {
-            i = i + 1;
+            i += 1;
         }
+    }
+
+    if input_file == "" {
+        println!("Error: No input file provided");
+        return;
     }
 
     // Default output file
@@ -291,7 +297,13 @@ fn main() {
     let final_output: String;
     
     if output_file == "" {
-        output_string = input_file.replace(".mn", ""); // Default to no extension
+        output_string = if input_file.ends_with(".mn") {
+            input_file.strip_suffix(".mn").unwrap().to_string()
+        } else if input_file.ends_with(".gul") {
+            input_file.strip_suffix(".gul").unwrap().to_string()
+        } else {
+            input_file.clone()
+        };
         final_output = output_string.clone();
     } else {
         final_output = output_file.to_string();

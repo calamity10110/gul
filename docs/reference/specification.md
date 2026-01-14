@@ -1,7 +1,7 @@
 # GUL Language Specification v3.2
 
-**Version**: 0.13.0
-**Date**: 2025-12-30
+**Version**: 0.14.0-dev
+**Date**: 2026-01-08
 **Status**: Production Ready
 
 ---
@@ -115,7 +115,7 @@ if x > 0:
 
 ### 2.5 Comments
 
-- **Single line**: `#` comment
+- **Single line**: `#` or `//` comment
 - **Multi-line**: `#[ ... ]#` block comment
 
 ```gul
@@ -154,11 +154,12 @@ The lexer produces keywords, identifiers, literals, operators, delimiters, and s
 - `mn:` (Entry point)
 - `struct`, `enum` (Types)
 - `if`, `elif`, `else`, `match` (Conditional)
-- `for`, `while`, `loop`, `break`, `continue` (Loops)
+- `for`, `while`, `also_for`, `also_while`, `loop`, `break`, `continue` (Loops)
 - `try`, `catch`, `finally`, `throw` (Error Handling)
 - `borrow`, `ref`, `move`, `kept` (Ownership)
 - `@imp` (Import)
 - `@python`, `@rust`, `@sql`, `@js` (Foreign Blocks)
+- `autograd_begin`, `make_var`, `backward` (ML Primitives)
 
 **Constants:** `true`, `false`, `null`
 
@@ -221,7 +222,8 @@ numbers.pop()               # Remove from end
 numbers.pop(0)              # Remove at index
 numbers.clear()             # Empty list
 numbers.contains("C")       # Membership verify
-numbers.len()               # Length property
+numbers.len()               # Length (Method)
+len(numbers)                # Length (Builtin)
 numbers[0]  # First element
 numbers[-1]  # Last element
 ```
@@ -234,7 +236,8 @@ var cfg = @dict{host: "localhost", port: 8080}  # Mutable
 
 #### Methods
 config.contains("port")     # Membership verify
-config.len()                # Length property
+config.len()                # Length (Method)
+len(config)                 # Length (Builtin)
 config[key]  # access by identifier
 config(host)
 config["key"]  # access by string
@@ -265,7 +268,8 @@ tags.add("c")             # Add element
 tags.contains("C")        # Membership verify
 tags.remove("b")          # Remove element
 tags.clear()              # Empty set
-tags.len()                # Length property
+tags.len()                # Length (Method)
+len(tags)                 # Length (Builtin)
 ```
 
 ### 4.3 Type Annotations
@@ -406,6 +410,17 @@ for i in 0..10:
 
 while count < 10:
     count = count + 1
+
+**Parallel (v3.2+):**
+
+```gul
+also_for i in 0..10:
+    process(i)
+
+also_while condition:
+    step()
+```
+
 ```
 
 **Match:**

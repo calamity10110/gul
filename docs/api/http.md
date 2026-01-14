@@ -1,6 +1,6 @@
 # Http
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+**Version**: 0.14.0-dev | **Syntax**: v3.2 | **Updated**: 2026-01-08
 
 ---
 
@@ -78,7 +78,7 @@ let client = http.Client(
     follow_redirects=true,
     max_redirects=10,
     verify_ssl=true,
-    user_agent="GUL HTTP Client/0.13.0"
+    user_agent="GUL HTTP Client/0.14.0-dev"
 )
 ```
 
@@ -222,16 +222,16 @@ http.internal_error(message: str): Response       # 500
 
 ```gul
 @server.get("/api/data")
-fn get_data(request):
+@fn get_data(request):
     data = {"users": [...], "posts": [...]}
     return http.json_response(data)
 
 @server.get("/download/{filename}")
-fn download_file(request, filename):
+@fn download_file(request, filename):
     return http.file_download(f"files/{filename}")
 
 @server.get("/redirect")
-fn redirect_page(request):
+@fn redirect_page(request):
     return http.redirect("/new-location")
 ```
 
@@ -290,8 +290,8 @@ server.use(middleware.security_headers(
 ### Custom Middleware
 
 ```gul
-fn custom_middleware(next_handler):
-    fn handler(request):
+@fn custom_middleware(next_handler):
+   @fn handler(request):
         # Pre-processing
         print(f"Request: {request.method} {request.path}")
 
@@ -318,12 +318,12 @@ import std.websocket
 ws = websocket.Server()
 
 @ws.on_connect
-fn handle_connect(client):
+@fn handle_connect(client):
     print(f"Client {client.id} connected")
     client.send({"type": "welcome"})
 
 @ws.on_message
-fn handle_message(client, message):
+@fn handle_message(client, message):
     print(f"Received: {message}")
     client.send({"type": "echo", "data": message})
 
@@ -331,7 +331,7 @@ fn handle_message(client, message):
     ws.broadcast({"type": "update", "data": message})
 
 @ws.on_disconnect
-fn handle_disconnect(client):
+@fn handle_disconnect(client):
     print(f"Client {client.id} disconnected")
 
 # Attach to HTTP server
@@ -346,20 +346,20 @@ import std.websocket
 ws = websocket.Client("ws://localhost:8080/ws")
 
 @ws.on_open
-fn on_open():
+@fn on_open():
     print("Connected")
     ws.send({"type": "hello"})
 
 @ws.on_message
-fn on_message(message):
+@fn on_message(message):
     print(f"Received: {message}")
 
 @ws.on_close
-fn on_close():
+@fn on_close():
     print("Disconnected")
 
 @ws.on_error
-fn on_error(error):
+@fn on_error(error):
     print(f"Error: {error}")
 
 ws.connect()
@@ -375,7 +375,7 @@ server.static("/static", directory="public/")
 
 # Or use a route
 @server.get("/static/*filepath")
-fn serve_static(request, filepath):
+@fn serve_static(request, filepath):
     return http.serve_file(f"public/{filepath}")
 
 # With caching
@@ -389,7 +389,7 @@ server.static("/static", directory="public/", cache={
 
 ```gul
 @server.get("/download")
-fn download(request):
+@fn download(request):
     return http.serve_file(
         path="/path/to/file.pdf",
         content_type="application/pdf",
@@ -404,7 +404,7 @@ fn download(request):
 
 ```gul
 @server.get("/set-cookie")
-fn set_cookie(request):
+@fn set_cookie(request):
     response = http.Response(body="Cookie set!")
     response.set_cookie(
         name="session_id",
@@ -417,7 +417,7 @@ fn set_cookie(request):
     return response
 
 @server.get("/read-cookie")
-fn read_cookie(request):
+@fn read_cookie(request):
     session_id = request.cookies.get("session_id")
     return f"Session: {session_id}"
 ```
@@ -426,7 +426,7 @@ fn read_cookie(request):
 
 ```gul
 @server.post("/upload")
-fn handle_upload(request):
+@fn handle_upload(request):
     file = request.files.get("document")
 
     if file:
@@ -445,8 +445,8 @@ fn handle_upload(request):
 
 ```gul
 @server.get("/stream")
-fn stream_data(request):
-    fn generate():
+@fn stream_data(request):
+   @fn generate():
         for i in range(100):
             yield f"data: {i}\n\n"
             time.sleep(0.1)
@@ -461,8 +461,8 @@ fn stream_data(request):
 
 ```gul
 @server.get("/events")
-fn event_stream(request):
-    fn send_events():
+@fn event_stream(request):
+   @fn send_events():
         while True:
             data = get_latest_data()
             yield http.sse_event(data, event="update")
@@ -479,6 +479,6 @@ fn event_stream(request):
 
 ---
 
-**Last Updated**: 2025-12-28  
-**Version: 0.13.0  
+**Last Updated**: 2026-01-08  
+**Version**: 0.14.0-dev  
 **License**: MIT

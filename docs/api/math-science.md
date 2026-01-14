@@ -1,6 +1,6 @@
 # Math Science
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+**Version**: 0.14.0-dev | **Syntax**: v3.2 | **Updated**: 2026-01-08
 
 ---
 
@@ -165,6 +165,50 @@ items = [1, 2, 3, 4, 5]
 random.shuffle(items)
 ```
 
+## 🧠 Autograd (Automatic Differentiation)
+
+GUL provides native automatic differentiation support for machine learning and scientific optimization. These are available as global built-in functions.
+
+```gul
+# Initialize tape
+autograd_begin()
+
+# Create tracked variables
+let x = make_var(2.0)
+let y = make_var(3.0)
+
+# Build computational graph
+# z = x^2 + x*y
+let x2 = var_mul(x, x)
+let xy = var_mul(x, y)
+let z = var_add(x2, xy)
+
+print(f"Forward value: {var_val(z)}") # 10.0
+
+# Compute gradients
+backward(z)
+
+print(f"dz/dx: {var_grad(x)}") # 7.0 (2x + y = 2*2 + 3)
+print(f"dz/dy: {var_grad(y)}") # 2.0 (x = 2)
+
+# Cleanup
+autograd_end()
+```
+
+### Autograd API
+
+| Function | Description |
+| -------- | ----------- |
+| `autograd_begin()` | Starts the autograd tape. |
+| `autograd_end()` | Clears the autograd tape and releases memory. |
+| `make_var(val)` | Creates a new variable tracked by the tape. |
+| `var_val(v)` | Retrieves the current value of a tracked variable. |
+| `var_grad(v)` | Retrieves the gradient of a tracked variable after `backward()`. |
+| `var_add(a, b)` | Tracks addition. |
+| `var_mul(a, b)` | Tracks multiplication. |
+| `var_sin(v)` | Tracks sine function. |
+| `backward(v)` | Computes gradients via backpropagation starting from `v`. |
+
 ## 📚 See Also
 
 - [Scientific Computing Tutorial](../tutorials/scientific-computing.md)
@@ -172,6 +216,6 @@ random.shuffle(items)
 
 ---
 
-**Last Updated**: 2025-12-28  
-**Version: 0.13.0  
+**Last Updated**: 2026-01-08  
+**Version**: 0.14.0-dev  
 **License**: MIT

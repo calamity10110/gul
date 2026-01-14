@@ -1,0 +1,108 @@
+# GUL Machine Learning - Gradient Descent
+# Category: ML / Optimization
+
+@fn linear_prediction(x: int, weight: int, bias: int) -> int:
+    return (x * weight) + bias
+
+@fn compute_loss(predicted: int, actual: int) -> int:
+    let diff = predicted - actual
+    if diff < 0:
+        diff = 0 - diff
+    
+    # Squared error
+    return diff * diff
+
+@fn update_weight(weight: int, gradient: int, learning_rate: int) -> int:
+    let update = (gradient * learning_rate) / 100
+    return weight - update
+
+@fn train_linear_model() -> int:
+    print("=== LINEAR MODEL TRAINING ===")
+    
+    # Initialize parameters
+    let weight = 10
+    let bias = 5
+    let learning_rate = 1
+    
+    print("Initial weight:")
+    print(weight)
+    print("Initial bias:")
+    print(bias)
+    
+    # Training data (x, y pairs)
+    let x1 = 1
+    let y1 = 15
+    let x2 = 2
+    let y2 = 25
+    let x3 = 3
+    let y3 = 35
+    
+    # Epoch 1
+    print("--- EPOCH 1 ---")
+    let pred1 = linear_prediction(x1, weight, bias)
+    let loss1 = compute_loss(pred1, y1)
+    print("Loss:")
+    print(loss1)
+    weight = update_weight(weight, loss1 / 10, learning_rate)
+    print("Updated weight:")
+    print(weight)
+    
+    # Epoch 2
+    print("--- EPOCH 2 ---")
+    let pred2 = linear_prediction(x2, weight, bias)
+    let loss2 = compute_loss(pred2, y2)
+    print("Loss:")
+    print(loss2)
+    weight = update_weight(weight, loss2 / 10, learning_rate)
+    print("Updated weight:")
+    print(weight)
+    
+    # Epoch 3
+    print("--- EPOCH 3 ---")
+    let pred3 = linear_prediction(x3, weight, bias)
+    let loss3 = compute_loss(pred3, y3)
+    print("Loss:")
+    print(loss3)
+    weight = update_weight(weight, loss3 / 10, learning_rate)
+    print("Updated weight:")
+    print(weight)
+    
+    print("=== TRAINING COMPLETE ===")
+    print("Final weight:")
+    print(weight)
+    
+    return weight
+
+@fn test_activations() -> int:
+    print("=== ACTIVATION FUNCTIONS ===")
+    
+    # ReLU
+    let x1 = -10
+    let relu1 = 0
+    if x1 > 0:
+        relu1 = x1
+    print("ReLU(-10):")
+    print(relu1)
+    
+    let x2 = 50
+    let relu2 = 0
+    if x2 > 0:
+        relu2 = x2
+    print("ReLU(50):")
+    print(relu2)
+    
+    # Sigmoid (simplified)
+    let x3 = 25
+    let sig = 50
+    if x3 < 0:
+        sig = 0
+    if x3 > 50:
+        sig = 100
+    print("Sigmoid(25):")
+    print(sig)
+    
+    return 0
+
+mn:
+    let trained = train_linear_model()
+    let act_test = test_activations()

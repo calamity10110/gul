@@ -1,0 +1,16 @@
+@fn run() -> int:
+    print("Hello, GUL v3.2!")
+    
+    let x = 42
+    print(x)
+    
+    let numbers = [1, 2, 3]
+    print(numbers[0])
+    
+    let user = {"name": "Alice", "age": 25}
+    print(user["name"])
+    
+    return 0
+
+mn:
+    run()

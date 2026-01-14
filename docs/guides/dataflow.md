@@ -1,6 +1,6 @@
 # GUL Data-Flow Programming Guide
 
-\*\*Version: 0.13.0 | Syntax: v3.2 | Updated\*\*: 2025-12-28
+\*\*Version: 0.14.0-dev | Syntax: v3.2 | Updated\*\*: 2026-01-08
 
 ---
 
@@ -51,13 +51,13 @@ node filter_node:
 
 ```gul
 # calculator.fnc
-fn @int add_impl(a, b):
+@fn @int add_impl(a, b):
     return a + b
 
-fn @int multiply_impl(x, y):
+@fn @int multiply_impl(x, y):
     return x * y
 
-fn @list filter_impl(data, threshold):
+@fn @list filter_impl(data, threshold):
     let result = @list[]
     for item in data:
         if item > threshold:
@@ -126,7 +126,7 @@ node transform:
     (input: ref @int),
     (output: @str)
 
-fn @str transform_impl(n):
+@fn @str transform_impl(n):
     return "Number: " + str(n)
 ```
 
@@ -161,7 +161,7 @@ node parallel_task:
     (data: ref @list),
     (results: @list)
 
-fn @list parallel_impl(data):
+@fn @list parallel_impl(data):
     @python {
         from concurrent.futures import ThreadPoolExecutor
         with ThreadPoolExecutor() as executor:
@@ -185,7 +185,7 @@ node stream_processor:
     (input: stream @int),
     (output: stream @int)
 
-fn stream_impl(stream):
+@fn stream_impl(stream):
     for item in stream:
         if item > 0:
             yield item * 2
@@ -274,7 +274,7 @@ node visualize:
     (chart: @str)
 
 # Implement nodes
-fn @dict load_impl(filepath):
+@fn @dict load_impl(filepath):
     @python {
         import pandas as pd
         df = pd.read_csv(filepath)
@@ -282,7 +282,7 @@ fn @dict load_impl(filepath):
     }
     return python.result
 
-fn @dict clean_impl(raw):
+@fn @dict clean_impl(raw):
     @python {
         df = pd.DataFrame(raw)
         df = df.dropna()
@@ -291,7 +291,7 @@ fn @dict clean_impl(raw):
     }
     return python.result
 
-fn @dict analyze_impl(data):
+@fn @dict analyze_impl(data):
     @python {
         df = pd.DataFrame(data)
         stats = {
@@ -418,6 +418,6 @@ gul-mcp generate "data pipeline: load → clean → analyze → save"
 
 ---
 
-**Last Updated**: 2025-12-28  
-**Version: 0.13.0  
+**Last Updated**: 2026-01-08  
+**Version**: 0.14.0-dev  
 **Syntax\*\*: v3.2

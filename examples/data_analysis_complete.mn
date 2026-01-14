@@ -1,0 +1,83 @@
+# GUL Data Analysis - Sales Analytics Dashboard
+# Category: Data Science / Business Intelligence
+
+@fn load_sales_data() -> int:
+    # Simulate sales data
+    let sales = [
+        [100, 1500, 200],  # Product A
+        [150, 2000, 180],  # Product B
+        [200, 2500, 220],  # Product C
+        [120, 1800, 190],  # Product D
+        [180, 2200, 210]   # Product E
+    ]
+    
+    print("Sales Data Loaded")
+    return sales[0][0]
+
+@fn calculate_revenue(units: int, price: int) -> int:
+    return units * price
+
+@fn analyze_performance() -> int:
+    let q1_sales = 100
+    let q2_sales = 150
+    let q3_sales = 200
+    let q4_sales = 180
+    
+    # Calculate total
+    let annual_sales = q1_sales + q2_sales + q3_sales + q4_sales
+    print(annual_sales)
+    
+    # Calculate average
+    let avg_quarterly = annual_sales / 4
+    print(avg_quarterly)
+    
+    # Find best quarter (max)
+    let best = q1_sales
+    if q2_sales > best:
+        best = q2_sales
+    if q3_sales > best:
+        best = q3_sales
+    if q4_sales > best:
+        best = q4_sales
+    
+    print(best)
+    
+    return annual_sales
+
+@fn compute_metrics() -> int:
+    # Revenue calculation
+    let units_sold = 1000
+    let unit_price = 25
+    let total_revenue = calculate_revenue(units_sold, unit_price)
+    print(total_revenue)
+    
+    # Profit margins
+    let cost_per_unit = 15
+    let total_cost = units_sold * cost_per_unit
+    let profit = total_revenue - total_cost
+    print(profit)
+    
+    # ROI calculation
+    let roi_percentage = (profit * 100) / total_cost
+    print(roi_percentage)
+    
+    return profit
+
+@fn generate_report() -> int:
+    print("=== SALES ANALYTICS REPORT ===")
+    
+    let data_check = load_sales_data()
+    print(data_check)
+    
+    let performance = analyze_performance()
+    print(performance)
+    
+    let metrics = compute_metrics()
+    print(metrics)
+    
+    print("=== REPORT COMPLETE ===")
+    
+    return 0
+
+mn:
+    generate_report()

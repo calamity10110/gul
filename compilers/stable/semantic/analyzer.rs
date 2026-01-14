@@ -343,6 +343,11 @@ impl SemanticAnalyzer {
 
         // Analyze statements
         }
+        // Analyze functions
+        for func in &program.functions {
+            self.analyze_function_decl(func);
+        }
+        // Analyze statements
         for stmt in program.statements {
             self.analyze_statement(&stmt);
 
@@ -966,6 +971,19 @@ impl SemanticAnalyzer {
         // GUL spec implies explicit casting, but for builtins we might want flexibility.
         // For now, keep strict but allow aliases if we had them.
         
+        if expected == "str".to_string() && (actual == "int".to_string() || actual == "float".to_string()) {
+             return true; // Auto convert
+        }
+        // bool <- str logic requires runtime check if value is "true"/"false", but at static analysis time we only know it's "str".
+        // Spec: @str "true" and "false" can auto convert to @bool.
+        // Static analyzer sees type "str". Does it see the value? strict type check says str != bool.
+        // Unless we implement literal analysis.
+        // For now, allow str -> bool conversion and rely on runtime/codegen to handle it?
+        // Or only if it's a string literal?
+        if expected == "bool".to_string() && actual == "str".to_string() {
+             return true; // Allow potential conversion
+        }
+
         return false;
     }
 // Public API

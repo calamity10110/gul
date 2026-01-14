@@ -1,6 +1,6 @@
 # Data Engineering with GUL - Complete Guide
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-28
+**Version**: 0.14.0-dev | **Syntax**: v3.2 | **Updated**: 2026-01-08
 
 Build production-grade data pipelines for SaaS platforms with GUL.
 
@@ -43,13 +43,13 @@ struct DataPipeline:
     source_db: @str
     target_db: @str
 
-    async fn @dict extract(self, query):
+    @async @dict extract(self, query):
         """Extract data from source"""
         let conn = postgres.connect(self.source_db)
         let data = await conn.query(query)
         return data
 
-    fn @dict transform(self, data):
+   @fn @dict transform(self, data):
         """Transform data with Python/Pandas"""
         @python {
             df = pd.DataFrame(data)
@@ -69,7 +69,7 @@ struct DataPipeline:
         }
         return python.result
 
-    async fn @bool load(self, data):
+    @async @bool load(self, data):
         """Load data to target"""
         let conn = postgres.connect(self.target_db)
 
@@ -82,7 +82,7 @@ struct DataPipeline:
         return @bool(true)
 
 # Run pipeline
-async main():
+@async main():
     let pipeline = DataPipeline{
         source_db: "postgresql://prod/sales",
         target_db: "postgresql://warehouse/analytics"
@@ -111,21 +111,21 @@ mn:
 
 struct MultiSourcePipeline:
 
-    async fn @dict extract_all(self):
+    @async @dict extract_all(self):
         """Extract from multiple sources in parallel"""
 
         # PostgreSQL data
-        async fn @dict get_postgres():
+        @async @dict get_postgres():
             let conn = postgres.connect("postgresql://localhost/orders")
             return await conn.query("SELECT * FROM orders")
 
         # MongoDB data
-        async fn @dict get_mongo():
+        @async @dict get_mongo():
             let client = mongodb.connect("mongodb://localhost/users")
             return await client.find(@dict{})
 
         # Redis cache
-        async fn @dict get_redis():
+        @async @dict get_redis():
             let client = redis.connect("redis://localhost")
             let keys = await client.keys("session:*")
             let sessions = @dict{}
@@ -148,7 +148,7 @@ struct MultiSourcePipeline:
             redis: results[2]
         }
 
-    fn @dict transform_unified(self, sources):
+   @fn @dict transform_unified(self, sources):
         """Unify data from multiple sources"""
         @python {
             # Convert to DataFrames
@@ -198,7 +198,7 @@ struct EventProcessor:
     consumer_group: @str
     db_conn: @str
 
-    async fn process_events(self):
+    @async process_events(self):
         """Process streaming events from Kafka"""
 
         # Create Kafka consumer
@@ -227,7 +227,7 @@ struct EventProcessor:
                     "page_view" => self.handle_pageview(db, event)
                     _ => print("Unknown event:", event["type"])
 
-    fn handle_purchase(self, db, event):
+   @fn handle_purchase(self, db, event):
         """Handle purchase event"""
         # Update user LTV
         db.execute(
@@ -262,7 +262,7 @@ struct StreamAggregator:
 
     window_size: @int  # seconds
 
-    async fn aggregate_realtime(self, topic):
+    @async aggregate_realtime(self, topic):
         """Compute real-time metrics with sliding windows"""
 
         let consumer = kafka.Consumer{
@@ -300,7 +300,7 @@ struct StreamAggregator:
                     timestamp: time.now()
                 }))
 
-    fn @str get_window_key(self, timestamp):
+   @fn @str get_window_key(self, timestamp):
         """Get window key for timestamp"""
         let window_start = (timestamp / self.window_size) * self.window_size
         return "window:" + str(window_start)
@@ -322,11 +322,11 @@ mn:
 struct TenantAnalytics:
     """Multi-tenant analytics with row-level security"""
 
-    fn @str get_tenant_schema(self, tenant_id):
+   @fn @str get_tenant_schema(self, tenant_id):
         """Get schema name for tenant"""
         return "tenant_" + str(tenant_id)
 
-    async fn @dict query_tenant_data(self, tenant_id, query):
+    @async @dict query_tenant_data(self, tenant_id, query):
         """Query data with tenant isolation"""
 
         let conn = snowflake.connect("snowflake://account/db")
@@ -340,7 +340,7 @@ struct TenantAnalytics:
 
         return result
 
-    async fn compute_tenant_metrics(self, tenant_id):
+    @async compute_tenant_metrics(self, tenant_id):
         """Compute metrics for single tenant"""
 
         let metrics = @dict{}
@@ -381,7 +381,7 @@ mn:
 @imp gul{bigquery}
 @imp python{pandas}
 
-async fn analyze_all_tenants():
+@async analyze_all_tenants():
     """Aggregate metrics across all tenants"""
 
     let client = bigquery.connect("project-id")
@@ -448,7 +448,7 @@ struct SnowflakeWarehouse:
     database: @str
     warehouse: @str
 
-    async fn create_fact_table(self):
+    @async create_fact_table(self):
         """Create optimized fact table"""
 
         let conn = snowflake.connect(
@@ -471,7 +471,7 @@ struct SnowflakeWarehouse:
             PARTITION BY (date)
         """)
 
-    async fn load_from_s3(self, s3_path):
+    @async load_from_s3(self, s3_path):
         """Load data from S3 using COPY command"""
 
         let conn = snowflake.connect(account=self.account)
@@ -483,7 +483,7 @@ struct SnowflakeWarehouse:
             MATCH_BY_COLUMN_NAME = CASE_INSENSITIVE
         """.format(s3_path))
 
-    async fn @dict query_with_caching(self, query):
+    @async @dict query_with_caching(self, query):
         """Execute query with result caching"""
 
         let conn = snowflake.connect(account=self.account)
@@ -507,7 +507,7 @@ struct BigQueryStreaming:
     dataset: @str
     table: @str
 
-    async fn stream_insert(self, rows):
+    @async stream_insert(self, rows):
         """Stream data to BigQuery in real-time"""
 
         let client = bigquery.connect(self.project)
@@ -531,7 +531,7 @@ struct BigQueryStreaming:
 
         return @bool(true)
 
-    async fn query_realtime(self, sql):
+    @async query_realtime(self, sql):
         """Query with real-time data"""
 
         let client = bigquery.connect(self.project)
@@ -555,7 +555,7 @@ struct BigQueryStreaming:
 ```gul
 @imp gul.airflow
 
-fn create_etl_dag():
+@fn create_etl_dag():
     """Define Airflow DAG for ETL pipeline"""
 
     let dag = airflow.DAG{
@@ -615,14 +615,14 @@ fn create_etl_dag():
 struct DbtProject:
     project_dir: @str
 
-    fn create_model(self, name, sql):
+   @fn create_model(self, name, sql):
         """Create dbt model"""
 
         let model_path = self.project_dir + "/models/" + name + ".sql"
 
         fs.write_file(model_path, sql)
 
-    async fn @dict run_models(self, models):
+    @async @dict run_models(self, models):
         """Run specific dbt models"""
 
         let result = await sys.execute(
@@ -635,7 +635,7 @@ struct DbtProject:
             output: result.output
         }
 
-    async fn @dict test_models(self):
+    @async @dict test_models(self):
         """Run dbt tests"""
 
         let result = await sys.execute("dbt test", cwd=self.project_dir)
@@ -673,7 +673,7 @@ mn:
 ### 1. Idempotent Pipelines
 
 ```gul
-async fn idempotent_load(data, table, partition_key):
+@async idempotent_load(data, table, partition_key):
     """Load data idempotently using upserts"""
 
     let conn = postgres.connect("postgresql://warehouse/analytics")
@@ -700,7 +700,7 @@ async fn idempotent_load(data, table, partition_key):
 struct RobustPipeline:
     max_retries: @int
 
-    async fn @dict run_with_retry(self, fn, *args):
+    @async @dict run_with_retry(self, fn, *args):
         """Run function with exponential backoff"""
 
         var retries = 0
@@ -726,7 +726,7 @@ struct RobustPipeline:
 ```gul
 struct PipelineMonitor:
 
-    fn track_metrics(self, pipeline_name, metrics):
+   @fn track_metrics(self, pipeline_name, metrics):
         """Track pipeline metrics"""
 
         # Send to monitoring service
@@ -754,6 +754,6 @@ struct PipelineMonitor:
 
 ---
 
-**Last Updated**: 2025-12-28  
-**Version**: 0.13.0  
+**Last Updated**: 2026-01-08  
+**Version**: 0.14.0-dev  
 **Status**: Production Ready

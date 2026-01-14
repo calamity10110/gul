@@ -1,7 +1,19 @@
 use crate::ast::*;
 use std::collections::HashMap;
 use std::fmt;
+use rayon::prelude::*;
+use std::process::Command;
+use std::io::Write;
 
+#[derive(Clone, Debug)]
+pub enum ControlFlow {
+    Next,
+    Return(Value),
+    Break,
+    Continue,
+}
+
+#[derive(Clone)]
 pub struct Interpreter {
     variables: HashMap<String, Value>,
 }
@@ -15,8 +27,10 @@ pub enum Value {
     List(Vec<Value>),
     Dict(HashMap<String, Value>),
     Object(String, HashMap<String, Value>), // Struct instance
-    Function(Vec<String>, Vec<Statement>),
+    Function(Vec<(String, Option<Type>)>, Vec<(String, Option<Type>)>, Vec<Statement>),
     NativeFunction(fn(Vec<Value>) -> Value),
+    Lambda(Vec<(String, Option<Type>)>, Box<Expression>), // Updated Lambda for v3.2
+    Dual(f64, f64), // Auto-diff: (value, gradient)
     Any(Box<Value>), // Gradual typing - boxed to avoid recursion
     Null,
 }
@@ -31,8 +45,10 @@ impl PartialEq for Value {
             (Value::List(a), Value::List(b)) => a == b,
             (Value::Dict(a), Value::Dict(b)) => a == b,
             (Value::Object(n1, f1), Value::Object(n2, f2)) => n1 == n2 && f1 == f2,
-            (Value::Function(p1, b1), Value::Function(p2, b2)) => p1 == p2 && b1 == b2,
+            (Value::Function(p1, o1, b1), Value::Function(p2, o2, b2)) => p1 == p2 && o1 == o2 && b1 == b2,
             (Value::NativeFunction(_), Value::NativeFunction(_)) => false, // Can't compare fn ptrs
+            (Value::Lambda(p1, b1), Value::Lambda(p2, b2)) => p1 == p2 && b1 == b2,
+            (Value::Dual(v1, d1), Value::Dual(v2, d2)) => v1 == v2 && d1 == d2,
             (Value::Any(a), Value::Any(b)) => a == b,
             (Value::Null, Value::Null) => true,
             _ => false,
@@ -50,10 +66,12 @@ impl fmt::Debug for Value {
             Value::List(l) => write!(f, "{:?}", l),
             Value::Dict(d) => write!(f, "{:?}", d),
             Value::Object(name, fields) => write!(f, "{} {:?}", name, fields),
-            Value::Function(params, _) => write!(f, "fn({:?})", params),
+            Value::Function(params, outputs, _) => write!(f, "fn({:?}) -> ({:?})", params, outputs),
             Value::NativeFunction(_) => write!(f, "native_fn"),
+            Value::Lambda(params, _) => write!(f, "lambda({:?})", params),
             Value::Any(val) => write!(f, "any({:?})", val),
             Value::Null => write!(f, "null"),
+            Value::Dual(v, d) => write!(f, "Dual({}, grad={})", v, d),
         }
     }
 }
@@ -75,16 +93,22 @@ impl Interpreter {
 
     pub fn run(&mut self, program: &crate::ast::Program) -> Result<(), String> {
         for stmt in &program.statements {
-            self.execute(stmt)?;
+            if let ControlFlow::Return(_) = self.execute(stmt)? {
+                break;
+            }
         }
         Ok(())
     }
 
-    fn execute_statements(&mut self, statements: &[Statement]) -> Result<(), String> {
+    fn execute_statements(&mut self, statements: &[Statement]) -> Result<ControlFlow, String> {
         for stmt in statements {
-            self.execute(stmt)?;
+            let flow = self.execute(stmt)?;
+            match flow {
+                ControlFlow::Next => continue,
+                _ => return Ok(flow),
+            }
         }
-        Ok(())
+        Ok(ControlFlow::Next)
     }
 
     fn register_builtins(&mut self) {
@@ -232,125 +256,271 @@ impl Interpreter {
                 }
             }),
         );
+        // "grad" is handled specially in evaluate to allow interpreter access
+
+        // "input" builtin (v3.2)
+        self.variables.insert(
+            "input".to_string(),
+            Value::NativeFunction(|_| {
+                let mut buffer = String::new();
+                if std::io::stdin().read_line(&mut buffer).is_ok() {
+                    Value::String(buffer.trim().to_string())
+                } else {
+                    Value::Null
+                }
+            }),
+        );
+        self.variables.insert(
+            "println".to_string(),
+            Value::NativeFunction(|args| {
+                for (i, arg) in args.iter().enumerate() {
+                    if i > 0 { print!(" "); }
+                    match arg {
+                        Value::String(s) => print!("{}", s),
+                        Value::Integer(v) => print!("{}", v),
+                        Value::Float(v) => print!("{}", v),
+                        Value::Bool(v) => print!("{}", v),
+                        _ => print!("{:?}", arg),
+                    }
+                }
+                println!();
+                Value::Null
+            }),
+        );
+
+        self.variables.insert(
+            "@str".to_string(),
+            Value::NativeFunction(|args| {
+                if let Some(val) = args.first() {
+                     match val {
+                         Value::String(s) => Value::String(s.clone()),
+                         Value::Integer(i) => Value::String(i.to_string()),
+                         Value::Float(f) => Value::String(f.to_string()),
+                         Value::Bool(b) => Value::String(b.to_string()),
+                         _ => Value::String(format!("{:?}", val)),
+                     }
+                } else {
+                    Value::String("null".to_string())
+                }
+            }),
+        );
     }
 
-    fn execute(&mut self, stmt: &Statement) -> Result<(), String> {
+    fn execute(&mut self, stmt: &Statement) -> Result<ControlFlow, String> {
         match stmt {
             Statement::Expression(expr) => {
                 self.evaluate(expr)?;
-                Ok(())
+                Ok(ControlFlow::Next)
             }
             Statement::Definition { name, value } => {
                 let val = self.evaluate(value)?;
                 self.variables.insert(name.clone(), val);
-                Ok(())
+                Ok(ControlFlow::Next)
             }
-            Statement::Function {
-                name, params, body, ..
+            Statement::If {
+                condition,
+                then_body,
+                else_body,
             } => {
-                let val = Value::Function(params.clone(), body.clone());
-                self.variables.insert(name.clone(), val);
-                Ok(())
+                let cond = self.evaluate(condition)?;
+                let truthy = match cond {
+                    Value::Bool(b) => b,
+                    Value::Null => false,
+                    Value::Integer(i) => i != 0,
+                    _ => true,
+                };
+                if truthy {
+                    self.execute_statements(then_body)
+                } else if let Some(else_stmts) = else_body {
+                    self.execute_statements(else_stmts)
+                } else {
+                    Ok(ControlFlow::Next)
+                }
             }
-            Statement::StructDef { name, .. } => {
-                // Just register name as placeholder construct for now,
-                // or handle struct instantiation logic later.
-                self.variables.insert(name.clone(), Value::Null); // Minimal
-                Ok(())
-            }
-            Statement::Import(name) => {
-                if let Some(module) = crate::stdlib::load_std_module(name) {
-                    // Register module. For "std.math", we might want to register as "math" or "std"
-                    // Ideally parser handles "use std.math as m".
-                    // For now, simpler: Import "std.math" -> registers "math" variable?
-                    // Or just registers the full name if we support dotted access lookup (which we don't fully yet).
-                    // Let's split by dot and take list part: "std.math" -> "math"
-
-                    let parts: Vec<&str> = name.split('.').collect();
-                    if let Some(short_name) = parts.last() {
-                        self.variables.insert(short_name.to_string(), module);
+            Statement::Loop { body } => {
+                loop {
+                    let flow = self.execute_statements(body)?;
+                    match flow {
+                        ControlFlow::Break => break Ok(ControlFlow::Next),
+                        ControlFlow::Continue | ControlFlow::Next => continue,
+                        ControlFlow::Return(v) => break Ok(ControlFlow::Return(v)),
                     }
                 }
-                Ok(())
             }
-            Statement::Main { body } => {
-                for s in body {
-                    self.execute(s)?;
+            Statement::While { condition, body, is_parallel } => {
+                if *is_parallel {
+                    // also_while implementation (v3.2)
+                    // Simplified: parallel execute one iteration if condition holds?
+                    // While loops are hard to parallelize safely without transactions.
+                    // For now, execute sequentially but mark as parallel-intended.
+                    println!("Warning: also_while executed sequentially for safety.");
                 }
-                Ok(())
+                loop {
+                     let cond = self.evaluate(condition)?;
+                     let truthy = match cond {
+                        Value::Bool(b) => b,
+                        Value::Null => false,
+                        Value::Integer(i) => i != 0,
+                        _ => true,
+                    };
+                    if !truthy { break Ok(ControlFlow::Next); }
+
+                    let flow = self.execute_statements(body)?;
+                    match flow {
+                        ControlFlow::Break => break Ok(ControlFlow::Next),
+                        ControlFlow::Continue | ControlFlow::Next => continue,
+                        ControlFlow::Return(v) => break Ok(ControlFlow::Return(v)),
+                    }
+                }
+            }
+            Statement::For {
+                variable,
+                iterable,
+                body,
+                is_parallel,
+            } => {
+                let iterable_val = self.evaluate(iterable)?;
+                match iterable_val {
+                    Value::List(items) => {
+                        if *is_parallel {
+                            // Parallel execution using Rayon
+                            items.par_iter().for_each(|item| {
+                                let mut thread_interpreter = self.clone();
+                                thread_interpreter.variables.insert(variable.clone(), item.clone());
+                                let _ = thread_interpreter.execute_statements(body);
+                            });
+                            Ok(ControlFlow::Next)
+                        } else {
+                            // Sequential execution
+                            for item in items {
+                                self.variables.insert(variable.clone(), item);
+                                let flow = self.execute_statements(body)?;
+                                match flow {
+                                    ControlFlow::Break => break,
+                                    ControlFlow::Continue | ControlFlow::Next => continue,
+                                    ControlFlow::Return(v) => return Ok(ControlFlow::Return(v)),
+                                }
+                            }
+                            Ok(ControlFlow::Next)
+                        }
+                    }
+                    _ => Err("For loop expects a list".to_string()),
+                }
+            }
+            Statement::Function {
+                name, params, outputs, body, ..
+            } => {
+                let val = Value::Function(params.clone(), outputs.clone(), body.clone());
+                self.variables.insert(name.clone(), val);
+                Ok(ControlFlow::Next)
+            }
+            Statement::Return(expr) => {
+                let val = if let Some(e) = expr {
+                    self.evaluate(e)?
+                } else {
+                    Value::Null
+                };
+                Ok(ControlFlow::Return(val))
+            }
+            Statement::Break => Ok(ControlFlow::Break),
+            Statement::Continue => Ok(ControlFlow::Continue),
+            Statement::Import(modules) => {
+                for name in modules {
+                    if let Some(module) = crate::stdlib::load_std_module(name) {
+                        let parts: Vec<&str> = name.split('.').collect();
+                        if let Some(short_name) = parts.last() {
+                            self.variables.insert(short_name.to_string(), module);
+                        }
+                    }
+                }
+                Ok(ControlFlow::Next)
             }
             Statement::Assignment { name, value } => {
                 let val = self.evaluate(value)?;
                 self.variables.insert(name.clone(), val);
-                Ok(())
+                Ok(ControlFlow::Next)
             }
             Statement::GlobalDef { name, value, .. } => {
                 let val = self.evaluate(value)?;
                 self.variables.insert(name.clone(), val);
-                Ok(())
+                Ok(ControlFlow::Next)
+            }
+            Statement::Main { body } => {
+                self.execute_statements(body).map(|_| ControlFlow::Next)
             }
             Statement::ForeignBlock { language, code } => {
                 // Execute foreign code blocks based on language
                 match language.as_str() {
                     "python" => {
-                        // Python integration via pyo3 or subprocess
-                        #[cfg(feature = "python-interop")]
-                        {
-                            if let Ok(result) = crate::interop::python_runtime::execute_python(code)
-                            {
-                                if !result.is_empty() {
-                                    println!("{}", result);
+                        let output = Command::new("python3")
+                            .arg("-c")
+                            .arg(code)
+                            .output();
+
+                        match output {
+                            Ok(out) => {
+                                if !out.status.success() {
+                                    eprintln!("Python error: {}", String::from_utf8_lossy(&out.stderr));
                                 }
+                                print!("{}", String::from_utf8_lossy(&out.stdout));
                             }
-                        }
-                        #[cfg(not(feature = "python-interop"))]
-                        {
-                            println!("[Python block - {} chars]", code.len());
+                            Err(e) => eprintln!("Failed to execute python: {}", e),
                         }
                     }
                     "rust" => {
                         // Rust blocks are compiled at compile time, skip at runtime
-                        println!("[Rust block compiled]");
+                        // But for GUL script execution, we compile and run on the fly?
+                        let temp_file = "gul_temp.rs";
+                        let temp_bin = "./gul_temp_bin";
+                        
+                        // 1. Write code to file
+                        if let Ok(mut file) = std::fs::File::create(temp_file) {
+                            let _ = file.write_all(code.as_bytes());
+                        }
+
+                        // 2. Compile
+                        let status = Command::new("rustc")
+                            .arg(temp_file)
+                            .arg("-o")
+                            .arg("gul_temp_bin")
+                            .status();
+
+                        if let Ok(s) = status {
+                            if s.success() {
+                                // 3. Run
+                                let _start = std::time::Instant::now();
+                                let run = Command::new(temp_bin).status();
+                                if let Ok(_) = run {
+                                     // Success
+                                }
+                                // Cleanup
+                                let _ = std::fs::remove_file(temp_file);
+                                let _ = std::fs::remove_file(temp_bin);
+                            } else {
+                                eprintln!("Rust compilation failed");
+                            }
+                        } else {
+                             eprintln!("Failed to run rustc");
+                        }
                     }
                     "sql" => {
                         // SQL blocks can be executed against database
-                        #[cfg(feature = "sql-interop")]
-                        {
-                            if let Ok(result) = crate::interop::sql::execute_sql(code) {
-                                if !result.is_empty() {
-                                    println!("{}", result);
-                                }
-                            }
-                        }
-                        #[cfg(not(feature = "sql-interop"))]
-                        {
-                            println!("[SQL block - {} chars]", code.len());
-                        }
+                        // Placeholder
+                         println!("[SQL block - {} chars]", code.len());
                     }
                     "js" | "javascript" => {
-                        // JavaScript via deno_core or QuickJS
-                        #[cfg(feature = "js-interop")]
-                        {
-                            if let Ok(result) = crate::interop::js_runtime::execute_js(code) {
-                                if !result.is_empty() {
-                                    println!("{}", result);
-                                }
-                            }
-                        }
-                        #[cfg(not(feature = "js-interop"))]
-                        {
-                            println!("[JavaScript block - {} chars]", code.len());
-                        }
+                         // Placeholder
+                         println!("[JavaScript block - {} chars]", code.len());
                     }
                     "c" => {
-                        // C blocks are compiled, skip at runtime
+                        // C blocks
                         println!("[C block compiled]");
                     }
                     _ => {
                         println!("[{} block - {} chars]", language, code.len());
                     }
                 }
-                Ok(())
+                Ok(ControlFlow::Next)
             }
             Statement::Try {
                 try_body,
@@ -367,7 +537,7 @@ impl Interpreter {
                         if let Some(finally) = finally_body {
                             let _ = self.execute_statements(finally); // Ignore finally errors for now
                         }
-                        Ok(())
+                        Ok(ControlFlow::Next)
                     }
                     Err(error) => {
                         // Try failed, execute catch if present
@@ -401,7 +571,7 @@ impl Interpreter {
                 };
                 Err(error_msg)
             }
-            _ => Ok(()),
+            _ => Ok(ControlFlow::Next),
         }
     }
 
@@ -417,6 +587,41 @@ impl Interpreter {
                 .cloned()
                 .ok_or_else(|| format!("Undefined variable: {}", name)),
             Expression::Call { function, args } => {
+                // Special handling for grad(f, x)
+                if let Expression::Identifier(name) = function.as_ref() {
+                    if name == "grad" {
+                        if args.len() != 2 {
+                            return Err("grad expects 2 arguments (function, value)".to_string());
+                        }
+                        let f_val = self.evaluate(&args[0])?;
+                        let x_val = self.evaluate(&args[1])?;
+                        
+                        let x_dual = match x_val {
+                            Value::Integer(i) => Value::Dual(i as f64, 1.0),
+                            Value::Float(f) => Value::Dual(f, 1.0),
+                            _ => return Err("grad expects numeric value".to_string()),
+                        };
+                        
+                        match f_val {
+                            Value::Lambda(params, body_expr) => {
+                                if params.len() != 1 { return Err("grad expects function with 1 parameter".to_string()); }
+                                let param_name = &params[0].0;
+                                let old_val = self.variables.insert(param_name.clone(), x_dual);
+                                let result = self.evaluate(&body_expr)?;
+                                if let Some(v) = old_val { self.variables.insert(param_name.clone(), v); } 
+                                else { self.variables.remove(param_name); }
+                                
+                                match result {
+                                    Value::Dual(_, grad) => return Ok(Value::Float(grad)),
+                                    Value::Integer(_) | Value::Float(_) => return Ok(Value::Float(0.0)),
+                                    _ => return Err("Function did not return numeric value".to_string()),
+                                }
+                            }
+                             _ => return Err("grad currently supports Arrow Functions only".to_string()),
+                        }
+                    }
+                }
+
                 let func_val = self.evaluate(function)?;
                 let mut arg_vals = Vec::new();
                 for arg in args {
@@ -425,13 +630,56 @@ impl Interpreter {
 
                 match func_val {
                     Value::NativeFunction(f) => Ok(f(arg_vals)),
-                    Value::Function(_params, _body) => {
-                        // Create scope
-                        // This naive implementation just overwrites variables, no scope stack yet!
-                        // Needs scope stack for real functions, but good enough for flat scripts.
-                        Ok(Value::Null)
+                    Value::Function(params, outputs, body) => {
+                         let mut local_interpreter = self.clone();
+                         // Bind inputs
+                         for (i, (param_name, _)) in params.iter().enumerate() {
+                             if i < arg_vals.len() {
+                                 local_interpreter.variables.insert(param_name.clone(), arg_vals[i].clone());
+                             }
+                         }
+                         // Bind outputs as Null initially
+                         for (out_name, _) in &outputs {
+                             if !out_name.is_empty() {
+                                 local_interpreter.variables.insert(out_name.clone(), Value::Null);
+                             }
+                         }
+
+                         match local_interpreter.execute_statements(&body)? {
+                             ControlFlow::Return(v) => Ok(v),
+                             _ => {
+                                 // Return outputs if no explicit return
+                                 if outputs.is_empty() {
+                                     Ok(Value::Null)
+                                 } else if outputs.len() == 1 {
+                                     let (out_name, _) = &outputs[0];
+                                     if out_name.is_empty() {
+                                          Ok(Value::Null)
+                                     } else {
+                                          Ok(local_interpreter.variables.get(out_name).cloned().unwrap_or(Value::Null))
+                                     }
+                                 } else {
+                                     let mut res_map = HashMap::new();
+                                     for (out_name, _) in &outputs {
+                                         if !out_name.is_empty() {
+                                             res_map.insert(out_name.clone(), local_interpreter.variables.get(out_name).cloned().unwrap_or(Value::Null));
+                                         }
+                                     }
+                                     Ok(Value::Dict(res_map))
+                                 }
+                             }
+                         }
                     }
-                    _ => Err("Not a callable".to_string()),
+                    Value::Lambda(params, body_expr) => {
+                         // Execute expression body
+                         for (i, (param, _ty)) in params.iter().enumerate() {
+                             if i < arg_vals.len() {
+                                 self.variables.insert(param.clone(), arg_vals[i].clone());
+                             }
+                         }
+                         self.evaluate(&body_expr)
+                    }
+                    _ => Err(format!("Not a callable: {:?}", func_val)),
                 }
             }
             Expression::Binary { left, op, right } => {
@@ -445,6 +693,60 @@ impl Interpreter {
                     (Value::Integer(a), BinaryOp::Add, Value::Integer(b)) => {
                         Ok(Value::Integer(a + b))
                     }
+                    (Value::Integer(a), BinaryOp::Subtract, Value::Integer(b)) => {
+                        Ok(Value::Integer(a - b))
+                    }
+                    (Value::Integer(a), BinaryOp::Multiply, Value::Integer(b)) => {
+                        Ok(Value::Integer(a * b))
+                    }
+                    (Value::Integer(a), BinaryOp::Divide, Value::Integer(b)) => {
+                        if b == 0 {
+                            Err("Division by zero".to_string())
+                        } else {
+                            Ok(Value::Integer(a / b))
+                        }
+                    }
+                    (Value::Float(a), BinaryOp::Add, Value::Float(b)) => {
+                        Ok(Value::Float(a + b))
+                    }
+                    (Value::Float(a), BinaryOp::Subtract, Value::Float(b)) => {
+                        Ok(Value::Float(a - b))
+                    }
+                    (Value::Float(a), BinaryOp::Multiply, Value::Float(b)) => {
+                        Ok(Value::Float(a * b))
+                    }
+                    (Value::Float(a), BinaryOp::Divide, Value::Float(b)) => {
+                        Ok(Value::Float(a / b))
+                    }
+                    // Auto-differentiation (Dual numbers)
+                    (Value::Dual(v1, d1), BinaryOp::Add, Value::Dual(v2, d2)) => {
+                        Ok(Value::Dual(v1 + v2, d1 + d2))
+                    }
+                    (Value::Dual(v1, d1), BinaryOp::Subtract, Value::Dual(v2, d2)) => {
+                        Ok(Value::Dual(v1 - v2, d1 - d2))
+                    }
+                    (Value::Dual(v1, d1), BinaryOp::Multiply, Value::Dual(v2, d2)) => {
+                        // Product rule: d(uv) = udv + vdu
+                        Ok(Value::Dual(v1 * v2, v1 * d2 + v2 * d1))
+                    }
+                    (Value::Dual(v1, d1), BinaryOp::Divide, Value::Dual(v2, d2)) => {
+                        // Quotient rule: d(u/v) = (vdu - udv) / v^2
+                        Ok(Value::Dual(v1 / v2, (v2 * d1 - v1 * d2) / (v2 * v2)))
+                    }
+                    (Value::Dual(v1, d1), BinaryOp::Add, Value::Integer(n)) => {
+                         Ok(Value::Dual(v1 + n as f64, d1))
+                    }
+                    (Value::Integer(n), BinaryOp::Add, Value::Dual(v2, d2)) => {
+                         Ok(Value::Dual(n as f64 + v2, d2))
+                    }
+                    (Value::Dual(v1, d1), BinaryOp::Multiply, Value::Integer(n)) => {
+                         Ok(Value::Dual(v1 * n as f64, d1 * n as f64))
+                    }
+                    (Value::Integer(n), BinaryOp::Multiply, Value::Dual(v2, d2)) => {
+                         Ok(Value::Dual(n as f64 * v2, n as f64 * d2))
+                    }
+                     // Add more combinations (Float, etc.) as needed for basic support
+                    
                     (l, BinaryOp::Equal, r) => Ok(Value::Bool(l == r)),
                     (l, BinaryOp::NotEqual, r) => Ok(Value::Bool(l != r)),
                     (Value::Integer(a), BinaryOp::Less, Value::Integer(b)) => Ok(Value::Bool(a < b)),
@@ -489,10 +791,30 @@ impl Interpreter {
                         .get(member)
                         .cloned()
                         .ok_or_else(|| format!("Member not found: {}", member)),
+                    Value::Function(params, outputs, _) => {
+                         // v3.2 Function Node properties
+                         if member.starts_with("input_") {
+                             let idx: usize = member[6..].parse().unwrap_or(0);
+                             if idx > 0 && idx <= params.len() {
+                                 let (name, _ty) = &params[idx-1];
+                                 let mut map = HashMap::new();
+                                 map.insert(name.clone(), Value::String(name.clone())); // Simplified proxy
+                                 return Ok(Value::Dict(map));
+                             }
+                         } else if member.starts_with("output_") {
+                             let idx: usize = member[7..].parse().unwrap_or(0);
+                             if idx > 0 && idx <= outputs.len() {
+                                 let (name, _ty) = &outputs[idx-1];
+                                 return Ok(Value::String(name.clone()));
+                             }
+                         }
+                         Err(format!("Function property not found: {}", member))
+                    }
                     _ => Err(format!("Cannot access member '{}' on non-object", member)),
                 }
             }
             Expression::Ownership { value, .. } => self.evaluate(value),
+            Expression::Await(expr) => self.evaluate(expr),
             Expression::ListOp { op, args } => {
                 match op {
                     ListOp::Car => {
@@ -553,7 +875,7 @@ impl Interpreter {
                                     Value::NativeFunction(f) => {
                                         result.push(f(vec![item]));
                                     }
-                                    Value::Function(params, _body) => {
+                                    Value::Function(params, _outputs, _body) => {
                                         // For user functions, simplified call
                                         if params.is_empty() {
                                             result.push(item);
@@ -638,6 +960,10 @@ impl Interpreter {
                 // For gradual typing, just evaluate the inner expression
                 // Type checking is done at compile time
                 self.evaluate(expr)
+            }
+            Expression::Lambda { params, body } => {
+                let typed_params: Vec<(String, Option<Type>)> = params.iter().map(|p| (p.clone(), None)).collect();
+                Ok(Value::Lambda(typed_params, body.clone()))
             }
             _ => Ok(Value::Null),
         }

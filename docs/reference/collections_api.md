@@ -1,4 +1,4 @@
-# GUL v3.3 Collections Runtime API
+# GUL v3.2 Collections Runtime API
 
 ## Overview
 
@@ -76,4 +76,4 @@ Each symbol has an `ownership_mode` field:
 
 ## Version
 
-GUL Runtime v0.14.0 (v3.3 Nightly)
+GUL Runtime v0.14.0-dev (v3.2 Nightly)

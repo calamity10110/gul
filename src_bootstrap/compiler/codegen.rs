@@ -47,8 +47,10 @@ impl CodeGenerator {
 
     fn generate_statement(&mut self, statement: &Statement) -> Result<(), String> {
         match statement {
-            Statement::Import(module) => {
-                self.emit_line(&format!("// import {}", module));
+            Statement::Import(modules) => {
+                for module in modules {
+                    self.emit_line(&format!("// import {}", module));
+                }
             }
             Statement::StructDef {
                 name,
@@ -80,12 +82,18 @@ impl CodeGenerator {
             Statement::Function {
                 name,
                 params,
+                outputs,
                 body,
                 is_async,
             } => {
                 let async_keyword = if *is_async { "async " } else { "" };
-                let params_str = params.join(", ");
-                self.emit_line(&format!("{}fn {}({}) {{", async_keyword, name, params_str));
+                let params_str = params.iter().map(|(n, _)| n.clone()).collect::<Vec<String>>().join(", ");
+                let outputs_str = if outputs.is_empty() {
+                    "".to_string()
+                } else {
+                    format!("({}) ", outputs.iter().map(|(n, _)| n.clone()).collect::<Vec<String>>().join(", "))
+                };
+                self.emit_line(&format!("{}fn {}({}) {} {{", async_keyword, name, params_str, outputs_str));
                 self.indent();
 
                 for stmt in body {
@@ -149,6 +157,7 @@ impl CodeGenerator {
                 variable,
                 iterable,
                 body,
+                is_parallel: _,
             } => {
                 let iter_code = self.generate_expression(iterable)?;
                 self.emit_line(&format!("for {} in {} {{", variable, iter_code));
@@ -161,9 +170,14 @@ impl CodeGenerator {
                 self.dedent();
                 self.emit_line("}");
             }
-            Statement::While { condition, body } => {
+            Statement::While {
+                condition,
+                body,
+                is_parallel,
+            } => {
+                let parallel_marker = if *is_parallel { "/* parallel */ " } else { "" };
                 let cond_code = self.generate_expression(condition)?;
-                self.emit_line(&format!("while {} {{", cond_code));
+                self.emit_line(&format!("{}while {} {{", parallel_marker, cond_code));
                 self.indent();
 
                 for stmt in body {
@@ -280,6 +294,7 @@ impl CodeGenerator {
             Expression::Ownership { value, .. } => self.generate_expression(value),
             Expression::ListOp { .. } => Ok("/* list op */".to_string()),
             Expression::Typed { expr, .. } => self.generate_expression(expr), // For now, ignore type annotation in codegen
+            Expression::Lambda { .. } => Ok("/* lambda */".to_string()), // Placeholder for lambda
         }
     }
 
