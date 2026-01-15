@@ -1,139 +1,125 @@
 # GUL Machine Learning - Neural Network Training Simulation
 # Category: AI / Machine Learning
 
-@fn initialize_weights() -> int:
-    # Simulate weight initialization
-    let w1 = 50
-    let w2 = 30
-    let w3 = 70
-    let w4 = 40
+@fn initialize_weights()(res):
+    // Simulate weight initialization
+    @const w1 = 50
+    @const w2 = 30
+    @const w3 = 70
+    @const w4 = 40
     
-    print("Weights initialized")
-    return w1
+    println("Weights initialized")
+    res = w1
 
-@fn forward_pass(input: int, weight: int) -> int:
-    # Simulate forward propagation
-    let output = input * weight
-    return output / 100
+@fn forward_pass(input, weight)(res):
+    // Simulate forward propagation
+    @const output = input * weight
+    res = output / 100
 
-@fn activation_relu(x: int) -> int:
+@fn activation_relu(x)(res):
     if x < 0:
-        return 0
-    return x
+        res = 0
+    else:
+        res = x
 
-@fn activation_sigmoid(x: int) -> int:
-    # Simplified sigmoid (returns 0-100 scale)
+@fn activation_sigmoid(x)(res):
+    // Simplified sigmoid (returns 0-100 scale)
     if x < 0:
-        return 25
-    if x < 50:
-        return 50
-    return 75
+        res = 25
+    elif x < 50:
+        res = 50
+    else:
+        res = 75
 
-@fn compute_loss(predicted: int, actual: int) -> int:
-    let diff = predicted - actual
+@fn compute_loss(predicted, actual)(res):
+    @var diff = predicted - actual
     if diff < 0:
         diff = 0 - diff
-    return diff
+    res = diff
 
-@fn backpropagate(loss: int, learning_rate: int) -> int:
-    # Simulate gradient descent
-    let gradient = loss * learning_rate
-    return gradient / 100
+@fn backpropagate(loss, learning_rate)(res):
+    // Simulate gradient descent
+    @const gradient = loss * learning_rate
+    res = gradient / 100
 
-@fn update_weights(old_weight: int, gradient: int) -> int:
-    let new_weight = old_weight - gradient
+@fn update_weights(old_weight, gradient)(res):
+    @var new_weight = old_weight - gradient
     if new_weight < 1:
         new_weight = 1
-    return new_weight
+    res = new_weight
 
-@fn train_epoch(weight: int) -> int:
-    # Simulate one training epoch
-    let input_data = 10
-    let target = 50
+@fn train_epoch(weight)(res):
+    // Simulate one training epoch
+    @const input_data = 10
+    @const target = 50
     
-    # Forward pass
-    let prediction = forward_pass(input_data, weight)
-    print("Prediction:")
-    print(prediction)
+    // Forward pass
+    @const prediction = forward_pass(input_data, weight)
+    println("Prediction: " + @str(prediction))
     
-    # Compute loss
-    let loss = compute_loss(prediction, target)
-    print("Loss:")
-    print(loss)
+    // Compute loss
+    @const loss = compute_loss(prediction, target)
+    println("Loss: " + @str(loss))
     
-    # Backpropagate
-    let gradient = backpropagate(loss, 10)
+    // Backpropagate
+    @const gradient = backpropagate(loss, 10)
     
-    # Update weights
-    let new_weight = update_weights(weight, gradient)
-    print("Updated weight:")
-    print(new_weight)
+    // Update weights
+    @const new_weight = update_weights(weight, gradient)
+    println("Updated weight: " + @str(new_weight))
     
-    return new_weight
+    res = new_weight
 
-@fn train_model() -> int:
-    print("=== NEURAL NETWORK TRAINING ===")
+@fn train_model()(res):
+    println("=== NEURAL NETWORK TRAINING ===")
     
-    # Initialize
-    let weight = initialize_weights()
-    print("Initial weight:")
-    print(weight)
+    // Initialize
+    @var weight = initialize_weights()
+    println("Initial weight: " + @str(weight))
     
-    # Train for 5 epochs
-    print("--- EPOCH 1 ---")
+    // Train for 5 epochs
+    println("--- EPOCH 1 ---")
     weight = train_epoch(weight)
     
-    print("--- EPOCH 2 ---")
+    println("--- EPOCH 2 ---")
     weight = train_epoch(weight)
     
-    print("--- EPOCH 3 ---")
+    println("--- EPOCH 3 ---")
     weight = train_epoch(weight)
     
-    print("--- EPOCH 4 ---")
+    println("--- EPOCH 4 ---")
     weight = train_epoch(weight)
     
-    print("--- EPOCH 5 ---")
+    println("--- EPOCH 5 ---")
     weight = train_epoch(weight)
     
-    print("=== TRAINING COMPLETE ===")
-    print("Final weight:")
-    print(weight)
+    println("=== TRAINING COMPLETE ===")
+    println("Final weight: " + @str(weight))
     
-    return weight
+    res = weight
 
-@fn test_activations() -> int:
-    print("=== TESTING ACTIVATION FUNCTIONS ===")
+@fn test_activations()(res):
+    println("=== TESTING ACTIVATION FUNCTIONS ===")
     
-    print("ReLU(-10):")
-    let relu_neg = activation_relu(-10)
-    print(relu_neg)
+    println("ReLU(-10): " + @str(activation_relu(-10)))
+    println("ReLU(50): " + @str(activation_relu(50)))
+    println("Sigmoid(25): " + @str(activation_sigmoid(25)))
+    println("Sigmoid(75): " + @str(activation_sigmoid(75)))
     
-    print("ReLU(50):")
-    let relu_pos = activation_relu(50)
-    print(relu_pos)
-    
-    print("Sigmoid(25):")
-    let sig1 = activation_sigmoid(25)
-    print(sig1)
-    
-    print("Sigmoid(75):")
-    let sig2 = activation_sigmoid(75)
-    print(sig2)
-    
-    return 0
+    res = 0
 
-@fn run_ml_simulation() -> int:
-    print("=== MACHINE LEARNING SIMULATION ===")
+@fn run_ml_simulation()(res):
+    println("=== MACHINE LEARNING SIMULATION ===")
     
-    # Test activations
-    let test_result = test_activations()
+    // Test activations
+    @const test_result = test_activations()
     
-    # Train model
-    let final_weight = train_model()
+    // Train model
+    @const final_weight = train_model()
     
-    print("=== ML SIMULATION COMPLETE ===")
+    println("=== ML SIMULATION COMPLETE ===")
     
-    return final_weight
+    res = final_weight
 
 mn:
     run_ml_simulation()

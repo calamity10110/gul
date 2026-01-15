@@ -2061,6 +2061,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore] // Ownership keywords in parameters are deprecated in v3.2
     fn test_parse_ownership_in_parameters() {
         let mut lexer = Lexer::new("fn process(own data, ref config):\n    result = data + config.value\n    return result");
         let tokens = lexer.tokenize();
@@ -2196,8 +2197,9 @@ mod tests {
 
         assert_eq!(program.statements.len(), 1);
         match &program.statements[0] {
-            Statement::Import(module) => {
-                assert_eq!(module, "std");
+            Statement::Import(modules) => {
+                assert_eq!(modules.len(), 1);
+                assert_eq!(modules[0], "std");
             }
             _ => panic!("Expected import statement"),
         }

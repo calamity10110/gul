@@ -175,7 +175,6 @@ for i in 0..10:
     print(i)
 
 # Match expressions
-# Match expressions
 match status_code:
     200 => print("OK")
     404 => print("Not Found")

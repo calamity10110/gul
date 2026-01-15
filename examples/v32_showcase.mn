@@ -7,43 +7,44 @@
 @imp python{numpy, pandas}
 @imp rust{serde}
 
-# 1. Variables and Constants
-let VERSION = @str("3.2.0")
-let MAX_ITEMS = @int(100)
-var counter = @int(0)
+// 1. Variables and Constants
+@const VERSION = @str("3.2.0")
+@const MAX_ITEMS = @int(100)
+@var counter = @int(0)
 
-# 2. Collections
-let numbers = @list[1, 2, 3, 4, 5]
-let coordinates = @tuple(10.5, 20.3, 30.1)
-let unique_ids = @set{101, 102, 103}
-let config = @dict{
+// 2. Collections
+@const numbers = @list[1, 2, 3, 4, 5]
+@const coordinates = (10.5, 20.3, 30.1)
+@const unique_ids = @set{101, 102, 103}
+@const config = @dict{
     host: "localhost",
     port: 8080,
     debug: true
 }
 
-# 3. Functions with return types
-fn @int factorial(n):
+// 3. Functions with outputs
+@fn factorial(n)(result):
     if n <= 1:
-        return 1
-    return n * factorial(n - 1)
+        result = 1
+    else:
+        result = n * factorial(n - 1)
 
-fn @str format_message(name, age):
-    return "User: " + name + ", Age: " + str(age)
+@fn format_message(name, age)(result):
+    result = "User: " + name + ", Age: " + @str(age)
 
-# 4. Structs
+// 4. Structs
 struct User:
-    name: @str
-    age: @int
-    email: @str
+    name: str
+    age: int
+    email: str
     
-    fn @str greet(self):
-        return "Hello, I'm " + self.name
+    @fn greet(self)(result):
+        result = "Hello, I'm " + self.name
     
-    fn @bool is_adult(self):
-        return self.age >= 18
+    @fn is_adult(self)(result):
+        result = self.age >= 18
 
-# 5. Foreign code blocks
+// 5. Foreign code blocks
 @python {
     import numpy as np
     
@@ -69,51 +70,50 @@ struct User:
     }
 }
 
-# 6. Async functions
-async @dict fetch_api(url):
-    let response = http.get(url)
-    return response.json()
+// 6. Async functions
+@async fetch_api(url)(result):
+    @const response = http.get(url)
+    result = response.json()
 
-# 7. Ownership modes demonstration
-fn modify_list(data: borrow @list):
+// 7. Ownership modes demonstration
+@fn modify_list(data: borrow list):
     data.append(100)
 
-fn @int sum_list(data: ref @list):
-    var total = @int(0)
+@fn sum_list(data: ref list)(total):
+    total = 0
     for item in data:
         total = total + item
-    return total
 
 mn:
     print("=== GUL v3.2 Complete Showcase ===")
     print("Version:", VERSION)
     
-    # Test primitives
+    // Test primitives
     print("\n1. Primitives and Collections:")
     print("  Numbers:", numbers)
     print("  Config:", config)
     
-    # Test functions
+    // Test functions
     print("\n2. Functions:")
     print("  factorial(5) =", factorial(5))
     print("  Message:", format_message("Alice", 30))
     
-    # Test structs
+    // Test structs
     print("\n3. Structs:")
-    let user = User{name: "Bob", age: 25, email: "bob@example.com"}
+    @const user = User{name: "Bob", age: 25, email: "bob@example.com"}
     print("  ", user.greet())
     print("   Is adult:", user.is_adult())
     
-    # Test foreign code
+    // Test foreign code
     print("\n4. Foreign Code:")
-    let data = @list[1.0, 2.0, 3.0, 4.0, 5.0]
-    let stats = python.compute_stats(data)
+    @const data = @list[1.0, 2.0, 3.0, 4.0, 5.0]
+    @const stats = python.compute_stats(data)
     print("   Python stats:", stats)
     print("   Rust fibonacci(20):", rust.fast_fibonacci(20))
     
-    # Test ownership
+    // Test ownership
     print("\n5. Ownership:")
-    var nums = @list[1, 2, 3]
+    @var nums = @list[1, 2, 3]
     modify_list(borrow nums)
     print("   Modified list:", nums)
     print("   Sum:", sum_list(ref nums))

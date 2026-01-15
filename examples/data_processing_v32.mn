@@ -23,24 +23,24 @@
         return df[df[column] > value]
 }
 
-fn @dict process_data(filepath):
-    # Load data
-    let data = python.load_csv(filepath)
+@fn process_data(filepath)(result):
+    // Load data
+    @const data = python.load_csv(filepath)
     
-    # Analyze
-    let stats = python.analyze_data(data)
+    // Analyze
+    @const stats = python.analyze_data(data)
     
-    # Filter
-    let filtered = python.filter_data(data, "age", 18)
+    // Filter
+    @const filtered = python.filter_data(data, "age", 18)
     
-    return @dict{
+    result = @dict{
         stats: stats,
         filtered_count: filtered.shape[0]
     }
 
 mn:
-    let filepath = @str("data.csv")
-    let result = process_data(filepath)
+    @const filepath = @str("data.csv")
+    @const result = process_data(filepath)
     
     print("Statistics:", result["stats"])
     print("Filtered count:", result["filtered_count"])

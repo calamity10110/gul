@@ -1,28 +1,18 @@
 # GUL Hello World - v3.2
-# Demonstrates @ prefix type system
 
 @imp std.io
 
-fn @str greet(name):
-    return "Hello, " + name
+@fn greet(name)(result):
+    result = "Hello, " + name
 
 mn:
-    let message = @str("Hello, World!")
-    var count = @int(42)
+    @const message = "Hello, World!"
+    @var count = 42
     
-    print(message)
-    print("Count:", count)
-    print(greet("GUL v3.2"))
+    println(message)
+    println("Count: " + @str(count))
     
-    # Collections with @ prefix
-    let numbers = @list[1, 2, 3, 4, 5]
-    let config = @dict{host: "localhost", port: 8080}
+    @const greeting = greet("GUL v3.2")
+    println(greeting)
     
-    print("Numbers:", numbers)
-    print("Config:", config)
-    
-    # Error handling
-    try:
-        print("Testing try/catch...")
-    catch error:
-        print("Caught error:", error)
+    println("✓ Hello World complete!")

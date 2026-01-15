@@ -1,0 +1,131 @@
+# GUL v3.2 Complete Walkthrough
+# This file demonstrates all major features of GUL v3.2
+
+@imp std.io
+
+// ============================================================================
+// FEATURE 1: Modern Variable Declarations
+// ============================================================================
+
+@const APP_NAME = "GUL Walkthrough"
+@const VERSION = "3.2.0"
+@var counter = 0
+
+// ============================================================================
+// FEATURE 2: Functions with Explicit Outputs (v3.2 Enhancement)
+// ============================================================================
+
+@fn add(a, b)(result):
+    result = a + b
+
+@fn multiply(x, y)(result):
+    result = x * y
+
+@fn format_message(name, version)(msg):
+    msg = "Welcome to " + name + " v" + version
+
+// ============================================================================
+// FEATURE 3: Arrow Functions (Concise Syntax)
+// ============================================================================
+
+@const square = (x) => x * x
+@const double = (n) => n * 2
+
+// ============================================================================
+// FEATURE 4: Async Functions (Modern Shortcut - No 'fn' keyword needed!)
+// ============================================================================
+
+async simulate_fetch(url)(data):
+    // In real implementation, this would await http.get(url)
+    data = "Simulated data from " + url
+
+// ============================================================================
+// FEATURE 5: Parallel Loops (v3.2 NEW!)
+// ============================================================================
+
+@fn demonstrate_parallel_for():
+    println("\n=== Parallel Processing Demo ===")
+    
+    // Run iterations in parallel
+    also_for i in [1, 2, 3, 4, 5]:
+        println("  Parallel iteration: " + @str(i))
+
+@fn demonstrate_parallel_while():
+    println("\n=== Parallel While Demo ===")
+    @var count = 0
+    
+    also_while count < 3:
+        println("  Parallel while: " + @str(count))
+        count = count + 1
+
+// ============================================================================
+// FEATURE 6: Comments (Both Styles Supported!)
+// ============================================================================
+
+// C-style comments (v3.2 new)
+# Python-style comments (legacy, still supported)
+
+// ============================================================================
+// MAIN ENTRY POINT
+// ============================================================================
+
+mn:
+    println("============================================================")
+    println("  GUL v3.2 COMPLETE FEATURE WALKTHROUGH")
+    println("============================================================")
+    
+    // 1. Variables
+    println("\n[1] VARIABLES")
+    println("  App: " + APP_NAME)
+    println("  Version: " + VERSION)
+    println("  Counter: " + @str(counter))
+    
+    // 2. Functions with Outputs
+    println("\n[2] FUNCTIONS WITH EXPLICIT OUTPUTS")
+    @const sum = add(10, 20)
+    @const product = multiply(5, 6)
+    println("  10 + 20 = " + @str(sum))
+    println("  5 * 6 = " + @str(product))
+    
+    // 3. Formatted Messages
+    println("\n[3] FORMATTED OUTPUT")
+    @const welcome = format_message(APP_NAME, VERSION)
+    println("  " + welcome)
+    
+    // 4. Arrow Functions
+    println("\n[4] ARROW FUNCTIONS")
+    @const squared = square(7)
+    @const doubled = double(15)
+    println("  square(7) = " + @str(squared))
+    println("  double(15) = " + @str(doubled))
+    
+    // 5. Async/Await
+    println("\n[5] ASYNC/AWAIT")
+    @const fetched = await simulate_fetch("https://api.example.com/data")
+    println("  " + fetched)
+    
+    // 6. Parallel Processing
+    println("\n[6] PARALLEL PROCESSING (v3.2 NEW!)")
+    demonstrate_parallel_for()
+    demonstrate_parallel_while()
+    
+    // 7. Control Flow
+    println("\n[7] CONTROL FLOW")
+    @var i = 0
+    for i in [1, 2, 3]:
+        println("  Loop iteration: " + @str(i))
+    
+    // Summary
+    println("\n============================================================")
+    println("  ALL v3.2 FEATURES DEMONSTRATED!")
+    println("============================================================")
+    
+    println("\nKey v3.2 Improvements:")
+    println("  - @const / @var variable declarations")
+    println("  - @fn with explicit outputs: @fn name(inputs)(outputs):")
+    println("  - async shortcuts (no 'fn' keyword needed)")
+    println("  - also_for / also_while parallel loops")
+    println("  - await expressions for async operations")
+    println("  - // comment style supported")
+    println("  - @ui component{property: value} syntax")
+    println("")

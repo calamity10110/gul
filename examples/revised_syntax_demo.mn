@@ -5,54 +5,56 @@
 @imp std.math
 @imp std.json
 
-# 1. Type annotations with @ prefix
-let name = @str("GUL")
-let version = @str("3.2.0")
-let count = @int(42)
-let pi = @float(3.14159)
-let active = @bool(true)
+// 1. Type annotations with @ prefix
+@const name = @str("GUL")
+@const version = @str("3.2.0")
+@const count = @int(42)
+@const pi = @float(3.14159)
+@const active = @bool(true)
 
-# 2. Collections
-let numbers = @list[1, 2, 3, 4, 5]
-let coords = @tuple(10.5, 20.3)
-let tags = @set{"rust", "python", "javascript"}
-let config = @dict{
+// 2. Collections
+@const numbers = @list[1, 2, 3, 4, 5]
+@const coords = (10.5, 20.3)
+@const tags = @set{"rust", "python", "javascript"}
+@const config = @dict{
     host: "localhost",
     port: 8080,
     debug: true
 }
 
-# 3. Functions with return types
-fn @int add(a, b): a + b
-fn @float multiply(x, y): x * y
-fn @str format(template, value):
-    return template + ": " + str(value)
+// 3. Functions with outputs
+@fn add(a, b)(result):
+    result = a + b
 
-# 4. Structs
+@fn multiply(x, y)(result):
+    result = x * y
+
+@fn format(template, value)(result):
+    result = template + ": " + @str(value)
+
+// 4. Structs
 struct Point:
-    x: @float
-    y: @float
+    x: float
+    y: float
     
-    fn @float magnitude(self):
-        return math.sqrt(self.x^2 + self.y^2)
+    @fn magnitude(self)(result):
+        result = math.sqrt(self.x^2 + self.y^2)
 
 struct Config:
-    name: @str
-    value: @int
-    enabled: @bool
-
-# 5. List comprehensions
-let squares = @list[x^2 for x in range(10)]
-let evens = @list[x for x in numbers if x % 2 == 0]
+    name: str
+    value: int
+    enabled: bool
 
 mn:
     print("=== GUL v3.2 Syntax Demo ===")
     print("Name:", name, "Version:", version)
     print("Collections:", numbers, config)
-    print("Functions:", add(10, 20), format("Result", 100))
     
-    let p = Point{x: 3.0, y: 4.0}
+    @const sum_result = add(10, 20)
+    @const fmt_result = format("Result", 100)
+    print("Functions:", sum_result, fmt_result)
+    
+    @const p = Point{x: 3.0, y: 4.0}
     print("Point magnitude:", p.magnitude())
     
-    print("Comprehensions:", squares, evens)
     print("✓ All features working!")

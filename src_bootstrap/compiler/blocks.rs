@@ -149,7 +149,7 @@ mod tests {
 
         let program = Program {
             statements: vec![
-                Statement::Import("std.io".to_string()),
+                Statement::Import(vec!["std.io".to_string()]),
                 Statement::Definition {
                     name: "x".to_string(),
                     value: Expression::Integer(10),

@@ -572,6 +572,7 @@ mod tests {
             statements: vec![Statement::Function {
                 name: "sync_fn".to_string(),
                 params: vec![],
+                outputs: vec![],
                 body: vec![Statement::Expression(Expression::Await(Box::new(
                     Expression::Integer(42),
                 )))],

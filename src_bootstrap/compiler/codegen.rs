@@ -366,7 +366,8 @@ mod tests {
         let program = Program {
             statements: vec![Statement::Function {
                 name: "add".to_string(),
-                params: vec!["a".to_string(), "b".to_string()],
+                params: vec![("a".to_string(), None), ("b".to_string(), None)],
+                outputs: vec![],
                 body: vec![Statement::Return(Some(Expression::Binary {
                     left: Box::new(Expression::Identifier("a".to_string())),
                     op: BinaryOp::Add,

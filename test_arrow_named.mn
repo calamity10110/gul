@@ -1,0 +1,16 @@
+@imp std.io
+
+// Test with @fn prefix
+@fn double(x) => x * 2
+@fn add(a, b) => a + b
+
+mn:
+    println("=== Arrow Function Test ===")
+    
+    @const result1 = double(5)
+    println("double(5) = " + @str(result1))
+    
+    @const result2 = add(10, 20)
+    println("add(10, 20) = " + @str(result2))
+    
+    println("Arrow functions working!")
