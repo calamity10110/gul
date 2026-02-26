@@ -91,7 +91,7 @@ fn Hero() -> Element {
     rsx! {
         section { class: "hero",
             div { class: "hero-content",
-                div { class: "hero-badge", "🚀 Version 0.13.0 Released" }
+                div { class: "hero-badge", "🚀 Version 0.14.0-dev Released" }
                 h1 { class: "hero-title",
                     "The Universal Programming Language"
                 }
@@ -405,7 +405,7 @@ index(request):
 status(request):
     return http.json_response({
         "status": "ok",
-        "version": "0.13.0"
+        "version": "0.14.0-dev"
     })
 
 server.start()
@@ -446,7 +446,7 @@ io.print("Server running on http://localhost:8080")
                 div { class: "editor-panel",
                     div { class: "panel-header",
                         span { class: "panel-title", "📝 main.gul" }
-                        span { class: "panel-info", "GUL 0.13.0" }
+                        span { class: "panel-info", "GUL 0.14.0-dev" }
                     }
                     textarea {
                         class: "code-editor",
@@ -593,9 +593,9 @@ fn Blog() -> Element {
             
             div { class: "blog-list",
                 BlogPost {
-                    title: "GUL v0.13.0 Released - Web IDE & Enhanced FFI",
+                    title: "GUL v0.14.0-dev Released - Web IDE & Enhanced FFI",
                     date: "December 19, 2024",
-                    excerpt: "We're excited to announce GUL v0.13.0! This release includes the new Web IDE/Playground, improved FFI performance, and over 500 new packages.",
+                    excerpt: "We're excited to announce GUL v0.14.0-dev! This release includes the new Web IDE/Playground, improved FFI performance, and over 500 new packages.",
                     is_featured: true
                 }
                 BlogPost {
@@ -721,7 +721,7 @@ fn Download() -> Element {
             p { class: "page-subtitle", "Get the latest version of GUL for your platform" }
             
             div { class: "version-banner",
-                span { class: "current-version", "Current Version: 0.13.0" }
+                span { class: "current-version", "Current Version: 0.14.0-dev" }
                 span { class: "release-date", "Released: December 19, 2024" }
             }
 
@@ -777,7 +777,7 @@ fn Download() -> Element {
             }
 
             section { class: "whats-new",
-                h2 { "What's New in 0.13.0" }
+                h2 { "What's New in 0.14.0-dev" }
                 ul { class: "changelog",
                     li { "✨ New Web IDE/Playground" }
                     li { "🚀 40% faster FFI calls" }
@@ -816,7 +816,7 @@ fn Footer() -> Element {
                 div { class: "footer-section",
                     h4 { "GUL" }
                     p { "The Universal Programming Language" }
-                    p { class: "version", "Version 0.13.0" }
+                    p { class: "version", "Version 0.14.0-dev" }
                 }
                 div { class: "footer-section",
                     h4 { "Resources" }

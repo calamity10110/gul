@@ -130,7 +130,7 @@ impl FileSystem {
     pub fn join_path(base: &str, component: &str) -> String {
         let mut path = PathBuf::from(base);
         path.push(component);
-        path.to_string_lossy().to_string()
+        path.to_string_lossy().replace('\\', "/")
     }
 
     /// Get file extension

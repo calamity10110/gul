@@ -1,6 +1,6 @@
 //! # GUL - GUL Universal Language
 //!
-//! **Version**: 0.13.0 | **Syntax**: v3.2 | **Status**: Production Ready
+//! **Version**: 0.14.0-dev | **Syntax**: v3.2 | **Status**: Production Ready
 //!
 //! GUL is a modern, multi-paradigm programming language that combines:
 //! - 🐍 Python's simplicity and readability

@@ -1,6 +1,6 @@
 # AI Agents & Automation in GUL
 
-**Version**: 0.13.0 | **Syntax**: v3.2 | **Updated**: 2025-12-30
+**Version**: 0.14.0-dev | **Syntax**: v3.2 | **Updated**: 2026-02-25
 
 ---
 
@@ -737,6 +737,6 @@ gul-mcp schedule [list|enable|disable|create] NAME
 
 ---
 
-**Last Updated**: 2025-12-30  
+**Last Updated**: 2026-02-25  
 **For**: AI Agents & Developers  
 **Version**: v3.2 MCP Integration

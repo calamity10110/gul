@@ -204,7 +204,7 @@ impl GulWebIde {
                 target: "native".to_string(),
                 optimize: false,
                 dependencies: Vec::new(),
-                gul_version: "0.13.0".to_string(),
+                gul_version: "0.14.0-dev".to_string(),
             },
         });
         self.file_tree.root = root.clone();
@@ -566,7 +566,7 @@ impl Default for ProjectConfig {
             target: "native".to_string(),
             optimize: false,
             dependencies: Vec::new(),
-            gul_version: "0.13.0".to_string(),
+            gul_version: "0.14.0-dev".to_string(),
         }
     }
 }

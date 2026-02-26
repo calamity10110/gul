@@ -47,7 +47,7 @@ GUL is a modern, multi-paradigm programming language that combines the best feat
 
 ### Production Ready
 
-- ✅ **521 Tests Passing**
+- ✅ **490 Tests Passing**
 - ✅ **Comprehensive Benchmarks**
 - ✅ **Full Documentation**
 - ✅ **Example Gallery** (22 examples)

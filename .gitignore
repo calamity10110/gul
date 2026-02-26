@@ -20,6 +20,8 @@
 # IDE files
 .vscode/
 .idea/
+.claude/
+.obsidian/
 *.swp
 *.swo
 *~

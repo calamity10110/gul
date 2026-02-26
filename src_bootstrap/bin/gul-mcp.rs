@@ -9,7 +9,7 @@ use std::process::Command;
 
 #[derive(Parser)]
 #[command(name = "gul-mcp")]
-#[command(version = "0.13.0")]
+#[command(version = "0.14.0-dev")]
 #[command(about = "GUL MCP Server and CLI")]
 #[command(
     long_about = "GUL Model Context Protocol server with command-line interface for code generation, automation, and AI agent integration"
@@ -124,7 +124,7 @@ fn execute_command(cmd: Commands) -> Result<(), String> {
 }
 
 fn cmd_serve(port: u16, daemon: bool) -> Result<(), String> {
-    println!("GUL MCP Server v0.13.0");
+    println!("GUL MCP Server v0.14.0-dev");
     println!("======================\n");
 
     if daemon {
@@ -270,7 +270,7 @@ fn run_cargo_cmd(args: &[&str]) -> Result<(), String> {
 }
 
 fn show_server_info() {
-    println!("GUL MCP Server v0.13.0");
+    println!("GUL MCP Server v0.14.0-dev");
     println!("======================\n");
 
     let server = GulMcpServer::new();
