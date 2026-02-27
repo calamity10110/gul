@@ -24,6 +24,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libudev-dev pkg-config libssl-dev
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
@@ -62,6 +67,11 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libudev-dev pkg-config libssl-dev
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -189,16 +199,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libudev-dev pkg-config libssl-dev xvfb imagemagick
+
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
       - name: Build GUL
         run: cargo build --release
-
-      - name: Install screenshot tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y xvfb imagemagick
 
       - name: Generate CLI screenshots
         run: |

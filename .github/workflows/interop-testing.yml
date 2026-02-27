@@ -3,11 +3,11 @@ name: Multi-Language Interop Testing
 on:
   push:
     paths:
-      - "src/interop/**"
+      - "src_bootstrap/interop/**"
       - "tests/interop/**"
   pull_request:
     paths:
-      - "src/interop/**"
+      - "src_bootstrap/interop/**"
       - "tests/interop/**"
 
 jobs:
@@ -16,10 +16,15 @@ jobs:
     name: Python FFI
     runs-on: ubuntu-latest
     continue-on-error: true  # Don't fail build for interop tests
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libudev-dev pkg-config libssl-dev
 
       - name: Setup Python 3.12
         uses: actions/setup-python@v5
@@ -48,10 +53,15 @@ jobs:
     name: Rust FFI
     runs-on: ubuntu-latest
     continue-on-error: true
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libudev-dev pkg-config libssl-dev
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -72,13 +82,15 @@ jobs:
     name: C FFI
     runs-on: ubuntu-latest
     continue-on-error: true
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install C compiler
-        run: sudo apt-get update && sudo apt-get install -y gcc
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc libudev-dev pkg-config libssl-dev
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -99,10 +111,15 @@ jobs:
     name: JavaScript FFI
     runs-on: ubuntu-latest
     continue-on-error: true
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libudev-dev pkg-config libssl-dev
 
       - name: Setup Node.js 20
         uses: actions/setup-node@v4
@@ -129,11 +146,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test-python-ffi, test-rust-ffi, test-c-ffi, test-js-ffi]
     if: always()
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Summary
         run: |
           echo "## Interop Test Summary" >> $GITHUB_STEP_SUMMARY

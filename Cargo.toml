@@ -23,7 +23,7 @@ path = "src_bootstrap/lib.rs"
 [dependencies]
 rayon = "1.10"
 clap = { version = "4.5", features = ["derive"] }
-gul-repl = { path = "packages/devtools/gul-repl" }
+gul-repl = { path = "packages/devtools/gul-repl", optional = true }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 toml = "0.8"
@@ -35,7 +35,7 @@ anyhow = "1.0"
 tracing = "0.1"
 tracing-subscriber = "0.3"
 tokio = { version = "1.35", features = ["full"] }
-reqwest = { version = "0.12", features = ["json", "blocking"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "blocking", "rustls-tls"] }
 sha2 = "0.10"
 ed25519-dalek = "2.1"
 rand = "0.8"
@@ -72,7 +72,8 @@ name = "performance"
 harness = false
 
 [features]
-default = ["dioxus/web"]
+default = ["dioxus/web", "repl"]
+repl = ["dep:gul-repl"]
 tui = []
 web-tui = []
 mcp = ["axum", "tower", "tower-http"]

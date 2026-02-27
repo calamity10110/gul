@@ -140,6 +140,7 @@ enum Commands {
     Webui,
 
     /// Launch MCU Repl
+    #[cfg(feature = "repl")]
     Repl {
         /// Serial Port
         #[arg(short, long, default_value = "/dev/ttyUSB0")]
@@ -616,6 +617,7 @@ fn main() {
                 eprintln!("Web IDE error: {}", e);
             }
         }
+        #[cfg(feature = "repl")]
         Commands::Repl { port } => {
             println!("Starting REPL on {}", port);
             if let Err(e) = gul_repl::run(port) {
