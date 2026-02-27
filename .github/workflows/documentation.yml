@@ -2,10 +2,10 @@ name: Documentation Automation
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, master, develop]
     paths:
       - "docs/**"
-      - "src/**"
+      - "src_bootstrap/**"
       - "packages/**"
   pull_request:
     paths:
@@ -128,7 +128,7 @@ jobs:
     name: Deploy Documentation
     runs-on: ubuntu-latest
     needs: build-docs-site
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
 
     steps:
       - name: Checkout code
@@ -156,7 +156,7 @@ jobs:
   generate-changelog:
     name: Generate Changelog
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
 
     steps:
       - name: Checkout code

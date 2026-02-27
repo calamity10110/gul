@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Version to build (e.g., v0.13.0)"
+        description: "Version to build (e.g., v0.14.0-dev)"
         required: true
-        default: "v0.13.0"
+        default: "v0.14.0-dev"
 
 env:
   CARGO_TERM_COLOR: always
@@ -27,7 +27,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Cache Cargo
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
@@ -64,7 +64,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Cache Cargo
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
@@ -101,7 +101,7 @@ jobs:
           targets: x86_64-apple-darwin,aarch64-apple-darwin
 
       - name: Cache Cargo
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry
@@ -166,7 +166,7 @@ jobs:
           sudo apt-get install -y gcc-${{ matrix.gcc }}
 
       - name: Cache Cargo
-        uses: actions/upload-artifact@v4
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cargo/registry

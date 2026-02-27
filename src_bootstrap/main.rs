@@ -1,4 +1,4 @@
-use gul_lang::{autonomous, benchmarks, compiler, tools};
+use gul_lang::{autonomous, benchmarks, backend::{codegen as compiler, interpreter::Interpreter}, frontend::{lexer::Lexer, parser::Parser as GulParser}, tools};
 
 use clap::{Parser, Subcommand};
 use colored::*;
@@ -234,12 +234,12 @@ fn main() {
             println!("{} {}", "Running".green().bold(), file.display());
             match std::fs::read_to_string(&file) {
                 Ok(source) => {
-                    let mut lexer = gul_lang::lexer::Lexer::new(&source);
+                    let mut lexer = gul_lang::frontend::lexer::Lexer::new(&source);
                     let tokens = lexer.tokenize();
-                    let mut parser = gul_lang::parser::Parser::new(tokens);
+                    let mut parser = gul_lang::frontend::parser::Parser::new(tokens);
                     match parser.parse() {
                         Ok(program) => {
-                            let mut interpreter = gul_lang::interpreter::Interpreter::new();
+                            let mut interpreter = gul_lang::backend::interpreter::Interpreter::new();
                             if let Err(e) = interpreter.run(&program) {
                                 eprintln!("{} {}", "Runtime error:".red().bold(), e);
                             }
@@ -396,7 +396,7 @@ fn main() {
         }
 
         Commands::Ai { action } => {
-            use gul_lang::ai::{AIManager, AIProvider};
+            use gul_lang::domains::ai::{AIManager, AIProvider};
             let mut manager = AIManager::from_env();
 
             match action {
@@ -694,12 +694,12 @@ fn run_single_test(path: &std::path::Path) -> Result<(), String> {
     let source = std::fs::read_to_string(path)
         .map_err(|e| format!("Failed to read file: {}", e))?;
 
-    let mut lexer = gul_lang::lexer::Lexer::new(&source);
+    let mut lexer = Lexer::new(&source);
     let tokens = lexer.tokenize();
-    let mut parser = gul_lang::parser::Parser::new(tokens);
+    let mut parser = GulParser::new(tokens);
     let program = parser.parse().map_err(|e| format!("Parse error: {}", e))?;
 
-    let mut interpreter = gul_lang::interpreter::Interpreter::new();
+    let mut interpreter = Interpreter::new();
     
     // We use catch_unwind because assert() panics on failure
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(move || {
