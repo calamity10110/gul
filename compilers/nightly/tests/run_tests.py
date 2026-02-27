@@ -29,7 +29,10 @@ def run_test(file_path):
         print(f"Compilation failed:\n{result.stderr}")
         return False
         
-    # Run
+    # Run compiled executable
+    if not os.path.exists(exe_name):
+        print(f"Compilation produced no output file: {exe_name}")
+        return False
     result = subprocess.run([exe_name], capture_output=True, text=True)
     output = [line for line in result.stdout.strip().splitlines() if line]
     
