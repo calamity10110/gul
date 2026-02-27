@@ -3,6 +3,7 @@
 
 mod expressions;
 mod statements;
+mod types;
 
 use crate::ast::{Type, *};
 use crate::lexer::Token;
