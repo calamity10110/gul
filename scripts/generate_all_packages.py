@@ -123,4 +123,4 @@ if __name__ == "__main__":
         create_package(path, desc, keywords)
         print(f"✓ Created {path}")
     
-    print(f"\n✅ Generated {len(PACKAGES)} packages!")
+    print(f"\n[OK] Generated {len(PACKAGES)} packages!")

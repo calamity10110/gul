@@ -211,7 +211,7 @@ def check_directory(directory: Path, extensions: list = None, strict: bool = Fal
 def print_results(results: dict) -> None:
     """Print check results with colors."""
     if not results:
-        print("✅ No deprecated v3.1 syntax found!")
+        print("[OK] No deprecated v3.1 syntax found!")
         return
     
     error_count = 0
@@ -225,10 +225,10 @@ def print_results(results: dict) -> None:
         print(f"📄 {filepath}:")
         for line, msg, level in issues:
             if level == "error":
-                print(f"   ❌ Line {line}: {msg}")
+                print(f"   [FAIL] Line {line}: {msg}")
                 error_count += 1
             else:
-                print(f"   ⚠️  Line {line}: {msg}")
+                print(f"   [WARN]  Line {line}: {msg}")
                 warning_count += 1
         print()
     
@@ -268,17 +268,17 @@ Examples:
         if issues:
             print(f"\n{path}:")
             for line, msg, level in issues:
-                prefix = "❌" if level == "error" else "⚠️"
+                prefix = "[FAIL]" if level == "error" else "[WARN]"
                 print(f"  {prefix} Line {line}: {msg}")
             return 1 if args.strict else 0
         elif not args.quiet:
-            print(f"✅ {path}: No issues found")
+            print(f"[OK] {path}: No issues found")
     else:
         results = check_directory(path, args.extensions, args.strict)
         
         if not results:
             if not args.quiet:
-                print("✅ No deprecated v3.1 syntax found!")
+                print("[OK] No deprecated v3.1 syntax found!")
             return 0
         
         print_results(results)

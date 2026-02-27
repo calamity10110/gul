@@ -154,12 +154,12 @@ class DocExampleValidator:
         print(f"Warnings: {len(self.warnings)}")
         
         if self.warnings:
-            print(f"\n⚠️  Warnings:")
+            print(f"\n[WARN] Warnings:")
             for warning in self.warnings[:10]:  # Show first 10
                 print(f"   {warning}")
         
         if self.errors:
-            print(f"\n❌ Errors:")
+            print(f"\n[ERROR] Errors:")
             for error in self.errors[:10]:  # Show first 10
                 print(f"   {error}")
         

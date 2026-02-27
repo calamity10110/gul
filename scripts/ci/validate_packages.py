@@ -167,17 +167,17 @@ class PackageValidator:
         print(f"\n{'='*60}")
         print(f"Validation Results")
         print(f"{'='*60}")
-        print(f"✅ Validated packages: {len(self.validated_packages)}")
-        print(f"⚠️  Warnings: {len(self.warnings)}")
-        print(f"❌ Errors: {len(self.errors)}")
+        print(f"[OK] Validated packages: {len(self.validated_packages)}")
+        print(f"[WARN]  Warnings: {len(self.warnings)}")
+        print(f"[FAIL] Errors: {len(self.errors)}")
         
         if self.warnings:
-            print(f"\n⚠️  Warnings:")
+            print(f"\n[WARN]  Warnings:")
             for warning in self.warnings:
                 print(f"   - {warning}")
         
         if self.errors:
-            print(f"\n❌ Errors:")
+            print(f"\n[FAIL] Errors:")
             for error in self.errors:
                 print(f"   - {error}")
         
@@ -192,10 +192,10 @@ def main():
     success = validator.validate_all()
     
     if success:
-        print("✅ All packages validated successfully!")
+        print("[OK] All packages validated successfully!")
         sys.exit(0)
     else:
-        print("❌ Package validation failed!")
+        print("[FAIL] Package validation failed!")
         sys.exit(1)
 
 if __name__ == "__main__":

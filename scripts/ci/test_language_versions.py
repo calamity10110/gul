@@ -53,7 +53,7 @@ class LanguageVersionTester:
                 )
                 
                 if result.returncode != 0:
-                    print(f"    ⚠️  Python {version} not available, skipping")
+                    print(f"    [WARN]  Python {version} not available, skipping")
                     continue
                 
                 # Run Python FFI tests
@@ -61,12 +61,12 @@ class LanguageVersionTester:
                 self.test_results["python"][version] = test_result
                 
                 if test_result:
-                    print(f"    ✅ Python {version} compatible")
+                    print(f"    [OK] Python {version} compatible")
                 else:
-                    print(f"    ❌ Python {version} incompatible")
+                    print(f"    [FAIL] Python {version} incompatible")
             
             except Exception as e:
-                print(f"    ❌ Error testing Python {version}: {e}")
+                print(f"    [FAIL] Error testing Python {version}: {e}")
                 self.test_results["python"][version] = False
     
     def _test_nodejs_versions(self):
@@ -86,12 +86,12 @@ class LanguageVersionTester:
                 self.test_results["nodejs"][version] = test_result
                 
                 if test_result:
-                    print(f"    ✅ Node.js {version} compatible")
+                    print(f"    [OK] Node.js {version} compatible")
                 else:
-                    print(f"    ❌ Node.js {version} incompatible")
+                    print(f"    [FAIL] Node.js {version} incompatible")
             
             except Exception as e:
-                print(f"    ❌ Error testing Node.js {version}: {e}")
+                print(f"    [FAIL] Error testing Node.js {version}: {e}")
                 self.test_results["nodejs"][version] = False
     
     def _test_rust_versions(self):
@@ -117,12 +117,12 @@ class LanguageVersionTester:
                 self.test_results["rust"][version] = test_result
                 
                 if test_result:
-                    print(f"    ✅ Rust {version} compatible")
+                    print(f"    [OK] Rust {version} compatible")
                 else:
-                    print(f"    ❌ Rust {version} incompatible")
+                    print(f"    [FAIL] Rust {version} incompatible")
             
             except Exception as e:
-                print(f"    ❌ Error testing Rust {version}: {e}")
+                print(f"    [FAIL] Error testing Rust {version}: {e}")
                 self.test_results["rust"][version] = False
     
     def _run_interop_test(self, language: str, version: str) -> bool:
@@ -130,7 +130,7 @@ class LanguageVersionTester:
         test_file = self.root_dir / "tests" / "interop" / f"{language}_ffi_test.gul"
         
         if not test_file.exists():
-            print(f"    ⚠️  Test file not found: {test_file}")
+            print(f"    [WARN]  Test file not found: {test_file}")
             return True  # Don't fail if test doesn't exist yet
         
         try:
@@ -147,7 +147,7 @@ class LanguageVersionTester:
                 )
                 
                 if build_result.returncode != 0:
-                    print(f"    ❌ Failed to build GUL")
+                    print(f"    [FAIL] Failed to build GUL")
                     return False
             
             # Run the test
@@ -164,7 +164,7 @@ class LanguageVersionTester:
             print(f"    ⏱️  Test timed out")
             return False
         except Exception as e:
-            print(f"    ❌ Test error: {e}")
+            print(f"    [FAIL] Test error: {e}")
             return False
     
     def _generate_report(self):

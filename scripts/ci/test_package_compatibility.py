@@ -71,10 +71,10 @@ class CompatibilityTester:
             )
             
             if result.returncode == 0:
-                print(f"    ✅ {package} tests passed")
+                print(f"    [OK] {package} tests passed")
                 return True
             else:
-                print(f"    ❌ {package} tests failed")
+                print(f"    [FAIL] {package} tests failed")
                 print(f"    Error: {result.stderr[:200]}")
                 return False
         
@@ -82,7 +82,7 @@ class CompatibilityTester:
             print(f"    ⏱️  {package} tests timed out")
             return False
         except Exception as e:
-            print(f"    ❌ {package} error: {e}")
+            print(f"    [FAIL] {package} error: {e}")
             return False
     
     def _test_package_combinations(self, packages: List[str]):
@@ -140,14 +140,14 @@ edition = "2021"
             )
             
             if result.returncode == 0:
-                print(f"    ✅ Compatible")
+                print(f"    [OK] Compatible")
                 return True
             else:
-                print(f"    ❌ Incompatible")
+                print(f"    [FAIL] Incompatible")
                 return False
         
         except Exception as e:
-            print(f"    ❌ Error: {e}")
+            print(f"    [FAIL] Error: {e}")
             return False
     
     def _generate_report(self):

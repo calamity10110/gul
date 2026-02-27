@@ -155,7 +155,7 @@ def main():
     
     # Report results
     if all_issues:
-        print("❌ Dependency issues found:")
+        print("[FAIL] Dependency issues found:")
         for issue in all_issues:
             if "cycle" in issue:
                 print(f"  - {issue['error']}: {issue['cycle']}")
@@ -164,7 +164,7 @@ def main():
                 print(f"    Dependency: {issue['dependency']} ({issue['type']})")
         sys.exit(1)
     else:
-        print("✅ All dependencies are valid")
+        print("[OK] All dependencies are valid")
         sys.exit(0)
 
 

@@ -108,7 +108,7 @@ def generate_report(packages: list[dict], matrix: dict) -> str:
     
     for pkg in sorted(packages, key=lambda x: x["name"]):
         deps = ", ".join(pkg["dependencies"]) if pkg["dependencies"] else "-"
-        tests = "✅" if pkg.get("has_tests") else "❌"
+        tests = "[OK]" if pkg.get("has_tests") else "[FAIL]"
         report.append(f"| {pkg['name']} | {pkg['version']} | {deps} | {tests} |")
     
     report.append("")
@@ -156,7 +156,7 @@ def main():
     with open(report_path, "w") as f:
         f.write(report)
     
-    print(f"✅ Compatibility report generated: {report_path}")
+    print(f"[OK] Compatibility report generated: {report_path}")
     
     # Also save JSON data
     json_path = project_root / "docs" / "api" / "compatibility_matrix.json"
@@ -167,7 +167,7 @@ def main():
             "generated": datetime.now().isoformat()
         }, f, indent=2)
     
-    print(f"✅ Compatibility matrix saved: {json_path}")
+    print(f"[OK] Compatibility matrix saved: {json_path}")
 
 
 if __name__ == "__main__":

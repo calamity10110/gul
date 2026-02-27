@@ -191,8 +191,8 @@ def main():
             "packages": all_packages
         }, f, indent=2)
     
-    print(f"✅ Generated documentation for {len(all_packages)} packages")
-    print(f"   Output: {output_dir}")
+    print(f"[OK] Generated documentation for {len(all_packages)} packages")
+    print(f"     Output: {output_dir}")
 
 
 if __name__ == "__main__":

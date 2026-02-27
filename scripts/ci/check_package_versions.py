@@ -126,7 +126,7 @@ def main():
     
     # Report results
     if all_issues:
-        print("❌ Package version issues found:")
+        print("[FAIL] Package version issues found:")
         for issue in all_issues:
             print(f"  - {issue.get('package', 'unknown')}: {issue['error']}")
             if 'version' in issue:
@@ -134,7 +134,7 @@ def main():
             print(f"    File: {issue['file']}")
         sys.exit(1)
     else:
-        print("✅ All package versions are valid")
+        print("[OK] All package versions are valid")
         sys.exit(0)
 
 

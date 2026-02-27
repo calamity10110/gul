@@ -142,7 +142,7 @@ def main():
     # Report results
     if regressions:
         print("")
-        print(f"❌ Performance regressions detected (threshold: {threshold*100:.0f}%):")
+        print(f"[FAIL] Performance regressions detected (threshold: {threshold*100:.0f}%):")
         print("")
         
         for reg in regressions:
@@ -153,10 +153,10 @@ def main():
             print("")
         
         # Don't fail the build, just warn
-        print("⚠️  Please review these regressions before merging")
+        print("[WARN]  Please review these regressions before merging")
         sys.exit(0)  # Change to sys.exit(1) to fail on regressions
     else:
-        print("✅ No performance regressions detected")
+        print("[OK] No performance regressions detected")
         
         # Update baseline on success (optional)
         if os.environ.get("UPDATE_BASELINE", "").lower() == "true":

@@ -97,7 +97,7 @@ def main():
         create_example(pkg, pkg.name)
     
     print(f"\n{'=' * 60}")
-    print(f"✅ Complete! {len(packages)} packages tested and examples created")
+    print(f"[OK] Complete! {len(packages)} packages tested and examples created")
     print(f"{'=' * 60}")
 
 if __name__ == "__main__":

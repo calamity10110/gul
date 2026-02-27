@@ -67,7 +67,7 @@ def generate_markdown(packages):
         "",
         "---",
         "",
-        f"## ✅ IMPLEMENTED PACKAGES ({implemented})",
+        f"## [OK] IMPLEMENTED PACKAGES ({implemented})",
         ""
     ]
     
@@ -84,7 +84,7 @@ def generate_markdown(packages):
         md.append("")
         
         for pkg in by_category[cat]:
-            icon = "✅" if "Implemented" in pkg['status'] or "Production" in pkg['status'] else "🚧"
+            icon = "[OK]" if "Implemented" in pkg['status'] or "Production" in pkg['status'] else "🚧"
             md.append(f"**{pkg['name']}** {icon}")
             md.append(f"- **Status**: {pkg['status']}")
             md.append(f"- **Description**: {pkg['description']}")

@@ -77,23 +77,23 @@ def generate_report():
     print(f"   Warnings: {audit_results['warnings']}")
     
     if audit_results['vulnerabilities'] > 0:
-        print("   ⚠️  ACTION REQUIRED: Security vulnerabilities found!")
+        print("   [WARN]  ACTION REQUIRED: Security vulnerabilities found!")
         sys.exit(1)
     elif audit_results['warnings'] > 0:
         print(f"   ℹ️  {audit_results['warnings']} unmaintained dependencies (monitored)")
     else:
-        print("   ✅ No security issues found")
+        print("   [OK] No security issues found")
     
     # Check outdated
     outdated_results = check_outdated()
     print(f"\n📦 Dependency Status:")
     if outdated_results['outdated'] == 0:
-        print("   ✅ All dependencies up to date")
+        print("   [OK] All dependencies up to date")
     else:
         print(f"   📊 {outdated_results['outdated']} packages can be updated")
     
     print("\n" + "=" * 60)
-    print("Status: PASS ✅" if audit_results['vulnerabilities'] == 0 else "Status: FAIL ❌")
+    print("Status: PASS [OK]" if audit_results['vulnerabilities'] == 0 else "Status: FAIL [FAIL]")
     print("=" * 60)
     
     return audit_results['vulnerabilities'] == 0
