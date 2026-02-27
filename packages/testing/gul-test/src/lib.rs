@@ -1,5 +1,5 @@
 // GUL Test - Testing Framework
-use gul_lang::{interpreter::Interpreter, lexer::Lexer, parser::Parser};
+use gul_lang::{backend::interpreter::Interpreter, frontend::lexer::Lexer, frontend::parser::Parser};
 use std::path::Path;
 
 /// Test Result

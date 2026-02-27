@@ -1,6 +1,6 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use gul_lang::lexer::Lexer;
-use gul_lang::parser::Parser;
+use gul_lang::frontend::lexer::Lexer;
+use gul_lang::frontend::parser::Parser;
 
 fn bench_lexer_simple(c: &mut Criterion) {
     c.bench_function("lexer_simple", |b| {
