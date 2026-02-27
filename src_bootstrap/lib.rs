@@ -58,110 +58,30 @@
 //! - [Quick Reference](https://github.com/calamity10110/gul/blob/main/docs/QUICK_REFERENCE.md)
 //! - [Examples](https://github.com/calamity10110/gul/tree/main/examples)
 
-/// Advanced language features and constructs
-pub mod advanced;
-
-/// AI integration and autonomous features
-pub mod ai;
-
-/// Abstract Syntax Tree (AST) definitions
+// === Pipeline groups ===
+/// Frontend: source code → AST pipeline
 ///
-/// Core data structures representing parsed GUL code.
-/// Includes expressions, statements, and type annotations.
-pub mod ast;
+/// Contains lexical analysis, parsing, and semantic analysis stages.
+/// - [`ast`] - Abstract Syntax Tree definitions
+/// - [`lexer`] - Tokenization and lexical analysis
+/// - [`parser`] - Parse tokens into AST
+/// - [`semantic`] - Semantic analysis and type checking
+pub mod frontend;
 
-/// Autonomous code organization and refactoring
-pub mod autonomous;
-
-/// Performance benchmarks and profiling
-pub mod benchmarks;
-
-/// Code generation and compilation to various targets
+/// Backend: AST → execution pipeline
 ///
-/// Supports compilation to:
-/// - Native machine code
-/// - WebAssembly
-/// - Interpreted bytecode
-pub mod compiler;
+/// Contains compilation, code generation, and runtime execution stages.
+/// - [`interpreter`] - Runtime interpretation and execution
+/// - [`codegen`] - Code generation for various targets
+/// - [`vm`] - Virtual machine execution
+pub mod backend;
 
-/// Reactive dataflow programming support
-pub mod dataflow;
-
-/// Embedded systems support (ESP32, RP2040)
-pub mod embedded;
-
-/// Foreign language interoperability
-///
-/// Enables embedding and calling:
-/// - Python code
-/// - Rust code
-/// - JavaScript/TypeScript
-/// - SQL queries
-pub mod interop;
-
-/// Runtime interpreter and execution engine
-///
-/// Executes GUL programs with support for:
-/// - Variables and scoping
-/// - Function calls
-/// - Async/await
-/// - Foreign code execution
-pub mod interpreter;
-
-/// Lexical analysis and tokenization
-///
-/// Converts source code into tokens for parsing.
-/// Supports v3.2 syntax including `let`, `var`, `@imp`, etc.
-pub mod lexer;
-
-/// Model Context Protocol (MCP) server
-///
-/// AI agent integration for:
-/// - Code generation
-/// - Auto-maintenance (fmt, lint, check)
-/// - Workflow automation
-/// - Package management
-pub mod mcp;
-
-/// Memory management utilities
-pub mod memory;
-
-/// Ownership and borrow checking
-///
-/// Implements Rust-like ownership with:
-/// - `borrow` - Read-only reference
-/// - `ref` - Mutable reference
-/// - `move` - Transfer ownership
-/// - `kept` - Make a copy
-pub mod ownership;
-
-/// Parser - converts tokens to AST
-///
-/// Recursive descent parser supporting:
-/// - v3.2 syntax
-/// - Type annotations
-/// - Pattern matching
-/// - Async functions
-/// - Foreign code blocks
-pub mod parser;
-
-/// Platform-specific code and targets
-pub mod platform;
-
+// === Runtime & support ===
 /// Runtime operations and foreign code execution
 ///
 /// Executes Python, JavaScript, and Rust code at runtime.
 /// Manages dynamic library loading.
 pub mod runtime;
-
-/// Semantic analysis and type checking
-///
-/// Validates program semantics:
-/// - Type checking
-/// - Name resolution
-/// - Scope analysis
-/// - Ownership verification
-pub mod semantic;
 
 /// Standard library implementation
 ///
@@ -181,11 +101,40 @@ pub mod semantic;
 /// - `std.compress` - Compression (gzip, zip)
 pub mod stdlib;
 
+// === Domains ===
+/// Domain-specific language features
+///
+/// Contains specialized functionality for different problem domains:
+/// - [`advanced`] - Advanced language features
+/// - [`embedded`] - Embedded systems support
+/// - [`ai`] - AI integration
+/// - [`dataflow`] - Reactive dataflow programming
+pub mod domains;
+
+// === Tools & infrastructure ===
 /// Development tools and CLI utilities
 pub mod tools;
 
-/// Trait definitions and implementations
-pub mod traits;
+/// Platform-specific code and targets
+pub mod platform;
+
+/// Foreign language interoperability
+///
+/// Enables embedding and calling:
+/// - Python code
+/// - Rust code
+/// - JavaScript/TypeScript
+/// - SQL queries
+pub mod interop;
+
+/// Model Context Protocol (MCP) server
+///
+/// AI agent integration for:
+/// - Code generation
+/// - Auto-maintenance (fmt, lint, check)
+/// - Workflow automation
+/// - Package management
+pub mod mcp;
 
 /// Terminal User Interface (TUI) IDE
 ///
@@ -196,3 +145,12 @@ pub mod traits;
 /// - Debugger
 /// - Package manager UI
 pub mod tui;
+
+/// Autonomous code organization and refactoring
+pub mod autonomous;
+
+/// Memory management utilities
+pub mod memory;
+
+/// Performance benchmarks and profiling
+pub mod benchmarks;

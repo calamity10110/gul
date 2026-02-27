@@ -25,7 +25,7 @@ pub struct McpResource {
 /// GUL MCP Server
 pub struct GulMcpServer {
     #[allow(dead_code)]
-    ai_manager: crate::ai::AIManager,
+    ai_manager: crate::domains::ai::AIManager,
     tools: HashMap<String, McpTool>,
     resources: HashMap<String, McpResource>,
 }
@@ -34,7 +34,7 @@ impl GulMcpServer {
     /// Create a new MCP server
     pub fn new() -> Self {
         let mut server = Self {
-            ai_manager: crate::ai::AIManager::from_env(),
+            ai_manager: crate::domains::ai::AIManager::from_env(),
             tools: HashMap::new(),
             resources: HashMap::new(),
         };

@@ -1,5 +1,5 @@
 // Standard Library for GUL
-use crate::interpreter::Value;
+use crate::backend::interpreter::Value;
 use std::collections::HashMap;
 
 pub fn load_std_module(name: &str) -> Option<Value> {

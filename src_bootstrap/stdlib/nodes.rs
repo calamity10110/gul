@@ -1,8 +1,8 @@
 // GUL 101 Standard Library Node Contracts
 // Per Appendix F
 
-use crate::ast::{Ownership, Type};
-use crate::dataflow::ir::{IRNode, IRPort};
+use crate::frontend::ast::{Ownership, Type};
+use crate::domains::dataflow::ir::{IRNode, IRPort};
 
 /// Create print node contract (F.1)
 pub fn print_node() -> IRNode {

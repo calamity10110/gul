@@ -1,5 +1,5 @@
 // UDP Module for GUL Standard Library
-use crate::ast::Value;
+use crate::frontend::ast::Value;
 use std::collections::HashMap;
 
 pub fn load_udp_module() -> HashMap<String, Value> {
