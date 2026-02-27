@@ -84,18 +84,25 @@ jobs:
 
       - name: Test ${{ matrix.package-set }} packages
         run: |
-          for package in packages/${{ matrix.package-set }}/*; do
-            if [ -d "$package" ]; then
-              echo "::group::Testing $(basename $package)"
-              cd "$package"
-              cargo test --all-features
-              cd -
-              echo "::endgroup::"
-            fi
-          done
+          if [ -d "packages/${{ matrix.package-set }}" ]; then
+            for package in packages/${{ matrix.package-set }}/*; do
+              if [ -d "$package" ]; then
+                echo "::group::Testing $(basename $package)"
+                cd "$package"
+                cargo test --all-features
+                cd -
+                echo "::endgroup::"
+              fi
+            done
+          else
+            echo "Package category packages/${{ matrix.package-set }} not found, skipping"
+          fi
 
       - name: Test cross-package compatibility
-        run: python scripts/ci/test_package_compatibility.py --category ${{ matrix.package-set }}
+        run: |
+          if [ -d "packages/${{ matrix.package-set }}" ]; then
+            python scripts/ci/test_package_compatibility.py --category ${{ matrix.package-set }}
+          fi
 
   # Test all gul_packages
   test-gul-packages:
@@ -122,16 +129,23 @@ jobs:
 
       - name: Test all gul_packages
         run: |
-          for package in gul_packages/*; do
-            if [ -d "$package" ]; then
-              echo "::group::Testing GUL package: $(basename $package)"
-              gul test "$package"
-              echo "::endgroup::"
-            fi
-          done
+          if [ -d "gul_packages" ]; then
+            for package in gul_packages/*; do
+              if [ -d "$package" ]; then
+                echo "::group::Testing GUL package: $(basename $package)"
+                gul test "$package"
+                echo "::endgroup::"
+              fi
+            done
+          else
+            echo "gul_packages directory not found, skipping"
+          fi
 
       - name: Generate compatibility report
-        run: python scripts/ci/generate_compatibility_report.py
+        run: |
+          if [ -f "scripts/ci/generate_compatibility_report.py" ]; then
+            python scripts/ci/generate_compatibility_report.py
+          fi
 
   # Package installation tests
   test-installation:
@@ -193,7 +207,7 @@ jobs:
       - name: Run package benchmarks
         run: |
           for package in packages/*/*; do
-            if [ -d "$package" ] && [ -f "$package/benches" ]; then
+            if [ -d "$package" ] && [ -d "$package/benches" ]; then
               cd "$package"
               cargo bench --no-fail-fast
               cd -
@@ -244,8 +258,8 @@ jobs:
           pip install mkdocs mkdocs-material
           mkdocs build
 
-      - name: Deploy docs (main branch only)
-        if: github.ref == 'refs/heads/main'
+      - name: Deploy docs (main/master branch only)
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

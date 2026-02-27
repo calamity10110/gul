@@ -4701,7 +4701,7 @@ version = "0.14.0-dev"
 dependencies = [
  "anyhow",
  "axum 0.7.9",
- "base64 0.21.7",
+ "base64 0.22.1",
  "chrono",
  "clap",
  "colored",

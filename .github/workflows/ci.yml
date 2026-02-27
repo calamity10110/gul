@@ -44,6 +44,8 @@ jobs:
         run: cargo test -p ${{ matrix.compiler }}
 
   # Run shared sanity tests on both compilers
+  # Note: both compilers produce a binary named 'gul-compile', so we build
+  # and test each one separately to avoid overwriting.
   sanity-tests:
     name: Shared Sanity Tests
     runs-on: ubuntu-latest
@@ -51,25 +53,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libudev-dev pkg-config libssl-dev
+
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Build compilers
+      - name: Build and test with gul_nightly
         run: |
-          cargo build -p gul_stable --release
           cargo build -p gul_nightly --release
-
-      - name: Test with gul_nightly
-        run: |
-          ./target/release/gulc compilers/shared/tests/sanity_check.mn -o sanity_nightly
+          ./target/release/gul-compile compilers/shared/tests/sanity_check.mn -o sanity_nightly
           ./sanity_nightly
 
-      - name: Test with gul_stable
-        working-directory: compilers/stable
+      - name: Build and test with gul_stable
         run: |
-          ../../target/release/gul-compile tests/sanity_check.mn -o sanity_stable
+          cargo build -p gul_stable --release
+          ./target/release/gul-compile compilers/stable/tests/sanity_check.mn -o sanity_stable
           ./sanity_stable
-          ../../target/release/gul-compile tests/arithmetic.mn -o arith_stable
+          ./target/release/gul-compile compilers/stable/tests/arithmetic.mn -o arith_stable
           ./arith_stable
 
   # Lint and format check
@@ -113,4 +116,4 @@ jobs:
       - name: Run test suite
         run: |
           cd compilers/nightly
-          python3 tests/run_tests.py || true
+          python3 tests/run_tests.py
