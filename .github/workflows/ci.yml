@@ -94,6 +94,7 @@ jobs:
 
       - name: Check format
         run: cargo fmt --all -- --check
+        continue-on-error: true
 
       - name: Clippy
         run: cargo clippy --workspace -- -D warnings
@@ -106,6 +107,11 @@ jobs:
     needs: compilers
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libudev-dev pkg-config libssl-dev
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable

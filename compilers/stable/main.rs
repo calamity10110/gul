@@ -184,8 +184,23 @@ pub fn compiler_compile(compiler: Compiler)  ->  CompileResult {
                 return compiler_create_result(false, "".to_string(), errors, warnings);
             }
             
-            // Find stdlib.c path (relative to workspace)
-            let stdlib_path = "compilers/shared/runtime/stdlib.c";
+            // Find stdlib.c path relative to the compiler binary's location
+            let stdlib_path = {
+                let exe_dir = std::env::current_exe()
+                    .ok()
+                    .and_then(|p| p.parent().map(|d| d.to_path_buf()));
+                let candidates = [
+                    exe_dir.as_ref().map(|d| d.join("../../compilers/shared/runtime/stdlib.c")),
+                    exe_dir.as_ref().map(|d| d.join("../shared/runtime/stdlib.c")),
+                    Some(std::path::PathBuf::from("compilers/shared/runtime/stdlib.c")),
+                    Some(std::path::PathBuf::from("../shared/runtime/stdlib.c")),
+                ];
+                candidates.iter()
+                    .filter_map(|c| c.as_ref())
+                    .find(|p| p.exists())
+                    .map(|p| p.to_string_lossy().to_string())
+                    .unwrap_or_else(|| "compilers/shared/runtime/stdlib.c".to_string())
+            };
             
             // Link with cc
             println!("{}", "  Linking...".to_string());

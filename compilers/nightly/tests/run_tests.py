@@ -5,7 +5,10 @@ import sys
 
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 # Adjust path to where binary is (workspace root target)
-COMPILER = os.path.abspath(os.path.join(TEST_DIR, "../../../target/debug/gul-compile"))
+# Check release first (CI builds with --release), then debug
+_RELEASE = os.path.abspath(os.path.join(TEST_DIR, "../../../target/release/gul-compile"))
+_DEBUG = os.path.abspath(os.path.join(TEST_DIR, "../../../target/debug/gul-compile"))
+COMPILER = _RELEASE if os.path.exists(_RELEASE) else _DEBUG
 
 def run_test(file_path):
     print(f"Running {os.path.basename(file_path)}...")
