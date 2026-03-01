@@ -366,11 +366,25 @@ impl Parser {
         }
         else if token.token_type == TokenType::Pipeline {
             // Pipeline Operator: left |> right
+            // Three forms:
+            //   left |> func          -> func(left)
+            //   left |> func(a, b)    -> func(left, a, b)
+            //   left |> func(a, _, b) -> func(a, left, b)
             let right = self.parse_expression(precedence);
-            
+
             match right {
                  Expression::Call(mut call_expr) => {
-                     call_expr.arguments.insert(0, left);
+                     // Check if any argument is the placeholder `_`
+                     let placeholder_pos = call_expr.arguments.iter().position(|arg| {
+                         matches!(arg, Expression::Identifier(ident) if ident.name == "_")
+                     });
+                     if let Some(pos) = placeholder_pos {
+                         // Replace placeholder with piped value
+                         call_expr.arguments[pos] = left;
+                     } else {
+                         // No placeholder: insert as first argument
+                         call_expr.arguments.insert(0, left);
+                     }
                      return Expression::Call(call_expr);
                  },
                  Expression::Identifier(ident_expr) => {
