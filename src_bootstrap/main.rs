@@ -139,6 +139,9 @@ enum Commands {
     #[cfg(feature = "web-tui")]
     Webui,
 
+    /// Launch interactive TUI REPL
+    ReplTui,
+
     /// Launch MCU Repl
     #[cfg(feature = "repl")]
     Repl {
@@ -617,6 +620,16 @@ fn main() {
                 eprintln!("Web IDE error: {}", e);
             }
         }
+        Commands::ReplTui => {
+            let project_name = std::env::current_dir()
+                .ok()
+                .and_then(|p| p.file_name().map(|n| n.to_string_lossy().to_string()))
+                .unwrap_or_else(|| "gul".to_string());
+            if let Err(e) = gul_lang::repl::run_repl(project_name) {
+                eprintln!("REPL error: {}", e);
+            }
+        }
+
         #[cfg(feature = "repl")]
         Commands::Repl { port } => {
             println!("Starting REPL on {}", port);

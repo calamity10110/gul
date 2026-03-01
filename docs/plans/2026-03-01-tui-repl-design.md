@@ -2,7 +2,7 @@
 
 **Date**: 2026-03-01
 **Version**: 0.14.0-dev
-**Status**: Approved
+**Status**: Implemented (2026-03-01)
 **Backend**: Bootstrap interpreter (`src_bootstrap`)
 
 ## Summary
