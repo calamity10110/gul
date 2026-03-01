@@ -2,7 +2,7 @@
 
 **Date**: 2026-02-27
 **Version**: 0.14.0-dev
-**Status**: Approved
+**Status**: Implemented (placeholder support added 2026-03-01)
 **Approach**: Syntactic sugar (parser desugaring)
 
 ## Summary
