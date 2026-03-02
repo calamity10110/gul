@@ -46,10 +46,12 @@ jobs:
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
+        continue-on-error: true
         with:
           file: ./coverage.xml
           flags: packages
           name: package-coverage
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   build-docs:
     runs-on: ubuntu-latest

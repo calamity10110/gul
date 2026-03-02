@@ -11,3 +11,5 @@ keywords = ["mongodb", "database", "nosql"]
 [dependencies]
 
 [dev-dependencies]
+gul-logging = { path = "../../logging/gul-logging" }
+log = "0.4"
