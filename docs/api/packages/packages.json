@@ -1,0 +1,29 @@
+{
+  "generated": "2026-03-02T05:48:25.114064",
+  "packages": [
+    {
+      "name": "examples",
+      "version": "0.1.0",
+      "description": "",
+      "modules": [],
+      "functions": [],
+      "types": []
+    },
+    {
+      "name": "interop",
+      "version": "0.1.0",
+      "description": "",
+      "modules": [],
+      "functions": [],
+      "types": []
+    },
+    {
+      "name": "std",
+      "version": "0.1.0",
+      "description": "",
+      "modules": [],
+      "functions": [],
+      "types": []
+    }
+  ]
+}
