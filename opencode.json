@@ -19,7 +19,7 @@
       "command": ["npx", "-y", "@utcp/code-mode-mcp"],
       "enabled": true,
       "environment": {
-        "UTCP_CONFIG_FILE": "/home/vu/.config/opencode/.utcp_config.json"},
+        "UTCP_CONFIG_FILE": "/home/.config/opencode/.utcp_config.json"},
      },  
    },
   "permission": {

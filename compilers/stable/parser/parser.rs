@@ -26,7 +26,7 @@ pub enum Precedence {
 pub fn get_precedence(token_type: TokenType)  ->  Precedence {
     // Get the precedence level for a given token type// 
     if token_type == TokenType::Equal {
-        return Precedence::Assignment;
+        return Precedence::NoPrec;
     }
     else if token_type == TokenType::Pipeline {
         return Precedence::Pipeline;
@@ -54,6 +54,9 @@ pub fn get_precedence(token_type: TokenType)  ->  Precedence {
     }
     else if token_type == TokenType::LeftParen || token_type == TokenType::LeftBracket || token_type == TokenType::Dot {
         return Precedence::Call;
+    }
+    else if token_type == TokenType::DotDot {
+        return Precedence::Range;
     }
     return Precedence::NoPrec;
 
@@ -119,7 +122,6 @@ impl Parser {
             if self.current_pos >= (self.tokens).len() - 1 { break }
             let tok = self.tokens[self.current_pos].clone();
             let prec = get_precedence(tok.token_type.clone());
-            println!("DEBUG: token={:?} prec={:?} min={:?}", tok.token_type, prec, min_precedence);
             if prec <= min_precedence { break }
             left = self.parse_infix(left, prec);
         }
@@ -358,17 +360,31 @@ impl Parser {
     }
     pub fn parse_infix(&mut self, left: Expression, precedence: Precedence)  ->  Expression {
         let token = self.advance();
-        if token.token_type == TokenType::Plus || token.token_type == TokenType::Minus || token.token_type == TokenType::Star || token.token_type == TokenType::Slash {
+        if token.token_type == TokenType::Plus || token.token_type == TokenType::Minus || token.token_type == TokenType::Star || token.token_type == TokenType::Slash || token.token_type == TokenType::DotDot {
             let right = self.parse_expression(precedence);
             return Expression::BinaryOp(BinaryOpExpr{node: ASTNode{line: 1, column: 1}, left: Box::new(left), operator: token.token_type, right: Box::new(right)});
         }
         else if token.token_type == TokenType::Pipeline {
             // Pipeline Operator: left |> right
+            // Three forms:
+            //   left |> func          -> func(left)
+            //   left |> func(a, b)    -> func(left, a, b)
+            //   left |> func(a, _, b) -> func(a, left, b)
             let right = self.parse_expression(precedence);
-            
+
             match right {
                  Expression::Call(mut call_expr) => {
-                     call_expr.arguments.insert(0, left);
+                     // Check if any argument is the placeholder `_`
+                     let placeholder_pos = call_expr.arguments.iter().position(|arg| {
+                         matches!(arg, Expression::Identifier(ident) if ident.name == "_")
+                     });
+                     if let Some(pos) = placeholder_pos {
+                         // Replace placeholder with piped value
+                         call_expr.arguments[pos] = left;
+                     } else {
+                         // No placeholder: insert as first argument
+                         call_expr.arguments.insert(0, left);
+                     }
                      return Expression::Call(call_expr);
                  },
                  Expression::Identifier(ident_expr) => {
@@ -578,6 +594,7 @@ impl Parser {
             TokenType::Let => return self.parse_let_statement(),
             TokenType::Var => return self.parse_var_statement(),
             TokenType::Fn => return self.parse_function_declaration(vec![]), // Function declarations without decorators
+            TokenType::AtFn => return self.parse_function_declaration(vec![]),
             // TokenType.Async => return self.parse_async_function_declaration()
             TokenType::Struct => return self.parse_struct_declaration(),
             // TokenType.Enum => return self.parse_enum_declaration()
@@ -677,9 +694,9 @@ impl Parser {
         }
         
         // Now expect a function declaration (or potentially others later)
-        if self.match_token(TokenType::Fn) {
+        if self.match_token(TokenType::Fn) || self.match_token(TokenType::AtFn) {
              return self.parse_function_declaration(decorators);
-        } else if self.current().token_type == TokenType::Fn {
+        } else if self.current().token_type == TokenType::Fn || self.current().token_type == TokenType::AtFn {
              return self.parse_function_declaration(decorators);
         } else {
              // If we consumed decorators but didn't find a function, it's an error (or a standalone statement?)
@@ -698,8 +715,8 @@ impl Parser {
     }
 
     pub fn parse_function_declaration(&mut self, decorators: Vec<String>)  ->  Statement {
-        // Parse function: fn add(a, b) -> int: ...// 
-        let fn_token = self.advance(); // Consumes 'fn'
+        // Parse function: fn add(a, b) -> int: || @fn add(a, b) -> int: ...// 
+        let fn_token = self.advance(); // Consumes 'fn' or '@fn'
 
         // Optional return type annotation before name
         let mut return_type = "".to_string();

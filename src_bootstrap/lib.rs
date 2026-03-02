@@ -146,6 +146,12 @@ pub mod mcp;
 /// - Package manager UI
 pub mod tui;
 
+/// Interactive TUI REPL
+///
+/// Split-pane REPL with output history, input editing,
+/// variables/functions sidebar, and project banner.
+pub mod repl;
+
 /// Autonomous code organization and refactoring
 pub mod autonomous;
 

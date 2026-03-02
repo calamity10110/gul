@@ -251,8 +251,40 @@ pub fn create_analyzer()  ->  SemanticAnalyzer {
             ownership_mode: "owned".to_string(),
             is_borrowed: false,
             borrow_count: 0,
-            line: 0, 
-            column: 0
+            line: 0,
+            column: 0,
+        });
+    }
+
+    // Autograd Builtins
+    let autograd_funcs = vec![
+        "autograd_begin", "autograd_end", "make_var", "var_val", "var_grad",
+        "var_add", "var_mul", "var_sin", "backward"
+    ];
+    for f in autograd_funcs {
+        let sig = if f == "autograd_begin" || f == "autograd_end" {
+            MethodSignature { params: vec![], return_type: "void".to_string() }
+        } else if f == "make_var" {
+            MethodSignature { params: vec!["float".to_string()], return_type: "int".to_string() }
+        } else if f == "var_val" || f == "var_grad" {
+            MethodSignature { params: vec!["int".to_string()], return_type: "float".to_string() }
+        } else if f == "var_add" || f == "var_mul" {
+            MethodSignature { params: vec!["int".to_string(), "int".to_string()], return_type: "int".to_string() }
+        } else { // backward, var_sin
+            MethodSignature { params: vec!["int".to_string()], return_type: "void".to_string() }
+        };
+
+        analyzer.current_scope.symbols.insert(f.to_string(), Symbol{
+            name: f.to_string(), 
+            symbol_type: "fn".to_string(), 
+            is_mutable: false, 
+            is_function: true, 
+            signature: Some(sig),
+            ownership_mode: "owned".to_string(),
+            is_borrowed: false,
+            borrow_count: 0,
+            line: 0,
+            column: 0,
         });
     }
 
@@ -751,22 +783,22 @@ impl SemanticAnalyzer {
         expr.operator == TokenType::Star ||
         expr.operator == TokenType::Slash {
             // Arithmetic operators
-            if left_type == "int".to_string() && right_type == "int".to_string() {
+            if left_type == "int" && right_type == "int" {
                 return "int".to_string();
             }
-            else if left_type == "float".to_string() && right_type == "float".to_string() {
-                return "float".to_string();
+            if left_type == "float" || right_type == "float" {
+                if (left_type == "int" || left_type == "float") && (right_type == "int" || right_type == "float") {
+                     return "float".to_string();
+                }
             }
-            else if (left_type == "int".to_string() && right_type == "float".to_string()) ||
-                    (left_type == "float".to_string() && right_type == "int".to_string()) {
-                self.error(format!("Type mismatch: binary op {:?} requires same types (got {} and {}). Use explicit cast.", 
-                    expr.operator, left_type, right_type), expr.node.line, expr.node.column);
-                return "any".to_string(); // Poison
+            if expr.operator == TokenType::Plus && (left_type == "str" || right_type == "str") {
+                 return "str".to_string();
             }
-            else {
+            if left_type == "any" || right_type == "any" {
                 return "any".to_string();
-
             }
+            
+            return "any".to_string();
         }
         else if expr.operator == TokenType::EqualEqual ||
             expr.operator == TokenType::NotEqual ||
@@ -816,7 +848,10 @@ impl SemanticAnalyzer {
                      return_type = sig.return_type.clone();
                      
                      // Check arg count
-                     if sig.params.len() != expr.arguments.len() {
+                     if ident.name == "print" {
+                          // print() is variadic
+                          return_type = "void".to_string();
+                      } else if sig.params.len() != expr.arguments.len() {
                          self.error(format!("Function '{}' expects {} arguments, got {}", 
                              ident.name, sig.params.len(), expr.arguments.len()), 
                              expr.node.line, expr.node.column);

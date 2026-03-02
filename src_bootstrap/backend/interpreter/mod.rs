@@ -12,7 +12,7 @@ pub use values::{ControlFlow, Value};
 
 #[derive(Clone)]
 pub struct Interpreter {
-    pub(crate) variables: HashMap<String, Value>,
+    pub variables: HashMap<String, Value>,
 }
 
 impl Default for Interpreter {

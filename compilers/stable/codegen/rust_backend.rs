@@ -102,12 +102,39 @@ impl CodeGenerator {
             Statement::ReturnStmt(s) => self.generate_return(s),
             Statement::AssignmentStmt(s) => self.generate_assignment(s),
             Statement::ExpressionStmt(s) => self.generate_expression_stmt(s),
-            Statement::StructDecl(s) => self.emit("// Struct decl".to_string().to_string()), // TODO
-            Statement::EnumDecl(s) => self.emit("// Enum decl".to_string().to_string()), // TODO
+            Statement::StructDecl(s) => self.generate_struct(s),
+            Statement::EnumDecl(s) => self.generate_enum(s),
             Statement::ImportStmt(s) => self.generate_import(s),
             Statement::PassStmt(s) => {}
             _ => self.emit_raw("// Unsupported statement".to_string().to_string()),
         }
+    }
+    pub fn generate_struct(&mut self, stmt: &StructDecl) {
+        // Generate struct declaration
+        self.emit(format!("struct {} {{", stmt.name));
+        self.indent();
+        for field in &stmt.fields {
+            let field_type = if field.type_annotation.is_empty() { 
+                "i64".to_string() 
+            } else { 
+                self.map_type(field.type_annotation.clone()) 
+            };
+            self.emit(format!("{}: {},", field.name, field_type));
+        }
+        self.dedent();
+        self.emit("}".to_string());
+        self.emit_raw("".to_string());
+    }
+    pub fn generate_enum(&mut self, stmt: &EnumDecl) {
+        // Generate enum declaration
+        self.emit(format!("enum {} {{", stmt.name));
+        self.indent();
+        for variant in &stmt.variants {
+            self.emit(format!("{},", variant)); // variant is a String
+        }
+        self.dedent();
+        self.emit("}".to_string());
+        self.emit_raw("".to_string());
     }
     pub fn generate_let(&mut self, stmt: &LetStmt) {
         // Generate let declaration// 

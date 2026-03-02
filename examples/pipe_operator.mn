@@ -1,0 +1,34 @@
+# Pipe Operator Examples - GUL v3.2
+
+# Helper functions for testing
+@fn double(x)(res):
+    res = x * 2
+
+@fn add(a, b)(res):
+    res = a + b
+
+@fn wrap(prefix, value, suffix)(res):
+    res = prefix + str(value) + suffix
+
+mn:
+    # Form 1: No-arg pipe (bare identifier)
+    const a = 5 |> double
+    print(a)
+
+    # Form 2: Default first-arg pipe
+    const b = 10 |> add(5)
+    print(b)
+
+    # Form 3: Placeholder pipe
+    const c = 42 |> wrap("[", _, "]")
+    print(c)
+
+    # Chaining
+    const d = 3 |> double |> double |> double
+    print(d)
+
+    # Mixed chaining with placeholder
+    const e = 100 |> add(50) |> wrap("<<", _, ">>")
+    print(e)
+
+    print("All pipe operator tests passed!")

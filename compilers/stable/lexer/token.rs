@@ -61,6 +61,7 @@ pub enum TokenType {
 
     // ML decorators
     AtGrad, // @grad
+    AtFn,   // @fn
     
     // v4.0 New Features
     AtTabl, // @tabl
@@ -219,7 +220,7 @@ pub fn get_keyword_type(word: String)  ->  TokenType {
     else if word == "if".to_string() {
         return TokenType::If;
     }
-    else if word == "else if".to_string() {
+    else if word == "else if".to_string() || word == "elif".to_string() {
         return TokenType::Elif;
     }
     else if word == "else".to_string() {
@@ -375,6 +376,9 @@ pub fn get_decorator_type(text: String)  ->  TokenType {
     }
     else if suffix == "grad".to_string() {
         return TokenType::AtGrad;
+    }
+    else if suffix == "fn".to_string() {
+        return TokenType::AtFn;
     }
     else if suffix == "flow".to_string() {
         return TokenType::AtFlow;
