@@ -341,8 +341,8 @@ gul build --release
 
 - **Web Server**: Build a [web-based todo app](web-server.md)
 - **Database**: Add [database persistence](data-analysis.md)
-- **Testing**: Learn to write [tests](../guides/testing-deployment.md)
-- **Deployment**: [Deploy your application](../guides/testing-deployment.md)
+- **Testing**: Learn to write [tests](testing-deployment.md)
+- **Deployment**: [Deploy your application](testing-deployment.md)
 
 ## 💡 Key Takeaways
 

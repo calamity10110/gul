@@ -883,7 +883,7 @@ server.start()
 ## 📚 See Also
 
 - [HTTP Module API](../api/http.md)
-- [Database Module](../api/database.md)
+- [Database Module](database.md)
 - [Secret Management](secrets.md)
 - [Testing & Deployment](testing-deployment.md)
 

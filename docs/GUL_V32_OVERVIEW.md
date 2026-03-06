@@ -310,10 +310,10 @@ mn:
 
 ## Resources
 
-- **Documentation**: [docs/](docs/)
-- **Quick Reference**: [QUICK_REFERENCE.md](docs/QUICK_REFERENCE.md)
-- **Migration Guide**: [v32_migration.md](docs/guides/v32_migration.md)
-- **Examples**: [examples/](examples/)
+- **Documentation**: [docs/](./)
+- **Quick Reference**: [QUICK_REFERENCE.md](QUICK_REFERENCE.md)
+- **Migration Guide**: [v32_migration.md](guides/v32_migration.md)
+- **Examples**: [examples/](../examples/)
 - **Tests**: Run `cargo test --lib` (490 tests passing)
 
 ---
@@ -321,8 +321,8 @@ mn:
 ## Next Steps
 
 1. Try the interactive walkthrough: `gul run walkthrough_v32.mn`
-2. Read the [migration guide](docs/guides/v32_migration.md)
-3. Explore [examples/](examples/) for real-world code
-4. Check out the [package ecosystem](docs/reference/package-catalog.md) (180+ packages!)
+2. Read the [migration guide](guides/v32_migration.md)
+3. Explore [examples/](../examples/) for real-world code
+4. Check out the [package ecosystem](reference/package-catalog.md) (180+ packages!)
 
 **GUL v3.2** - Write once, run everywhere! 🚀

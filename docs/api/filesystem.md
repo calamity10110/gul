@@ -189,7 +189,7 @@ for file in txt_files:
 ## 📚 See Also
 
 - [Standard Library](standard-library.md)
-- [First Program Tutorial](../tutorials/first-program.md)
+- [First Program Tutorial](../guides/first-program.md)
 
 ---
 

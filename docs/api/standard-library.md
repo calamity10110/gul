@@ -393,7 +393,7 @@ mn:
 ## See Also
 
 - [HTTP API](http.md) - Detailed HTTP reference
-- [Database API](database.md) - Database guide
+- [Database API](../guides/database.md) - Database guide
 - [Math & Science](math-science.md) - Scientific computing
 - [Quick Reference](../QUICK_REFERENCE.md) - Syntax cheat sheet
 

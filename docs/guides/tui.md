@@ -464,8 +464,7 @@ runtime.flush()  # Render all at once
 
 ## 📚 Additional Resources
 
-- [TUI Examples](examples/tui/)
-- [Component API Reference](docs/api/ui.md)
-- [TUI Design Patterns](docs/patterns/tui.md)
+- [TUI Examples](../../examples/)
+- [Component API Reference](../api/ui-components.md)
 
 **Build amazing terminal applications with GUL!** 🚀

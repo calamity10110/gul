@@ -642,7 +642,7 @@ kubectl run -it --rm debug --image=postgres:16 --restart=Never -- \
 
 ## Next Steps
 
-1. Review [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md) for package implementation
+1. Review the package implementation roadmap in the project repository
 2. Set up monitoring with Prometheus/Grafana
 3. Configure alerting rules
 4. Plan disaster recovery procedures

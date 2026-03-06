@@ -474,7 +474,7 @@ server.static("/static", directory="public/", cache={
 ## 📚 See Also
 
 - [Web Development Guide](../guides/web-development.md)
-- [Database Module](database.md)
+- [Database Module](../guides/database.md)
 - [Secret Management](../guides/secrets.md)
 
 ---

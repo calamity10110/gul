@@ -191,7 +191,7 @@ Launch the web-based IDE:
 gul ide --mode web
 ```
 
-This will start a local web server default: <http://localhost:8080>
+This will start a local web server default: `http://localhost:8080`
 
 ### VS Code Integration (Coming Soon)
 
@@ -375,17 +375,16 @@ If GUL runs slowly:
 
 If you encounter issues not covered here:
 
-- **Documentation**: [gul-lang.org/docs](https://gul-lang.org/docs)
-- **GitHub Issues**: [github.com/gul-lang/gul/issues](https://github.com/gul-lang/gul/issues)
-- **Community Forum**: [forum.mn-lang.org](https://forum.mn-lang.org)
+- **Documentation**: [GitHub Docs](https://github.com/calamity10110/gul/tree/master/docs)
+- **GitHub Issues**: [github.com/calamity10110/gul/issues](https://github.com/calamity10110/gul/issues)
 - **Discord**: [discord.gg/gul-lang](https://discord.gg/gul-lang)
 
 ## 📚 Next Steps
 
 Now that GUL is installed:
 
-1. **Read the Quick Start**: [tutorials/quickstart.md](../tutorials/quickstart.md)
-2. **Write Your First Program**: [tutorials/first-program.md](../tutorials/first-program.md)
+1. **Read the Quick Start**: [quickstart.md](quickstart.md)
+2. **Write Your First Program**: [first-program.md](first-program.md)
 3. **Explore Examples**: Check the `examples/` directory
 4. **Learn the Syntax**: [reference/syntax.md](../reference/syntax.md)
 
@@ -433,4 +432,4 @@ rm -rf ~/.cache/gul
 **Version**: 0.14.0-dev  
 **License**: MIT
 
-For more information, visit [gul-lang.org](https://gul-lang.org)
+For more information, visit [GitHub](https://github.com/calamity10110/gul)

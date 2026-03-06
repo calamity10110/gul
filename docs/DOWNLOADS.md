@@ -23,7 +23,7 @@ gul --version
 
 #### Windows (x86_64)
 
-1. Download: [gul-v0.14.0-dev-windows-x86_64.zip](https://github.com/calamity10110/gul/releases/download/v0.14.0-dev/gul-v0.14.0-dev-windows-x86_64.zip)
+1. Download from [GitHub Releases](https://github.com/calamity10110/gul/releases): `gul-v0.14.0-dev-windows-x86_64.zip`
 2. Extract the ZIP file
 3. Add the extracted directory to your PATH
 
@@ -175,12 +175,12 @@ Nightly builds are available from the [Actions tab](https://github.com/calamity1
 - **v0.14.0-dev** (Latest) - Multi-platform release, MCP integration, v3.2 syntax
 - **v0.12.0** - Enhanced foreign code integration
 - **v0.11.0** - Package management system
-- See [CHANGELOG.md](../../CHANGELOG.md) for full history
+- See [CHANGELOG.md](../CHANGELOG.md) for full history
 
 ---
 
 ## Support
 
 - **Issues**: [GitHub Issues](https://github.com/calamity10110/gul/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/calamity10110/gul/discussions)
-- **Documentation**: [docs.gul-lang.org](https://docs.gul-lang.org)
+- **Issues**: [GitHub Issues](https://github.com/calamity10110/gul/issues)
+- **Documentation**: [GitHub Docs](https://github.com/calamity10110/gul/tree/master/docs)

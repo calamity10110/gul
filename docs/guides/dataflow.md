@@ -414,7 +414,7 @@ gul-mcp generate "data pipeline: load → clean → analyze → save"
 
 - [Quick Reference](../QUICK_REFERENCE.md) - Syntax guide
 - [Standard Library](../api/standard-library.md) - Available functions
-- [Integration Guide](integration.md) - Connect with other languages
+- [Integration Guide](../api/integration.md) - Connect with other languages
 
 ---
 

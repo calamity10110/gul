@@ -10,10 +10,10 @@ Complete guide to using the GUL Web IDE and developing web applications.
 
 ## 📋 Table of Contents
 
-1. [Using the Web IDE](<using-the-web-ide>)
-2. [Developing Web Applications](<developing-web-applications>)
-3. [Hosting & Deployment](<hosting--deployment>)
-4. [Web IDE Features](<web-ide-features>)
+1. [Using the Web IDE](#-using-the-web-ide)
+2. [Developing Web Applications](#-developing-web-applications)
+3. [Hosting & Deployment](#-hosting--deployment)
+4. [Web IDE Features](#-web-ide-features)
 
 ---
 
@@ -555,9 +555,8 @@ app.use_csrf_protection()
 
 ## 📚 Additional Resources
 
-- [Web Examples](examples/web/)
 - [Dioxus Documentation](https://dioxuslabs.com)
-- [Web API Reference](docs/api/web.md)
-- [Deployment Guide](docs/deployment.md)
+- [Web API Reference](../api/http.md)
+- [Deployment Guide](../PRODUCTION_DEPLOYMENT.md)
 
 **Build amazing web applications with GUL!** 🚀

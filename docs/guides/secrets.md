@@ -582,7 +582,7 @@ server = http.Server(port=8080)
 ## 📚 See Also
 
 - [Web Development Guide](web-development.md)
-- [Database Module](../api/database.md)
+- [Database Module](database.md)
 - [HTTP Module](../api/http.md)
 - [Testing & Deployment](testing-deployment.md)
 

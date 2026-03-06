@@ -484,7 +484,7 @@ mn:
     let total = js.calculateTotal(cart_items)
 ```
 
-**See Also**: [Integration Guide](../docs/api/integration.md)
+**See Also**: [Integration Guide](../api/integration.md)
 
 ---
 
@@ -812,7 +812,7 @@ mn:
 | "type mismatch" | Wrong type passed | Check function signature |
 | "module not found" | Missing import | Add `@imp` statement |
 
-**See Also**: [Guides](../docs/guides/), [Book](../docs/book/)
+**See Also**: [Guides](../guides/), [Book](../book/)
 
 ---
 

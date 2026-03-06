@@ -21,7 +21,7 @@
 
 ---
 
-This specification is based on the comprehensive GUL [knowledgebase](knowledgebase.md) and defines the complete language syntax, semantics, and behavior. For implementation details, see the [Compiler Guide](../guides/compiler.md).
+This specification is based on the comprehensive GUL [knowledgebase](knowledgebase.md) and defines the complete language syntax, semantics, and behavior. For implementation details, see the [Compiler Guide](../api/compiler.md).
 
 For a quick reference, see [QUICK_REFERENCE.md](../QUICK_REFERENCE.md).
 

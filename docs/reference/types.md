@@ -730,7 +730,6 @@ struct Age(int)
 
 - [Ownership Model](ownership.md)
 - [Language Specification](specification.md)
-- [Generics Tutorial](../tutorials/generics.md)
 
 ---
 

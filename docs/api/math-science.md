@@ -211,8 +211,8 @@ autograd_end()
 
 ## 📚 See Also
 
-- [Scientific Computing Tutorial](../tutorials/scientific-computing.md)
-- [Data Analysis Tutorial](../tutorials/data-analysis.md)
+- [Scientific Computing Tutorial](scientific-computing.md)
+- [Data Analysis Tutorial](../guides/data-analysis.md)
 
 ---
 

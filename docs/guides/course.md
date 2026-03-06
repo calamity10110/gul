@@ -474,20 +474,17 @@ Want to improve the course? Contributions are welcome!
 
 ### Documentation
 
-- **GUL Docs:** https://docs.mn-lang.org
-- **API Reference:** https://api.mn-lang.org
-- **Examples:** https://github.com/gul-lang/gul/tree/main/examples
+- **GUL Docs:** https://github.com/calamity10110/gul/tree/master/docs
+- **Examples:** https://github.com/calamity10110/gul/tree/master/examples
 
 ### Community
 
 - **Discord:** https://discord.gg/gul
-- **GitHub:** https://github.com/gul-lang/gul
-- **Forum:** https://community.mn-lang.org
+- **GitHub:** https://github.com/calamity10110/gul
 
 ### Support
 
-- **Issues:** https://github.com/gul-lang/gul/issues
-- **Discussions:** https://github.com/gul-lang/gul/discussions
+- **Issues:** https://github.com/calamity10110/gul/issues
 
 ---
 

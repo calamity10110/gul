@@ -10,7 +10,7 @@
 - [MCP Quick Start](guides/MCP_QUICKSTART.md) - AI assistant integration
 - [Syntax Guide](reference/syntax.md) - Complete v3.2 syntax
 - [Standard Library](api/standard-library.md) - 13 modules, 110+ functions
-- [MCP Advanced Features](../MCP_ADVANCED.md) - Scheduling, workflows, automation
+- [MCP Advanced Features](api/MCP_ADVANCED.md) - Scheduling, workflows, automation
 
 ---
 
@@ -82,21 +82,19 @@ mn:
 - [Standard Library](api/standard-library.md) - Core modules
 - [Math & Science](api/math-science.md) - Scientific computing
 - [HTTP](api/http.md) - Web requests
-- [Database](api/database.md) - SQL and NoSQL
+- [Database](guides/database.md) - SQL and NoSQL
 - [UI Components](api/ui-components.md) - User interfaces
-- [MCP Complete](api/MCP_COMPLETE.md) - MCP server API
+- [MCP Complete](api/MCP_ADVANCED.md) - MCP server API
 
 ### Advanced
 
-- [MCP Advanced Features](../MCP_ADVANCED.md) - Complete automation guide
-- [Compiler Guide](guides/compiler.md) - Compilation details
-- [Integration](guides/integration.md) - Integrate with other languages
+- [MCP Advanced Features](api/MCP_ADVANCED.md) - Complete automation guide
+- [Compiler Guide](api/compiler.md) - Compilation details
+- [Integration](api/integration.md) - Integrate with other languages
 
 ### History
 
-- [Development History](devhistory.md) - v1.0 → v3.2 evolution
-- [v3.2 Update](V32_UPDATE_COMPLETE.md) - Latest changes
-- [Project Status](PROJECT_STATUS.md) - Current state
+- [v3.2 vs v2 Comparison](V2_VS_V32_COMPARISON.md) - What changed
 
 ---
 

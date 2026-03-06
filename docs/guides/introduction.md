@@ -37,7 +37,7 @@ GUL is a modern, multi-paradigm programming language that combines:
 
 ```bash
 # Clone the repository
-git clone https://github.com/gul-lang/gul.git
+git clone https://github.com/calamity10110/gul.git
 cd gul
 
 # Build with Cargo
@@ -254,14 +254,14 @@ gul runtime load-lib <path>
 ## Next Steps
 
 1. **[Syntax Reference](../reference/syntax.md)** - Complete v3.2 syntax guide
-2. **[Quick Start Tutorial](../tutorials/quickstart.md)** - Learn by doing
+2. **[Quick Start Tutorial](quickstart.md)** - Learn by doing
 3. **[Standard Library](../api/standard-library.md)** - Built-in modules
 4. **[Package Catalog](../reference/package-catalog.md)** - 58 available packages
 
 ## Getting Help
 
-- 📚 **Documentation**: [docs/](../README.md)
-- 🐛 **Issue Tracker**: [GitHub Issues](https://github.com/gul-lang/gul/issues)
+- 📚 **Documentation**: [docs/](../../README.md)
+- 🐛 **Issue Tracker**: [GitHub Issues](https://github.com/calamity10110/gul/issues)
 - � **Community**: [Discord](https://discord.gg/gul-lang)
 
 ---
