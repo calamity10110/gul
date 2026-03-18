@@ -307,12 +307,12 @@ impl AutoImport {
 
     /// Recommend packages based on usage
     pub fn recommend_packages(&self, symbols: &[String]) -> Vec<String> {
-        let mut package_scores: HashMap<String, usize> = HashMap::new();
+        let mut package_scores: HashMap<&str, usize> = HashMap::new();
 
         for symbol in symbols {
             if let Some(packages) = self.symbol_index.get(symbol) {
                 for package in packages {
-                    *package_scores.entry(package.clone()).or_insert(0) += 1;
+                    *package_scores.entry(package.as_str()).or_insert(0) += 1;
                 }
             }
         }
@@ -320,7 +320,10 @@ impl AutoImport {
         let mut recommendations: Vec<_> = package_scores.into_iter().collect();
         recommendations.sort_by(|a, b| b.1.cmp(&a.1));
 
-        recommendations.into_iter().map(|(pkg, _)| pkg).collect()
+        recommendations
+            .into_iter()
+            .map(|(pkg, _)| pkg.to_string())
+            .collect()
     }
 }
 
