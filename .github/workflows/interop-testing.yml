@@ -10,6 +10,11 @@ on:
       - "src_bootstrap/interop/**"
       - "tests/interop/**"
 
+# ⚡ Bolt: Cancel redundant builds on PRs to save CI minutes
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' && github.ref != 'refs/heads/develop' }}
+
 jobs:
   # Python FFI testing
   test-python-ffi:
@@ -34,6 +39,9 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      # ⚡ Bolt: Use robust rust caching to avoid recompiling from scratch
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
       - name: Build GUL
         run: cargo build --release
 
@@ -66,6 +74,9 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      # ⚡ Bolt: Use robust rust caching to avoid recompiling from scratch
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
       - name: Build GUL
         run: cargo build --release
 
@@ -95,6 +106,9 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      # ⚡ Bolt: Use robust rust caching to avoid recompiling from scratch
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
       - name: Build GUL
         run: cargo build --release
 
@@ -129,6 +143,9 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      # ⚡ Bolt: Use robust rust caching to avoid recompiling from scratch
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
       - name: Build GUL
         run: cargo build --release
 

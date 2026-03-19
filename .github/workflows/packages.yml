@@ -11,6 +11,11 @@ on:
     paths:
       - "packages/**"
 
+# ⚡ Bolt: Cancel redundant builds on PRs to save CI minutes
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' && github.ref != 'refs/heads/develop' }}
+
 jobs:
   test-packages:
     runs-on: ubuntu-latest
