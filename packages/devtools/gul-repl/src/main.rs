@@ -1,4 +1,4 @@
-use gul_repl; 
+use gul_repl::run;
 use clap::Parser;
 
 #[derive(Parser, Debug)]

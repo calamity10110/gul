@@ -4,6 +4,7 @@
 use std::collections::HashMap;
 use std::fs;
 use std::process::Command;
+use std::sync::atomic::{AtomicU64, Ordering};
 
 /// Go runtime manager
 pub struct GoRuntime {
@@ -25,7 +26,9 @@ impl GoRuntime {
 
     /// Execute Go code by writing to temp file and running
     pub fn execute(&self, code: &str) -> Result<String, String> {
-        let file_path = format!("{}/main.go", self.temp_dir);
+        static COUNTER: AtomicU64 = AtomicU64::new(0);
+        let id = COUNTER.fetch_add(1, Ordering::SeqCst);
+        let file_path = format!("{}/main_{}.go", self.temp_dir, id);
 
         // Wrap code in main package if not present
         let full_code = if code.contains("package main") {

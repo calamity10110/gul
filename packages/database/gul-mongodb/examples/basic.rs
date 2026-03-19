@@ -1,4 +1,3 @@
-use gul_mongodb;
 use log::info;
 
 fn main() {

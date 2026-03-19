@@ -28,6 +28,3 @@ default = ["cranelift-backend"]
 cranelift-backend = []
 # llvm-backend = []  # Future: LLVM backend support
 
-[profile.release]
-opt-level = 3
-lto = true

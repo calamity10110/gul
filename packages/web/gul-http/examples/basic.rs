@@ -1,4 +1,3 @@
-use gul_http;
 use log::info;
 
 fn main() {
