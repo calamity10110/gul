@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [main, master]
 
+# ⚡ Bolt: Cancel redundant builds on PRs to save CI minutes
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' && github.ref != 'refs/heads/develop' }}
+
 env:
   CARGO_TERM_COLOR: always
 
@@ -28,15 +33,11 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Cache Cargo
-        uses: actions/cache@v4
+      # ⚡ Bolt: Use robust rust caching to avoid recompiling from scratch
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ matrix.compiler }}-${{ hashFiles('**/Cargo.lock') }}
-
+          key: ${{ matrix.compiler }}
       - name: Build ${{ matrix.compiler }}
         run: cargo build -p ${{ matrix.compiler }} --release
 
@@ -61,6 +62,11 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
+      # ⚡ Bolt: Use robust rust caching to avoid recompiling from scratch
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.compiler }}
       - name: Build and test with gul_nightly
         run: |
           cargo build -p gul_nightly --release
@@ -92,6 +98,9 @@ jobs:
         with:
           components: clippy, rustfmt
 
+      # ⚡ Bolt: Use robust rust caching to avoid recompiling from scratch
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
       - name: Check format
         run: cargo fmt --all -- --check
         continue-on-error: true
@@ -117,6 +126,9 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
+      # ⚡ Bolt: Use robust rust caching to avoid recompiling from scratch
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
       - name: Build nightly
         run: cargo build -p gul_nightly --release
 
