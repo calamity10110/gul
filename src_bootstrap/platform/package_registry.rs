@@ -288,10 +288,12 @@ impl AutoImport {
     pub fn detect_missing_symbols(&self, code: &str) -> Vec<String> {
         // Simplified detection - in production, use proper AST analysis
         let mut missing = Vec::new();
+        let mut seen = std::collections::HashSet::new();
 
         for word in code.split_whitespace() {
             if word.chars().next().is_some_and(|c| c.is_uppercase())
                 && !self.symbol_index.contains_key(word)
+                && seen.insert(word)
             {
                 missing.push(word.to_string());
             }
