@@ -1,3 +1,7 @@
 ## 2024-05-19 - [Avoid Redundant String Allocations with HashSet<&str>]
 **Learning:** During symbol extraction (`detect_missing_symbols`), allocating a new `String` directly and returning it often results in duplicate instances of the same string, creating unnecessary heap pressure. Directly converting it via `std::collections::HashSet::new()` and then collecting introduces non-deterministic order output (flaky tests risk).
 **Action:** When extracting multiple distinct strings, preserve iteration order and prevent redundant `to_string()` allocations by tracking `&str` references in a `HashSet<&str>` using `seen.insert(word)` as a conditional guard before inserting elements into a traditional `Vec`.
+
+## 2026-03-21 - [Avoid Redundant String Allocations in Map Counting via References]
+**Learning:** In chemistry components like `molecular_formula` (and other map-based counts), creating a map directly as `HashMap<String, u32>` within a loop calls `.clone()` or `.to_string()` on every element counted, which results in $O(N)$ string allocations.
+**Action:** When counting element frequencies or frequencies of any property into a map, track counts using references first (`HashMap<&str, u32>`), avoiding repeated String allocations for duplicate keys. Only allocate owned `String`s at the very end when converting the reference map into the final `HashMap<String, u32>` structure. This guarantees $O(U)$ allocations, where $U$ is the number of *unique* elements.

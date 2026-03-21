@@ -137,11 +137,18 @@ impl Molecule {
     }
 
     pub fn molecular_formula(&self) -> HashMap<String, u32> {
-        let mut formula = HashMap::new();
+        // ⚡ Bolt Optimization: Use HashMap<&str, u32> to count elements first.
+        // This avoids allocating a new String for every single atom in the molecule,
+        // reducing allocations from O(N_atoms) to O(N_unique_elements).
+        let mut formula_refs = HashMap::new();
         for atom in &self.atoms {
-            *formula.entry(atom.element.symbol.clone()).or_insert(0) += 1;
+            *formula_refs.entry(atom.element.symbol.as_str()).or_insert(0) += 1;
         }
-        formula
+
+        formula_refs
+            .into_iter()
+            .map(|(k, v)| (k.to_string(), v))
+            .collect()
     }
 
     pub fn molecular_weight(&self) -> f64 {
