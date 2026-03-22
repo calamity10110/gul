@@ -137,11 +137,14 @@ impl Molecule {
     }
 
     pub fn molecular_formula(&self) -> HashMap<String, u32> {
-        let mut formula = HashMap::new();
+        let mut counts = HashMap::new();
         for atom in &self.atoms {
-            *formula.entry(atom.element.symbol.clone()).or_insert(0) += 1;
+            *counts.entry(atom.element.symbol.as_str()).or_insert(0) += 1;
         }
-        formula
+
+        counts.into_iter()
+            .map(|(k, v)| (k.to_string(), v))
+            .collect()
     }
 
     pub fn molecular_weight(&self) -> f64 {
@@ -542,10 +545,12 @@ impl ChemistryEngine {
             }
 
             for (product, coeff) in &reaction.products {
-                *self
-                    .concentrations
-                    .entry(product.name.clone())
-                    .or_insert(0.0) += rate * coeff * dt;
+                let change = rate * coeff * dt;
+                if let Some(conc) = self.concentrations.get_mut(&product.name) {
+                    *conc += change;
+                } else {
+                    self.concentrations.insert(product.name.clone(), change);
+                }
             }
         }
 

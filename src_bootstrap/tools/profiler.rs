@@ -78,14 +78,16 @@ impl Profiler {
         self.active_timers.insert(name.clone(), Instant::now());
 
         // Initialize entry if it doesn't exist
-        self.entries.entry(name.clone()).or_insert(ProfileEntry {
-            name,
-            call_count: 0,
-            total_time: Duration::ZERO,
-            self_time: Duration::ZERO,
-            memory_allocated: 0,
-            memory_freed: 0,
-        });
+        if !self.entries.contains_key(&name) {
+            self.entries.insert(name.clone(), ProfileEntry {
+                name,
+                call_count: 0,
+                total_time: Duration::ZERO,
+                self_time: Duration::ZERO,
+                memory_allocated: 0,
+                memory_freed: 0,
+            });
+        }
     }
 
     pub fn end_function(&mut self, name: &str) {
