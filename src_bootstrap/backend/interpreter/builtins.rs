@@ -1,6 +1,6 @@
-use std::collections::HashMap;
 use super::values::Value;
 use super::Interpreter;
+use std::collections::HashMap;
 
 impl Interpreter {
     pub(crate) fn register_builtins(&mut self) {
@@ -166,7 +166,9 @@ impl Interpreter {
             "println".to_string(),
             Value::NativeFunction(|args| {
                 for (i, arg) in args.iter().enumerate() {
-                    if i > 0 { print!(" "); }
+                    if i > 0 {
+                        print!(" ");
+                    }
                     match arg {
                         Value::String(s) => print!("{}", s),
                         Value::Integer(v) => print!("{}", v),
@@ -184,13 +186,13 @@ impl Interpreter {
             "@str".to_string(),
             Value::NativeFunction(|args| {
                 if let Some(val) = args.first() {
-                     match val {
-                         Value::String(s) => Value::String(s.clone()),
-                         Value::Integer(i) => Value::String(i.to_string()),
-                         Value::Float(f) => Value::String(f.to_string()),
-                         Value::Bool(b) => Value::String(b.to_string()),
-                         _ => Value::String(format!("{:?}", val)),
-                     }
+                    match val {
+                        Value::String(s) => Value::String(s.clone()),
+                        Value::Integer(i) => Value::String(i.to_string()),
+                        Value::Float(f) => Value::String(f.to_string()),
+                        Value::Bool(b) => Value::String(b.to_string()),
+                        _ => Value::String(format!("{:?}", val)),
+                    }
                 } else {
                     Value::String("null".to_string())
                 }

@@ -1,8 +1,8 @@
 // Type annotation parsing methods for Parser
 
+use super::Parser;
 use crate::frontend::ast::{Type, *};
 use crate::frontend::lexer::Token;
-use super::Parser;
 
 impl Parser {
     pub(crate) fn parse_type(&mut self) -> Result<Type, String> {
@@ -24,12 +24,12 @@ impl Parser {
                     "any" => Ok(Type::Any),
                     "list" => {
                         if self.current_token() == &Token::Less {
-                             self.advance();
-                             let inner = self.parse_type()?;
-                             self.expect(Token::Greater)?;
-                             Ok(Type::List(Box::new(inner)))
+                            self.advance();
+                            let inner = self.parse_type()?;
+                            self.expect(Token::Greater)?;
+                            Ok(Type::List(Box::new(inner)))
                         } else {
-                             Ok(Type::List(Box::new(Type::Any)))
+                            Ok(Type::List(Box::new(Type::Any)))
                         }
                     }
                     "dict" => Ok(Type::Dict(Box::new(Type::Any), Box::new(Type::Any))),
@@ -46,7 +46,10 @@ impl Parser {
                     }
                 }
             }
-            _ => Err(format!("Expected type name, found {:?}", self.current_token())),
+            _ => Err(format!(
+                "Expected type name, found {:?}",
+                self.current_token()
+            )),
         }
     }
 

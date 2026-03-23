@@ -107,7 +107,7 @@ impl SemanticAnalyzer {
         match statement {
             Statement::Import(modules) => {
                 for module in modules {
-                   let _ = module;
+                    let _ = module;
                 }
             }
             Statement::GlobalDef { name, value, .. } => {
@@ -197,15 +197,15 @@ impl SemanticAnalyzer {
                 // Define named outputs in scope (v3.2)
                 for (out_name, _ty) in outputs {
                     if !out_name.is_empty() {
-                         let symbol = Symbol {
-                             name: out_name.clone(),
-                             symbol_type: Type::Unknown,
-                             is_mutable: true,
-                             ownership: Ownership::Own,
-                         };
-                         if let Err(e) = self.symbol_table.define(out_name.clone(), symbol) {
-                             self.errors.push(e);
-                         }
+                        let symbol = Symbol {
+                            name: out_name.clone(),
+                            symbol_type: Type::Unknown,
+                            is_mutable: true,
+                            ownership: Ownership::Own,
+                        };
+                        if let Err(e) = self.symbol_table.define(out_name.clone(), symbol) {
+                            self.errors.push(e);
+                        }
                     }
                 }
 

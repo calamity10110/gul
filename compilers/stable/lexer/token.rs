@@ -41,35 +41,35 @@ pub enum TokenType {
     Finally,
 
     // Import system
-    AtImp, // @imp
+    AtImp,    // @imp
     AtPython, // @python
-    AtRust, // @rust
-    AtSql, // @sql
-    AtJs, // @js
-    AtUi, // @ui
+    AtRust,   // @rust
+    AtSql,    // @sql
+    AtJs,     // @js
+    AtUi,     // @ui
 
     // Type constructors
-    AtInt, // @int
-    AtFloat, // @float
-    AtStr, // @str
-    AtBool, // @bool
-    AtList, // @list
-    AtTuple, // @tuple
-    AtSet, // @set
-    AtDict, // @dict
+    AtInt,    // @int
+    AtFloat,  // @float
+    AtStr,    // @str
+    AtBool,   // @bool
+    AtList,   // @list
+    AtTuple,  // @tuple
+    AtSet,    // @set
+    AtDict,   // @dict
     AtTensor, // @tensor
 
     // ML decorators
     AtGrad, // @grad
     AtFn,   // @fn
-    
+
     // v4.0 New Features
-    AtTabl, // @tabl
-    AtFlow, // @flow
-    AtChan, // @chan
-    AtFrame, // @frame
+    AtTabl,   // @tabl
+    AtFlow,   // @flow
+    AtChan,   // @chan
+    AtFrame,  // @frame
     Parallel, // parallel keyword
-    Await, // await keyword (as specific token if needed, or matched as keyword)
+    Await,    // await keyword (as specific token if needed, or matched as keyword)
 
     // Ownership modes
     Borrow,
@@ -78,51 +78,51 @@ pub enum TokenType {
     Kept,
 
     // Operators
-    Plus, // +
-    Minus, // -
-    Star, // *
-    Slash, // /
-    Percent, // %
+    Plus,       // +
+    Minus,      // -
+    Star,       // *
+    Slash,      // /
+    Percent,    // %
     DoubleStar, // **
 
     // Comparison
     EqualEqual, // ==
-    NotEqual, // !=
-    Greater, // >
-    GreaterEq, // >=
-    Less, // <
-    LessEq, // <=
+    NotEqual,   // !=
+    Greater,    // >
+    GreaterEq,  // >=
+    Less,       // <
+    LessEq,     // <=
 
     // Logical
     And, // &&
-    Or, // ||
+    Or,  // ||
     Not, // not
 
     // Assignment
-    Equal, // =
-    PlusEq, // +=
+    Equal,   // =
+    PlusEq,  // +=
     MinusEq, // -=
-    StarEq, // *=
+    StarEq,  // *=
     SlashEq, // /=
 
     // Delimiters
-    LeftParen, // (
-    RightParen, // )
-    LeftBrace, // {
-    RightBrace, // }
-    LeftBracket, // [
+    LeftParen,    // (
+    RightParen,   // )
+    LeftBrace,    // {
+    RightBrace,   // }
+    LeftBracket,  // [
     RightBracket, // ]
 
     // Punctuation
-    Comma, // ,
-    Colon, // :
+    Comma,     // ,
+    Colon,     // :
     Semicolon, // ;
-    Dot, // .
-    Arrow, // ->
-    FatArrow, // =>
-    DotDot, // ..
-    DotDotEq, // ..=
-    Pipeline, // |>
+    Dot,       // .
+    Arrow,     // ->
+    FatArrow,  // =>
+    DotDot,    // ..
+    DotDotEq,  // ..=
+    Pipeline,  // |>
 
     // Special
     Newline,
@@ -135,7 +135,7 @@ pub enum TokenType {
     // Entry point
     Mn, // mn:
 
-// Token struct representing a single lexical token
+        // Token struct representing a single lexical token
 }
 #[derive(Debug, Clone, PartialEq)]
 pub struct Token {
@@ -143,256 +143,229 @@ pub struct Token {
     pub value: String,
     pub line: usize,
     pub column: usize,
-
 }
 impl Token {
-    pub fn to_string(&mut self)  ->  String {
-        return format!("{:?}('{}') at {}:{}", self.token_type, self.value, self.line, self.column);
-
+    pub fn to_string(&mut self) -> String {
+        return format!(
+            "{:?}('{}') at {}:{}",
+            self.token_type, self.value, self.line, self.column
+        );
     }
     pub fn is_keyword(&self) -> bool {
-        // Check if token is a keyword// 
-        let keywords = HashSet::from([TokenType::Let, TokenType::Var, TokenType::Fn,
-            TokenType::Async, TokenType::Struct, TokenType::Enum,
-            TokenType::Match, TokenType::If, TokenType::Elif,
-            TokenType::Else, TokenType::For, TokenType::While,
-            TokenType::Loop, TokenType::In, TokenType::Break,
-            TokenType::Continue, TokenType::Return, TokenType::Try,
-            TokenType::Catch, TokenType::Finally, TokenType::Mn]);
+        // Check if token is a keyword//
+        let keywords = HashSet::from([
+            TokenType::Let,
+            TokenType::Var,
+            TokenType::Fn,
+            TokenType::Async,
+            TokenType::Struct,
+            TokenType::Enum,
+            TokenType::Match,
+            TokenType::If,
+            TokenType::Elif,
+            TokenType::Else,
+            TokenType::For,
+            TokenType::While,
+            TokenType::Loop,
+            TokenType::In,
+            TokenType::Break,
+            TokenType::Continue,
+            TokenType::Return,
+            TokenType::Try,
+            TokenType::Catch,
+            TokenType::Finally,
+            TokenType::Mn,
+        ]);
         return keywords.contains(&self.token_type);
-
     }
     pub fn is_operator(&self) -> bool {
-        // Check if token is an operator// 
-        let operators = HashSet::from([TokenType::Plus, TokenType::Minus, TokenType::Star,
-            TokenType::Slash, TokenType::Percent, TokenType::DoubleStar,
-            TokenType::EqualEqual, TokenType::NotEqual,
-            TokenType::Greater, TokenType::GreaterEq,
-            TokenType::Less, TokenType::LessEq,
-            TokenType::And, TokenType::Or, TokenType::Not,
-            TokenType::Pipeline]);
+        // Check if token is an operator//
+        let operators = HashSet::from([
+            TokenType::Plus,
+            TokenType::Minus,
+            TokenType::Star,
+            TokenType::Slash,
+            TokenType::Percent,
+            TokenType::DoubleStar,
+            TokenType::EqualEqual,
+            TokenType::NotEqual,
+            TokenType::Greater,
+            TokenType::GreaterEq,
+            TokenType::Less,
+            TokenType::LessEq,
+            TokenType::And,
+            TokenType::Or,
+            TokenType::Not,
+            TokenType::Pipeline,
+        ]);
         return operators.contains(&self.token_type);
-
     }
     pub fn is_literal(&self) -> bool {
-        // Check if token is a literal value// 
-        let literals = HashSet::from([TokenType::Integer, TokenType::Float,
-            TokenType::String, TokenType::Boolean,
-            TokenType::NoneLiteral]);
+        // Check if token is a literal value//
+        let literals = HashSet::from([
+            TokenType::Integer,
+            TokenType::Float,
+            TokenType::String,
+            TokenType::Boolean,
+            TokenType::NoneLiteral,
+        ]);
         return literals.contains(&self.token_type);
 
-// Helper function to create tokens
+        // Helper function to create tokens
+    }
 }
-}
-pub fn create_token(token_type: TokenType, value: String, line: usize, column: usize)  ->  Token {
-    let t = Token{
+pub fn create_token(token_type: TokenType, value: String, line: usize, column: usize) -> Token {
+    let t = Token {
         token_type: token_type,
         value: value,
         line: line,
         column: column,
     };
     return t;
-
 }
-pub fn get_keyword_type(word: String)  ->  TokenType {
-    // Get the token type for a keyword// 
+pub fn get_keyword_type(word: String) -> TokenType {
+    // Get the token type for a keyword//
     if word == "let".to_string() {
         return TokenType::Let;
-    }
-    else if word == "var".to_string() {
+    } else if word == "var".to_string() {
         return TokenType::Var;
-    }
-    else if word == "fn".to_string() {
+    } else if word == "fn".to_string() {
         return TokenType::Fn;
-    }
-    else if word == "async".to_string() {
+    } else if word == "async".to_string() {
         return TokenType::Async;
-    }
-    else if word == "struct".to_string() {
+    } else if word == "struct".to_string() {
         return TokenType::Struct;
-    }
-    else if word == "enum".to_string() {
+    } else if word == "enum".to_string() {
         return TokenType::Enum;
-    }
-    else if word == "match".to_string() {
+    } else if word == "match".to_string() {
         return TokenType::Match;
-    }
-    else if word == "if".to_string() {
+    } else if word == "if".to_string() {
         return TokenType::If;
-    }
-    else if word == "else if".to_string() || word == "elif".to_string() {
+    } else if word == "else if".to_string() || word == "elif".to_string() {
         return TokenType::Elif;
-    }
-    else if word == "else".to_string() {
+    } else if word == "else".to_string() {
         return TokenType::Else;
-    }
-    else if word == "for".to_string() {
+    } else if word == "for".to_string() {
         return TokenType::For;
-    }
-    else if word == "while".to_string() {
+    } else if word == "while".to_string() {
         return TokenType::While;
-    }
-    else if word == "loop".to_string() {
+    } else if word == "loop".to_string() {
         return TokenType::Loop;
-    }
-    else if word == "in".to_string() {
+    } else if word == "in".to_string() {
         return TokenType::In;
-    }
-    else if word == "break".to_string() {
+    } else if word == "break".to_string() {
         return TokenType::Break;
-    }
-    else if word == "continue".to_string() {
+    } else if word == "continue".to_string() {
         return TokenType::Continue;
-    }
-    else if word == "return".to_string() {
+    } else if word == "return".to_string() {
         return TokenType::Return;
-    }
-    else if word == "try".to_string() {
+    } else if word == "try".to_string() {
         return TokenType::Try;
-    }
-    else if word == "catch".to_string() {
+    } else if word == "catch".to_string() {
         return TokenType::Catch;
-    }
-    else if word == "finally".to_string() {
+    } else if word == "finally".to_string() {
         return TokenType::Finally;
-    }
-    else if word == "await".to_string() {
+    } else if word == "await".to_string() {
         return TokenType::Await;
-    }
-    else if word == "parallel".to_string() {
+    } else if word == "parallel".to_string() {
         return TokenType::Parallel;
-    }
-    else if word == "mn".to_string() {
+    } else if word == "mn".to_string() {
         return TokenType::Mn;
-    }
-    else if word == "borrow".to_string() {
+    } else if word == "borrow".to_string() {
         return TokenType::Borrow;
-    }
-    else if word == "ref".to_string() {
+    } else if word == "ref".to_string() {
         return TokenType::Ref;
-    }
-    else if word == "move".to_string() {
+    } else if word == "move".to_string() {
         return TokenType::Move;
-    }
-    else if word == "kept".to_string() {
+    } else if word == "kept".to_string() {
         return TokenType::Kept;
-    }
-    else if word == "&&".to_string() {
+    } else if word == "&&".to_string() {
         return TokenType::And;
-    }
-    else if word == "||".to_string() {
+    } else if word == "||".to_string() {
         return TokenType::Or;
-    }
-    else if word == "!".to_string() {
+    } else if word == "!".to_string() {
         return TokenType::Not;
-    }
-    else if word == "true".to_string() {
+    } else if word == "true".to_string() {
         return TokenType::TrueKeyword;
-    }
-    else if word == "false".to_string() {
+    } else if word == "false".to_string() {
         return TokenType::FalseKeyword;
     }
     return TokenType::Error;
-
 }
-pub fn is_keyword(word: String)  ->  bool {
-    // Check if word is a reserved keyword// 
+pub fn is_keyword(word: String) -> bool {
+    // Check if word is a reserved keyword//
     return get_keyword_type(word) != TokenType::Error;
-
 }
-pub fn get_type_constructor_type(text: String)  ->  TokenType {
-    // Get the token type for a type constructor// 
+pub fn get_type_constructor_type(text: String) -> TokenType {
+    // Get the token type for a type constructor//
     // Check for @ prefix (byte 64)
     if text.len() < 2 || text.as_bytes()[0] != 64 {
         return TokenType::Error;
     }
     let suffix = &text[1..];
     if suffix == "chan".to_string() {
-         return TokenType::AtChan;
+        return TokenType::AtChan;
     }
     if suffix == "int".to_string() {
         return TokenType::AtInt;
-    }
-    else if suffix == "float".to_string() {
+    } else if suffix == "float".to_string() {
         return TokenType::AtFloat;
-    }
-    else if suffix == "str".to_string() {
+    } else if suffix == "str".to_string() {
         return TokenType::AtStr;
-    }
-    else if suffix == "bool".to_string() {
+    } else if suffix == "bool".to_string() {
         return TokenType::AtBool;
-    }
-    else if suffix == "list".to_string() {
+    } else if suffix == "list".to_string() {
         return TokenType::AtList;
-    }
-    else if suffix == "tuple".to_string() {
+    } else if suffix == "tuple".to_string() {
         return TokenType::AtTuple;
-    }
-    else if suffix == "set".to_string() {
+    } else if suffix == "set".to_string() {
         return TokenType::AtSet;
-    }
-    else if suffix == "dict".to_string() {
+    } else if suffix == "dict".to_string() {
         return TokenType::AtDict;
-    }
-    else if suffix == "tensor".to_string() {
+    } else if suffix == "tensor".to_string() {
         return TokenType::AtTensor;
-    }
-    else if suffix == "tabl".to_string() {
+    } else if suffix == "tabl".to_string() {
         return TokenType::AtTabl;
     }
     return TokenType::Error;
-
 }
-pub fn is_type_constructor(text: String)  ->  bool {
-    // Check if text is a type constructor// 
+pub fn is_type_constructor(text: String) -> bool {
+    // Check if text is a type constructor//
     return get_type_constructor_type(text) != TokenType::Error;
-
 }
-pub fn get_decorator_type(text: String)  ->  TokenType {
-    // Get the token type for a decorator// 
+pub fn get_decorator_type(text: String) -> TokenType {
+    // Get the token type for a decorator//
     // Check for @ prefix (byte 64)
     if text.len() < 2 || text.as_bytes()[0] != 64 {
         return TokenType::Error;
-
     }
     let suffix = &text[1..];
     if suffix == "imp".to_string() {
         return TokenType::AtImp;
-    }
-    else if suffix == "python".to_string() {
+    } else if suffix == "python".to_string() {
         return TokenType::AtPython;
-    }
-    else if suffix == "rust".to_string() {
+    } else if suffix == "rust".to_string() {
         return TokenType::AtRust;
-    }
-    else if suffix == "sql".to_string() {
+    } else if suffix == "sql".to_string() {
         return TokenType::AtSql;
-    }
-    else if suffix == "js".to_string() {
+    } else if suffix == "js".to_string() {
         return TokenType::AtJs;
-    }
-    else if suffix == "ui".to_string() {
+    } else if suffix == "ui".to_string() {
         return TokenType::AtUi;
-    }
-    else if suffix == "grad".to_string() {
+    } else if suffix == "grad".to_string() {
         return TokenType::AtGrad;
-    }
-    else if suffix == "fn".to_string() {
+    } else if suffix == "fn".to_string() {
         return TokenType::AtFn;
-    }
-    else if suffix == "flow".to_string() {
+    } else if suffix == "flow".to_string() {
         return TokenType::AtFlow;
-    }
-    else if suffix == "frame".to_string() {
+    } else if suffix == "frame".to_string() {
         return TokenType::AtFrame;
-    }
-    else if suffix == "fn".to_string() {
+    } else if suffix == "fn".to_string() {
         return TokenType::Fn;
     }
     return TokenType::Error;
-
 }
-pub fn is_decorator(text: String)  ->  bool {
-    // Check if text is a decorator/annotation// 
+pub fn is_decorator(text: String) -> bool {
+    // Check if text is a decorator/annotation//
     return get_decorator_type(text) != TokenType::Error;
 }

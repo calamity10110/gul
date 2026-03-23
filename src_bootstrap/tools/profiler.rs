@@ -79,14 +79,17 @@ impl Profiler {
 
         // Initialize entry if it doesn't exist
         if !self.entries.contains_key(&name) {
-            self.entries.insert(name.clone(), ProfileEntry {
-                name,
-                call_count: 0,
-                total_time: Duration::ZERO,
-                self_time: Duration::ZERO,
-                memory_allocated: 0,
-                memory_freed: 0,
-            });
+            self.entries.insert(
+                name.clone(),
+                ProfileEntry {
+                    name,
+                    call_count: 0,
+                    total_time: Duration::ZERO,
+                    self_time: Duration::ZERO,
+                    memory_allocated: 0,
+                    memory_freed: 0,
+                },
+            );
         }
     }
 

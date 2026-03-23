@@ -1,8 +1,8 @@
 // Expression parsing methods for Parser
 
+use super::Parser;
 use crate::frontend::ast::*;
 use crate::frontend::lexer::Token;
-use super::Parser;
 
 impl Parser {
     pub(crate) fn parse_paren_or_lambda(&mut self) -> Result<Statement, String> {
@@ -61,9 +61,9 @@ impl Parser {
                 }
                 Ok(params)
             }
-             // Handle (param) parenthesized which might return grouping logic if applicable
-             // If parse_primary groups (x) as x (identifier), it falls into first match.
-             // If (a,b) is generic List, it falls into second match.
+            // Handle (param) parenthesized which might return grouping logic if applicable
+            // If parse_primary groups (x) as x (identifier), it falls into first match.
+            // If (a,b) is generic List, it falls into second match.
             _ => Err("Invalid lambda parameters".to_string()),
         }
     }

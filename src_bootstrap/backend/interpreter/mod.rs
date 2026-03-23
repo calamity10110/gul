@@ -2,10 +2,10 @@ use crate::frontend::ast::*;
 use std::collections::HashMap;
 
 // Module declarations
-pub mod values;
 mod builtins;
-mod exec;
 mod eval;
+mod exec;
+pub mod values;
 
 // Re-export public types
 pub use values::{ControlFlow, Value};

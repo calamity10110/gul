@@ -19,10 +19,14 @@ pub enum Value {
     List(Vec<Value>),
     Dict(HashMap<String, Value>),
     Object(String, HashMap<String, Value>), // Struct instance
-    Function(Vec<(String, Option<Type>)>, Vec<(String, Option<Type>)>, Vec<Statement>),
+    Function(
+        Vec<(String, Option<Type>)>,
+        Vec<(String, Option<Type>)>,
+        Vec<Statement>,
+    ),
     NativeFunction(fn(Vec<Value>) -> Value),
     Lambda(Vec<(String, Option<Type>)>, Box<Expression>), // Updated Lambda for v3.2
-    Dual(f64, f64), // Auto-diff: (value, gradient)
+    Dual(f64, f64),                                       // Auto-diff: (value, gradient)
     Any(Box<Value>), // Gradual typing - boxed to avoid recursion
     Null,
 }
@@ -37,7 +41,9 @@ impl PartialEq for Value {
             (Value::List(a), Value::List(b)) => a == b,
             (Value::Dict(a), Value::Dict(b)) => a == b,
             (Value::Object(n1, f1), Value::Object(n2, f2)) => n1 == n2 && f1 == f2,
-            (Value::Function(p1, o1, b1), Value::Function(p2, o2, b2)) => p1 == p2 && o1 == o2 && b1 == b2,
+            (Value::Function(p1, o1, b1), Value::Function(p2, o2, b2)) => {
+                p1 == p2 && o1 == o2 && b1 == b2
+            }
             (Value::NativeFunction(_), Value::NativeFunction(_)) => false, // Can't compare fn ptrs
             (Value::Lambda(p1, b1), Value::Lambda(p2, b2)) => p1 == p2 && b1 == b2,
             (Value::Dual(v1, d1), Value::Dual(v2, d2)) => v1 == v2 && d1 == d2,

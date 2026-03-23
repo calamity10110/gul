@@ -1,5 +1,5 @@
-use gul_repl::run;
 use clap::Parser;
+use gul_repl::run;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]

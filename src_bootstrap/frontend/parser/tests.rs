@@ -54,10 +54,37 @@ fn test_parse_async_function() {
 
     assert_eq!(program.statements.len(), 1);
     match &program.statements[0] {
-        crate::frontend::ast::Statement::Function { name, is_async, params, outputs, .. } => {
-            let p_str = params.iter().map(|p| p.0.clone()).collect::<Vec<_>>().join(", ");
-            let o_str = if outputs.is_empty() { "".to_string() } else { format!("({})", outputs.iter().map(|o| o.0.clone()).collect::<Vec<_>>().join(", ")) };
-            format!("{}fn {}({}) {} {{ ... }}", if *is_async { "async " } else { "" }, name, p_str, o_str);
+        crate::frontend::ast::Statement::Function {
+            name,
+            is_async,
+            params,
+            outputs,
+            ..
+        } => {
+            let p_str = params
+                .iter()
+                .map(|p| p.0.clone())
+                .collect::<Vec<_>>()
+                .join(", ");
+            let o_str = if outputs.is_empty() {
+                "".to_string()
+            } else {
+                format!(
+                    "({})",
+                    outputs
+                        .iter()
+                        .map(|o| o.0.clone())
+                        .collect::<Vec<_>>()
+                        .join(", ")
+                )
+            };
+            format!(
+                "{}fn {}({}) {} {{ ... }}",
+                if *is_async { "async " } else { "" },
+                name,
+                p_str,
+                o_str
+            );
         }
         _ => panic!("Expected async function"),
     }
@@ -66,7 +93,9 @@ fn test_parse_async_function() {
 #[test]
 #[ignore] // Ownership keywords in parameters are deprecated in v3.2
 fn test_parse_ownership_in_parameters() {
-    let mut lexer = Lexer::new("fn process(own data, ref config):\n    result = data + config.value\n    return result");
+    let mut lexer = Lexer::new(
+        "fn process(own data, ref config):\n    result = data + config.value\n    return result",
+    );
     let tokens = lexer.tokenize();
     let mut parser = Parser::new(tokens);
     let program = parser.parse().unwrap();

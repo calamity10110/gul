@@ -24,7 +24,7 @@ impl Registry {
     pub fn register(&self, name: &str, url: &str) -> String {
         let mut map = self.services.lock().unwrap();
         let instances = map.entry(name.to_string()).or_insert(Vec::new());
-        
+
         let id = uuid::Uuid::new_v4().to_string();
         instances.push(ServiceInstance {
             id: id.clone(),

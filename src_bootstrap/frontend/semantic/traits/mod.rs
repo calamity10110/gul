@@ -85,9 +85,12 @@ impl TraitRegistry {
 
     /// Add trait inheritance
     pub fn add_inheritance(&mut self, child: &str, parent: &str) {
+        if !self.inheritance.contains_key(child) {
+            self.inheritance.insert(child.to_string(), Vec::new());
+        }
         self.inheritance
-            .entry(child.to_string())
-            .or_default()
+            .get_mut(child)
+            .unwrap()
             .push(parent.to_string());
     }
 
