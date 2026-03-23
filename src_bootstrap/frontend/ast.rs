@@ -32,8 +32,8 @@ pub enum Statement {
     },
     Function {
         name: String,
-        params: Vec<(String, Option<Type>)>,   // Param name and optional type
-        outputs: Vec<(String, Option<Type>)>,  // Output name and optional type
+        params: Vec<(String, Option<Type>)>, // Param name and optional type
+        outputs: Vec<(String, Option<Type>)>, // Output name and optional type
         body: Vec<Statement>,
         is_async: bool,
     },

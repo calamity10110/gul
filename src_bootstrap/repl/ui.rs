@@ -1,3 +1,8 @@
+use crossterm::{
+    event::{self, Event, KeyCode, KeyModifiers},
+    execute,
+    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
+};
 use ratatui::{
     backend::CrosstermBackend,
     layout::{Constraint, Direction, Layout},
@@ -5,11 +10,6 @@ use ratatui::{
     text::{Line, Span},
     widgets::{Block, Borders, List, ListItem, Paragraph},
     Frame, Terminal,
-};
-use crossterm::{
-    event::{self, Event, KeyCode, KeyModifiers},
-    execute,
-    terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
 use std::io;
 
@@ -56,10 +56,14 @@ pub fn run_repl(project_name: String) -> io::Result<()> {
                     (_, KeyCode::Up) => state.history_up(),
                     (_, KeyCode::Down) => state.history_down(),
                     (_, KeyCode::Left) => {
-                        if state.cursor_col > 0 { state.cursor_col -= 1; }
+                        if state.cursor_col > 0 {
+                            state.cursor_col -= 1;
+                        }
                     }
                     (_, KeyCode::Right) => {
-                        if state.cursor_col < state.input.len() { state.cursor_col += 1; }
+                        if state.cursor_col < state.input.len() {
+                            state.cursor_col += 1;
+                        }
                     }
                     (_, KeyCode::Home) => state.cursor_col = 0,
                     (_, KeyCode::End) => state.cursor_col = state.input.len(),
@@ -105,7 +109,12 @@ fn render(frame: &mut Frame, state: &ReplState) {
         state.project_name, file_display
     );
     let banner = Paragraph::new(banner_text)
-        .style(Style::default().fg(Color::White).bg(Color::Blue).add_modifier(Modifier::BOLD))
+        .style(
+            Style::default()
+                .fg(Color::White)
+                .bg(Color::Blue)
+                .add_modifier(Modifier::BOLD),
+        )
         .block(Block::default().borders(Borders::BOTTOM));
     frame.render_widget(banner, main_chunks[0]);
 
@@ -122,26 +131,35 @@ fn render(frame: &mut Frame, state: &ReplState) {
         .split(content_chunks[0]);
 
     // Output pane
-    let output_items: Vec<ListItem> = state.output.iter().map(|entry| {
-        match entry {
+    let output_items: Vec<ListItem> = state
+        .output
+        .iter()
+        .map(|entry| match entry {
             OutputEntry::Input(s) => ListItem::new(Line::from(vec![
-                Span::styled("> ", Style::default().fg(Color::Green).add_modifier(Modifier::BOLD)),
+                Span::styled(
+                    "> ",
+                    Style::default()
+                        .fg(Color::Green)
+                        .add_modifier(Modifier::BOLD),
+                ),
                 Span::raw(s),
             ])),
             OutputEntry::Continuation(s) => ListItem::new(Line::from(vec![
                 Span::styled(". ", Style::default().fg(Color::DarkGray)),
                 Span::raw(s),
             ])),
-            OutputEntry::Result(s) => ListItem::new(Line::from(
-                Span::styled(s.as_str(), Style::default().fg(Color::Cyan)),
-            )),
-            OutputEntry::Error(s) => ListItem::new(Line::from(
-                Span::styled(s.as_str(), Style::default().fg(Color::Red)),
-            )),
-        }
-    }).collect();
-    let output_list = List::new(output_items)
-        .block(Block::default().borders(Borders::ALL).title(" Output "));
+            OutputEntry::Result(s) => ListItem::new(Line::from(Span::styled(
+                s.as_str(),
+                Style::default().fg(Color::Cyan),
+            ))),
+            OutputEntry::Error(s) => ListItem::new(Line::from(Span::styled(
+                s.as_str(),
+                Style::default().fg(Color::Red),
+            ))),
+        })
+        .collect();
+    let output_list =
+        List::new(output_items).block(Block::default().borders(Borders::ALL).title(" Output "));
     frame.render_widget(output_list, left_chunks[0]);
 
     // Input pane
@@ -154,40 +172,58 @@ fn render(frame: &mut Frame, state: &ReplState) {
 
     // Sidebar: variables + functions
     let vars = state.get_variables();
-    let (var_items, fn_items): (Vec<_>, Vec<_>) = vars.iter().partition(|v| v.type_name != "fn" && v.type_name != "lambda");
+    let (var_items, fn_items): (Vec<_>, Vec<_>) = vars
+        .iter()
+        .partition(|v| v.type_name != "fn" && v.type_name != "lambda");
 
     let mut sidebar_lines: Vec<ListItem> = Vec::new();
 
     // Variables section
-    sidebar_lines.push(ListItem::new(Line::from(
-        Span::styled(" Variables", Style::default().add_modifier(Modifier::BOLD).fg(Color::Yellow)),
-    )));
+    sidebar_lines.push(ListItem::new(Line::from(Span::styled(
+        " Variables",
+        Style::default()
+            .add_modifier(Modifier::BOLD)
+            .fg(Color::Yellow),
+    ))));
     if var_items.is_empty() {
-        sidebar_lines.push(ListItem::new(Span::styled("  (none)", Style::default().fg(Color::DarkGray))));
+        sidebar_lines.push(ListItem::new(Span::styled(
+            "  (none)",
+            Style::default().fg(Color::DarkGray),
+        )));
     }
     for v in &var_items {
         sidebar_lines.push(ListItem::new(Line::from(vec![
             Span::styled(format!("  {}", v.name), Style::default().fg(Color::White)),
-            Span::styled(format!(": {} = {}", v.type_name, v.short_value), Style::default().fg(Color::DarkGray)),
+            Span::styled(
+                format!(": {} = {}", v.type_name, v.short_value),
+                Style::default().fg(Color::DarkGray),
+            ),
         ])));
     }
 
     sidebar_lines.push(ListItem::new("")); // spacer
 
     // Functions section
-    sidebar_lines.push(ListItem::new(Line::from(
-        Span::styled(" Functions", Style::default().add_modifier(Modifier::BOLD).fg(Color::Yellow)),
-    )));
+    sidebar_lines.push(ListItem::new(Line::from(Span::styled(
+        " Functions",
+        Style::default()
+            .add_modifier(Modifier::BOLD)
+            .fg(Color::Yellow),
+    ))));
     if fn_items.is_empty() {
-        sidebar_lines.push(ListItem::new(Span::styled("  (none)", Style::default().fg(Color::DarkGray))));
-    }
-    for f in &fn_items {
-        sidebar_lines.push(ListItem::new(Line::from(
-            Span::styled(format!("  {} {}", f.name, f.short_value), Style::default().fg(Color::Green)),
+        sidebar_lines.push(ListItem::new(Span::styled(
+            "  (none)",
+            Style::default().fg(Color::DarkGray),
         )));
     }
+    for f in &fn_items {
+        sidebar_lines.push(ListItem::new(Line::from(Span::styled(
+            format!("  {} {}", f.name, f.short_value),
+            Style::default().fg(Color::Green),
+        ))));
+    }
 
-    let sidebar = List::new(sidebar_lines)
-        .block(Block::default().borders(Borders::ALL).title(" State "));
+    let sidebar =
+        List::new(sidebar_lines).block(Block::default().borders(Borders::ALL).title(" State "));
     frame.render_widget(sidebar, content_chunks[1]);
 }

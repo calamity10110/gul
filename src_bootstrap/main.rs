@@ -1,4 +1,10 @@
-use gul_lang::{autonomous, benchmarks, backend::{codegen as compiler, interpreter::Interpreter}, frontend::{lexer::Lexer, parser::Parser as GulParser}, tools};
+use gul_lang::{
+    autonomous,
+    backend::{codegen as compiler, interpreter::Interpreter},
+    benchmarks,
+    frontend::{lexer::Lexer, parser::Parser as GulParser},
+    tools,
+};
 
 use clap::{Parser, Subcommand};
 use colored::*;
@@ -243,7 +249,8 @@ fn main() {
                     let mut parser = gul_lang::frontend::parser::Parser::new(tokens);
                     match parser.parse() {
                         Ok(program) => {
-                            let mut interpreter = gul_lang::backend::interpreter::Interpreter::new();
+                            let mut interpreter =
+                                gul_lang::backend::interpreter::Interpreter::new();
                             if let Err(e) = interpreter.run(&program) {
                                 eprintln!("{} {}", "Runtime error:".red().bold(), e);
                             }
@@ -706,8 +713,8 @@ fn main() {
 }
 
 fn run_single_test(path: &std::path::Path) -> Result<(), String> {
-    let source = std::fs::read_to_string(path)
-        .map_err(|e| format!("Failed to read file: {}", e))?;
+    let source =
+        std::fs::read_to_string(path).map_err(|e| format!("Failed to read file: {}", e))?;
 
     let mut lexer = Lexer::new(&source);
     let tokens = lexer.tokenize();
@@ -715,7 +722,7 @@ fn run_single_test(path: &std::path::Path) -> Result<(), String> {
     let program = parser.parse().map_err(|e| format!("Parse error: {}", e))?;
 
     let mut interpreter = Interpreter::new();
-    
+
     // We use catch_unwind because assert() panics on failure
     let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(move || {
         interpreter.run(&program)

@@ -381,9 +381,9 @@ impl Lexer {
             // v3.0 keywords (highest priority)
             "const" => Token::Let, // const is now the keyword for immutable (was let)
             "let" => {
-                 eprintln!("Warning: 'let' is deprecated, use 'const' instead");
-                 Token::Let
-            },
+                eprintln!("Warning: 'let' is deprecated, use 'const' instead");
+                Token::Let
+            }
             "var" => Token::Var,
 
             // v2.0 keywords (primary)

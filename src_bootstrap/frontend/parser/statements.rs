@@ -1,8 +1,8 @@
 // Statement parsing methods for Parser
 
+use super::Parser;
 use crate::frontend::ast::{Type, *};
 use crate::frontend::lexer::Token;
-use super::Parser;
 
 impl Parser {
     pub(crate) fn parse_statement(&mut self) -> Result<Statement, String> {
@@ -227,7 +227,10 @@ impl Parser {
             // Handle grouped sub-imports like std{io, http}
             if matches!(self.current_token(), Token::LeftBrace | Token::LeftParen) {
                 self.advance();
-                while !matches!(self.current_token(), Token::RightBrace | Token::RightParen | Token::Eof) {
+                while !matches!(
+                    self.current_token(),
+                    Token::RightBrace | Token::RightParen | Token::Eof
+                ) {
                     if matches!(self.current_token(), Token::Comma | Token::Newline) {
                         self.advance();
                         continue;
@@ -407,92 +410,99 @@ impl Parser {
             Token::Identifier(name) => name.clone(),
             Token::Main => "main".to_string(),
             Token::Mn => "main".to_string(),
-            _ => return Err(format!("Expected function name, found {:?}", self.current_token())),
+            _ => {
+                return Err(format!(
+                    "Expected function name, found {:?}",
+                    self.current_token()
+                ))
+            }
         };
         self.advance();
 
-            // Inputs
-            self.expect(Token::LeftParen)?;
-            let mut params = Vec::new();
-            while self.current_token() != &Token::RightParen {
-                let mut param_type = None;
-                // Handle @type prefix in parameters
-                if self.current_token() == &Token::At {
+        // Inputs
+        self.expect(Token::LeftParen)?;
+        let mut params = Vec::new();
+        while self.current_token() != &Token::RightParen {
+            let mut param_type = None;
+            // Handle @type prefix in parameters
+            if self.current_token() == &Token::At {
+                self.advance();
+                param_type = Some(self.parse_type()?);
+            }
+
+            if let Token::Identifier(name) = self.current_token() {
+                let param_name = name.clone();
+                self.advance();
+                // Optional suffix type annotation: param: type
+                if self.current_token() == &Token::Colon {
                     self.advance();
                     param_type = Some(self.parse_type()?);
                 }
+                params.push((param_name, param_type));
 
-                if let Token::Identifier(name) = self.current_token() {
-                    let param_name = name.clone();
+                if self.current_token() == &Token::Comma {
                     self.advance();
-                    // Optional suffix type annotation: param: type
-                    if self.current_token() == &Token::Colon {
-                        self.advance();
-                        param_type = Some(self.parse_type()?);
-                    }
-                    params.push((param_name, param_type));
+                }
+            } else {
+                break;
+            }
+        }
+        self.expect(Token::RightParen)?;
 
+        // v3.2 Optional Outputs
+        let mut outputs = Vec::new();
+        if self.current_token() == &Token::LeftParen {
+            self.advance();
+            while self.current_token() != &Token::RightParen {
+                let mut out_type = None;
+                if self.current_token() == &Token::At {
+                    self.advance();
+                    out_type = Some(self.parse_type()?);
+                }
+                if let Token::Identifier(name) = self.current_token() {
+                    let out_name = name.clone();
+                    self.advance();
+                    outputs.push((out_name, out_type));
                     if self.current_token() == &Token::Comma {
                         self.advance();
                     }
                 } else {
-                    break;
+                    // Just a type? (@int)
+                    if let Some(ty) = out_type {
+                        outputs.push(("".to_string(), Some(ty)));
+                    } else {
+                        break;
+                    }
                 }
             }
             self.expect(Token::RightParen)?;
+        }
 
-            // v3.2 Optional Outputs
-            let mut outputs = Vec::new();
-            if self.current_token() == &Token::LeftParen {
-                self.advance();
-                while self.current_token() != &Token::RightParen {
-                     let mut out_type = None;
-                     if self.current_token() == &Token::At {
-                         self.advance();
-                         out_type = Some(self.parse_type()?);
-                     }
-                     if let Token::Identifier(name) = self.current_token() {
-                         let out_name = name.clone();
-                         self.advance();
-                         outputs.push((out_name, out_type));
-                         if self.current_token() == &Token::Comma { self.advance(); }
-                     } else {
-                         // Just a type? (@int)
-                         if let Some(ty) = out_type {
-                              outputs.push(("".to_string(), Some(ty)));
-                         } else {
-                              break;
-                         }
-                     }
-                }
-                self.expect(Token::RightParen)?;
-            }
+        // Body
+        // v3.2 supports => or = or : followed by block
+        let body = if self.current_token() == &Token::FatArrow {
+            eprintln!("DEBUG: parse_function found FatArrow");
+            self.advance();
+            let expr = self.parse_expression()?;
+            vec![Statement::Return(Some(expr))]
+        } else if self.current_token() == &Token::Equal {
+            eprintln!("DEBUG: parse_function found Equal");
+            self.advance();
+            let expr = self.parse_expression()?;
+            vec![Statement::Return(Some(expr))]
+        } else {
+            self.expect(Token::Colon)?;
+            self.skip_newlines();
+            self.parse_block()?
+        };
 
-            // Body
-            // v3.2 supports => or = or : followed by block
-            let body = if self.current_token() == &Token::FatArrow {
-                eprintln!("DEBUG: parse_function found FatArrow");
-                self.advance();
-                let expr = self.parse_expression()?;
-                vec![Statement::Return(Some(expr))]
-            } else if self.current_token() == &Token::Equal {
-                eprintln!("DEBUG: parse_function found Equal");
-                self.advance();
-                let expr = self.parse_expression()?;
-                vec![Statement::Return(Some(expr))]
-            } else {
-                self.expect(Token::Colon)?;
-                self.skip_newlines();
-                self.parse_block()?
-            };
-
-            Ok(Statement::Function {
-                name: func_name,
-                params,
-                outputs,
-                body,
-                is_async: is_async_fn,
-            })
+        Ok(Statement::Function {
+            name: func_name,
+            params,
+            outputs,
+            body,
+            is_async: is_async_fn,
+        })
     }
 
     pub(crate) fn parse_block(&mut self) -> Result<Vec<Statement>, String> {
@@ -906,7 +916,6 @@ impl Parser {
         }
     }
 
-
     fn parse_at_import(&mut self) -> Result<Statement, String> {
         self.advance(); // Skip 'imp'
 
@@ -1133,28 +1142,94 @@ impl Parser {
                     self.advance();
                 }
                 // Handle Keywords
-                Token::Import | Token::Imp => { code.push_str("import "); self.advance(); }
-                Token::Fn => { code.push_str("fn "); self.advance(); }
-                Token::Def => { code.push_str("def "); self.advance(); }
-                Token::Return => { code.push_str("return "); self.advance(); }
-                Token::If => { code.push_str("if "); self.advance(); }
-                Token::Else => { code.push_str("else "); self.advance(); }
-                Token::Elif => { code.push_str("elif "); self.advance(); }
-                Token::For => { code.push_str("for "); self.advance(); }
-                Token::While => { code.push_str("while "); self.advance(); }
-                Token::Loop => { code.push_str("loop "); self.advance(); }
-                Token::Break => { code.push_str("break "); self.advance(); }
-                Token::Continue => { code.push_str("continue "); self.advance(); }
-                Token::Try => { code.push_str("try "); self.advance(); }
-                Token::Catch => { code.push_str("catch "); self.advance(); }
-                Token::Finally => { code.push_str("finally "); self.advance(); }
-                Token::Throw => { code.push_str("throw "); self.advance(); }
-                Token::Const => { code.push_str("const "); self.advance(); }
-                Token::Let => { code.push_str("let "); self.advance(); }
-                Token::Mut => { code.push_str("mut "); self.advance(); }
-                Token::Var => { code.push_str("var "); self.advance(); }
-                Token::Struct => { code.push_str("struct "); self.advance(); }
-                Token::Main | Token::Mn => { code.push_str("main "); self.advance(); }
+                Token::Import | Token::Imp => {
+                    code.push_str("import ");
+                    self.advance();
+                }
+                Token::Fn => {
+                    code.push_str("fn ");
+                    self.advance();
+                }
+                Token::Def => {
+                    code.push_str("def ");
+                    self.advance();
+                }
+                Token::Return => {
+                    code.push_str("return ");
+                    self.advance();
+                }
+                Token::If => {
+                    code.push_str("if ");
+                    self.advance();
+                }
+                Token::Else => {
+                    code.push_str("else ");
+                    self.advance();
+                }
+                Token::Elif => {
+                    code.push_str("elif ");
+                    self.advance();
+                }
+                Token::For => {
+                    code.push_str("for ");
+                    self.advance();
+                }
+                Token::While => {
+                    code.push_str("while ");
+                    self.advance();
+                }
+                Token::Loop => {
+                    code.push_str("loop ");
+                    self.advance();
+                }
+                Token::Break => {
+                    code.push_str("break ");
+                    self.advance();
+                }
+                Token::Continue => {
+                    code.push_str("continue ");
+                    self.advance();
+                }
+                Token::Try => {
+                    code.push_str("try ");
+                    self.advance();
+                }
+                Token::Catch => {
+                    code.push_str("catch ");
+                    self.advance();
+                }
+                Token::Finally => {
+                    code.push_str("finally ");
+                    self.advance();
+                }
+                Token::Throw => {
+                    code.push_str("throw ");
+                    self.advance();
+                }
+                Token::Const => {
+                    code.push_str("const ");
+                    self.advance();
+                }
+                Token::Let => {
+                    code.push_str("let ");
+                    self.advance();
+                }
+                Token::Mut => {
+                    code.push_str("mut ");
+                    self.advance();
+                }
+                Token::Var => {
+                    code.push_str("var ");
+                    self.advance();
+                }
+                Token::Struct => {
+                    code.push_str("struct ");
+                    self.advance();
+                }
+                Token::Main | Token::Mn => {
+                    code.push_str("main ");
+                    self.advance();
+                }
 
                 Token::LeftParen => {
                     code.push('(');
@@ -1206,12 +1281,30 @@ impl Parser {
                     self.advance();
                 }
                 // Handle basic operators
-                Token::Plus => { code.push('+'); self.advance(); }
-                Token::Minus => { code.push('-'); self.advance(); }
-                Token::Star => { code.push('*'); self.advance(); }
-                Token::Slash => { code.push('/'); self.advance(); }
-                Token::Percent => { code.push('%'); self.advance(); }
-                Token::Not => { code.push('!'); self.advance(); }
+                Token::Plus => {
+                    code.push('+');
+                    self.advance();
+                }
+                Token::Minus => {
+                    code.push('-');
+                    self.advance();
+                }
+                Token::Star => {
+                    code.push('*');
+                    self.advance();
+                }
+                Token::Slash => {
+                    code.push('/');
+                    self.advance();
+                }
+                Token::Percent => {
+                    code.push('%');
+                    self.advance();
+                }
+                Token::Not => {
+                    code.push('!');
+                    self.advance();
+                }
 
                 // Fallback for others
                 _ => {

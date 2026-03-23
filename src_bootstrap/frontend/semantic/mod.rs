@@ -5,4 +5,4 @@ pub mod ownership;
 pub mod traits;
 
 // Re-export the main analysis function
-pub use analyzer::{SemanticAnalyzer, SymbolTable, Symbol, analyze};
+pub use analyzer::{analyze, SemanticAnalyzer, Symbol, SymbolTable};

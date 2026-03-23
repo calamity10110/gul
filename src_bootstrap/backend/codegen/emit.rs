@@ -87,13 +87,27 @@ impl CodeGenerator {
                 is_async,
             } => {
                 let async_keyword = if *is_async { "async " } else { "" };
-                let params_str = params.iter().map(|(n, _)| n.clone()).collect::<Vec<String>>().join(", ");
+                let params_str = params
+                    .iter()
+                    .map(|(n, _)| n.clone())
+                    .collect::<Vec<String>>()
+                    .join(", ");
                 let outputs_str = if outputs.is_empty() {
                     "".to_string()
                 } else {
-                    format!("({}) ", outputs.iter().map(|(n, _)| n.clone()).collect::<Vec<String>>().join(", "))
+                    format!(
+                        "({}) ",
+                        outputs
+                            .iter()
+                            .map(|(n, _)| n.clone())
+                            .collect::<Vec<String>>()
+                            .join(", ")
+                    )
                 };
-                self.emit_line(&format!("{}fn {}({}) {} {{", async_keyword, name, params_str, outputs_str));
+                self.emit_line(&format!(
+                    "{}fn {}({}) {} {{",
+                    async_keyword, name, params_str, outputs_str
+                ));
                 self.indent();
 
                 for stmt in body {

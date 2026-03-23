@@ -1,14 +1,14 @@
-use std::{io, time::Duration};
+use anyhow::Result;
 use crossterm::{
     event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
     execute,
     terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
 };
 use ratatui::{prelude::*, widgets::*};
-use tui_input::{backend::crossterm::EventHandler, Input};
 use std::sync::{Arc, Mutex};
 use std::thread;
-use anyhow::Result;
+use std::{io, time::Duration};
+use tui_input::{backend::crossterm::EventHandler, Input};
 
 struct App {
     input: Input,
@@ -43,7 +43,10 @@ pub fn run(port: String) -> Result<()> {
         let mut i = 0;
         loop {
             thread::sleep(Duration::from_millis(2000));
-            messages.lock().unwrap().push(format!("MCU Output: Ping {}", i));
+            messages
+                .lock()
+                .unwrap()
+                .push(format!("MCU Output: Ping {}", i));
             i += 1;
         }
     });
@@ -92,10 +95,7 @@ fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<(
 fn ui(f: &mut Frame, app: &App) {
     let chunks = Layout::default()
         .direction(Direction::Vertical)
-        .constraints([
-            Constraint::Min(1),
-            Constraint::Length(3),
-        ])
+        .constraints([Constraint::Min(1), Constraint::Length(3)])
         .split(f.size());
 
     let messages: Vec<ListItem> = app
@@ -107,7 +107,11 @@ fn ui(f: &mut Frame, app: &App) {
         .collect();
 
     let messages_list = List::new(messages)
-        .block(Block::default().borders(Borders::ALL).title(format!("MCU Output ({})", app.port_name)))
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .title(format!("MCU Output ({})", app.port_name)),
+        )
         .start_corner(Corner::BottomLeft);
 
     f.render_widget(messages_list, chunks[0]);
@@ -116,10 +120,14 @@ fn ui(f: &mut Frame, app: &App) {
     let scroll = app.input.visual_scroll(width as usize);
     let input = Paragraph::new(app.input.value())
         .scroll((0, scroll as u16))
-        .block(Block::default().borders(Borders::ALL).title("Input (ESC to quit)"));
-    
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .title("Input (ESC to quit)"),
+        );
+
     f.render_widget(input, chunks[1]);
-    
+
     f.set_cursor(
         chunks[1].x + ((app.input.visual_cursor().max(scroll) - scroll) as u16) + 1,
         chunks[1].y + 1,

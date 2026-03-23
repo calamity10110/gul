@@ -94,12 +94,16 @@ impl RateLimiter {
     pub async fn check_rate_limit(&self, key: &str) -> Result<(), RateLimitError> {
         let mut buckets = self.buckets.write().await;
 
-        let bucket = buckets.entry(key.to_string()).or_insert_with(|| {
-            TokenBucket::new(
-                self.default_limit.burst,
-                self.default_limit.requests_per_minute,
-            )
-        });
+        if !buckets.contains_key(key) {
+            buckets.insert(
+                key.to_string(),
+                TokenBucket::new(
+                    self.default_limit.burst,
+                    self.default_limit.requests_per_minute,
+                ),
+            );
+        }
+        let bucket = buckets.get_mut(key).unwrap();
 
         if bucket.try_consume(1.0) {
             Ok(())
@@ -115,12 +119,16 @@ impl RateLimiter {
     pub async fn get_remaining(&self, key: &str) -> u32 {
         let mut buckets = self.buckets.write().await;
 
-        let bucket = buckets.entry(key.to_string()).or_insert_with(|| {
-            TokenBucket::new(
-                self.default_limit.burst,
-                self.default_limit.requests_per_minute,
-            )
-        });
+        if !buckets.contains_key(key) {
+            buckets.insert(
+                key.to_string(),
+                TokenBucket::new(
+                    self.default_limit.burst,
+                    self.default_limit.requests_per_minute,
+                ),
+            );
+        }
+        let bucket = buckets.get_mut(key).unwrap();
 
         bucket.available()
     }

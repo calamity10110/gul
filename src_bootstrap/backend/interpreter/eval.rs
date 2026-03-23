@@ -1,6 +1,6 @@
-use crate::frontend::ast::*;
-use super::values::{Value, ControlFlow};
+use super::values::{ControlFlow, Value};
 use super::Interpreter;
+use crate::frontend::ast::*;
 use std::collections::HashMap;
 
 impl Interpreter {
@@ -33,20 +33,37 @@ impl Interpreter {
 
                         match f_val {
                             Value::Lambda(params, body_expr) => {
-                                if params.len() != 1 { return Err("grad expects function with 1 parameter".to_string()); }
+                                if params.len() != 1 {
+                                    return Err(
+                                        "grad expects function with 1 parameter".to_string()
+                                    );
+                                }
                                 let param_name = &params[0].0;
                                 let old_val = self.variables.insert(param_name.clone(), x_dual);
                                 let result = self.evaluate(&body_expr)?;
-                                if let Some(v) = old_val { self.variables.insert(param_name.clone(), v); }
-                                else { self.variables.remove(param_name); }
+                                if let Some(v) = old_val {
+                                    self.variables.insert(param_name.clone(), v);
+                                } else {
+                                    self.variables.remove(param_name);
+                                }
 
                                 match result {
                                     Value::Dual(_, grad) => return Ok(Value::Float(grad)),
-                                    Value::Integer(_) | Value::Float(_) => return Ok(Value::Float(0.0)),
-                                    _ => return Err("Function did not return numeric value".to_string()),
+                                    Value::Integer(_) | Value::Float(_) => {
+                                        return Ok(Value::Float(0.0))
+                                    }
+                                    _ => {
+                                        return Err(
+                                            "Function did not return numeric value".to_string()
+                                        )
+                                    }
                                 }
                             }
-                             _ => return Err("grad currently supports Arrow Functions only".to_string()),
+                            _ => {
+                                return Err(
+                                    "grad currently supports Arrow Functions only".to_string()
+                                )
+                            }
                         }
                     }
                 }
@@ -60,53 +77,68 @@ impl Interpreter {
                 match func_val {
                     Value::NativeFunction(f) => Ok(f(arg_vals)),
                     Value::Function(params, outputs, body) => {
-                         let mut local_interpreter = self.clone();
-                         // Bind inputs
-                         for (i, (param_name, _)) in params.iter().enumerate() {
-                             if i < arg_vals.len() {
-                                 local_interpreter.variables.insert(param_name.clone(), arg_vals[i].clone());
-                             }
-                         }
-                         // Bind outputs as Null initially
-                         for (out_name, _) in &outputs {
-                             if !out_name.is_empty() {
-                                 local_interpreter.variables.insert(out_name.clone(), Value::Null);
-                             }
-                         }
+                        let mut local_interpreter = self.clone();
+                        // Bind inputs
+                        for (i, (param_name, _)) in params.iter().enumerate() {
+                            if i < arg_vals.len() {
+                                local_interpreter
+                                    .variables
+                                    .insert(param_name.clone(), arg_vals[i].clone());
+                            }
+                        }
+                        // Bind outputs as Null initially
+                        for (out_name, _) in &outputs {
+                            if !out_name.is_empty() {
+                                local_interpreter
+                                    .variables
+                                    .insert(out_name.clone(), Value::Null);
+                            }
+                        }
 
-                         match local_interpreter.execute_statements(&body)? {
-                             ControlFlow::Return(v) => Ok(v),
-                             _ => {
-                                 // Return outputs if no explicit return
-                                 if outputs.is_empty() {
-                                     Ok(Value::Null)
-                                 } else if outputs.len() == 1 {
-                                     let (out_name, _) = &outputs[0];
-                                     if out_name.is_empty() {
-                                          Ok(Value::Null)
-                                     } else {
-                                          Ok(local_interpreter.variables.get(out_name).cloned().unwrap_or(Value::Null))
-                                     }
-                                 } else {
-                                     let mut res_map = HashMap::new();
-                                     for (out_name, _) in &outputs {
-                                         if !out_name.is_empty() {
-                                             res_map.insert(out_name.clone(), local_interpreter.variables.get(out_name).cloned().unwrap_or(Value::Null));
-                                         }
-                                     }
-                                     Ok(Value::Dict(res_map))
-                                 }
-                             }
-                         }
+                        match local_interpreter.execute_statements(&body)? {
+                            ControlFlow::Return(v) => Ok(v),
+                            _ => {
+                                // Return outputs if no explicit return
+                                if outputs.is_empty() {
+                                    Ok(Value::Null)
+                                } else if outputs.len() == 1 {
+                                    let (out_name, _) = &outputs[0];
+                                    if out_name.is_empty() {
+                                        Ok(Value::Null)
+                                    } else {
+                                        Ok(local_interpreter
+                                            .variables
+                                            .get(out_name)
+                                            .cloned()
+                                            .unwrap_or(Value::Null))
+                                    }
+                                } else {
+                                    let mut res_map = HashMap::new();
+                                    for (out_name, _) in &outputs {
+                                        if !out_name.is_empty() {
+                                            res_map.insert(
+                                                out_name.clone(),
+                                                local_interpreter
+                                                    .variables
+                                                    .get(out_name)
+                                                    .cloned()
+                                                    .unwrap_or(Value::Null),
+                                            );
+                                        }
+                                    }
+                                    Ok(Value::Dict(res_map))
+                                }
+                            }
+                        }
                     }
                     Value::Lambda(params, body_expr) => {
-                         // Execute expression body
-                         for (i, (param, _ty)) in params.iter().enumerate() {
-                             if i < arg_vals.len() {
-                                 self.variables.insert(param.clone(), arg_vals[i].clone());
-                             }
-                         }
-                         self.evaluate(&body_expr)
+                        // Execute expression body
+                        for (i, (param, _ty)) in params.iter().enumerate() {
+                            if i < arg_vals.len() {
+                                self.variables.insert(param.clone(), arg_vals[i].clone());
+                            }
+                        }
+                        self.evaluate(&body_expr)
                     }
                     _ => Err(format!("Not a callable: {:?}", func_val)),
                 }
@@ -135,18 +167,14 @@ impl Interpreter {
                             Ok(Value::Integer(a / b))
                         }
                     }
-                    (Value::Float(a), BinaryOp::Add, Value::Float(b)) => {
-                        Ok(Value::Float(a + b))
-                    }
+                    (Value::Float(a), BinaryOp::Add, Value::Float(b)) => Ok(Value::Float(a + b)),
                     (Value::Float(a), BinaryOp::Subtract, Value::Float(b)) => {
                         Ok(Value::Float(a - b))
                     }
                     (Value::Float(a), BinaryOp::Multiply, Value::Float(b)) => {
                         Ok(Value::Float(a * b))
                     }
-                    (Value::Float(a), BinaryOp::Divide, Value::Float(b)) => {
-                        Ok(Value::Float(a / b))
-                    }
+                    (Value::Float(a), BinaryOp::Divide, Value::Float(b)) => Ok(Value::Float(a / b)),
                     // Auto-differentiation (Dual numbers)
                     (Value::Dual(v1, d1), BinaryOp::Add, Value::Dual(v2, d2)) => {
                         Ok(Value::Dual(v1 + v2, d1 + d2))
@@ -163,22 +191,23 @@ impl Interpreter {
                         Ok(Value::Dual(v1 / v2, (v2 * d1 - v1 * d2) / (v2 * v2)))
                     }
                     (Value::Dual(v1, d1), BinaryOp::Add, Value::Integer(n)) => {
-                         Ok(Value::Dual(v1 + n as f64, d1))
+                        Ok(Value::Dual(v1 + n as f64, d1))
                     }
                     (Value::Integer(n), BinaryOp::Add, Value::Dual(v2, d2)) => {
-                         Ok(Value::Dual(n as f64 + v2, d2))
+                        Ok(Value::Dual(n as f64 + v2, d2))
                     }
                     (Value::Dual(v1, d1), BinaryOp::Multiply, Value::Integer(n)) => {
-                         Ok(Value::Dual(v1 * n as f64, d1 * n as f64))
+                        Ok(Value::Dual(v1 * n as f64, d1 * n as f64))
                     }
                     (Value::Integer(n), BinaryOp::Multiply, Value::Dual(v2, d2)) => {
-                         Ok(Value::Dual(n as f64 * v2, n as f64 * d2))
+                        Ok(Value::Dual(n as f64 * v2, n as f64 * d2))
                     }
-                     // Add more combinations (Float, etc.) as needed for basic support
-
+                    // Add more combinations (Float, etc.) as needed for basic support
                     (l, BinaryOp::Equal, r) => Ok(Value::Bool(l == r)),
                     (l, BinaryOp::NotEqual, r) => Ok(Value::Bool(l != r)),
-                    (Value::Integer(a), BinaryOp::Less, Value::Integer(b)) => Ok(Value::Bool(a < b)),
+                    (Value::Integer(a), BinaryOp::Less, Value::Integer(b)) => {
+                        Ok(Value::Bool(a < b))
+                    }
                     (Value::Integer(a), BinaryOp::Greater, Value::Integer(b)) => {
                         Ok(Value::Bool(a > b))
                     }
@@ -221,23 +250,23 @@ impl Interpreter {
                         .cloned()
                         .ok_or_else(|| format!("Member not found: {}", member)),
                     Value::Function(params, outputs, _) => {
-                         // v3.2 Function Node properties
-                         if member.starts_with("input_") {
-                             let idx: usize = member[6..].parse().unwrap_or(0);
-                             if idx > 0 && idx <= params.len() {
-                                 let (name, _ty) = &params[idx-1];
-                                 let mut map = HashMap::new();
-                                 map.insert(name.clone(), Value::String(name.clone())); // Simplified proxy
-                                 return Ok(Value::Dict(map));
-                             }
-                         } else if member.starts_with("output_") {
-                             let idx: usize = member[7..].parse().unwrap_or(0);
-                             if idx > 0 && idx <= outputs.len() {
-                                 let (name, _ty) = &outputs[idx-1];
-                                 return Ok(Value::String(name.clone()));
-                             }
-                         }
-                         Err(format!("Function property not found: {}", member))
+                        // v3.2 Function Node properties
+                        if member.starts_with("input_") {
+                            let idx: usize = member[6..].parse().unwrap_or(0);
+                            if idx > 0 && idx <= params.len() {
+                                let (name, _ty) = &params[idx - 1];
+                                let mut map = HashMap::new();
+                                map.insert(name.clone(), Value::String(name.clone())); // Simplified proxy
+                                return Ok(Value::Dict(map));
+                            }
+                        } else if member.starts_with("output_") {
+                            let idx: usize = member[7..].parse().unwrap_or(0);
+                            if idx > 0 && idx <= outputs.len() {
+                                let (name, _ty) = &outputs[idx - 1];
+                                return Ok(Value::String(name.clone()));
+                            }
+                        }
+                        Err(format!("Function property not found: {}", member))
                     }
                     _ => Err(format!("Cannot access member '{}' on non-object", member)),
                 }
@@ -391,7 +420,8 @@ impl Interpreter {
                 self.evaluate(expr)
             }
             Expression::Lambda { params, body } => {
-                let typed_params: Vec<(String, Option<Type>)> = params.iter().map(|p| (p.clone(), None)).collect();
+                let typed_params: Vec<(String, Option<Type>)> =
+                    params.iter().map(|p| (p.clone(), None)).collect();
                 Ok(Value::Lambda(typed_params, body.clone()))
             }
             _ => Ok(Value::Null),

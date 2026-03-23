@@ -31,16 +31,16 @@ pub enum Token {
     Throw,
 
     // New keywords (v2.0)
-    Import, // import (replaces imp)
-    Const,  // const (explicit immutable)
-    Mut,    // mut (mutable)
-    Async,  // async (replaces asy)
-    Extern, // extern (replaces cs)
-    Main,   // main (optional, can use without mn)
-    Struct, // struct definition
-    Global, // @global
-    Static, // @static
-    Local,  // @local
+    Import,   // import (replaces imp)
+    Const,    // const (explicit immutable)
+    Mut,      // mut (mutable)
+    Async,    // async (replaces asy)
+    Extern,   // extern (replaces cs)
+    Main,     // main (optional, can use without mn)
+    Struct,   // struct definition
+    Global,   // @global
+    Static,   // @static
+    Local,    // @local
     Parallel, // parallel keyword
 
     // New keywords (v3.0)

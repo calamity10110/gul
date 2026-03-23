@@ -142,7 +142,8 @@ impl Molecule {
             *counts.entry(atom.element.symbol.as_str()).or_insert(0) += 1;
         }
 
-        counts.into_iter()
+        counts
+            .into_iter()
             .map(|(k, v)| (k.to_string(), v))
             .collect()
     }

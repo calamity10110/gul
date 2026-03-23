@@ -16,19 +16,16 @@ pub enum IRNodeType {
     Statement,
     Expression,
     Type,
-
-// Base IR node
+    // Base IR node
 }
 #[derive(Debug, Clone, PartialEq)]
 pub struct IRNode {
     pub node_type: IRNodeType,
     pub line: usize,
     pub column: usize,
-
-// ================================================================================
-// MODULE LEVEL
-// ================================================================================
-
+    // ================================================================================
+    // MODULE LEVEL
+    // ================================================================================
 }
 #[derive(Debug, Clone, PartialEq)]
 pub struct IRModule {
@@ -38,7 +35,6 @@ pub struct IRModule {
     pub structs: Vec<IRStruct>,
     pub impls: Vec<IRImpl>,
     pub functions: Vec<IRFunction>,
-
 }
 #[derive(Debug, Clone, PartialEq)]
 pub struct IRStruct {
@@ -46,14 +42,12 @@ pub struct IRStruct {
     pub name: String,
     pub fields: Vec<IRField>,
     // No methods - methods go in IRImpl
-
 }
 #[derive(Debug, Clone, PartialEq)]
 pub struct IRImpl {
     pub base: IRNode,
     pub target_type: String,
     pub methods: Vec<IRFunction>,
-
 }
 #[derive(Debug, Clone, PartialEq)]
 pub struct IRField {
@@ -62,10 +56,9 @@ pub struct IRField {
     pub type_name: String,
     pub default_value: String, // Optional
 
-// ================================================================================
-// FUNCTIONS
-// ================================================================================
-
+                               // ================================================================================
+                               // FUNCTIONS
+                               // ================================================================================
 }
 #[derive(Debug, Clone, PartialEq)]
 pub struct IRFunction {
@@ -76,7 +69,6 @@ pub struct IRFunction {
     pub body: Vec<IRStatement>,
     pub is_method: bool,
     pub receiver: String, // "self", "ref self", or empty
-
 }
 #[derive(Debug, Clone, PartialEq)]
 pub struct IRParameter {
@@ -85,10 +77,9 @@ pub struct IRParameter {
     pub type_name: String,
     pub ownership: String, // "borrow", "ref", "move", ""
 
-// ================================================================================
-// STATEMENTS
-// ================================================================================
-
+                           // ================================================================================
+                           // STATEMENTS
+                           // ================================================================================
 }
 #[derive(Debug, Clone, PartialEq)]
 pub enum IRStmtType {
@@ -102,7 +93,6 @@ pub enum IRStmtType {
     Match,
     Expr,
     Block,
-
 }
 #[derive(Debug, Clone, PartialEq)]
 pub struct IRStatement {
@@ -110,10 +100,9 @@ pub struct IRStatement {
     pub stmt_type: IRStmtType,
     pub content: String, // Serialized expression/details
 
-// ================================================================================
-// EXPRESSIONS
-// ================================================================================
-
+                         // ================================================================================
+                         // EXPRESSIONS
+                         // ================================================================================
 }
 #[derive(Debug, Clone, PartialEq)]
 pub enum IRExprType {
@@ -125,7 +114,6 @@ pub enum IRExprType {
     Index,
     Attribute,
     Construct,
-
 }
 #[derive(Debug, Clone, PartialEq)]
 pub struct IRExpression {
@@ -133,11 +121,9 @@ pub struct IRExpression {
     pub expr_type: IRExprType,
     pub value: String,
     pub children: Vec<IRExpression>,
-
-// ================================================================================
-// TYPES
-// ================================================================================
-
+    // ================================================================================
+    // TYPES
+    // ================================================================================
 }
 #[derive(Debug, Clone, PartialEq)]
 pub struct IRType {

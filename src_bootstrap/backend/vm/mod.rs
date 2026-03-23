@@ -1,9 +1,9 @@
 // GUL 101 Virtual Machine
 // Lock-based, ownership-aware execution per Appendix G
 
-use crate::frontend::ast::Ownership;
-use crate::domains::dataflow::ir::{IRGraph, IREdge, NodeId};
 use crate::backend::interpreter::Value;
+use crate::domains::dataflow::ir::{IREdge, IRGraph, NodeId};
+use crate::frontend::ast::Ownership;
 use std::collections::{HashMap, HashSet};
 use std::sync::{Arc, RwLock};
 
@@ -57,12 +57,15 @@ impl VMState {
         let id = self.next_value_id;
         self.next_value_id += 1;
 
-        self.values.insert(id, RuntimeValue {
+        self.values.insert(
             id,
-            data,
-            owner,
-            lock: LockState::Unlocked,
-        });
+            RuntimeValue {
+                id,
+                data,
+                owner,
+                lock: LockState::Unlocked,
+            },
+        );
         self.owners.insert(id, owner);
         self.locks.insert(id, LockState::Unlocked);
 
@@ -71,7 +74,11 @@ impl VMState {
 
     /// Acquire lock based on ownership mode
     pub fn acquire_lock(&mut self, value_id: ValueId, mode: &Ownership) -> Result<(), String> {
-        let lock = self.locks.get(&value_id).cloned().unwrap_or(LockState::Unlocked);
+        let lock = self
+            .locks
+            .get(&value_id)
+            .cloned()
+            .unwrap_or(LockState::Unlocked);
 
         match (mode, lock) {
             // Ref: acquire shared read lock
@@ -109,7 +116,11 @@ impl VMState {
 
     /// Release lock
     pub fn release_lock(&mut self, value_id: ValueId, mode: &Ownership) {
-        let lock = self.locks.get(&value_id).cloned().unwrap_or(LockState::Unlocked);
+        let lock = self
+            .locks
+            .get(&value_id)
+            .cloned()
+            .unwrap_or(LockState::Unlocked);
 
         match (mode, lock) {
             (Ownership::Ref, LockState::SharedRead(1)) => {
@@ -222,9 +233,7 @@ impl VM {
 
         // Store output values
         for (port_name, value) in output_values {
-            let value_id = self
-                .state
-                .create_value(node_id, value);
+            let value_id = self.state.create_value(node_id, value);
             // Output values would be tracked for downstream nodes
             let _ = (port_name, value_id); // Used by edges_from
         }
@@ -335,10 +344,7 @@ impl VM {
             if let Some(node) = graph.get_node(*node_id) {
                 for output in &node.outputs {
                     // Placeholder: would collect actual output values
-                    outputs.insert(
-                        format!("{}:{}", node.name, output.name),
-                        Value::Integer(0),
-                    );
+                    outputs.insert(format!("{}:{}", node.name, output.name), Value::Integer(0));
                 }
             }
         }
@@ -352,15 +358,9 @@ impl VM {
         // 1. They share no exclusive ownership
         // 2. They do not mutate shared data
 
-        let edges_a: HashSet<_> = graph.edges_to(node_a)
-            .iter()
-            .map(|e| e.from_node)
-            .collect();
+        let edges_a: HashSet<_> = graph.edges_to(node_a).iter().map(|e| e.from_node).collect();
 
-        let edges_b: HashSet<_> = graph.edges_to(node_b)
-            .iter()
-            .map(|e| e.from_node)
-            .collect();
+        let edges_b: HashSet<_> = graph.edges_to(node_b).iter().map(|e| e.from_node).collect();
 
         // Check for shared dependencies with exclusive access
         for shared in edges_a.intersection(&edges_b) {

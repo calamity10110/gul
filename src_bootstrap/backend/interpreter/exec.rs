@@ -1,12 +1,15 @@
-use crate::frontend::ast::*;
-use super::values::{Value, ControlFlow};
+use super::values::{ControlFlow, Value};
 use super::Interpreter;
+use crate::frontend::ast::*;
 use rayon::prelude::*;
-use std::process::Command;
 use std::io::Write;
+use std::process::Command;
 
 impl Interpreter {
-    pub(crate) fn execute_statements(&mut self, statements: &[Statement]) -> Result<ControlFlow, String> {
+    pub(crate) fn execute_statements(
+        &mut self,
+        statements: &[Statement],
+    ) -> Result<ControlFlow, String> {
         for stmt in statements {
             let flow = self.execute(stmt)?;
             match flow {
@@ -48,17 +51,19 @@ impl Interpreter {
                     Ok(ControlFlow::Next)
                 }
             }
-            Statement::Loop { body } => {
-                loop {
-                    let flow = self.execute_statements(body)?;
-                    match flow {
-                        ControlFlow::Break => break Ok(ControlFlow::Next),
-                        ControlFlow::Continue | ControlFlow::Next => continue,
-                        ControlFlow::Return(v) => break Ok(ControlFlow::Return(v)),
-                    }
+            Statement::Loop { body } => loop {
+                let flow = self.execute_statements(body)?;
+                match flow {
+                    ControlFlow::Break => break Ok(ControlFlow::Next),
+                    ControlFlow::Continue | ControlFlow::Next => continue,
+                    ControlFlow::Return(v) => break Ok(ControlFlow::Return(v)),
                 }
-            }
-            Statement::While { condition, body, is_parallel } => {
+            },
+            Statement::While {
+                condition,
+                body,
+                is_parallel,
+            } => {
                 if *is_parallel {
                     // also_while implementation (v3.2)
                     // Simplified: parallel execute one iteration if condition holds?
@@ -67,14 +72,16 @@ impl Interpreter {
                     println!("Warning: also_while executed sequentially for safety.");
                 }
                 loop {
-                     let cond = self.evaluate(condition)?;
-                     let truthy = match cond {
+                    let cond = self.evaluate(condition)?;
+                    let truthy = match cond {
                         Value::Bool(b) => b,
                         Value::Null => false,
                         Value::Integer(i) => i != 0,
                         _ => true,
                     };
-                    if !truthy { break Ok(ControlFlow::Next); }
+                    if !truthy {
+                        break Ok(ControlFlow::Next);
+                    }
 
                     let flow = self.execute_statements(body)?;
                     match flow {
@@ -97,7 +104,9 @@ impl Interpreter {
                             // Parallel execution using Rayon
                             items.par_iter().for_each(|item| {
                                 let mut thread_interpreter = self.clone();
-                                thread_interpreter.variables.insert(variable.clone(), item.clone());
+                                thread_interpreter
+                                    .variables
+                                    .insert(variable.clone(), item.clone());
                                 let _ = thread_interpreter.execute_statements(body);
                             });
                             Ok(ControlFlow::Next)
@@ -119,7 +128,11 @@ impl Interpreter {
                 }
             }
             Statement::Function {
-                name, params, outputs, body, ..
+                name,
+                params,
+                outputs,
+                body,
+                ..
             } => {
                 let val = Value::Function(params.clone(), outputs.clone(), body.clone());
                 self.variables.insert(name.clone(), val);
@@ -156,22 +169,20 @@ impl Interpreter {
                 self.variables.insert(name.clone(), val);
                 Ok(ControlFlow::Next)
             }
-            Statement::Main { body } => {
-                self.execute_statements(body).map(|_| ControlFlow::Next)
-            }
+            Statement::Main { body } => self.execute_statements(body).map(|_| ControlFlow::Next),
             Statement::ForeignBlock { language, code } => {
                 // Execute foreign code blocks based on language
                 match language.as_str() {
                     "python" => {
-                        let output = Command::new("python3")
-                            .arg("-c")
-                            .arg(code)
-                            .output();
+                        let output = Command::new("python3").arg("-c").arg(code).output();
 
                         match output {
                             Ok(out) => {
                                 if !out.status.success() {
-                                    eprintln!("Python error: {}", String::from_utf8_lossy(&out.stderr));
+                                    eprintln!(
+                                        "Python error: {}",
+                                        String::from_utf8_lossy(&out.stderr)
+                                    );
                                 }
                                 print!("{}", String::from_utf8_lossy(&out.stdout));
                             }
@@ -202,7 +213,7 @@ impl Interpreter {
                                 let _start = std::time::Instant::now();
                                 let run = Command::new(temp_bin).status();
                                 if let Ok(_) = run {
-                                     // Success
+                                    // Success
                                 }
                                 // Cleanup
                                 let _ = std::fs::remove_file(temp_file);
@@ -211,17 +222,17 @@ impl Interpreter {
                                 eprintln!("Rust compilation failed");
                             }
                         } else {
-                             eprintln!("Failed to run rustc");
+                            eprintln!("Failed to run rustc");
                         }
                     }
                     "sql" => {
                         // SQL blocks can be executed against database
                         // Placeholder
-                         println!("[SQL block - {} chars]", code.len());
+                        println!("[SQL block - {} chars]", code.len());
                     }
                     "js" | "javascript" => {
-                         // Placeholder
-                         println!("[JavaScript block - {} chars]", code.len());
+                        // Placeholder
+                        println!("[JavaScript block - {} chars]", code.len());
                     }
                     "c" => {
                         // C blocks

@@ -1,8 +1,8 @@
 // GUL 101 Ownership Checker Implementation
 
 use super::errors::{ErrorCode, OwnershipError};
-use crate::frontend::ast::Ownership;
 use crate::domains::dataflow::ir::{IREdge, IRGraph, NodeId};
+use crate::frontend::ast::Ownership;
 use std::collections::{HashMap, HashSet};
 
 /// Ownership checker for IR graphs
@@ -131,8 +131,8 @@ impl Default for OwnershipChecker {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::frontend::ast::Type;
     use crate::domains::dataflow::ir::{IRNode, IRPort};
+    use crate::frontend::ast::Type;
 
     #[test]
     fn test_valid_graph() {

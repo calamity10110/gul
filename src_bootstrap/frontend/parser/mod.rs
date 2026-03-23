@@ -125,7 +125,6 @@ impl Parser {
         }
         Ok(Program { statements })
     }
-
 }
 
 #[cfg(test)]
