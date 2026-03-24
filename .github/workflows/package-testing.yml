@@ -20,9 +20,9 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' && github.ref != 'refs/heads/develop' }}
 
 jobs:
-  # Validate all packages
-  validate-packages:
-    name: Validate Package Metadata
+  # ⚡ Bolt: Fold package ecosystem tests into a single job to avoid redundant CI build times
+  package-ecosystem-ubuntu:
+    name: Package Ecosystem Tests (Ubuntu)
     runs-on: ubuntu-latest
 
     steps:
@@ -40,6 +40,9 @@ jobs:
       # ⚡ Bolt: Use robust rust caching to avoid recompiling from scratch
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
+        with:
+          key: ubuntu-latest
+
       - name: Build GUL Compiler
         run: cargo build --release
 
@@ -48,7 +51,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
+      - name: Install Python dependencies
         run: pip install toml pyyaml jsonschema
 
       - name: Validate package manifests
@@ -75,85 +78,28 @@ jobs:
             echo "validate_dependencies.py not found, skipping"
           fi
 
-  # Test package compatibility
-  test-compatibility:
-    name: Package Compatibility Matrix
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        package-set:
-          - web
-          - database
-          - data-science
-          - tui
-          - utils
-          - testing
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install system dependencies
+      - name: Test Package Categories
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libudev-dev pkg-config libssl-dev
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      # ⚡ Bolt: Use robust rust caching to avoid recompiling from scratch
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-      - name: Build GUL
-        run: cargo build --release
-
-      - name: Test ${{ matrix.package-set }} packages
-        run: |
-          if [ -d "packages/${{ matrix.package-set }}" ]; then
-            for package in packages/${{ matrix.package-set }}/*; do
-              if [ -d "$package" ] && [ -f "$package/Cargo.toml" ]; then
-                echo "::group::Testing $(basename $package)"
-                cd "$package"
-                cargo test --all-features || echo "Tests failed for $(basename $package), continuing"
-                cd -
-                echo "::endgroup::"
+          categories=("web" "database" "data-science" "tui" "utils" "testing")
+          for category in "${categories[@]}"; do
+            echo "::group::Testing category $category"
+            if [ -d "packages/$category" ]; then
+              for package in packages/$category/*; do
+                if [ -d "$package" ] && [ -f "$package/Cargo.toml" ]; then
+                  echo "Testing $(basename $package)"
+                  cd "$package"
+                  cargo test --all-features || echo "Tests failed for $(basename $package), continuing"
+                  cd -
+                fi
+              done
+              if [ -f "scripts/ci/test_package_compatibility.py" ]; then
+                python scripts/ci/test_package_compatibility.py --category $category || echo "Cross-package compatibility test failed for $category, continuing"
               fi
-            done
-          else
-            echo "Package category packages/${{ matrix.package-set }} not found, skipping"
-          fi
-
-      - name: Test cross-package compatibility
-        run: |
-          if [ -d "packages/${{ matrix.package-set }}" ] && [ -f "scripts/ci/test_package_compatibility.py" ]; then
-            python scripts/ci/test_package_compatibility.py --category ${{ matrix.package-set }} || echo "Cross-package compatibility test failed for ${{ matrix.package-set }}, continuing"
-          else
-            echo "Skipping cross-package compatibility (missing directory or script)"
-          fi
-
-  # Test all gul_packages
-  test-gul-packages:
-    name: Test GUL Standard Packages
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libudev-dev pkg-config libssl-dev
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      # ⚡ Bolt: Use robust rust caching to avoid recompiling from scratch
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-      - name: Build GUL compiler
-        run: cargo build --release
+            else
+              echo "Package category packages/$category not found, skipping"
+            fi
+            echo "::endgroup::"
+          done
 
       - name: Test all gul_packages
         run: |
@@ -177,63 +123,6 @@ jobs:
             echo "Compatibility report script not found, skipping"
           fi
 
-  # Package installation tests
-  test-installation:
-    name: Package Installation Tests
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install system dependencies (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libudev-dev pkg-config libssl-dev
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      # ⚡ Bolt: Use robust rust caching to avoid recompiling from scratch
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          key: ${{ matrix.os }}
-      - name: Build GUL
-        run: cargo build --release
-
-      - name: Test package installation
-        run: |
-          echo "Package install/remove subcommands not yet implemented, skipping"
-          # Future: gul install http, gul install database, etc.
-
-  # Performance regression tests
-  package-benchmarks:
-    name: Package Performance Benchmarks
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libudev-dev pkg-config libssl-dev
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      # ⚡ Bolt: Use robust rust caching to avoid recompiling from scratch
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          key: ${{ matrix.os }}
       - name: Run package benchmarks
         run: |
           found=false
@@ -265,28 +154,6 @@ jobs:
           path: target/criterion
           if-no-files-found: ignore
 
-  # Package documentation generation
-  generate-package-docs:
-    name: Generate Package Documentation
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libudev-dev pkg-config libssl-dev
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      # ⚡ Bolt: Use robust rust caching to avoid recompiling from scratch
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-        with:
-          key: ${{ matrix.os }}
       - name: Generate package docs
         run: |
           found=false
@@ -326,3 +193,38 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./site
+
+  # Package installation tests
+  test-installation:
+    name: Package Installation Tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install system dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libudev-dev pkg-config libssl-dev
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      # ⚡ Bolt: Use robust rust caching to avoid recompiling from scratch
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          key: ${{ matrix.os }}
+      - name: Build GUL
+        run: cargo build --release
+
+      - name: Test package installation
+        run: |
+          echo "Package install/remove subcommands not yet implemented, skipping"
+          # Future: gul install http, gul install database, etc.
