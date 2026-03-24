@@ -20,19 +20,21 @@ concurrency:
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/master' && github.ref != 'refs/heads/develop' }}
 
 jobs:
-  # Validate documentation
-  validate-docs:
-    name: Validate Documentation
+  # ⚡ Bolt: Fold documentation jobs into a single pipeline to avoid redundant CI build times
+  documentation-pipeline:
+    name: Documentation Pipeline
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libudev-dev pkg-config libssl-dev
+          sudo apt-get install -y libudev-dev pkg-config libssl-dev xvfb imagemagick
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
@@ -40,6 +42,9 @@ jobs:
       # ⚡ Bolt: Use robust rust caching to avoid recompiling from scratch
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
+        with:
+          key: ubuntu-latest
+
       - name: Build GUL Compiler
         run: cargo build --release
 
@@ -71,32 +76,11 @@ jobs:
       - name: Check for broken cross-references
         run: python scripts/ci/check_doc_references.py || echo "Cross-reference check skipped or failed"
 
-  # Generate API documentation
-  generate-api-docs:
-    name: Generate API Documentation
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libudev-dev pkg-config libssl-dev
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      # ⚡ Bolt: Use robust rust caching to avoid recompiling from scratch
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
       - name: Generate Rust API docs
         run: cargo doc --no-deps --all-features --document-private-items
 
       - name: Generate GUL stdlib docs
         run: |
-          cargo build --release
           ./target/release/gul doc --all-packages --output docs/api/generated || echo "gul doc subcommand not yet implemented, skipping"
 
       - name: Generate package API docs
@@ -112,27 +96,28 @@ jobs:
           path: docs/api/generated
           if-no-files-found: ignore
 
-  # Build documentation site
-  build-docs-site:
-    name: Build Documentation Site
-    runs-on: ubuntu-latest
-    needs: [validate-docs, generate-api-docs]
+      - name: Generate CLI screenshots
+        run: |
+          if [ -f "scripts/ci/generate_cli_screenshots.py" ]; then
+            xvfb-run python scripts/ci/generate_cli_screenshots.py || echo "CLI screenshot generation failed"
+          else
+            echo "generate_cli_screenshots.py not found, skipping"
+          fi
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Generate TUI screenshots
+        run: |
+          if [ -f "scripts/ci/generate_tui_screenshots.py" ]; then
+            xvfb-run python scripts/ci/generate_tui_screenshots.py || echo "TUI screenshot generation failed"
+          else
+            echo "generate_tui_screenshots.py not found, skipping"
+          fi
 
-      - name: Download API docs
-        uses: actions/download-artifact@v4
-        continue-on-error: true
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
         with:
-          name: api-documentation
-          path: docs/api/generated
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+          name: tutorial-screenshots
+          path: docs/assets/screenshots
+          if-no-files-found: ignore
 
       - name: Install MkDocs
         run: |
@@ -157,24 +142,8 @@ jobs:
           name: documentation-site
           path: site
 
-  # Deploy documentation
-  deploy-docs:
-    name: Deploy Documentation
-    runs-on: ubuntu-latest
-    needs: build-docs-site
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Download documentation site
-        uses: actions/download-artifact@v4
-        with:
-          name: documentation-site
-          path: site
-
       - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -182,80 +151,20 @@ jobs:
           cname: docs.gul-lang.org
 
       - name: Deploy to documentation server
+        if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
         run: |
           # rsync -avz --delete site/ user@docs-server:/var/www/docs/
           echo "Deploy to custom server (configure as needed)"
 
-  # Generate changelog
-  generate-changelog:
-    name: Generate Changelog
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
       - name: Generate changelog
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
         run: python scripts/ci/generate_changelog.py || echo "Changelog generation skipped"
 
       - name: Update CHANGES.md
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add CHANGES.md
           git diff --quiet && git diff --staged --quiet || git commit -m "docs: update changelog [skip ci]"
           git push
-
-  # Generate tutorial screenshots
-  generate-screenshots:
-    name: Generate Tutorial Screenshots
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libudev-dev pkg-config libssl-dev xvfb imagemagick
-
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      # ⚡ Bolt: Use robust rust caching to avoid recompiling from scratch
-      - name: Rust Cache
-        uses: Swatinem/rust-cache@v2
-      - name: Build GUL
-        run: cargo build --release
-
-      - name: Generate CLI screenshots
-        run: |
-          if [ -f "scripts/ci/generate_cli_screenshots.py" ]; then
-            xvfb-run python scripts/ci/generate_cli_screenshots.py || echo "CLI screenshot generation failed"
-          else
-            echo "generate_cli_screenshots.py not found, skipping"
-          fi
-
-      - name: Generate TUI screenshots
-        run: |
-          if [ -f "scripts/ci/generate_tui_screenshots.py" ]; then
-            xvfb-run python scripts/ci/generate_tui_screenshots.py || echo "TUI screenshot generation failed"
-          else
-            echo "generate_tui_screenshots.py not found, skipping"
-          fi
-
-      - name: Upload screenshots
-        uses: actions/upload-artifact@v4
-        with:
-          name: tutorial-screenshots
-          path: docs/assets/screenshots
-          if-no-files-found: ignore

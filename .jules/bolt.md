@@ -9,3 +9,7 @@
 ## $(date +%Y-%m-%d) - [Fold CI/CD Interop Jobs]
 **Learning:** Provisioning separate CI runners for tightly related tests (like FFI tests for different languages) forces redundant toolchain downloads, codebase compilations, and dependency fetching, which eats up massive CI execution time.
 **Action:** Always fold related CI test jobs into a single pipeline block when they require the exact same pre-requisite build artifacts, drastically reducing redundant CI build overhead.
+
+## 2024-03-24 - CI/CD Pipeline Fragmentation Overhead
+**Learning:** Splitting logically related tests and documentation generation steps into multiple dependent or sequential jobs in GitHub Actions causes massive overhead. Each job redundantly provisions a runner, reinstalls system dependencies, fetches toolchains, caches Rust, and performs identical `cargo build --release` steps.
+**Action:** Fold related tests and pipeline steps into a single primary job per workflow to eliminate duplicate setup and build times, using simple bash loops instead of matrix strategies when testing fast, related components.
