@@ -13,3 +13,7 @@
 ## 2024-03-24 - CI/CD Pipeline Fragmentation Overhead
 **Learning:** Splitting logically related tests and documentation generation steps into multiple dependent or sequential jobs in GitHub Actions causes massive overhead. Each job redundantly provisions a runner, reinstalls system dependencies, fetches toolchains, caches Rust, and performs identical `cargo build --release` steps.
 **Action:** Fold related tests and pipeline steps into a single primary job per workflow to eliminate duplicate setup and build times, using simple bash loops instead of matrix strategies when testing fast, related components.
+
+## 2024-05-20 - Folding Matrix-Dependent CI Jobs Safely
+**Learning:** When folding fast sequential jobs (like integration tests, docs, and registry publishing) that depend on a natively parallelized matrix job (like test coverage across Python versions), attempting to fold the matrix itself into a bash loop breaks coverage artifact generation and increases test wall-clock time.
+**Action:** Preserve matrix strategies for parallel testing tasks that generate versioned artifacts, but aggressively fold all subsequent dependent jobs into a single combined job to eliminate massive redundant runner provisioning overhead.

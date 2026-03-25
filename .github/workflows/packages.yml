@@ -58,30 +58,8 @@ jobs:
           name: package-coverage
           token: ${{ secrets.CODECOV_TOKEN }}
 
-  build-docs:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Build documentation
-        run: |
-          echo "Documentation build would go here"
-          ls -la docs/
-
-  package-registry:
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
-    needs: [test-packages]
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Package for distribution
-        run: |
-          echo "Package build for registry"
-          find packages -name "*.py" | wc -l
-
-  integration-tests:
+  # ⚡ Bolt: Fold dependent jobs (docs, registry, integration tests) into a single runner to avoid redundant setup overhead
+  package-post-tests:
     runs-on: ubuntu-latest
     needs: [test-packages]
 
@@ -116,6 +94,11 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Build documentation
+        run: |
+          echo "Documentation build would go here"
+          ls -la docs/
+
       - name: Run integration tests
         env:
           POSTGRES_HOST: localhost
@@ -127,3 +110,9 @@ jobs:
         run: |
           echo "Integration tests would run here"
           echo "Testing database connections..."
+
+      - name: Package for distribution
+        if: github.ref == 'refs/heads/master'
+        run: |
+          echo "Package build for registry"
+          find packages -name "*.py" | wc -l
