@@ -23,7 +23,11 @@ impl Registry {
 
     pub fn register(&self, name: &str, url: &str) -> String {
         let mut map = self.services.lock().unwrap();
-        let instances = map.entry(name.to_string()).or_insert(Vec::new());
+        // ⚡ Bolt: Use contains_key instead of entry().or_insert() to avoid redundant String allocation in hot paths
+        if !map.contains_key(name) {
+            map.insert(name.to_string(), Vec::new());
+        }
+        let instances = map.get_mut(name).unwrap();
 
         let id = uuid::Uuid::new_v4().to_string();
         instances.push(ServiceInstance {

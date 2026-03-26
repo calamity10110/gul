@@ -47,7 +47,7 @@ jobs:
       # ⚡ Bolt: Combine tests to avoid recompiling from scratch and saving CI minutes
       - name: Shared Sanity Tests
         run: |
-          cargo build -p ${{ matrix.compiler }} --release
+          # ⚡ Bolt: Removed redundant `cargo build` here to save CI time; already built above
           if [ "${{ matrix.compiler }}" == "gul_nightly" ]; then
             ./target/release/gul-compile compilers/shared/tests/sanity_check.mn -o sanity_nightly
             ./sanity_nightly
@@ -63,7 +63,7 @@ jobs:
         if: matrix.compiler == 'gul_nightly'
         continue-on-error: true
         run: |
-          cargo build -p ${{ matrix.compiler }} --release
+          # ⚡ Bolt: Removed redundant `cargo build` here to save CI time; already built above
           cd compilers/nightly
           python3 tests/run_tests.py
 
