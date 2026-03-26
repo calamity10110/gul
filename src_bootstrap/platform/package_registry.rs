@@ -139,21 +139,22 @@ impl PackageRegistry {
         match self.packages.get(&key) {
             Some(package) => {
                 let mut resolved = Vec::new();
-                let mut to_resolve: Vec<(String, String)> = package
+                let mut visited = std::collections::HashSet::new();
+                let mut to_resolve: Vec<(&str, &str)> = package
                     .dependencies
                     .iter()
-                    .map(|(name, ver)| (name.clone(), ver.clone()))
+                    .map(|(name, ver)| (name.as_str(), ver.as_str()))
                     .collect();
 
                 while let Some((name, ver)) = to_resolve.pop() {
                     let dep_key = format!("{}@{}", name, ver);
 
-                    if !resolved.contains(&dep_key) {
+                    if visited.insert(dep_key.clone()) {
                         resolved.push(dep_key.clone());
 
                         if let Some(dep_pkg) = self.packages.get(&dep_key) {
                             for (dep_name, dep_ver) in &dep_pkg.dependencies {
-                                to_resolve.push((dep_name.clone(), dep_ver.clone()));
+                                to_resolve.push((dep_name.as_str(), dep_ver.as_str()));
                             }
                         }
                     }
