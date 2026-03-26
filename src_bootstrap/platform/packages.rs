@@ -245,21 +245,21 @@ impl PackageRegistry {
 
     pub fn resolve_dependencies(&self, package_name: &str) -> Result<Vec<String>, String> {
         let mut resolved = Vec::new();
-        let mut to_resolve = vec![package_name.to_string()];
+        let mut to_resolve = vec![package_name];
         let mut visited = std::collections::HashSet::new();
 
         while let Some(name) = to_resolve.pop() {
-            if visited.contains(&name) {
+            if visited.contains(name) {
                 continue;
             }
 
-            visited.insert(name.clone());
-            resolved.push(name.clone());
+            visited.insert(name);
+            resolved.push(name.to_string());
 
-            if let Some(pkg) = self.get_package(&name) {
+            if let Some(pkg) = self.get_package(name) {
                 for dep in &pkg.dependencies {
-                    if !visited.contains(dep) {
-                        to_resolve.push(dep.clone());
+                    if !visited.contains(dep.as_str()) {
+                        to_resolve.push(dep.as_str());
                     }
                 }
             } else {
