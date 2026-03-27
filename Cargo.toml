@@ -100,3 +100,7 @@ exclude = [
   "packages/*/examples",
   "packages/*/benches",
 ]
+
+[[bench]]
+name = "vm_bench"
+harness = false

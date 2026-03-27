@@ -17,3 +17,7 @@
 ## 2024-05-20 - Folding Matrix-Dependent CI Jobs Safely
 **Learning:** When folding fast sequential jobs (like integration tests, docs, and registry publishing) that depend on a natively parallelized matrix job (like test coverage across Python versions), attempting to fold the matrix itself into a bash loop breaks coverage artifact generation and increases test wall-clock time.
 **Action:** Preserve matrix strategies for parallel testing tasks that generate versioned artifacts, but aggressively fold all subsequent dependent jobs into a single combined job to eliminate massive redundant runner provisioning overhead.
+
+## 2024-03-27 - [VM String Allocation Optimization]
+**Learning:** By passing an intermediate HashMap (`inputs: HashMap<String, ValueId>`) by value rather than by reference into the VM execution logic, we can consume the string keys directly instead of cloning them when inserting them into the output map. We avoided another lookup loop for releasing locks by caching the locks in a `Vec` while building the inputs map.
+**Action:** When a function needs to copy data from an intermediate container that will be discarded, pass the container by value to allow moving its elements and avoid allocations. Cache necessary metadata (like locks to release) before consuming the container.

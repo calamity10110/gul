@@ -1,0 +1,6 @@
+vm_execution_100        time:   [404.37 µs 767.65 µs 1.6057 ms]
+                        change: [-39.208% +69.902% +326.58%] (p = 0.70 > 0.05)
+                        No change in performance detected.
+Found 3 outliers among 100 measurements (3.00%)
+  1 (1.00%) high mild
+  2 (2.00%) high severe

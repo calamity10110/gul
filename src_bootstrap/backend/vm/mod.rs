@@ -201,6 +201,7 @@ impl VM {
 
         // Track input values and acquire locks
         let mut input_values: HashMap<String, ValueId> = HashMap::new();
+        let mut locks_to_release = Vec::new();
 
         for edge in graph.edges_to(node_id) {
             // Get source node's output value
@@ -218,6 +219,7 @@ impl VM {
                         self.state.acquire_lock(value_id, &edge.mode)?;
 
                         input_values.insert(edge.to_port.clone(), value_id);
+                        locks_to_release.push((value_id, edge.mode.clone()));
 
                         // Handle ownership transfer for Take mode
                         if edge.mode.moves_ownership() {
@@ -229,7 +231,7 @@ impl VM {
         }
 
         // Execute node logic based on node type
-        let output_values = self.execute_node_logic(node, &input_values)?;
+        let output_values = self.execute_node_logic(node, input_values)?;
 
         // Store output values
         for (port_name, value) in output_values {
@@ -239,10 +241,8 @@ impl VM {
         }
 
         // Release input locks
-        for edge in graph.edges_to(node_id) {
-            if let Some(&value_id) = input_values.get(&edge.to_port) {
-                self.state.release_lock(value_id, &edge.mode);
-            }
+        for (value_id, mode) in locks_to_release {
+            self.state.release_lock(value_id, &mode);
         }
 
         Ok(())
@@ -252,7 +252,7 @@ impl VM {
     fn execute_node_logic(
         &mut self,
         node: &crate::domains::dataflow::ir::IRNode,
-        inputs: &HashMap<String, ValueId>,
+        inputs: HashMap<String, ValueId>,
     ) -> Result<HashMap<String, Value>, String> {
         let mut outputs = HashMap::new();
 
@@ -262,7 +262,7 @@ impl VM {
                 // Sum all inputs
                 let mut total = 0i64;
                 for (_, value_id) in inputs {
-                    if let Some(val) = self.state.get_value(*value_id) {
+                    if let Some(val) = self.state.get_value(value_id) {
                         if let Value::Integer(i) = &val.data {
                             total += i;
                         }
@@ -274,7 +274,7 @@ impl VM {
                 // Multiply all inputs
                 let mut product = 1i64;
                 for (_, value_id) in inputs {
-                    if let Some(val) = self.state.get_value(*value_id) {
+                    if let Some(val) = self.state.get_value(value_id) {
                         if let Value::Integer(i) = &val.data {
                             product *= i;
                         }
@@ -285,8 +285,8 @@ impl VM {
             "print" | "output" => {
                 // Output nodes - collect values for final output
                 for (port_name, value_id) in inputs {
-                    if let Some(val) = self.state.get_value(*value_id) {
-                        outputs.insert(port_name.clone(), val.data.clone());
+                    if let Some(val) = self.state.get_value(value_id) {
+                        outputs.insert(port_name, val.data.clone());
                     }
                 }
             }
@@ -299,7 +299,7 @@ impl VM {
             "double" => {
                 // Double first input
                 for (_, value_id) in inputs {
-                    if let Some(val) = self.state.get_value(*value_id) {
+                    if let Some(val) = self.state.get_value(value_id) {
                         if let Value::Integer(i) = &val.data {
                             outputs.insert("result".to_string(), Value::Integer(i * 2));
                             break;
@@ -310,24 +310,24 @@ impl VM {
             "filter" => {
                 // Pass through inputs that match condition
                 for (port_name, value_id) in inputs {
-                    if let Some(val) = self.state.get_value(*value_id) {
-                        outputs.insert(port_name.clone(), val.data.clone());
+                    if let Some(val) = self.state.get_value(value_id) {
+                        outputs.insert(port_name, val.data.clone());
                     }
                 }
             }
             "map" | "transform" => {
                 // Apply transformation (identity for now)
                 for (port_name, value_id) in inputs {
-                    if let Some(val) = self.state.get_value(*value_id) {
-                        outputs.insert(port_name.clone(), val.data.clone());
+                    if let Some(val) = self.state.get_value(value_id) {
+                        outputs.insert(port_name, val.data.clone());
                     }
                 }
             }
             _ => {
                 // Default: pass through
                 for (port_name, value_id) in inputs {
-                    if let Some(val) = self.state.get_value(*value_id) {
-                        outputs.insert(port_name.clone(), val.data.clone());
+                    if let Some(val) = self.state.get_value(value_id) {
+                        outputs.insert(port_name, val.data.clone());
                     }
                 }
             }
