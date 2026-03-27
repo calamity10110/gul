@@ -42,7 +42,8 @@ jobs:
         run: cargo build -p ${{ matrix.compiler }} --release
 
       - name: Test ${{ matrix.compiler }}
-        run: cargo test -p ${{ matrix.compiler }}
+        # ⚡ Bolt: Run tests in release mode to reuse artifacts from the previous build step and save CI time
+        run: cargo test -p ${{ matrix.compiler }} --release
 
       # ⚡ Bolt: Combine tests to avoid recompiling from scratch and saving CI minutes
       - name: Shared Sanity Tests
