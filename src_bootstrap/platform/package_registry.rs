@@ -116,13 +116,14 @@ impl PackageRegistry {
 
     /// Search by keywords
     pub fn search_by_keywords(&self, keywords: &[String]) -> Vec<&Package> {
+        // PERF: eq_ignore_ascii_case avoids to_lowercase() allocations inside hot loops
         self.packages
             .values()
             .filter(|pkg| {
                 keywords.iter().any(|kw| {
                     pkg.keywords
                         .iter()
-                        .any(|pkg_kw| pkg_kw.to_lowercase() == kw.to_lowercase())
+                        .any(|pkg_kw| pkg_kw.eq_ignore_ascii_case(kw))
                 })
             })
             .collect()
@@ -139,7 +140,9 @@ impl PackageRegistry {
         match self.packages.get(&key) {
             Some(package) => {
                 let mut resolved = Vec::new();
-                let mut visited = std::collections::HashSet::new();
+                // PERF: use (&str, &str) tuples to track visited dependencies without allocating Strings
+                let mut visited: std::collections::HashSet<(&str, &str)> =
+                    std::collections::HashSet::new();
                 let mut to_resolve: Vec<(&str, &str)> = package
                     .dependencies
                     .iter()
@@ -147,16 +150,16 @@ impl PackageRegistry {
                     .collect();
 
                 while let Some((name, ver)) = to_resolve.pop() {
-                    let dep_key = format!("{}@{}", name, ver);
-
-                    if visited.insert(dep_key.clone()) {
-                        resolved.push(dep_key.clone());
+                    if visited.insert((name, ver)) {
+                        let dep_key = format!("{}@{}", name, ver);
 
                         if let Some(dep_pkg) = self.packages.get(&dep_key) {
                             for (dep_name, dep_ver) in &dep_pkg.dependencies {
                                 to_resolve.push((dep_name.as_str(), dep_ver.as_str()));
                             }
                         }
+
+                        resolved.push(dep_key);
                     }
                 }
 
