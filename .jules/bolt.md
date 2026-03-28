@@ -6,7 +6,7 @@
 **Learning:** Using `.entry(key.clone()).or_insert()` inside frequent loops allocates a `String` on every iteration, bypassing the benefits of a hash map lookup.
 **Action:** When working with frequent lookups in hot loops, use `get_mut()` or `contains_key()` to avoid cloning keys unless an insertion is actually needed.
 
-## $(date +%Y-%m-%d) - [Fold CI/CD Interop Jobs]
+## 2026-03-28 - [Fold CI/CD Interop Jobs]
 **Learning:** Provisioning separate CI runners for tightly related tests (like FFI tests for different languages) forces redundant toolchain downloads, codebase compilations, and dependency fetching, which eats up massive CI execution time.
 **Action:** Always fold related CI test jobs into a single pipeline block when they require the exact same pre-requisite build artifacts, drastically reducing redundant CI build overhead.
 
@@ -17,3 +17,7 @@
 ## 2024-05-20 - Folding Matrix-Dependent CI Jobs Safely
 **Learning:** When folding fast sequential jobs (like integration tests, docs, and registry publishing) that depend on a natively parallelized matrix job (like test coverage across Python versions), attempting to fold the matrix itself into a bash loop breaks coverage artifact generation and increases test wall-clock time.
 **Action:** Preserve matrix strategies for parallel testing tasks that generate versioned artifacts, but aggressively fold all subsequent dependent jobs into a single combined job to eliminate massive redundant runner provisioning overhead.
+
+## 2026-03-28 - [Use --release for cargo test after cargo build --release]
+**Learning:** When a `cargo build --release` step is followed by a `cargo test` step without the `--release` flag in a CI/CD workflow, Cargo treats them as separate build profiles (release vs. dev) and redundantly recompiles the entire dependency tree and project from scratch in debug mode, doubling the CI time.
+**Action:** Always append the `--release` flag to `cargo test` if the build step preceding it was also executed with the `--release` flag, allowing Cargo to reuse the previously compiled artifacts and dramatically speed up CI runs.
