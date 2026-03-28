@@ -17,3 +17,11 @@
 ## 2024-05-20 - Folding Matrix-Dependent CI Jobs Safely
 **Learning:** When folding fast sequential jobs (like integration tests, docs, and registry publishing) that depend on a natively parallelized matrix job (like test coverage across Python versions), attempting to fold the matrix itself into a bash loop breaks coverage artifact generation and increases test wall-clock time.
 **Action:** Preserve matrix strategies for parallel testing tasks that generate versioned artifacts, but aggressively fold all subsequent dependent jobs into a single combined job to eliminate massive redundant runner provisioning overhead.
+
+## 2024-05-21 - [Avoid Format String Allocation in Graph Traversal]
+**Learning:** In deep graph traversal (like package dependency resolution), using `format!` to generate a key *before* checking if the node has been visited causes massive redundant heap allocations (O(edges) instead of O(nodes)).
+**Action:** Use a `HashSet` containing non-allocating primitive references (like `(&str, &str)` tuples) for cycle detection, and only perform heavy `String` allocations like `format!` when inserting a newly discovered node.
+
+## 2024-05-21 - [Avoid String Lowercasing inside Nested Filtering Loops]
+**Learning:** Using `String::to_lowercase()` inside a hot nested loop for string comparisons forces a heap allocation for every permutation, severely degrading search or filter performance.
+**Action:** When performing case-insensitive exact string comparisons inside hot loops in Rust, use the non-allocating standard library method `.eq_ignore_ascii_case()` instead.
