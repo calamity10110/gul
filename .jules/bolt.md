@@ -6,7 +6,7 @@
 **Learning:** Using `.entry(key.clone()).or_insert()` inside frequent loops allocates a `String` on every iteration, bypassing the benefits of a hash map lookup.
 **Action:** When working with frequent lookups in hot loops, use `get_mut()` or `contains_key()` to avoid cloning keys unless an insertion is actually needed.
 
-## $(date +%Y-%m-%d) - [Fold CI/CD Interop Jobs]
+## 2026-03-29 - [Fold CI/CD Interop Jobs]
 **Learning:** Provisioning separate CI runners for tightly related tests (like FFI tests for different languages) forces redundant toolchain downloads, codebase compilations, and dependency fetching, which eats up massive CI execution time.
 **Action:** Always fold related CI test jobs into a single pipeline block when they require the exact same pre-requisite build artifacts, drastically reducing redundant CI build overhead.
 
@@ -25,3 +25,6 @@
 ## 2024-05-21 - [Avoid String Lowercasing inside Nested Filtering Loops]
 **Learning:** Using `String::to_lowercase()` inside a hot nested loop for string comparisons forces a heap allocation for every permutation, severely degrading search or filter performance.
 **Action:** When performing case-insensitive exact string comparisons inside hot loops in Rust, use the non-allocating standard library method `.eq_ignore_ascii_case()` instead.
+## 2026-03-29 - [Reuse Release Artifacts in Cargo Test]
+**Learning:** Running `cargo test` immediately after a `cargo build --release` causes Cargo to recompile the entire project from scratch in debug mode, destroying the caching benefits of the previous step and drastically increasing CI execution time.
+**Action:** In CI workflows, if `cargo test` directly follows a `cargo build --release` step for the same target, always append the `--release` flag (e.g., `cargo test --release`) to ensure Cargo reuses the compiled release artifacts instead of starting a redundant debug build.
