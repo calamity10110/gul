@@ -42,7 +42,7 @@ jobs:
         run: cargo build -p ${{ matrix.compiler }} --release
 
       - name: Test ${{ matrix.compiler }}
-        run: cargo test -p ${{ matrix.compiler }}
+        run: cargo test -p ${{ matrix.compiler }} --release
 
       # ⚡ Bolt: Combine tests to avoid recompiling from scratch and saving CI minutes
       - name: Shared Sanity Tests
