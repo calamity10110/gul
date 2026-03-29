@@ -340,14 +340,16 @@ fn main() {
                 PackageAction::Search { query } => {
                     println!("{} '{}'", "Searching for".cyan().bold(), query);
                     let all_packages = pm.list_packages();
+
+                    // PERF: Extract query to_lowercase() outside the hot filter loop to prevent
+                    // redundant O(N) String allocations per iterated package.
+                    let query_lower = query.to_lowercase();
+
                     let results: Vec<_> = all_packages
                         .iter()
                         .filter(|pkg| {
-                            pkg.name.to_lowercase().contains(&query.to_lowercase())
-                                || pkg
-                                    .description
-                                    .to_lowercase()
-                                    .contains(&query.to_lowercase())
+                            pkg.name.to_lowercase().contains(&query_lower)
+                                || pkg.description.to_lowercase().contains(&query_lower)
                         })
                         .collect();
 
