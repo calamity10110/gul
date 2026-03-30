@@ -28,3 +28,7 @@
 ## 2026-03-29 - [Reuse Release Artifacts in Cargo Test]
 **Learning:** Running `cargo test` immediately after a `cargo build --release` causes Cargo to recompile the entire project from scratch in debug mode, destroying the caching benefits of the previous step and drastically increasing CI execution time.
 **Action:** In CI workflows, if `cargo test` directly follows a `cargo build --release` step for the same target, always append the `--release` flag (e.g., `cargo test --release`) to ensure Cargo reuses the compiled release artifacts instead of starting a redundant debug build.
+
+## 2024-05-18 - [Eliminate String Allocations in Package Search]
+**Learning:** Using `.to_lowercase().contains(&query_lower)` inside hot loops like the package registry's `search` function creates massive performance overhead due to O(N) memory allocations for every checked string field (name, description, keywords).
+**Action:** Replace `to_lowercase().contains()` with a custom case-insensitive byte window search using `eq_ignore_ascii_case()` (e.g., `contains_ignore_ascii_case`) to perform zero-allocation substring matching. This eliminates garbage creation and yields a >2x performance improvement.

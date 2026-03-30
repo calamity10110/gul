@@ -97,19 +97,51 @@ impl PackageRegistry {
         }
     }
 
+    /// Helper to perform case-insensitive substring search without allocations
+    fn contains_ignore_ascii_case(haystack: &str, needle: &str) -> bool {
+        let haystack_len = haystack.len();
+        let needle_len = needle.len();
+        if needle_len == 0 {
+            return true;
+        }
+        if haystack_len < needle_len {
+            return false;
+        }
+
+        let haystack_bytes = haystack.as_bytes();
+        let needle_bytes = needle.as_bytes();
+
+        let first_char_lower = needle_bytes[0].to_ascii_lowercase();
+        let first_char_upper = needle_bytes[0].to_ascii_uppercase();
+
+        for i in 0..=(haystack_len - needle_len) {
+            let c = haystack_bytes[i];
+            if (c == first_char_lower || c == first_char_upper)
+                && haystack_bytes[i..i + needle_len].eq_ignore_ascii_case(needle_bytes)
+            {
+                return true;
+            }
+        }
+        false
+    }
+
     /// Semantic search for packages
     pub fn search(&self, query: &str) -> Vec<&Package> {
-        let query_lower = query.to_lowercase();
+        if query.is_empty() {
+            return self.packages.values().collect();
+        }
 
+        // PERF: Avoid allocating new Strings with to_lowercase() inside the hot loop.
+        // O(N) allocations for package name, description and keywords are eliminated.
         self.packages
             .values()
             .filter(|pkg| {
-                pkg.name.to_lowercase().contains(&query_lower)
-                    || pkg.description.to_lowercase().contains(&query_lower)
+                Self::contains_ignore_ascii_case(&pkg.name, query)
+                    || Self::contains_ignore_ascii_case(&pkg.description, query)
                     || pkg
                         .keywords
                         .iter()
-                        .any(|k| k.to_lowercase().contains(&query_lower))
+                        .any(|k| Self::contains_ignore_ascii_case(k, query))
             })
             .collect()
     }
