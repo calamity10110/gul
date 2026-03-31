@@ -686,15 +686,24 @@ impl CommandPalette {
         if self.query.is_empty() {
             self.commands.iter().collect()
         } else {
-            // PERF: Extract the query's lowercase conversion outside the filter loop
-            // to avoid redundant string allocations on every iterated command.
-            let query_lower = self.query.to_lowercase();
+            // PERF: Use zero-allocation byte window iterator approach to prevent O(N) string
+            // allocations during case-insensitive substring searches in hot loops.
+            let query_bytes = self.query.as_bytes();
 
             self.commands
                 .iter()
                 .filter(|cmd| {
-                    cmd.name.to_lowercase().contains(&query_lower)
-                        || cmd.description.to_lowercase().contains(&query_lower)
+                    let name_bytes = cmd.name.as_bytes();
+                    let desc_bytes = cmd.description.as_bytes();
+
+                    (name_bytes.len() >= query_bytes.len()
+                        && name_bytes
+                            .windows(query_bytes.len())
+                            .any(|w| w.eq_ignore_ascii_case(query_bytes)))
+                        || (desc_bytes.len() >= query_bytes.len()
+                            && desc_bytes
+                                .windows(query_bytes.len())
+                                .any(|w| w.eq_ignore_ascii_case(query_bytes)))
                 })
                 .collect()
         }

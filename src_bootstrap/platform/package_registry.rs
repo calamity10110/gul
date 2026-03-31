@@ -99,17 +99,35 @@ impl PackageRegistry {
 
     /// Semantic search for packages
     pub fn search(&self, query: &str) -> Vec<&Package> {
-        let query_lower = query.to_lowercase();
+        // PERF: Use zero-allocation byte window iterator approach to prevent O(N) string
+        // allocations during case-insensitive substring searches in hot loops.
+        let query_bytes = query.as_bytes();
 
         self.packages
             .values()
             .filter(|pkg| {
-                pkg.name.to_lowercase().contains(&query_lower)
-                    || pkg.description.to_lowercase().contains(&query_lower)
-                    || pkg
-                        .keywords
-                        .iter()
-                        .any(|k| k.to_lowercase().contains(&query_lower))
+                if query_bytes.is_empty() {
+                    return true;
+                }
+
+                let name_bytes = pkg.name.as_bytes();
+                let desc_bytes = pkg.description.as_bytes();
+
+                (name_bytes.len() >= query_bytes.len()
+                    && name_bytes
+                        .windows(query_bytes.len())
+                        .any(|w| w.eq_ignore_ascii_case(query_bytes)))
+                    || (desc_bytes.len() >= query_bytes.len()
+                        && desc_bytes
+                            .windows(query_bytes.len())
+                            .any(|w| w.eq_ignore_ascii_case(query_bytes)))
+                    || pkg.keywords.iter().any(|k| {
+                        let k_bytes = k.as_bytes();
+                        k_bytes.len() >= query_bytes.len()
+                            && k_bytes
+                                .windows(query_bytes.len())
+                                .any(|w| w.eq_ignore_ascii_case(query_bytes))
+                    })
             })
             .collect()
     }

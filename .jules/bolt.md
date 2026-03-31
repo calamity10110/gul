@@ -25,6 +25,11 @@
 ## 2024-05-21 - [Avoid String Lowercasing inside Nested Filtering Loops]
 **Learning:** Using `String::to_lowercase()` inside a hot nested loop for string comparisons forces a heap allocation for every permutation, severely degrading search or filter performance.
 **Action:** When performing case-insensitive exact string comparisons inside hot loops in Rust, use the non-allocating standard library method `.eq_ignore_ascii_case()` instead.
+
 ## 2026-03-29 - [Reuse Release Artifacts in Cargo Test]
 **Learning:** Running `cargo test` immediately after a `cargo build --release` causes Cargo to recompile the entire project from scratch in debug mode, destroying the caching benefits of the previous step and drastically increasing CI execution time.
 **Action:** In CI workflows, if `cargo test` directly follows a `cargo build --release` step for the same target, always append the `--release` flag (e.g., `cargo test --release`) to ensure Cargo reuses the compiled release artifacts instead of starting a redundant debug build.
+
+## 2024-05-22 - [Avoid .windows(0) Panics in Zero-Allocation Substring Search]
+**Learning:** When replacing `.to_lowercase().contains()` with the zero-allocation byte window approach (`.as_bytes().windows(query.len()).any(|w| w.eq_ignore_ascii_case(query))`), if the query is an empty string, `query.len()` is 0. Rust's slice `.windows(size)` method explicitly panics at runtime if the `size` argument is 0.
+**Action:** Always wrap `.windows()`-based string search algorithms with an explicit empty guard (e.g., `if query.is_empty() { return true; }`) before entering the hot loop to prevent critical runtime panics.
