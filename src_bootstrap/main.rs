@@ -343,13 +343,21 @@ fn main() {
 
                     // PERF: Extract query to_lowercase() outside the hot filter loop to prevent
                     // redundant O(N) String allocations per iterated package.
-                    let query_lower = query.to_lowercase();
+                    let query_bytes = query.as_bytes();
+                    let is_empty = query.is_empty();
 
                     let results: Vec<_> = all_packages
                         .iter()
                         .filter(|pkg| {
-                            pkg.name.to_lowercase().contains(&query_lower)
-                                || pkg.description.to_lowercase().contains(&query_lower)
+                            if is_empty {
+                                return true;
+                            }
+
+                            let match_str = |haystack: &str| {
+                                haystack.len() >= query.len() && haystack.as_bytes().windows(query.len()).any(|w| w.eq_ignore_ascii_case(query_bytes))
+                            };
+
+                            match_str(&pkg.name) || match_str(&pkg.description)
                         })
                         .collect();
 

@@ -686,15 +686,16 @@ impl CommandPalette {
         if self.query.is_empty() {
             self.commands.iter().collect()
         } else {
-            // PERF: Extract the query's lowercase conversion outside the filter loop
-            // to avoid redundant string allocations on every iterated command.
-            let query_lower = self.query.to_lowercase();
+            // PERF: avoid redundant string allocations on every iterated command by using eq_ignore_ascii_case window
+            let query_bytes = self.query.as_bytes();
 
             self.commands
                 .iter()
                 .filter(|cmd| {
-                    cmd.name.to_lowercase().contains(&query_lower)
-                        || cmd.description.to_lowercase().contains(&query_lower)
+                    let match_str = |haystack: &str| {
+                        haystack.len() >= self.query.len() && haystack.as_bytes().windows(self.query.len()).any(|w| w.eq_ignore_ascii_case(query_bytes))
+                    };
+                    match_str(&cmd.name) || match_str(&cmd.description)
                 })
                 .collect()
         }

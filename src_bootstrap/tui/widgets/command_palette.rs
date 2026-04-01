@@ -55,13 +55,14 @@ impl<'a> CommandPaletteWidget<'a> {
             return self.commands.iter().collect();
         }
 
-        let query_lower = self.state.query.to_lowercase();
+        let query_bytes = self.state.query.as_bytes();
         self.commands
             .iter()
             .filter(|cmd| {
-                cmd.name.to_lowercase().contains(&query_lower)
-                    || cmd.description.to_lowercase().contains(&query_lower)
-                    || cmd.category.to_lowercase().contains(&query_lower)
+                let match_str = |haystack: &str| {
+                    haystack.len() >= self.state.query.len() && haystack.as_bytes().windows(self.state.query.len()).any(|w| w.eq_ignore_ascii_case(query_bytes))
+                };
+                match_str(&cmd.name) || match_str(&cmd.description) || match_str(&cmd.category)
             })
             .collect()
     }

@@ -28,3 +28,7 @@
 ## 2026-03-29 - [Reuse Release Artifacts in Cargo Test]
 **Learning:** Running `cargo test` immediately after a `cargo build --release` causes Cargo to recompile the entire project from scratch in debug mode, destroying the caching benefits of the previous step and drastically increasing CI execution time.
 **Action:** In CI workflows, if `cargo test` directly follows a `cargo build --release` step for the same target, always append the `--release` flag (e.g., `cargo test --release`) to ensure Cargo reuses the compiled release artifacts instead of starting a redundant debug build.
+
+## 2024-05-22 - [Avoid Allocating String during Character Lowercasing]
+**Learning:** Calling `c.to_lowercase().next().unwrap()` on a character inside a loop allocates an iterator which can be computationally expensive over many iterations compared to simple arithmetic conversions.
+**Action:** When working with ASCII text or in situations where true full Unicode lowercasing is not strictly required per character inside hot loops, use `c.to_ascii_lowercase()` to avoid iterator overhead and heap allocations.

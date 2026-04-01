@@ -99,17 +99,21 @@ impl PackageRegistry {
 
     /// Semantic search for packages
     pub fn search(&self, query: &str) -> Vec<&Package> {
-        let query_lower = query.to_lowercase();
+        let query_bytes = query.as_bytes();
+        let is_empty = query.is_empty();
 
         self.packages
             .values()
             .filter(|pkg| {
-                pkg.name.to_lowercase().contains(&query_lower)
-                    || pkg.description.to_lowercase().contains(&query_lower)
-                    || pkg
-                        .keywords
-                        .iter()
-                        .any(|k| k.to_lowercase().contains(&query_lower))
+                if is_empty {
+                    return true;
+                }
+
+                let match_str = |haystack: &str| {
+                    haystack.len() >= query.len() && haystack.as_bytes().windows(query.len()).any(|w| w.eq_ignore_ascii_case(query_bytes))
+                };
+
+                match_str(&pkg.name) || match_str(&pkg.description) || pkg.keywords.iter().any(|k| match_str(k))
             })
             .collect()
     }
