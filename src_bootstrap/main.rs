@@ -341,15 +341,17 @@ fn main() {
                     println!("{} '{}'", "Searching for".cyan().bold(), query);
                     let all_packages = pm.list_packages();
 
-                    // PERF: Extract query to_lowercase() outside the hot filter loop to prevent
-                    // redundant O(N) String allocations per iterated package.
-                    let query_lower = query.to_lowercase();
+                    let query_bytes = query.as_bytes();
+                    let q_len = query_bytes.len();
 
                     let results: Vec<_> = all_packages
                         .iter()
                         .filter(|pkg| {
-                            pkg.name.to_lowercase().contains(&query_lower)
-                                || pkg.description.to_lowercase().contains(&query_lower)
+                            if query.is_empty() {
+                                return true;
+                            }
+                            pkg.name.as_bytes().windows(q_len).any(|w| w.eq_ignore_ascii_case(query_bytes))
+                                || pkg.description.as_bytes().windows(q_len).any(|w| w.eq_ignore_ascii_case(query_bytes))
                         })
                         .collect();
 
