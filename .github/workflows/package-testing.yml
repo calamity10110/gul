@@ -221,9 +221,8 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           key: ${{ matrix.os }}
-      - name: Build GUL
-        run: cargo build --release
 
+      # ⚡ Bolt: Removed redundant `cargo build --release` step here to save CI time
       - name: Test package installation
         run: |
           echo "Package install/remove subcommands not yet implemented, skipping"
