@@ -113,7 +113,11 @@ impl Interpreter {
                         } else {
                             // Sequential execution
                             for item in items {
-                                self.variables.insert(variable.clone(), item);
+                                if let Some(val) = self.variables.get_mut(variable) {
+                                    *val = item;
+                                } else {
+                                    self.variables.insert(variable.clone(), item);
+                                }
                                 let flow = self.execute_statements(body)?;
                                 match flow {
                                     ControlFlow::Break => break,
