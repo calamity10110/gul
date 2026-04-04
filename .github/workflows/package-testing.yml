@@ -88,7 +88,8 @@ jobs:
                 if [ -d "$package" ] && [ -f "$package/Cargo.toml" ]; then
                   echo "Testing $(basename $package)"
                   cd "$package"
-                  cargo test --all-features || echo "Tests failed for $(basename $package), continuing"
+                  # ⚡ Bolt: Append --release to reuse artifacts from the earlier `cargo build --release` step
+                  cargo test --all-features --release || echo "Tests failed for $(basename $package), continuing"
                   cd -
                 fi
               done
