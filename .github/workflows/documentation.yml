@@ -46,7 +46,7 @@ jobs:
           key: ubuntu-latest
 
       - name: Build GUL Compiler
-        run: cargo build --release
+        run: cargo build
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -81,7 +81,7 @@ jobs:
 
       - name: Generate GUL stdlib docs
         run: |
-          ./target/release/gul doc --all-packages --output docs/api/generated || echo "gul doc subcommand not yet implemented, skipping"
+          ./target/debug/gul doc --all-packages --output docs/api/generated || echo "gul doc subcommand not yet implemented, skipping"
 
       - name: Generate package API docs
         run: python scripts/ci/generate_package_api_docs.py || echo "Package API doc generation skipped"

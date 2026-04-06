@@ -39,22 +39,22 @@ jobs:
         with:
           key: ${{ matrix.compiler }}
       - name: Build ${{ matrix.compiler }}
-        run: cargo build -p ${{ matrix.compiler }} --release
+        run: cargo build -p ${{ matrix.compiler }}
 
       - name: Test ${{ matrix.compiler }}
-        run: cargo test -p ${{ matrix.compiler }} --release
+        run: cargo test -p ${{ matrix.compiler }}
 
       # ⚡ Bolt: Combine tests to avoid recompiling from scratch and saving CI minutes
       - name: Shared Sanity Tests
         run: |
           # ⚡ Bolt: Removed redundant `cargo build` here to save CI time; already built above
           if [ "${{ matrix.compiler }}" == "gul_nightly" ]; then
-            ./target/release/gul-compile compilers/shared/tests/sanity_check.mn -o sanity_nightly
+            ./target/debug/gul-compile compilers/shared/tests/sanity_check.mn -o sanity_nightly
             ./sanity_nightly
           elif [ "${{ matrix.compiler }}" == "gul_stable" ]; then
-            ./target/release/gul-compile compilers/stable/tests/sanity_check.mn -o sanity_stable
+            ./target/debug/gul-compile compilers/stable/tests/sanity_check.mn -o sanity_stable
             ./sanity_stable
-            ./target/release/gul-compile compilers/stable/tests/arithmetic.mn -o arith_stable
+            ./target/debug/gul-compile compilers/stable/tests/arithmetic.mn -o arith_stable
             ./arith_stable
           fi
 
