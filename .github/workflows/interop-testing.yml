@@ -49,7 +49,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Build GUL
-        run: cargo build --release
+        run: cargo build
 
       - name: Install Python dependencies
         run: pip install pytest numpy pandas
@@ -58,7 +58,7 @@ jobs:
         id: python
         run: |
           if [ -f tests/interop/python_ffi_test.mn ]; then
-            ./target/release/gul test tests/interop/python_ffi_test.mn || echo "Test skipped: GUL runtime not fully implemented"
+            ./target/debug/gul test tests/interop/python_ffi_test.mn || echo "Test skipped: GUL runtime not fully implemented"
           else
             echo "Skipping: python_ffi_test.mn not found"
           fi
@@ -67,7 +67,7 @@ jobs:
         id: rust
         run: |
           if [ -f tests/interop/rust_ffi_test.mn ]; then
-            ./target/release/gul test tests/interop/rust_ffi_test.mn || echo "Test skipped: GUL runtime not fully implemented"
+            ./target/debug/gul test tests/interop/rust_ffi_test.mn || echo "Test skipped: GUL runtime not fully implemented"
           else
             echo "Skipping: rust_ffi_test.mn not found"
           fi
@@ -76,7 +76,7 @@ jobs:
         id: c
         run: |
           if [ -f tests/interop/c_ffi_test.mn ]; then
-            ./target/release/gul test tests/interop/c_ffi_test.mn || echo "Test skipped: GUL runtime not fully implemented"
+            ./target/debug/gul test tests/interop/c_ffi_test.mn || echo "Test skipped: GUL runtime not fully implemented"
           else
             echo "Skipping: c_ffi_test.mn not found"
           fi
@@ -85,7 +85,7 @@ jobs:
         id: js
         run: |
           if [ -f tests/interop/js_ffi_test.mn ]; then
-            ./target/release/gul test tests/interop/js_ffi_test.mn || echo "Test skipped: GUL runtime not fully implemented"
+            ./target/debug/gul test tests/interop/js_ffi_test.mn || echo "Test skipped: GUL runtime not fully implemented"
           else
             echo "Skipping: js_ffi_test.mn not found"
           fi

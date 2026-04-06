@@ -28,3 +28,7 @@
 ## 2026-03-29 - [Reuse Release Artifacts in Cargo Test]
 **Learning:** Running `cargo test` immediately after a `cargo build --release` causes Cargo to recompile the entire project from scratch in debug mode, destroying the caching benefits of the previous step and drastically increasing CI execution time.
 **Action:** In CI workflows, if `cargo test` directly follows a `cargo build --release` step for the same target, always append the `--release` flag (e.g., `cargo test --release`) to ensure Cargo reuses the compiled release artifacts instead of starting a redundant debug build.
+
+## 2024-05-23 - [Use Debug Profile for Fast CI Workflows]
+**Learning:** Release builds (`cargo build --release`) enable heavy LLVM optimizations that drastically inflate compile times, which usually outweighs any test execution time savings in CI environments. Mixing `--release` with un-flagged `cargo test` also causes redundant recompilation from scratch.
+**Action:** For fast Cargo CI workflows, prefer using the default debug profile (`cargo build` and `cargo test` without `--release`). Always ensure both build and test steps use the same profile to avoid redundant recompilations.
