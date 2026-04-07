@@ -88,7 +88,8 @@ jobs:
                 if [ -d "$package" ] && [ -f "$package/Cargo.toml" ]; then
                   echo "Testing $(basename $package)"
                   cd "$package"
-                  cargo test --release --all-features || echo "Tests failed for $(basename $package), continuing"
+                  # ⚡ Bolt: Removed --release to use debug profile, matching the `cargo build` above, preventing redundant recompilation
+                  cargo test --all-features || echo "Tests failed for $(basename $package), continuing"
                   cd -
                 fi
               done

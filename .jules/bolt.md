@@ -32,3 +32,7 @@
 ## 2024-05-23 - [Use Debug Profile for Fast CI Workflows]
 **Learning:** Release builds (`cargo build --release`) enable heavy LLVM optimizations that drastically inflate compile times, which usually outweighs any test execution time savings in CI environments. Mixing `--release` with un-flagged `cargo test` also causes redundant recompilation from scratch.
 **Action:** For fast Cargo CI workflows, prefer using the default debug profile (`cargo build` and `cargo test` without `--release`). Always ensure both build and test steps use the same profile to avoid redundant recompilations.
+
+## 2024-05-23 - [Avoid Redundant Release Builds in CI]
+**Learning:** Running `cargo test --release` when previous compilation steps (e.g., `cargo build`) were performed in debug mode causes Cargo to discard cached build artifacts and redundantly recompile the entire project in release mode, drastically inflating CI times.
+**Action:** Always ensure that `cargo build` and `cargo test` use the same profile (e.g., both debug or both release) in fast Cargo CI workflows to fully utilize cached artifacts and avoid redundant recompilation.
