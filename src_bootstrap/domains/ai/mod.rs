@@ -29,12 +29,16 @@ impl FromStr for AIProvider {
     type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s.to_lowercase().as_str() {
-            "openai" => Ok(AIProvider::OpenAI),
-            "anthropic" => Ok(AIProvider::Anthropic),
-            "google" => Ok(AIProvider::Google),
-            "local" => Ok(AIProvider::Local),
-            _ => Ok(AIProvider::Custom(s.to_string())),
+        if s.eq_ignore_ascii_case("openai") {
+            Ok(AIProvider::OpenAI)
+        } else if s.eq_ignore_ascii_case("anthropic") {
+            Ok(AIProvider::Anthropic)
+        } else if s.eq_ignore_ascii_case("google") {
+            Ok(AIProvider::Google)
+        } else if s.eq_ignore_ascii_case("local") {
+            Ok(AIProvider::Local)
+        } else {
+            Ok(AIProvider::Custom(s.to_string()))
         }
     }
 }

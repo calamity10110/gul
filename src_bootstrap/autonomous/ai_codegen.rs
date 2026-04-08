@@ -98,27 +98,29 @@ impl AiCodeGenerator {
 
     /// Generate code using templates or external runtimes
     fn simulate_code_generation(&self, request: &CodeGenRequest) -> Result<String, String> {
-        // Parse the prompt to understand intent
-        let prompt_lower = request.prompt.to_lowercase();
+        let contains_ignore_case = |needle: &str| -> bool {
+            if needle.is_empty() { return true; }
+            request.prompt.as_bytes().windows(needle.len()).any(|w| w.eq_ignore_ascii_case(needle.as_bytes()))
+        };
 
-        if prompt_lower.contains("function") && prompt_lower.contains("fibonacci") {
+        if contains_ignore_case("function") && contains_ignore_case("fibonacci") {
             Ok(self.generate_fibonacci(&request.language))
-        } else if prompt_lower.contains("sort") {
+        } else if contains_ignore_case("sort") {
             Ok(self.generate_sort(&request.language))
-        } else if prompt_lower.contains("http") && prompt_lower.contains("server") {
+        } else if contains_ignore_case("http") && contains_ignore_case("server") {
             Ok(self.generate_http_server(&request.language))
-        } else if prompt_lower.contains("class") || prompt_lower.contains("struct") {
+        } else if contains_ignore_case("class") || contains_ignore_case("struct") {
             Ok(self.generate_data_structure(&request.language, &request.prompt))
-        } else if prompt_lower.contains("execute") || prompt_lower.contains("run") {
+        } else if contains_ignore_case("execute") || contains_ignore_case("run") {
             // Try to execute code using external runtimes
             self.execute_with_runtime(&request.language, &request.prompt)
-        } else if prompt_lower.contains("ml") || prompt_lower.contains("machine learning") {
+        } else if contains_ignore_case("ml") || contains_ignore_case("machine learning") {
             // Generate ML code template
             self.generate_ml_code(&request.language, &request.prompt)
-        } else if prompt_lower.contains("async") || prompt_lower.contains("concurrent") {
+        } else if contains_ignore_case("async") || contains_ignore_case("concurrent") {
             // Generate async/concurrent code
             self.generate_async_code(&request.language, &request.prompt)
-        } else if prompt_lower.contains("api") || prompt_lower.contains("rest") {
+        } else if contains_ignore_case("api") || contains_ignore_case("rest") {
             // Generate REST API code
             self.generate_api_code(&request.language, &request.prompt)
         } else {

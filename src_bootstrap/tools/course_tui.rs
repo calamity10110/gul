@@ -31,31 +31,24 @@ impl CourseTUI {
                     "\nOptions: [N]ext, [P]revious, [H]ints, [E]xercise, [Q]uit: ",
                 )?;
 
-                match choice.to_lowercase().as_str() {
-                    "n" | "next" => {
-                        if !self.course.next_lesson() {
-                            println!("\n🎉 Congratulations! You've completed all lessons!");
-                            self.show_completion_stats();
-                            break;
-                        }
-                    }
-                    "p" | "prev" | "previous" => {
-                        self.course.previous_lesson();
-                    }
-                    "h" | "hints" => {
-                        self.show_hints = !self.show_hints;
-                    }
-                    "e" | "exercise" => {
-                        self.show_exercise(lesson);
-                    }
-                    "q" | "quit" => {
-                        println!("\nThanks for learning GUL! Keep coding! 🚀");
+                if choice.eq_ignore_ascii_case("n") || choice.eq_ignore_ascii_case("next") {
+                    if !self.course.next_lesson() {
+                        println!("\n🎉 Congratulations! You've completed all lessons!");
+                        self.show_completion_stats();
                         break;
                     }
-                    _ => {
-                        println!("Invalid option. Press Enter to continue...");
-                        let _ = self.get_user_input("")?;
-                    }
+                } else if choice.eq_ignore_ascii_case("p") || choice.eq_ignore_ascii_case("prev") || choice.eq_ignore_ascii_case("previous") {
+                    self.course.previous_lesson();
+                } else if choice.eq_ignore_ascii_case("h") || choice.eq_ignore_ascii_case("hints") {
+                    self.show_hints = !self.show_hints;
+                } else if choice.eq_ignore_ascii_case("e") || choice.eq_ignore_ascii_case("exercise") {
+                    self.show_exercise(lesson);
+                } else if choice.eq_ignore_ascii_case("q") || choice.eq_ignore_ascii_case("quit") {
+                    println!("\nThanks for learning GUL! Keep coding! 🚀");
+                    break;
+                } else {
+                    println!("Invalid option. Press Enter to continue...");
+                    let _ = self.get_user_input("")?;
                 }
             } else {
                 break;
@@ -160,10 +153,9 @@ impl CourseTUI {
 
             let show_solution = self
                 .get_user_input("Show solution? (y/n): ")
-                .unwrap_or_default()
-                .to_lowercase();
+                .unwrap_or_default();
 
-            if show_solution == "y" || show_solution == "yes" {
+            if show_solution.eq_ignore_ascii_case("y") || show_solution.eq_ignore_ascii_case("yes") {
                 println!();
                 println!("✅ Solution:");
                 println!("{}", "─".repeat(70));

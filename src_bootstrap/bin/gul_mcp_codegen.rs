@@ -9,13 +9,16 @@ pub fn generate_v32_code(description: &str, _use_ai: bool) -> Result<String, Str
 }
 
 fn generate_from_template(description: &str) -> String {
-    let desc_lower = description.to_lowercase();
+    let contains_ignore_case = |needle: &str| -> bool {
+        if needle.is_empty() { return true; }
+        description.as_bytes().windows(needle.len()).any(|w| w.eq_ignore_ascii_case(needle.as_bytes()))
+    };
     
-    if desc_lower.contains("api") || desc_lower.contains("web") || desc_lower.contains("rest") {
+    if contains_ignore_case("api") || contains_ignore_case("web") || contains_ignore_case("rest") {
         generate_web_api_template(description)
-    } else if desc_lower.contains("data") || desc_lower.contains("analysis") || desc_lower.contains("csv") {
+    } else if contains_ignore_case("data") || contains_ignore_case("analysis") || contains_ignore_case("csv") {
         generate_data_template(description)
-    } else if desc_lower.contains("embedded") || desc_lower.contains("gpio") || desc_lower.contains("led") {
+    } else if contains_ignore_case("embedded") || contains_ignore_case("gpio") || contains_ignore_case("led") {
         generate_embedded_template(description)
     } else {
         generate_generic_template(description)
