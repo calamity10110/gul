@@ -199,7 +199,8 @@ impl Linter {
                 if i > 0 {
                     result.push('_');
                 }
-                result.push(c.to_lowercase().next().unwrap());
+                // PERF: Bolt - Prevent iterator and allocation overhead by using to_ascii_lowercase directly
+                result.push(c.to_ascii_lowercase());
             } else {
                 result.push(c);
             }

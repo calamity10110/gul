@@ -8,14 +8,20 @@ pub fn generate_v32_code(description: &str, _use_ai: bool) -> Result<String, Str
     Ok(generate_from_template(description))
 }
 
+// PERF: Bolt - Prevent O(N) string allocations during case-insensitive substring searches
+fn contains_ignore_case(haystack: &str, needle: &str) -> bool {
+    if needle.is_empty() {
+        return true;
+    }
+    haystack.as_bytes().windows(needle.len()).any(|w| w.eq_ignore_ascii_case(needle.as_bytes()))
+}
+
 fn generate_from_template(description: &str) -> String {
-    let desc_lower = description.to_lowercase();
-    
-    if desc_lower.contains("api") || desc_lower.contains("web") || desc_lower.contains("rest") {
+    if contains_ignore_case(description, "api") || contains_ignore_case(description, "web") || contains_ignore_case(description, "rest") {
         generate_web_api_template(description)
-    } else if desc_lower.contains("data") || desc_lower.contains("analysis") || desc_lower.contains("csv") {
+    } else if contains_ignore_case(description, "data") || contains_ignore_case(description, "analysis") || contains_ignore_case(description, "csv") {
         generate_data_template(description)
-    } else if desc_lower.contains("embedded") || desc_lower.contains("gpio") || desc_lower.contains("led") {
+    } else if contains_ignore_case(description, "embedded") || contains_ignore_case(description, "gpio") || contains_ignore_case(description, "led") {
         generate_embedded_template(description)
     } else {
         generate_generic_template(description)

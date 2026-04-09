@@ -36,3 +36,7 @@
 ## 2024-05-23 - [Avoid Redundant Release Builds in CI]
 **Learning:** Running `cargo test --release` when previous compilation steps (e.g., `cargo build`) were performed in debug mode causes Cargo to discard cached build artifacts and redundantly recompile the entire project in release mode, drastically inflating CI times.
 **Action:** Always ensure that `cargo build` and `cargo test` use the same profile (e.g., both debug or both release) in fast Cargo CI workflows to fully utilize cached artifacts and avoid redundant recompilation.
+
+## 2024-05-23 - [Avoid Redundant String Lowercasing inside Nested Filtering Loops]
+**Learning:** Using `String::to_lowercase()` inside a hot nested loop for string comparisons forces a heap allocation for every permutation, severely degrading search or filter performance. Calling `.contains` on it does O(N) allocation for searches that could be done zero-allocation.
+**Action:** When performing case-insensitive exact string comparisons inside hot loops in Rust, use the non-allocating standard library method `haystack.as_bytes().windows(needle.len()).any(|w| w.eq_ignore_ascii_case(needle.as_bytes()))`. Always guard against empty search queries.

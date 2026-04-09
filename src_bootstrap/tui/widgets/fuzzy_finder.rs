@@ -72,8 +72,9 @@ pub fn fuzzy_match(pattern: &str, text: &str) -> Option<FuzzyMatch> {
         return Some(FuzzyMatch::new(text));
     }
 
-    let pattern_chars: Vec<char> = pattern.to_lowercase().chars().collect();
-    let text_chars: Vec<char> = text.to_lowercase().chars().collect();
+    // PERF: Bolt - Prevent O(N) String allocations by using direct ascii lowercase mapping
+    let pattern_chars: Vec<char> = pattern.chars().map(|c| c.to_ascii_lowercase()).collect();
+    let text_chars: Vec<char> = text.chars().map(|c| c.to_ascii_lowercase()).collect();
 
     let mut pattern_idx = 0;
     let mut matches = Vec::new();
