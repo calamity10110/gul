@@ -199,7 +199,7 @@ impl Linter {
                 if i > 0 {
                     result.push('_');
                 }
-                result.push(c.to_lowercase().next().unwrap());
+                result.push(c.to_ascii_lowercase());
             } else {
                 result.push(c);
             }

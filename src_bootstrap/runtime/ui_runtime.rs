@@ -307,17 +307,26 @@ impl UiRuntime {
     }
 
     fn parse_color(&self, color_name: &str) -> Color {
-        match color_name.to_lowercase().as_str() {
-            "black" => Color::Black,
-            "red" => Color::Red,
-            "green" => Color::Green,
-            "yellow" => Color::Yellow,
-            "blue" => Color::Blue,
-            "magenta" => Color::Magenta,
-            "cyan" => Color::Cyan,
-            "white" => Color::White,
-            "grey" | "gray" => Color::Grey,
-            _ => Color::White,
+        if color_name.eq_ignore_ascii_case("black") {
+            Color::Black
+        } else if color_name.eq_ignore_ascii_case("red") {
+            Color::Red
+        } else if color_name.eq_ignore_ascii_case("green") {
+            Color::Green
+        } else if color_name.eq_ignore_ascii_case("yellow") {
+            Color::Yellow
+        } else if color_name.eq_ignore_ascii_case("blue") {
+            Color::Blue
+        } else if color_name.eq_ignore_ascii_case("magenta") {
+            Color::Magenta
+        } else if color_name.eq_ignore_ascii_case("cyan") {
+            Color::Cyan
+        } else if color_name.eq_ignore_ascii_case("white") {
+            Color::White
+        } else if color_name.eq_ignore_ascii_case("grey") || color_name.eq_ignore_ascii_case("gray") {
+            Color::Grey
+        } else {
+            Color::White
         }
     }
 

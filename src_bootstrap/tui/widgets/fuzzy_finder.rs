@@ -72,8 +72,8 @@ pub fn fuzzy_match(pattern: &str, text: &str) -> Option<FuzzyMatch> {
         return Some(FuzzyMatch::new(text));
     }
 
-    let pattern_chars: Vec<char> = pattern.to_lowercase().chars().collect();
-    let text_chars: Vec<char> = text.to_lowercase().chars().collect();
+    let pattern_chars: Vec<char> = pattern.chars().map(|c| c.to_ascii_lowercase()).collect();
+    let text_chars: Vec<char> = text.chars().collect();
 
     let mut pattern_idx = 0;
     let mut matches = Vec::new();
@@ -81,7 +81,7 @@ pub fn fuzzy_match(pattern: &str, text: &str) -> Option<FuzzyMatch> {
     let mut consecutive = 0;
 
     for (i, &tc) in text_chars.iter().enumerate() {
-        if pattern_idx < pattern_chars.len() && tc == pattern_chars[pattern_idx] {
+        if pattern_idx < pattern_chars.len() && tc.to_ascii_lowercase() == pattern_chars[pattern_idx] {
             matches.push(i);
             pattern_idx += 1;
 
