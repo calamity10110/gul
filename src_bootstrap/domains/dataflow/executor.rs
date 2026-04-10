@@ -8,7 +8,7 @@ use std::collections::HashMap;
 /// Execution context
 pub struct ExecutionContext {
     /// Values at each port
-    port_values: HashMap<String, Value>,
+    port_values: HashMap<String, HashMap<String, Value>>,
 }
 
 impl ExecutionContext {
@@ -20,14 +20,18 @@ impl ExecutionContext {
 
     /// Set value at a port
     pub fn set_port_value(&mut self, node: &str, port: &str, value: Value) {
-        let key = format!("{}:{}", node, port);
-        self.port_values.insert(key, value);
+        if let Some(inner) = self.port_values.get_mut(node) {
+            inner.insert(port.to_string(), value);
+        } else {
+            let mut inner = HashMap::new();
+            inner.insert(port.to_string(), value);
+            self.port_values.insert(node.to_string(), inner);
+        }
     }
 
     /// Get value at a port
     pub fn get_port_value(&self, node: &str, port: &str) -> Option<&Value> {
-        let key = format!("{}:{}", node, port);
-        self.port_values.get(&key)
+        self.port_values.get(node).and_then(|inner| inner.get(port))
     }
 }
 

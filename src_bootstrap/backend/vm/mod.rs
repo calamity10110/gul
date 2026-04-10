@@ -344,7 +344,11 @@ impl VM {
             if let Some(node) = graph.get_node(*node_id) {
                 for output in &node.outputs {
                     // Placeholder: would collect actual output values
-                    outputs.insert(format!("{}:{}", node.name, output.name), Value::Integer(0));
+                    let mut key = String::with_capacity(node.name.len() + output.name.len() + 1);
+                    key.push_str(&node.name);
+                    key.push(':');
+                    key.push_str(&output.name);
+                    outputs.insert(key, Value::Integer(0));
                 }
             }
         }
