@@ -36,3 +36,11 @@
 ## 2024-05-23 - [Avoid Redundant Release Builds in CI]
 **Learning:** Running `cargo test --release` when previous compilation steps (e.g., `cargo build`) were performed in debug mode causes Cargo to discard cached build artifacts and redundantly recompile the entire project in release mode, drastically inflating CI times.
 **Action:** Always ensure that `cargo build` and `cargo test` use the same profile (e.g., both debug or both release) in fast Cargo CI workflows to fully utilize cached artifacts and avoid redundant recompilation.
+
+## 2024-05-25 - [Run CI Benchmarks in Dev Profile]
+**Learning:** In CI pipelines, running `cargo bench` defaults to the release profile. Executing it immediately after debug builds (like `cargo build` or `cargo test`) discards cached artifacts and triggers redundant full workspace recompilations just to check benchmark validity.
+**Action:** When the goal is just to test if benchmarks compile and run successfully (e.g., in CI validation checks), always use `cargo bench --profile dev` (or `cargo test --benches`) to verify benchmark code correctness without wasteful release compilation times.
+
+## 2024-05-25 - [Avoid String formatting for Composite Keys]
+**Learning:** Using `format!("{}:{}", a, b)` frequently inside hot loops or getters to construct composite map keys is a significant performance bottleneck due to continuous `String` allocations.
+**Action:** To avoid excessive `String` allocations, either redesign the data structure to use nested maps (e.g., `HashMap<String, HashMap<String, Value>>`), or if a flat map is strictly necessary, construct the composite key manually by pre-allocating the string (e.g., `let mut key = String::with_capacity(a.len() + b.len() + 1); key.push_str(a); key.push(':'); key.push_str(b);`).
