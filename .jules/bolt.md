@@ -44,3 +44,7 @@
 ## 2024-05-25 - [Avoid String formatting for Composite Keys]
 **Learning:** Using `format!("{}:{}", a, b)` frequently inside hot loops or getters to construct composite map keys is a significant performance bottleneck due to continuous `String` allocations.
 **Action:** To avoid excessive `String` allocations, either redesign the data structure to use nested maps (e.g., `HashMap<String, HashMap<String, Value>>`), or if a flat map is strictly necessary, construct the composite key manually by pre-allocating the string (e.g., `let mut key = String::with_capacity(a.len() + b.len() + 1); key.push_str(a); key.push(':'); key.push_str(b);`).
+
+## 2024-04-10 - [Optimize `cargo bench` execution in CI pipelines]
+**Learning:** `cargo bench` defaults to compiling in the release profile. Executing it in CI directly after a `cargo build` or `cargo test` (which default to debug profile) discards cached artifacts and triggers redundant full workspace recompilations.
+**Action:** Use `cargo bench --profile dev` (or `cargo test --benches`) in CI pipelines to verify benchmark code correctness using existing debug build artifacts without wasteful release compilation times.
