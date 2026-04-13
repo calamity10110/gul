@@ -130,7 +130,8 @@ jobs:
           for package in packages/*/*; do
             if [ -d "$package" ] && [ -d "$package/benches" ]; then
               cd "$package"
-              cargo bench --no-fail-fast || echo "Benchmark failed for $package"
+              # ⚡ Bolt: Run as tests instead of full benchmarks to save CI time
+              cargo test --benches --no-fail-fast || echo "Benchmark failed for $package"
               cd -
               found=true
             fi
