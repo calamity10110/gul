@@ -37,11 +37,16 @@ impl CourseTUI {
                         self.show_completion_stats();
                         break;
                     }
-                } else if choice.eq_ignore_ascii_case("p") || choice.eq_ignore_ascii_case("prev") || choice.eq_ignore_ascii_case("previous") {
+                } else if choice.eq_ignore_ascii_case("p")
+                    || choice.eq_ignore_ascii_case("prev")
+                    || choice.eq_ignore_ascii_case("previous")
+                {
                     self.course.previous_lesson();
                 } else if choice.eq_ignore_ascii_case("h") || choice.eq_ignore_ascii_case("hints") {
                     self.show_hints = !self.show_hints;
-                } else if choice.eq_ignore_ascii_case("e") || choice.eq_ignore_ascii_case("exercise") {
+                } else if choice.eq_ignore_ascii_case("e")
+                    || choice.eq_ignore_ascii_case("exercise")
+                {
                     self.show_exercise(lesson);
                 } else if choice.eq_ignore_ascii_case("q") || choice.eq_ignore_ascii_case("quit") {
                     println!("\nThanks for learning GUL! Keep coding! 🚀");
@@ -155,7 +160,8 @@ impl CourseTUI {
                 .get_user_input("Show solution? (y/n): ")
                 .unwrap_or_default();
 
-            if show_solution.eq_ignore_ascii_case("y") || show_solution.eq_ignore_ascii_case("yes") {
+            if show_solution.eq_ignore_ascii_case("y") || show_solution.eq_ignore_ascii_case("yes")
+            {
                 println!();
                 println!("✅ Solution:");
                 println!("{}", "─".repeat(70));

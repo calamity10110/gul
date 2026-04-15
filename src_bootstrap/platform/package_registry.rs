@@ -109,12 +109,20 @@ impl PackageRegistry {
         self.packages
             .values()
             .filter(|pkg| {
-                pkg.name.as_bytes().windows(q_len).any(|w| w.eq_ignore_ascii_case(query_bytes))
-                    || pkg.description.as_bytes().windows(q_len).any(|w| w.eq_ignore_ascii_case(query_bytes))
+                pkg.name
+                    .as_bytes()
+                    .windows(q_len)
+                    .any(|w| w.eq_ignore_ascii_case(query_bytes))
                     || pkg
-                        .keywords
-                        .iter()
-                        .any(|k| k.as_bytes().windows(q_len).any(|w| w.eq_ignore_ascii_case(query_bytes)))
+                        .description
+                        .as_bytes()
+                        .windows(q_len)
+                        .any(|w| w.eq_ignore_ascii_case(query_bytes))
+                    || pkg.keywords.iter().any(|k| {
+                        k.as_bytes()
+                            .windows(q_len)
+                            .any(|w| w.eq_ignore_ascii_case(query_bytes))
+                    })
             })
             .collect()
     }

@@ -130,8 +130,8 @@ jobs:
           for package in packages/*/*; do
             if [ -d "$package" ] && [ -d "$package/benches" ]; then
               cd "$package"
-              # ⚡ Bolt: Use dev profile to avoid redundant release recompilations after debug build
-              cargo bench --profile dev --no-fail-fast || echo "Benchmark failed for $package"
+              # ⚡ Bolt: Use test --benches to verify benchmark code correctness without executing mathematically meaningless unoptimized loops
+              cargo test --benches --no-fail-fast || echo "Benchmark failed for $package"
               cd -
               found=true
             fi
@@ -158,18 +158,8 @@ jobs:
 
       - name: Generate package docs
         run: |
-          found=false
-          for package in packages/*/*; do
-            if [ -d "$package" ] && [ -f "$package/Cargo.toml" ]; then
-              cd "$package"
-              cargo doc --no-deps --all-features || echo "Doc generation failed for $package"
-              cd -
-              found=true
-            fi
-          done
-          if [ "$found" = false ]; then
-            echo "No packages with Cargo.toml found, skipping doc generation"
-          fi
+          # ⚡ Bolt: Use --workspace to avoid redundant Cargo initialization and dependency resolution overhead per package
+          cargo doc --workspace --no-deps --all-features || echo "Doc generation failed"
 
       - name: Generate API reference
         run: |

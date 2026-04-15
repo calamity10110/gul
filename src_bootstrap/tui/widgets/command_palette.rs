@@ -60,9 +60,20 @@ impl<'a> CommandPaletteWidget<'a> {
         self.commands
             .iter()
             .filter(|cmd| {
-                cmd.name.as_bytes().windows(q_len).any(|w| w.eq_ignore_ascii_case(query_bytes))
-                    || cmd.description.as_bytes().windows(q_len).any(|w| w.eq_ignore_ascii_case(query_bytes))
-                    || cmd.category.as_bytes().windows(q_len).any(|w| w.eq_ignore_ascii_case(query_bytes))
+                cmd.name
+                    .as_bytes()
+                    .windows(q_len)
+                    .any(|w| w.eq_ignore_ascii_case(query_bytes))
+                    || cmd
+                        .description
+                        .as_bytes()
+                        .windows(q_len)
+                        .any(|w| w.eq_ignore_ascii_case(query_bytes))
+                    || cmd
+                        .category
+                        .as_bytes()
+                        .windows(q_len)
+                        .any(|w| w.eq_ignore_ascii_case(query_bytes))
             })
             .collect()
     }

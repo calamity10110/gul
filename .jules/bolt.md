@@ -48,3 +48,11 @@
 ## 2024-04-10 - [Optimize `cargo bench` execution in CI pipelines]
 **Learning:** `cargo bench` defaults to compiling in the release profile. Executing it in CI directly after a `cargo build` or `cargo test` (which default to debug profile) discards cached artifacts and triggers redundant full workspace recompilations.
 **Action:** Use `cargo bench --profile dev` (or `cargo test --benches`) in CI pipelines to verify benchmark code correctness using existing debug build artifacts without wasteful release compilation times.
+
+## 2024-05-26 - [Use `cargo doc --workspace` instead of bash loops]
+**Learning:** Running `cargo doc` inside a bash loop that iterates over multiple individual packages causes massive overhead. Cargo re-initializes, re-resolves dependencies, and re-evaluates the dependency graph for every single package, severely inflating CI documentation build times.
+**Action:** Always generate documentation for an entire workspace at once using `cargo doc --workspace` (or `--all`) to eliminate redundant initialization and dependency resolution overhead.
+
+## 2024-05-26 - [Avoid `cargo bench --profile dev` in CI]
+**Learning:** Using `cargo bench --profile dev` in CI correctly avoids redundant release compilation times, but it still actually executes the benchmark code. Running benchmark loops in debug mode is mathematically meaningless, completely unoptimized, and extremely slow (sometimes taking minutes just to spin in loops).
+**Action:** When you only need to verify that benchmark code compiles and doesn't panic in CI, use `cargo test --benches`. This compiles the benchmark harness as test executables and runs them exactly once without executing the slow iteration loops.
