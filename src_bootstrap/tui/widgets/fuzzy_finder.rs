@@ -81,7 +81,9 @@ pub fn fuzzy_match(pattern: &str, text: &str) -> Option<FuzzyMatch> {
     let mut consecutive = 0;
 
     for (i, &tc) in text_chars.iter().enumerate() {
-        if pattern_idx < pattern_chars.len() && tc.to_ascii_lowercase() == pattern_chars[pattern_idx] {
+        if pattern_idx < pattern_chars.len()
+            && tc.to_ascii_lowercase() == pattern_chars[pattern_idx]
+        {
             matches.push(i);
             pattern_idx += 1;
 

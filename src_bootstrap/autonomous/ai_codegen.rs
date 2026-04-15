@@ -99,8 +99,14 @@ impl AiCodeGenerator {
     /// Generate code using templates or external runtimes
     fn simulate_code_generation(&self, request: &CodeGenRequest) -> Result<String, String> {
         let contains_ignore_case = |needle: &str| -> bool {
-            if needle.is_empty() { return true; }
-            request.prompt.as_bytes().windows(needle.len()).any(|w| w.eq_ignore_ascii_case(needle.as_bytes()))
+            if needle.is_empty() {
+                return true;
+            }
+            request
+                .prompt
+                .as_bytes()
+                .windows(needle.len())
+                .any(|w| w.eq_ignore_ascii_case(needle.as_bytes()))
         };
 
         if contains_ignore_case("function") && contains_ignore_case("fibonacci") {

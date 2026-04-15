@@ -323,7 +323,8 @@ impl UiRuntime {
             Color::Cyan
         } else if color_name.eq_ignore_ascii_case("white") {
             Color::White
-        } else if color_name.eq_ignore_ascii_case("grey") || color_name.eq_ignore_ascii_case("gray") {
+        } else if color_name.eq_ignore_ascii_case("grey") || color_name.eq_ignore_ascii_case("gray")
+        {
             Color::Grey
         } else {
             Color::White
