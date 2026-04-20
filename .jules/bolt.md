@@ -56,3 +56,7 @@
 ## 2024-05-26 - [Avoid `cargo bench --profile dev` in CI]
 **Learning:** Using `cargo bench --profile dev` in CI correctly avoids redundant release compilation times, but it still actually executes the benchmark code. Running benchmark loops in debug mode is mathematically meaningless, completely unoptimized, and extremely slow (sometimes taking minutes just to spin in loops).
 **Action:** When you only need to verify that benchmark code compiles and doesn't panic in CI, use `cargo test --benches`. This compiles the benchmark harness as test executables and runs them exactly once without executing the slow iteration loops.
+
+## 2024-05-27 - [Avoid Replacing Non-Allocating HashMap::entry with get_mut + insert]
+**Learning:** While replacing `map.entry(key.clone()).or_insert()` with `get_mut()` is a valid optimization to avoid cloning, replacing `.entry()` with `get_mut()` + `insert()` when the key is *already* a non-allocating reference (like `&str`) is an anti-optimization. It forces the hash map to compute the hash and traverse buckets twice on insertion, whereas `.entry()` handles both lookup and insertion in a single efficient pass.
+**Action:** Never replace `HashMap::entry` with a manual check and insert if the key passed to `entry` does not involve an allocation (e.g., it is a `&str`). Only optimize away `.entry()` when it explicitly requires a `.clone()` or `.to_string()`.

@@ -83,7 +83,10 @@ impl PackageRegistry {
 
     /// Download a package
     pub fn download_package(&mut self, name: &str, version: &str) -> Result<Package, String> {
-        let key = format!("{}@{}", name, version);
+        let mut key = String::with_capacity(name.len() + version.len() + 1);
+        key.push_str(name);
+        key.push('@');
+        key.push_str(version);
 
         match self.packages.get(&key) {
             Some(package) => {
@@ -148,7 +151,10 @@ impl PackageRegistry {
         package_name: &str,
         version: &str,
     ) -> Result<Vec<String>, String> {
-        let key = format!("{}@{}", package_name, version);
+        let mut key = String::with_capacity(package_name.len() + version.len() + 1);
+        key.push_str(package_name);
+        key.push('@');
+        key.push_str(version);
 
         match self.packages.get(&key) {
             Some(package) => {
@@ -164,7 +170,10 @@ impl PackageRegistry {
 
                 while let Some((name, ver)) = to_resolve.pop() {
                     if visited.insert((name, ver)) {
-                        let dep_key = format!("{}@{}", name, ver);
+                        let mut dep_key = String::with_capacity(name.len() + ver.len() + 1);
+                        dep_key.push_str(name);
+                        dep_key.push('@');
+                        dep_key.push_str(ver);
 
                         if let Some(dep_pkg) = self.packages.get(&dep_key) {
                             for (dep_name, dep_ver) in &dep_pkg.dependencies {
@@ -219,7 +228,10 @@ impl PackageRegistry {
 
     /// Get package statistics
     pub fn get_stats(&self, package_name: &str, version: &str) -> Option<PackageStats> {
-        let key = format!("{}@{}", package_name, version);
+        let mut key = String::with_capacity(package_name.len() + version.len() + 1);
+        key.push_str(package_name);
+        key.push('@');
+        key.push_str(version);
 
         self.packages.get(&key).map(|pkg| PackageStats {
             name: pkg.name.clone(),
