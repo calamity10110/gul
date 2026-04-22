@@ -166,7 +166,11 @@ impl PackageDatabase {
 
     pub async fn insert_package(&self, package: Package) -> Result<(), String> {
         // Update cache
-        let key = format!("{}@{}", package.name, package.version);
+        // PERF: Avoid format! macro for hot path composite key generation to eliminate massive redundant heap allocations
+        let mut key = String::with_capacity(package.name.len() + package.version.len() + 1);
+        key.push_str(&package.name);
+        key.push('@');
+        key.push_str(&package.version);
         let mut cache = self.cache.write().await;
         cache.insert(key, package.clone());
 
@@ -188,7 +192,11 @@ impl PackageDatabase {
     }
 
     pub async fn get_package(&self, name: &str, version: &str) -> Result<Package, String> {
-        let key = format!("{}@{}", name, version);
+        // PERF: Avoid format! macro for hot path composite key generation to eliminate massive redundant heap allocations
+        let mut key = String::with_capacity(name.len() + version.len() + 1);
+        key.push_str(name);
+        key.push('@');
+        key.push_str(version);
 
         // Check cache first
         {
@@ -235,7 +243,11 @@ impl PackageDatabase {
     }
 
     pub async fn increment_downloads(&self, name: &str, version: &str) -> Result<(), String> {
-        let key = format!("{}@{}", name, version);
+        // PERF: Avoid format! macro for hot path composite key generation to eliminate massive redundant heap allocations
+        let mut key = String::with_capacity(name.len() + version.len() + 1);
+        key.push_str(name);
+        key.push('@');
+        key.push_str(version);
         let mut cache = self.cache.write().await;
 
         if let Some(pkg) = cache.get_mut(&key) {

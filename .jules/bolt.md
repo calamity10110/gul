@@ -60,3 +60,6 @@
 ## 2024-05-27 - [Avoid Replacing Non-Allocating HashMap::entry with get_mut + insert]
 **Learning:** While replacing `map.entry(key.clone()).or_insert()` with `get_mut()` is a valid optimization to avoid cloning, replacing `.entry()` with `get_mut()` + `insert()` when the key is *already* a non-allocating reference (like `&str`) is an anti-optimization. It forces the hash map to compute the hash and traverse buckets twice on insertion, whereas `.entry()` handles both lookup and insertion in a single efficient pass.
 **Action:** Never replace `HashMap::entry` with a manual check and insert if the key passed to `entry` does not involve an allocation (e.g., it is a `&str`). Only optimize away `.entry()` when it explicitly requires a `.clone()` or `.to_string()`.
+## 2024-05-27 - [Avoid format! Macro for Composite Keys]
+**Learning:** Using `format!("{}@{}", name, version)` inside frequent data access functions (like `get_package`, `insert_package`, and `increment_downloads`) forces redundant heap allocations and negatively impacts performance, especially in caching layers.
+**Action:** Replace `format!` macros used for composite key generation on hot paths with a manually pre-allocated string using `String::with_capacity` and `push_str()`. This ensures only a single heap allocation occurs per key generation.
