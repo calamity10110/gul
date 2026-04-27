@@ -49,7 +49,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Build GUL
-        run: cargo build
+        run: cargo build -p gul
 
       - name: Install Python dependencies
         run: pip install pytest numpy pandas

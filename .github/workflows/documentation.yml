@@ -46,7 +46,7 @@ jobs:
           key: ubuntu-latest
 
       - name: Build GUL Compiler
-        run: cargo build
+        run: cargo build -p gul
 
       - name: Setup Python
         uses: actions/setup-python@v5
