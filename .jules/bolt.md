@@ -63,3 +63,7 @@
 ## 2024-05-27 - [Avoid format! Macro for Composite Keys]
 **Learning:** Using `format!("{}@{}", name, version)` inside frequent data access functions (like `get_package`, `insert_package`, and `increment_downloads`) forces redundant heap allocations and negatively impacts performance, especially in caching layers.
 **Action:** Replace `format!` macros used for composite key generation on hot paths with a manually pre-allocated string using `String::with_capacity` and `push_str()`. This ensures only a single heap allocation occurs per key generation.
+
+## 2024-05-28 - [Targeted Cargo Builds in CI]
+**Learning:** In monolithic workspaces, running a blanket `cargo build` command in CI jobs that only need a specific binary (like documentation generation or interoperability testing) triggers redundant compilation of all workspace members and compiler targets, drastically inflating CI times.
+**Action:** Always replace blanket `cargo build` commands with targeted builds (e.g., `cargo build -p gul`) in CI workflows that only require a specific artifact.
